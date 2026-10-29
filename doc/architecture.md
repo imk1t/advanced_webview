@@ -22,6 +22,8 @@ lib/
 pigeons/messages.dart          Dart⇔ネイティブの契約（唯一の定義元）
 android/.../                   Kotlin 実装（MobileWebView, Registry, HostApiImpl, Factory）
 ios/flutter_mobile_webview/Sources/...   Swift 実装（同じ構成）
+ios/flutter_mobile_webview/Package.swift Swift Package Manager 用マニフェスト
+ios/flutter_mobile_webview.podspec       CocoaPods 用（Package.swift と同じソースを参照）
 ```
 
 Android と iOS は **同じクラス構成・同じ名前** に揃えている。片方を直したらもう片方の同名ファイルを見ればよい。

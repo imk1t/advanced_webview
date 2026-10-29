@@ -14,6 +14,10 @@ Android と iOS に絞った、Pigeon ベースの型安全な Flutter WebView �
 | --- | --- |
 | API 24+ | iOS 15+ |
 
+iOS は Swift Package Manager と CocoaPods の両方に対応しています。
+Flutter の設定（`flutter config --enable-swift-package-manager` /
+`--no-enable-swift-package-manager`）に応じてどちらでもビルドされ、利用側で追加の作業は不要です。
+
 ## 使い方
 
 ```dart
