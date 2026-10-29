@@ -63,6 +63,9 @@ Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
 - **Keep Android and iOS mirrored.** Both platforms use the same class names
   (`MobileWebView`, `WebViewRegistry`, `WebViewHostApiImpl`, `MobileWebViewFactory`,
   `MobileWebViewPlugin`). A change on one side normally needs the same change on the other.
+- **iOS supports both Swift Package Manager and CocoaPods.** Keep
+  `ios/flutter_mobile_webview/Package.swift` and `ios/flutter_mobile_webview.podspec` in
+  sync (minimum iOS version, sources, resources). CI builds the example with each.
 - Only symbols exported from `lib/flutter_mobile_webview.dart` are public API.
 - Format Dart code with `fvm dart format` (generated `*.g.dart` files are excluded).
 - Add or update tests for behaviour changes (`test/` uses a fake HostApi).

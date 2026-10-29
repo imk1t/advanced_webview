@@ -18,6 +18,10 @@ For design decisions (such as why Pigeon was chosen), see
 | --- | --- |
 | API 24+ | iOS 15+ |
 
+On iOS, both Swift Package Manager and CocoaPods are supported. The plugin builds with
+either, depending on your Flutter setting (`flutter config --enable-swift-package-manager` /
+`--no-enable-swift-package-manager`); no extra setup is needed in your app.
+
 ## Usage
 
 ```dart
