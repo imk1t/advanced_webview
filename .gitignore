@@ -32,9 +32,11 @@ migrate_working_dir/
 /build/
 /coverage/
 
-# APM (Agent Package Manager): downloaded packages and local verifier venv.
-# Deployed skills (.agents/, .claude/skills/), MCP config (.mcp.json, .codex/)
-# and apm.lock.yaml are committed so agents work on a fresh checkout.
+# APM (Agent Package Manager): outputs of `apm install`. Only apm.yml, apm.lock.yaml,
+# apm-policy.yml and .apm/ are committed.
 apm_modules/
 .venv-apm/
-.claude/settings.local.json
+.agents/
+.claude/
+.codex/
+.mcp.json

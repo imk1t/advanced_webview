@@ -108,15 +108,16 @@ Agent configuration is managed with Microsoft's
   (`dart`, plus `context7` from apm-shared). These skills defer to the rules in this file.
 - Project-specific skills live in `.apm/skills/` (e.g. `pigeon-contract`).
 - `apm install` deploys skills to `.agents/skills/` and `.claude/skills/`, and MCP config to
-  `.mcp.json` and `.codex/config.toml`. These outputs and `apm.lock.yaml` are committed;
-  never edit them or the lock hashes by hand.
+  `.mcp.json` and `.codex/config.toml`. These outputs are git-ignored; only `apm.yml`,
+  `apm.lock.yaml`, `apm-policy.yml` and `.apm/` are committed. Never edit the lock hashes by hand.
 - `apm-policy.yml` is enforced in CI (`.github/workflows/apm.yml`) by the apm-shared verifier.
 
-To change agent configuration, edit `apm.yml` or `.apm/skills/`, then:
+Setup after cloning, and after changing `apm.yml` or `.apm/skills/`:
 
 ```sh
 pip install apm-cli==0.33.0
-apm install --target agent-skills,claude,codex   # regenerates outputs and apm.lock.yaml
+apm install --frozen --target agent-skills,claude,codex   # deploy from the committed lock
+apm install --target agent-skills,claude,codex            # after changing apm.yml / .apm/: updates apm.lock.yaml
 ```
 
-Commit the regenerated files together with the change.
+Commit `apm.lock.yaml` together with the change.
