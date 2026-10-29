@@ -12,6 +12,7 @@
 
 - [ ] `flutter analyze` and `flutter test` pass locally
 - [ ] Dart code is formatted with `dart format`
+- [ ] Kotlin passes `ktlint` and Swift passes `swift format lint --strict` (if native code changed)
 - [ ] If `pigeons/messages.dart` changed, generated code was regenerated and committed
 - [ ] Android and iOS implementations are kept in sync (same class / method names)
 - [ ] Tests added or updated for behaviour changes

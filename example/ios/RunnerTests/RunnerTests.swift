@@ -78,7 +78,8 @@ final class RunnerTests: XCTestCase {
     try hostApi.create(
       params: params(
         webViewId: 1,
-        settings: settings(mediaPlaybackRequiresUserGesture: false, allowsInlineMediaPlayback: true)))
+        settings: settings(mediaPlaybackRequiresUserGesture: false, allowsInlineMediaPlayback: true)
+      ))
 
     let configuration = try registry.get(1).webView.configuration
     XCTAssertTrue(configuration.allowsInlineMediaPlayback)

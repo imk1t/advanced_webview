@@ -9,8 +9,7 @@ class WebViewRegistry {
         instances[instance.id] = instance
     }
 
-    fun get(id: Long): MobileWebView =
-        instances[id] ?: throw FlutterError("not-found", "No WebView with id $id", null)
+    fun get(id: Long): MobileWebView = instances[id] ?: throw FlutterError("not-found", "No WebView with id $id", null)
 
     fun remove(id: Long): MobileWebView? = instances.remove(id)
 

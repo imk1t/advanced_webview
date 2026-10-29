@@ -1,0 +1,25 @@
+# Read by ktlint (Kotlin) and most editors. Swift formatting is configured in
+# .swift-format; Dart formatting is `dart format` defaults.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+indent_style = space
+indent_size = 4
+# Kotlin coding conventions (the style IntelliJ IDEA / Android Studio apply).
+ktlint_code_style = intellij_idea
+max_line_length = 120
+# Flutter plugin packages are named after the Dart package (dev.k1t.flutter_mobile_webview),
+# which requires underscores.
+ktlint_standard_package-name = disabled
+
+# Pigeon output is excluded on the command line as well; keep editors from
+# rewriting it.
+[*.g.{kt,swift,dart}]
+insert_final_newline = unset
+trim_trailing_whitespace = unset
