@@ -15,8 +15,9 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      # Pigeon output (*.g.dart) is committed as generated and not reformatted.
       - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib test example/lib example/integration_test pigeons
+        run: dart format --output=none --set-exit-if-changed $(git ls-files '*.dart' | grep -v '\.g\.dart$')
       - name: Check Pigeon output is up to date
         run: |
           dart run pigeon --input pigeons/messages.dart
