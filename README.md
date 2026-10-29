@@ -6,7 +6,7 @@
 Android と iOS に絞った、Pigeon ベースの型安全な Flutter WebView プラグインです。
 `flutter_inappwebview` の機能設計を参考にしつつ、小さな公開APIと1か所に集約したプラットフォーム契約で保守性を優先しています。
 
-設計判断（Pigeon 採用理由など）は [docs/architecture.md](docs/architecture.md) を参照してください。
+設計判断（Pigeon 採用理由など）は [doc/architecture.md](doc/architecture.md) を参照してください。
 
 ## 対応プラットフォーム
 

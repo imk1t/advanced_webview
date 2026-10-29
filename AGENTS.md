@@ -9,7 +9,7 @@ rules below are the same, written for agents.
 `flutter_mobile_webview` is a Flutter WebView plugin for **Android and iOS only**, built
 on [Pigeon](https://pub.dev/packages/pigeon). It borrows feature ideas from
 `flutter_inappwebview` but optimises for a small public API and maintainability.
-Design rationale (Japanese): [docs/architecture.md](docs/architecture.md). Read it
+Design rationale (Japanese): [doc/architecture.md](doc/architecture.md). Read it
 before changing the architecture.
 
 Do not add Web, macOS, Windows or Linux support.
@@ -86,7 +86,7 @@ claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both p
 - Dart: `flutter_lints` (see `analysis_options.yaml`), `dart format` default width.
 - Kotlin: official Kotlin style, coroutines (`suspend`) for async HostApi methods.
 - Swift: Swift API Design Guidelines, `async` for async HostApi methods.
-- Code comments and dartdoc in English. Docs under `docs/` may be Japanese.
+- Code comments and dartdoc in English. Docs under `doc/` may be Japanese.
 
 ## Pull requests
 

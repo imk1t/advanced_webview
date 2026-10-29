@@ -3,7 +3,7 @@ description: "A lean, type-safe WebView plugin for Android and iOS built on Pige
 version: 0.0.1
 repository: https://github.com/imk1t/flutter_mobile_webview
 issue_tracker: https://github.com/imk1t/flutter_mobile_webview/issues
-documentation: https://github.com/imk1t/flutter_mobile_webview/blob/main/docs/architecture.md
+documentation: https://github.com/imk1t/flutter_mobile_webview/blob/main/doc/architecture.md
 topics:
   - webview
   - browser
@@ -18,6 +18,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  meta: ^1.11.0
 
 dev_dependencies:
   flutter_test:

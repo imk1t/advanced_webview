@@ -9,7 +9,7 @@ English or Japanese (日本語での Issue / PR も歓迎します).
 - For anything larger than a small fix (new APIs, behaviour changes), open an issue
   to discuss the design before writing code. The goal of this package is a **small,
   maintainable API for Android and iOS only**; please read
-  [docs/architecture.md](docs/architecture.md) to understand the design decisions.
+  [doc/architecture.md](doc/architecture.md) to understand the design decisions.
 - Web, macOS, Windows and Linux support is out of scope.
 
 ## Development setup
