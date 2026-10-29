@@ -124,6 +124,9 @@ jobs:
       - name: Swift unit tests (XCTest)
         working-directory: example/ios
         run: |
+          # `flutter test` leaves Generated.xcconfig pointing at its temporary
+          # test entrypoint; reset it to the app before building with Xcode.
+          (cd .. && flutter build ios --config-only --simulator --debug)
           xcodebuild test \
             -workspace Runner.xcworkspace \
             -scheme Runner \
