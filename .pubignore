@@ -45,3 +45,5 @@ apm_modules/
 .codex/
 .mcp.json
 .venv-apm/
+.fvmrc
+.fvm/

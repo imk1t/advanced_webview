@@ -40,3 +40,6 @@ apm_modules/
 .claude/
 .codex/
 .mcp.json
+
+# FVM (Flutter version is pinned in .fvmrc)
+.fvm/

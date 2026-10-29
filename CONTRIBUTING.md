@@ -14,13 +14,13 @@ English or Japanese (日本語での Issue / PR も歓迎します).
 
 ## Development setup
 
-Requirements: Flutter (stable channel), Xcode for iOS, Android SDK + JDK 17 for Android.
+Requirements: [FVM](https://fvm.app) (the Flutter version is pinned in `.fvmrc`; run `fvm install` once), Xcode for iOS, Android SDK + JDK 17 for Android. All commands below go through `fvm`.
 
 ```sh
-flutter pub get
-flutter analyze
-flutter test                                    # Dart unit tests
-cd example && flutter test integration_test     # on a device or simulator
+fvm flutter pub get
+fvm flutter analyze
+fvm flutter test                                    # Dart unit tests
+cd example && fvm flutter test integration_test     # on a device or simulator
 ```
 
 ## Project rules
@@ -29,7 +29,7 @@ cd example && flutter test integration_test     # on a device or simulator
   regenerate the bindings and commit the generated files:
 
   ```sh
-  dart run pigeon --input pigeons/messages.dart
+  fvm dart run pigeon --input pigeons/messages.dart
   ```
 
   Never edit `*.g.dart`, `Messages.g.kt` or `Messages.g.swift` by hand. CI fails if
@@ -38,7 +38,7 @@ cd example && flutter test integration_test     # on a device or simulator
   (`MobileWebView`, `WebViewRegistry`, `WebViewHostApiImpl`, `MobileWebViewFactory`,
   `MobileWebViewPlugin`). A change on one side normally needs the same change on the other.
 - Only symbols exported from `lib/flutter_mobile_webview.dart` are public API.
-- Format Dart code with `dart format` (generated `*.g.dart` files are excluded).
+- Format Dart code with `fvm dart format` (generated `*.g.dart` files are excluded).
 - Add or update tests for behaviour changes (`test/` uses a fake HostApi).
 - Update `CHANGELOG.md` under `## Unreleased` for user-visible changes.
 
@@ -46,7 +46,7 @@ cd example && flutter test integration_test     # on a device or simulator
 
 1. Fork the repository and create a branch from `main`.
 2. Make your change, keeping the PR focused on one topic.
-3. Make sure `flutter analyze`, `flutter test` and formatting pass locally.
+3. Make sure `fvm flutter analyze`, `fvm flutter test` and formatting pass locally.
 4. Fill in the pull request template. CI builds the example app for Android and iOS.
 
 By contributing, you agree that your contributions will be licensed under the

@@ -33,18 +33,23 @@ example/                           Example app + integration_test
 
 ## Commands
 
+Flutter is managed with [FVM](https://fvm.app); the version is pinned in `.fvmrc`.
+Always run Flutter and Dart through `fvm` (run `fvm install` once after cloning).
+To upgrade Flutter, use `fvm use <version>` and commit `.fvmrc`; CI reads the same file.
+
 ```sh
-flutter pub get
-dart format $(git ls-files '*.dart' | grep -v '\.g\.dart$')
-flutter analyze
-flutter test
-dart run pigeon --input pigeons/messages.dart   # after editing pigeons/messages.dart
-flutter pub publish --dry-run                   # package validation
-cd example && flutter build apk --debug         # Android build check
-cd example && flutter build ios --simulator --debug  # iOS build check (macOS only)
+fvm install                                     # install the pinned Flutter
+fvm flutter pub get
+fvm dart format $(git ls-files '*.dart' | grep -v '\.g\.dart$')
+fvm flutter analyze
+fvm flutter test
+fvm dart run pigeon --input pigeons/messages.dart   # after editing pigeons/messages.dart
+fvm flutter pub publish --dry-run                   # package validation
+cd example && fvm flutter build apk --debug         # Android build check
+cd example && fvm flutter build ios --simulator --debug  # iOS build check (macOS only)
 ```
 
-Run `dart format`, `flutter analyze` and `flutter test` before finishing a change.
+Run `fvm dart format`, `fvm flutter analyze` and `fvm flutter test` before finishing a change.
 If Flutter or a platform SDK is not available in your environment, say so instead of
 claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both platforms.
 

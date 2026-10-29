@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 - Add MIT license, community health files, issue/PR templates and pub.dev metadata.
+- Pin Flutter 3.47.8 with FVM (`.fvmrc`); CI uses the same version.
 - Add AI agent configuration (`AGENTS.md`, APM with shared skills from `imk1t/apm-shared`).
 
 ## 0.0.1
