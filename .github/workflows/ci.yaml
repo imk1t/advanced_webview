@@ -213,17 +213,19 @@ jobs:
           channel: stable
           cache: true
       - run: flutter config --no-enable-swift-package-manager
-      - name: Build example app
-        working-directory: example
-        run: flutter build ios --simulator --debug -v
-      - name: Dump Swift package state
-        if: failure()
+      # The example references the plugin as a local Swift package
+      # (../../ios/flutter_mobile_webview) so Xcode can edit its sources. That
+      # package depends on ../FlutterFramework, which only exists when Flutter
+      # links plugins with SwiftPM, so drop the reference to build the way a
+      # regular CocoaPods app does.
+      - name: Remove the plugin's local package reference
         working-directory: example/ios
         run: |
-          cat Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift || true
-          ls -laR Flutter/ephemeral/Packages || true
-          ls -la .symlinks/plugins || true
-          cat Podfile || true
+          sed -i '' '/\/\* flutter_mobile_webview \*\//d' Runner.xcodeproj/project.pbxproj
+          if grep -q 'flutter_mobile_webview' Runner.xcodeproj/project.pbxproj; then exit 1; fi
+      - name: Build example app
+        working-directory: example
+        run: flutter build ios --simulator --debug
       - name: Check the plugin was built with CocoaPods
         working-directory: example
         run: |
