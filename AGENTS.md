@@ -119,8 +119,17 @@ Agent configuration is managed with Microsoft's
 
 Setup after cloning, and after changing `apm.yml` or `.apm/skills/`:
 
+Install the APM CLI with Homebrew. The lock and CI are pinned to APM 0.33.0, so check the
+version; if Homebrew provides a different one, use the official installer pinned to it
+(in CI or containers without Homebrew, `pip install apm-cli==0.33.0` also works):
+
 ```sh
-pip install apm-cli==0.33.0
+brew install apm
+apm --version                                   # must be 0.33.0
+# otherwise: curl -sSL https://aka.ms/apm-unix | sh -s -- @v0.33.0
+```
+
+```sh
 apm install --frozen --target agent-skills,claude,codex   # deploy from the committed lock
 apm install --target agent-skills,claude,codex            # after changing apm.yml / .apm/: updates apm.lock.yaml
 ```
