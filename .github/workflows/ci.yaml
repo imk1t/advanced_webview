@@ -114,7 +114,13 @@ jobs:
                       | select(.name | startswith("iPhone"))] | last | .udid')
           echo "Using simulator $udid"
           xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
           echo "udid=$udid" >> "$GITHUB_OUTPUT"
+      # Runs before xcodebuild, which can leave the simulator unavailable to
+      # `flutter devices` afterwards.
+      - name: Integration tests on the simulator
+        working-directory: example
+        run: flutter test integration_test -d ${{ steps.simulator.outputs.udid }}
       - name: Swift unit tests (XCTest)
         working-directory: example/ios
         run: |
@@ -124,7 +130,5 @@ jobs:
             -configuration Debug \
             -destination "id=${{ steps.simulator.outputs.udid }}" \
             -only-testing:RunnerTests \
+            -parallel-testing-enabled NO \
             CODE_SIGNING_ALLOWED=NO
-      - name: Integration tests on the simulator
-        working-directory: example
-        run: flutter test integration_test -d ${{ steps.simulator.outputs.udid }}
