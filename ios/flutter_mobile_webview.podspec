@@ -13,7 +13,10 @@ A lean, type-safe WebView plugin for Android and iOS.
   s.license          = { :type => 'MIT', :file => '../LICENSE' }
   s.author           = { 'imk1t' => 'https://github.com/imk1t' }
   s.source           = { :path => '.' }
-  s.source_files = 'flutter_mobile_webview/Sources/flutter_mobile_webview/**/*'
+  # CocoaPods and Swift Package Manager (flutter_mobile_webview/Package.swift)
+  # build the same sources; keep the platform version, sources and resources of
+  # the two in sync.
+  s.source_files = 'flutter_mobile_webview/Sources/flutter_mobile_webview/**/*.swift'
   s.dependency 'Flutter'
   s.platform = :ios, '15.0'
 
@@ -21,9 +24,7 @@ A lean, type-safe WebView plugin for Android and iOS.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'
 
-  # If your plugin requires a privacy manifest, for example if it uses any
-  # required reason APIs, update the PrivacyInfo.xcprivacy file to describe your
-  # plugin's privacy impact, and then uncomment this line. For more information,
-  # see https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
-  # s.resource_bundles = {'flutter_mobile_webview_privacy' => ['flutter_mobile_webview/Sources/flutter_mobile_webview/PrivacyInfo.xcprivacy']}
+  s.resource_bundles = {
+    'flutter_mobile_webview_privacy' => ['flutter_mobile_webview/Sources/flutter_mobile_webview/Resources/PrivacyInfo.xcprivacy']
+  }
 end

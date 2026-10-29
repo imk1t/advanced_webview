@@ -154,9 +154,18 @@ jobs:
           flutter-version: ${{ steps.fvm.outputs.version }}
           channel: stable
           cache: true
+      # Swift Package Manager is Flutter's default; enable it explicitly so this
+      # job keeps covering it. The `ios-cocoapods` job covers the podspec.
+      - run: flutter config --enable-swift-package-manager
       - name: Build example app
         working-directory: example
         run: flutter build ios --simulator --debug
+      - name: Check the plugin was built with Swift Package Manager
+        working-directory: example
+        run: |
+          test ! -e ios/Podfile
+          grep -q flutter_mobile_webview ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift
+          find build/ios/iphonesimulator/Runner.app -path '*flutter_mobile_webview*' -name PrivacyInfo.xcprivacy | grep .
       - name: Boot an iPhone simulator
         id: simulator
         run: |
@@ -178,6 +187,53 @@ jobs:
           # `flutter test` leaves Generated.xcconfig pointing at its temporary
           # test entrypoint; reset it to the app before building with Xcode.
           (cd .. && flutter build ios --config-only --simulator --debug)
+          xcodebuild test \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Debug \
+            -destination "id=${{ steps.simulator.outputs.udid }}" \
+            -only-testing:RunnerTests \
+            -parallel-testing-enabled NO \
+            CODE_SIGNING_ALLOWED=NO
+
+  # Builds the example and runs the Swift unit tests with CocoaPods instead of
+  # Swift Package Manager, so ios/flutter_mobile_webview.podspec keeps working.
+  ios-cocoapods:
+    runs-on: macos-latest
+    needs: dart
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read Flutter version from .fvmrc
+        id: fvm
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.fvm.outputs.version }}
+          channel: stable
+          cache: true
+      - run: flutter config --no-enable-swift-package-manager
+      - name: Build example app
+        working-directory: example
+        run: flutter build ios --simulator --debug
+      - name: Check the plugin was built with CocoaPods
+        working-directory: example
+        run: |
+          grep -q 'flutter_mobile_webview (from' ios/Podfile.lock
+          find build/ios/iphonesimulator/Runner.app -path '*flutter_mobile_webview*' -name PrivacyInfo.xcprivacy | grep .
+      - name: Boot an iPhone simulator
+        id: simulator
+        run: |
+          udid=$(xcrun simctl list devices available --json \
+            | jq -r '[.devices | to_entries[] | select(.key | test("iOS")) | .value[]
+                      | select(.name | startswith("iPhone"))] | last | .udid')
+          echo "Using simulator $udid"
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+      - name: Swift unit tests (XCTest)
+        working-directory: example/ios
+        run: |
           xcodebuild test \
             -workspace Runner.xcworkspace \
             -scheme Runner \

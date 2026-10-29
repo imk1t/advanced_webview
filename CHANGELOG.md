@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tests on an Android emulator and an iOS simulator in CI.
 - Lint and format native code in CI: ktlint for Kotlin and swift-format for Swift
   (Pigeon-generated files are excluded).
+- iOS: support both Swift Package Manager and CocoaPods, and ship a privacy manifest
+  (`PrivacyInfo.xcprivacy`) with either. CI builds the example app with each.
 - Add AI agent configuration (`AGENTS.md`, APM with shared skills from `imk1t/apm-shared`).
 
 ## 0.0.1
