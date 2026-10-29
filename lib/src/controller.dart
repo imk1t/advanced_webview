@@ -58,8 +58,11 @@ class MobileWebViewController {
   final TitleChangedCallback? onTitleChanged;
   final WebResourceErrorCallback? onWebResourceError;
 
-  /// Called for main-frame navigations only. On Android an allowed navigation
-  /// is re-issued as a GET, so POST bodies and redirects are not preserved.
+  /// Called for main-frame navigations started by the page (links, forms,
+  /// `window.location`, redirects). Loads started by this controller
+  /// ([loadUrl], [loadHtmlString], [reload], [goBack], [goForward]) are not
+  /// reported. On Android an allowed navigation is re-issued as a GET, so POST
+  /// bodies and redirects are not preserved.
   final NavigationRequestCallback? onNavigationRequest;
 
   /// Completes once the native WebView exists.

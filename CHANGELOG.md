@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pin Flutter 3.47.8 with FVM (`.fvmrc`); CI uses the same version.
 - Android: detach the WebView from its previous container when a controller is shown
   by a new `MobileWebView`, so re-attaching a controller does not fail.
+- iOS: app-initiated loads (`loadUrl`, `loadHtmlString`, `reload`, `goBack`,
+  `goForward`) no longer reach `onNavigationRequest`, matching Android.
 - Add native unit tests (Robolectric on Android, XCTest on iOS) and run the integration
   tests on an Android emulator and an iOS simulator in CI.
 - Add AI agent configuration (`AGENTS.md`, APM with shared skills from `imk1t/apm-shared`).

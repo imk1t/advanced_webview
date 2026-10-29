@@ -11,6 +11,9 @@ final class MobileWebView: NSObject, FlutterPlatformView {
   private let hasNavigationDelegate: Bool
   private var observations: [NSKeyValueObservation] = []
   private var isDestroyed = false
+  /// URL of the load started by `load(_:)` / `loadHTMLString(_:baseURL:)`
+  /// whose policy decision has not arrived yet.
+  private var pendingAppInitiatedURL: String?
 
   init(params: CreationParamsMessage, flutterApi: MobileWebViewFlutterApi) {
     self.id = params.webViewId
@@ -42,6 +45,20 @@ final class MobileWebView: NSObject, FlutterPlatformView {
     webView.isOpaque = !settings.transparentBackground
     webView.backgroundColor = settings.transparentBackground ? .clear : .white
     webView.scrollView.backgroundColor = webView.backgroundColor
+  }
+
+  /// Loads a request started by the app. Like Android, it does not consult
+  /// the navigation delegate.
+  func load(_ request: URLRequest) {
+    pendingAppInitiatedURL = request.url?.absoluteString
+    webView.load(request)
+  }
+
+  /// Loads an HTML string started by the app without consulting the
+  /// navigation delegate.
+  func loadHTMLString(_ html: String, baseURL: URL?) {
+    pendingAppInitiatedURL = (baseURL ?? URL(string: "about:blank"))?.absoluteString
+    webView.loadHTMLString(html, baseURL: baseURL)
   }
 
   func evaluateJavaScript(_ source: String) async throws -> String? {
@@ -151,9 +168,21 @@ extension MobileWebView: WKNavigationDelegate {
     _ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
   ) {
-    // Same rule as Android: only main-frame navigations reach Dart.
+    // Same rules as Android: only main-frame navigations started by the page
+    // reach Dart. App-initiated loads, reloads and back/forward never do.
     let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true
     guard hasNavigationDelegate, isMainFrame, let url = navigationAction.request.url else {
+      decisionHandler(.allow)
+      return
+    }
+    if let pending = pendingAppInitiatedURL, pending == url.absoluteString {
+      pendingAppInitiatedURL = nil
+      decisionHandler(.allow)
+      return
+    }
+    if navigationAction.navigationType == .reload
+      || navigationAction.navigationType == .backForward
+    {
       decisionHandler(.allow)
       return
     }
