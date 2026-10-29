@@ -1,0 +1,27 @@
+# Agent Package Manager (https://github.com/microsoft/apm) manifest.
+# Run `apm install` to deploy the instructions in .apm/ and the MCP servers below
+# to the supported agents. AGENTS.md is hand-written: do not run `apm compile`
+# (it would regenerate AGENTS.md).
+name: flutter_mobile_webview
+version: 0.0.1
+description: AI agent configuration for developing the flutter_mobile_webview Flutter plugin.
+author: imk1t
+license: MIT
+targets: [claude, copilot]
+includes:
+  - .apm/instructions/
+
+scripts:
+  analyze: "flutter analyze"
+  test: "flutter test"
+  pigeon: "dart run pigeon --input pigeons/messages.dart"
+
+dependencies:
+  apm: []
+  mcp:
+    # Dart and Flutter MCP server (ships with the Dart SDK 3.9+).
+    - name: dart
+      registry: false
+      transport: stdio
+      command: dart
+      args: [mcp-server]

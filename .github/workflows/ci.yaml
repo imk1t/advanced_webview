@@ -24,6 +24,8 @@ jobs:
           git diff --exit-code
       - run: flutter analyze
       - run: flutter test
+      - name: Validate package for pub.dev
+        run: flutter pub publish --dry-run
 
   android:
     runs-on: ubuntu-latest

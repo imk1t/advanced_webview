@@ -31,3 +31,9 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 /build/
 /coverage/
+
+# APM (Agent Package Manager): installed packages and files deployed by `apm install`.
+# The sources of truth are apm.yml, apm.lock.yaml, AGENTS.md and .apm/.
+apm_modules/
+.claude/rules/
+.github/instructions/

@@ -1,5 +1,8 @@
 # flutter_mobile_webview
 
+[![CI](https://github.com/imk1t/flutter_mobile_webview/actions/workflows/ci.yaml/badge.svg)](https://github.com/imk1t/flutter_mobile_webview/actions/workflows/ci.yaml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Android と iOS に絞った、Pigeon ベースの型安全な Flutter WebView プラグインです。
 `flutter_inappwebview` の機能設計を参考にしつつ、小さな公開APIと1か所に集約したプラットフォーム契約で保守性を優先しています。
 
@@ -53,3 +56,14 @@ flutter analyze
 flutter test                                     # Dart 単体テスト
 cd example && flutter test integration_test      # 実機・シミュレータでの結合テスト
 ```
+
+## コントリビュート
+
+Issue・Pull Request を歓迎します（日本語・英語どちらでも可）。[CONTRIBUTING.md](CONTRIBUTING.md) と [行動規範](CODE_OF_CONDUCT.md) を参照してください。
+脆弱性の報告は Issue ではなく [SECURITY.md](SECURITY.md) の手順でお願いします。
+
+AI コーディングエージェント向けの指示は [AGENTS.md](AGENTS.md) にあります（[APM](https://github.com/microsoft/apm) の `apm.yml` で配布）。
+
+## ライセンス
+
+[MIT License](LICENSE)
