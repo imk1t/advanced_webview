@@ -28,11 +28,11 @@ final class WebViewHostApiImpl: MobileWebViewHostApi {
     }
     var request = URLRequest(url: target)
     headers.forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
-    try registry.get(webViewId).webView.load(request)
+    try registry.get(webViewId).load(request)
   }
 
   func loadHtmlString(webViewId: Int64, html: String, baseUrl: String?) throws {
-    try registry.get(webViewId).webView.loadHTMLString(html, baseURL: baseUrl.flatMap(URL.init))
+    try registry.get(webViewId).loadHTMLString(html, baseURL: baseUrl.flatMap(URL.init))
   }
 
   func reload(webViewId: Int64) throws {
