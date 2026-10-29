@@ -215,7 +215,15 @@ jobs:
       - run: flutter config --no-enable-swift-package-manager
       - name: Build example app
         working-directory: example
-        run: flutter build ios --simulator --debug
+        run: flutter build ios --simulator --debug -v
+      - name: Dump Swift package state
+        if: failure()
+        working-directory: example/ios
+        run: |
+          cat Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift || true
+          ls -laR Flutter/ephemeral/Packages || true
+          ls -la .symlinks/plugins || true
+          cat Podfile || true
       - name: Check the plugin was built with CocoaPods
         working-directory: example
         run: |
