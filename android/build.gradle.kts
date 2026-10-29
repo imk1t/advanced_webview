@@ -52,8 +52,6 @@ android {
         unitTests {
             isIncludeAndroidResources = true
             all {
-                it.useJUnitPlatform()
-
                 it.outputs.upToDateWhen { false }
 
                 it.testLogging {
@@ -74,6 +72,9 @@ kotlin {
 dependencies {
     // Required by the Pigeon-generated suspend APIs.
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.mockito:mockito-core:5.0.0")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+    testImplementation("org.mockito:mockito-core:5.14.2")
+    // Robolectric shadows android.webkit.WebView so the plugin can be tested on the JVM.
+    testImplementation("org.robolectric:robolectric:4.14.1")
 }

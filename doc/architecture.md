@@ -89,4 +89,3 @@ Pigeon には、ネイティブクラスを1対1で Dart に写す **ProxyApi**�
 - `onCreateWindow`（`target=_blank` / `window.open`）
 - SSL エラー・HTTP認証のハンドリング
 - スクリーンショット、PullToRefresh、検索（find in page）
-- ネイティブ側の単体テスト（Robolectric / XCTest）
