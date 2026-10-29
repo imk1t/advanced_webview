@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest a new capability or API change.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This package intentionally keeps a small API for Android and iOS only.
+        Please describe the use case so we can judge whether it fits.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Use case
+      description: What are you trying to do, and why is it hard today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API or behaviour
+      description: How would you like it to work? Include a Dart snippet if possible.
+  - type: textarea
+    id: platforms
+    attributes:
+      label: Platform notes
+      description: Is this possible on both Android (android.webkit) and iOS (WKWebView)? Any known differences?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

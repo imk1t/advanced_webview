@@ -1,0 +1,31 @@
+# Publishes to pub.dev when a version tag (e.g. v0.1.0) is pushed.
+# Requires automated publishing to be enabled for this repository on pub.dev
+# (package admin page > Automated publishing > GitHub Actions, tag pattern `v{{version}}`).
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pub.dev
+    permissions:
+      id-token: write # OIDC token for pub.dev
+    steps:
+      - uses: actions/checkout@v4
+      # Configures the pub.dev OIDC credentials.
+      - uses: dart-lang/setup-dart@v1
+      - name: Read Flutter version from .fvmrc
+        id: fvm
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.fvm.outputs.version }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter pub publish --dry-run
+      - run: flutter pub publish --force

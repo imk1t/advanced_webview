@@ -1,0 +1,59 @@
+name: Bug report
+description: Report something that does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please search existing issues first.
+        For security issues, follow [SECURITY.md](https://github.com/imk1t/flutter_mobile_webview/blob/main/SECURITY.md) instead of opening an issue.
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: A minimal code sample (ideally based on the example app) and the steps to trigger the bug.
+      render: dart
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - Android
+        - iOS
+    validations:
+      required: true
+  - type: input
+    id: os-version
+    attributes:
+      label: OS / device
+      placeholder: e.g. Android 15 (Pixel 8), iOS 18.1 (iPhone 15 simulator)
+    validations:
+      required: true
+  - type: input
+    id: package-version
+    attributes:
+      label: flutter_mobile_webview version
+      placeholder: e.g. 0.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: flutter-doctor
+    attributes:
+      label: flutter doctor -v
+      render: text
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant output from `flutter run`, logcat or Xcode.
+      render: text

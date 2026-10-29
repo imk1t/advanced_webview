@@ -9,9 +9,9 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 A lean, type-safe WebView plugin for Android and iOS.
                        DESC
-  s.homepage         = 'http://example.com'
-  s.license          = { :file => '../LICENSE' }
-  s.author           = { 'koichi' => '' }
+  s.homepage         = 'https://github.com/imk1t/flutter_mobile_webview'
+  s.license          = { :type => 'MIT', :file => '../LICENSE' }
+  s.author           = { 'imk1t' => 'https://github.com/imk1t' }
   s.source           = { :path => '.' }
   s.source_files = 'flutter_mobile_webview/Sources/flutter_mobile_webview/**/*'
   s.dependency 'Flutter'

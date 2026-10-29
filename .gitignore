@@ -31,3 +31,15 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 /build/
 /coverage/
+
+# APM (Agent Package Manager): outputs of `apm install`. Only apm.yml, apm.lock.yaml,
+# apm-policy.yml and .apm/ are committed.
+apm_modules/
+.venv-apm/
+.agents/
+.claude/
+.codex/
+.mcp.json
+
+# FVM (Flutter version is pinned in .fvmrc)
+.fvm/

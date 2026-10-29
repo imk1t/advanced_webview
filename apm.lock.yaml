@@ -1,0 +1,292 @@
+lockfile_version: '1'
+apm_version: 0.33.0
+dependencies:
+- repo_url: imk1t/apm-shared
+  name: apm-shared
+  host: github.com
+  resolved_commit: 71918d0a82d5b83d7f56382f7a55c75c83907bbe
+  resolved_ref: v0.1.3
+  version: 0.1.3
+  package_type: apm_package
+  deployed_files:
+  - .agents/skills/code-docs
+  - .agents/skills/code-docs/SKILL.md
+  - .agents/skills/code-hygiene
+  - .agents/skills/code-hygiene/SKILL.md
+  - .agents/skills/create-pr
+  - .agents/skills/create-pr/SKILL.md
+  - .agents/skills/project-docs-sync
+  - .agents/skills/project-docs-sync/SKILL.md
+  - .claude/skills/code-docs
+  - .claude/skills/code-docs/SKILL.md
+  - .claude/skills/code-hygiene
+  - .claude/skills/code-hygiene/SKILL.md
+  - .claude/skills/create-pr
+  - .claude/skills/create-pr/SKILL.md
+  - .claude/skills/project-docs-sync
+  - .claude/skills/project-docs-sync/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/code-docs/SKILL.md: sha256:9882ffad87a0b791a03af4adfdf2a1f5114c1df61ffd7b55e22962c367403ccd
+    .agents/skills/code-hygiene/SKILL.md: sha256:7f9806cae3f6863739d6999994231d190f328ed70ffb3d68dabf88c02bd9daf9
+    .agents/skills/create-pr/SKILL.md: sha256:9b29f9180a83c0f06f3875583e0d0c1d0a48c92290082014d9d1573f7af3d9e8
+    .agents/skills/project-docs-sync/SKILL.md: sha256:d540c71163562aae09b77ca88236bdf405d5a65dc4dd042e34ee7cc8304a442a
+    .claude/skills/code-docs/SKILL.md: sha256:9882ffad87a0b791a03af4adfdf2a1f5114c1df61ffd7b55e22962c367403ccd
+    .claude/skills/code-hygiene/SKILL.md: sha256:7f9806cae3f6863739d6999994231d190f328ed70ffb3d68dabf88c02bd9daf9
+    .claude/skills/create-pr/SKILL.md: sha256:9b29f9180a83c0f06f3875583e0d0c1d0a48c92290082014d9d1573f7af3d9e8
+    .claude/skills/project-docs-sync/SKILL.md: sha256:d540c71163562aae09b77ca88236bdf405d5a65dc4dd042e34ee7cc8304a442a
+  content_hash: sha256:d12e7c0436ceba23c3a1a19c91e6bae7198a4382bc4f118c3d5a489253c515fa
+  declared_license: MIT
+deployments:
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/code-docs
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/code-docs/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: sha256:9882ffad87a0b791a03af4adfdf2a1f5114c1df61ffd7b55e22962c367403ccd
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/code-hygiene
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/code-hygiene/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: sha256:7f9806cae3f6863739d6999994231d190f328ed70ffb3d68dabf88c02bd9daf9
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/create-pr
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/create-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: sha256:9b29f9180a83c0f06f3875583e0d0c1d0a48c92290082014d9d1573f7af3d9e8
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/project-docs-sync
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: null
+- kind: project-relative
+  target: agent-skills
+  value: .agents/skills/project-docs-sync/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: sha256:d540c71163562aae09b77ca88236bdf405d5a65dc4dd042e34ee7cc8304a442a
+- kind: project-relative
+  target: claude
+  value: .claude/skills/code-docs
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/code-docs/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: sha256:9882ffad87a0b791a03af4adfdf2a1f5114c1df61ffd7b55e22962c367403ccd
+- kind: project-relative
+  target: claude
+  value: .claude/skills/code-hygiene
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/code-hygiene/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: sha256:7f9806cae3f6863739d6999994231d190f328ed70ffb3d68dabf88c02bd9daf9
+- kind: project-relative
+  target: claude
+  value: .claude/skills/create-pr
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/create-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: sha256:9b29f9180a83c0f06f3875583e0d0c1d0a48c92290082014d9d1573f7af3d9e8
+- kind: project-relative
+  target: claude
+  value: .claude/skills/pigeon-contract
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/pigeon-contract/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:e9275f5183f5da1050a13a253805a32673998a86198760626159e7a0a1130672
+- kind: project-relative
+  target: claude
+  value: .claude/skills/project-docs-sync
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/project-docs-sync/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - imk1t/apm-shared
+  active_owner: imk1t/apm-shared
+  content_hash: sha256:d540c71163562aae09b77ca88236bdf405d5a65dc4dd042e34ee7cc8304a442a
+- kind: project-relative
+  target: legacy
+  value: .agents/skills/pigeon-contract
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: legacy
+  value: .agents/skills/pigeon-contract/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:e9275f5183f5da1050a13a253805a32673998a86198760626159e7a0a1130672
+- kind: uri
+  target: mcp
+  value: context7
+  runtime: claude
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: uri
+  target: mcp
+  value: dart
+  runtime: claude
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: uri
+  target: mcp
+  value: context7
+  runtime: codex
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: uri
+  target: mcp
+  value: dart
+  runtime: codex
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+mcp_servers:
+- context7
+- dart
+mcp_configs:
+  context7:
+    name: context7
+    transport: stdio
+    args:
+    - -y
+    - '@upstash/context7-mcp@4.4.1'
+    registry: false
+    command: npx
+  dart:
+    name: dart
+    transport: stdio
+    args:
+    - dart
+    - mcp-server
+    registry: false
+    command: fvm
+mcp_target_servers:
+  claude:
+  - context7
+  - dart
+  codex:
+  - context7
+  - dart
+mcp_config_provenance:
+  context7: apm-shared
+local_deployed_files:
+- .agents/skills/pigeon-contract
+- .agents/skills/pigeon-contract/SKILL.md
+- .claude/skills/pigeon-contract
+- .claude/skills/pigeon-contract/SKILL.md
+local_deployed_file_hashes:
+  .agents/skills/pigeon-contract/SKILL.md: sha256:e9275f5183f5da1050a13a253805a32673998a86198760626159e7a0a1130672
+  .claude/skills/pigeon-contract/SKILL.md: sha256:e9275f5183f5da1050a13a253805a32673998a86198760626159e7a0a1130672
