@@ -16,10 +16,10 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import io.flutter.Log
 import io.flutter.plugin.platform.PlatformView
-import kotlin.coroutines.resume
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 /** One native WebView plus the clients that forward its callbacks to Dart. */
 class MobileWebView(

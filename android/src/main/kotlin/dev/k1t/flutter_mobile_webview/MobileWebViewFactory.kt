@@ -9,9 +9,8 @@ import io.flutter.plugin.platform.PlatformViewFactory
  * The native WebView is created ahead of time by `MobileWebViewHostApi.create`;
  * the factory only looks it up by `webViewId` and attaches it.
  */
-class MobileWebViewFactory(
-    private val registry: WebViewRegistry,
-) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
+class MobileWebViewFactory(private val registry: WebViewRegistry) :
+    PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
         val params = args as Map<*, *>
         val webViewId = (params["webViewId"] as Number).toLong()
