@@ -37,5 +37,11 @@ AGENTS.md
 CLAUDE.md
 apm.yml
 apm.lock.yaml
+apm-policy.yml
 apm_modules/
 .apm/
+.agents/
+.claude/
+.codex/
+.mcp.json
+.venv-apm/

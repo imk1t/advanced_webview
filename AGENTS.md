@@ -99,14 +99,24 @@ claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both p
 ## AI tooling (APM)
 
 Agent configuration is managed with Microsoft's
-[Agent Package Manager](https://github.com/microsoft/apm) (`apm.yml`):
+[Agent Package Manager](https://github.com/microsoft/apm) (APM CLI 0.33.0):
 
 - `AGENTS.md` (this file) is hand-written and is the source of truth for repo-wide rules.
   Do not regenerate it with `apm compile`.
-- File-scoped rules live in `.apm/instructions/*.instructions.md` (with `applyTo` globs).
-  `apm install` deploys them to `.claude/rules/` and `.github/instructions/` (git-ignored).
-- MCP servers for agents (Dart/Flutter MCP server) are declared in `apm.yml`.
+- `apm.yml` pulls shared skills from [`imk1t/apm-shared`](https://github.com/imk1t/apm-shared)
+  (`create-pr`, `code-docs`, `project-docs-sync`, `code-hygiene`) and declares MCP servers
+  (`dart`, plus `context7` from apm-shared). These skills defer to the rules in this file.
+- Project-specific skills live in `.apm/skills/` (e.g. `pigeon-contract`).
+- `apm install` deploys skills to `.agents/skills/` and `.claude/skills/`, and MCP config to
+  `.mcp.json` and `.codex/config.toml`. These outputs and `apm.lock.yaml` are committed;
+  never edit them or the lock hashes by hand.
+- `apm-policy.yml` is enforced in CI (`.github/workflows/apm.yml`) by the apm-shared verifier.
+
+To change agent configuration, edit `apm.yml` or `.apm/skills/`, then:
 
 ```sh
-apm install    # install dependencies, deploy instructions and MCP config
+pip install apm-cli==0.33.0
+apm install --target agent-skills,claude,codex   # regenerates outputs and apm.lock.yaml
 ```
+
+Commit the regenerated files together with the change.

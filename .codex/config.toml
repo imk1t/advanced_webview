@@ -1,0 +1,13 @@
+[mcp_servers.dart]
+command = "dart"
+args = ["mcp-server"]
+id = ""
+
+[mcp_servers.dart.env]
+
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@4.4.1"]
+id = ""
+
+[mcp_servers.context7.env]
