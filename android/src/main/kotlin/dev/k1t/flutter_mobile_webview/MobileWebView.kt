@@ -6,6 +6,7 @@ import android.content.MutableContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -47,6 +48,9 @@ class MobileWebView(
 
     fun attachToContext(context: Context) {
         contextWrapper.baseContext = context
+        // A re-created platform view reuses this WebView; detach it from the
+        // previous container so it can be added to the new one.
+        (webView.parent as? ViewGroup)?.removeView(webView)
     }
 
     @SuppressLint("SetJavaScriptEnabled")

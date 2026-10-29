@@ -82,7 +82,10 @@ claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both p
 
 - Dart behaviour: unit tests in `test/` using `FakeHostApi` (`test/fake_host_api.dart`).
   Inject it via the `@visibleForTesting` `hostApi` / `dispatcher` constructor parameters.
-- End-to-end: `example/integration_test/` (needs a device or simulator).
+- Native: Kotlin unit tests with Robolectric in `android/src/test/kotlin/`, Swift unit
+  tests with XCTest in `example/ios/RunnerTests/`. Keep them mirrored like the sources.
+- End-to-end: `example/integration_test/` (needs a device or simulator). CI runs it on an
+  Android emulator and an iOS simulator; put behaviour that must match on both platforms here.
 - Add or update tests for every behaviour change. Never skip or delete a failing test to
   make CI pass.
 

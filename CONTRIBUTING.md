@@ -21,6 +21,12 @@ fvm flutter pub get
 fvm flutter analyze
 fvm flutter test                                    # Dart unit tests
 cd example && fvm flutter test integration_test     # on a device or simulator
+
+# Native unit tests (build the example once first so Gradle / Xcode are configured)
+cd example && fvm flutter build apk --debug && cd android && ./gradlew :flutter_mobile_webview:testDebugUnitTest
+cd example && fvm flutter build ios --simulator --debug && cd ios && \
+  xcodebuild test -workspace Runner.xcworkspace -scheme Runner -only-testing:RunnerTests \
+  -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
 ## Project rules
