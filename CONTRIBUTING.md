@@ -14,7 +14,16 @@ English or Japanese (日本語での Issue / PR も歓迎します).
 
 ## Development setup
 
-Requirements: [FVM](https://fvm.app) (the Flutter version is pinned in `.fvmrc`; run `fvm install` once), Xcode for iOS, Android SDK + JDK 17 for Android. All commands below go through `fvm`.
+Requirements: [FVM](https://fvm.app) (the Flutter version is pinned in `.fvmrc`; run `fvm install` once), Xcode for iOS, Android SDK + JDK 17 for Android. All Flutter / Dart commands below go through `fvm`.
+
+For native code you also need [ktlint](https://pinterest.github.io/ktlint/) 1.8.0 (Kotlin) and
+[swift-format](https://github.com/swiftlang/swift-format) (Swift). swift-format ships with
+Xcode 16+ as `swift format`; ktlint can be installed with Homebrew:
+
+```sh
+brew install ktlint     # check `ktlint --version` (CI uses 1.8.0)
+swift format --version  # CI uses the Swift 6.4.1 toolchain
+```
 
 ```sh
 fvm flutter pub get
@@ -28,6 +37,17 @@ cd example && fvm flutter build ios --simulator --debug && cd ios && \
   xcodebuild test -workspace Runner.xcworkspace -scheme Runner -only-testing:RunnerTests \
   -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
+
+Format and lint native code (generated Pigeon files are excluded):
+
+```sh
+ktlint --format $(git ls-files '*.kt' '*.kts' | grep -v '\.g\.kt$')
+swift format --in-place $(git ls-files '*.swift' | grep -v '\.g\.swift$')
+swift format lint --strict $(git ls-files '*.swift' | grep -v '\.g\.swift$')
+```
+
+Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
+`.swift-format`. CI fails on any violation.
 
 ## Project rules
 
@@ -52,7 +72,8 @@ cd example && fvm flutter build ios --simulator --debug && cd ios && \
 
 1. Fork the repository and create a branch from `main`.
 2. Make your change, keeping the PR focused on one topic.
-3. Make sure `fvm flutter analyze`, `fvm flutter test` and formatting pass locally.
+3. Make sure `fvm flutter analyze`, `fvm flutter test` and formatting (Dart, and ktlint /
+   swift-format for native code) pass locally.
 4. Fill in the pull request template. CI builds the example app for Android and iOS.
 
 By contributing, you agree that your contributions will be licensed under the

@@ -47,9 +47,15 @@ fvm dart run pigeon --input pigeons/messages.dart   # after editing pigeons/mess
 fvm flutter pub publish --dry-run                   # package validation
 cd example && fvm flutter build apk --debug         # Android build check
 cd example && fvm flutter build ios --simulator --debug  # iOS build check (macOS only)
+
+# Native lint / format (Pigeon output *.g.kt / *.g.swift is always excluded)
+ktlint --format $(git ls-files '*.kt' '*.kts' | grep -v '\.g\.kt$')            # Kotlin
+swift format --in-place $(git ls-files '*.swift' | grep -v '\.g\.swift$')      # Swift
+swift format lint --strict $(git ls-files '*.swift' | grep -v '\.g\.swift$')
 ```
 
 Run `fvm dart format`, `fvm flutter analyze` and `fvm flutter test` before finishing a change.
+When you touch Kotlin or Swift, also run ktlint and swift-format as above.
 If Flutter or a platform SDK is not available in your environment, say so instead of
 claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both platforms.
 
@@ -92,8 +98,17 @@ claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both p
 ## Style
 
 - Dart: `flutter_lints` (see `analysis_options.yaml`), `dart format` default width.
-- Kotlin: official Kotlin style, coroutines (`suspend`) for async HostApi methods.
-- Swift: Swift API Design Guidelines, `async` for async HostApi methods.
+- Kotlin: official Kotlin style enforced by [ktlint](https://pinterest.github.io/ktlint/)
+  1.8.0 (`ktlint_code_style = intellij_idea`, 4-space indent, 120 columns; see
+  `.editorconfig`), coroutines (`suspend`) for async HostApi methods.
+- Swift: Swift API Design Guidelines, formatted and linted by
+  [swift-format](https://github.com/swiftlang/swift-format) (`swift format`, bundled with the
+  Swift 6 toolchain / Xcode 16+; 2-space indent, 100 columns; see `.swift-format`).
+  CI pins Swift 6.4.1; if a local version formats differently, follow the CI diff.
+  `async` for async HostApi methods.
+- CI (`kotlin-lint`, `swift-lint` jobs) fails on any ktlint or swift-format violation. Fix
+  the code rather than disabling rules; if a rule must be disabled, do it in
+  `.editorconfig` / `.swift-format` with a comment explaining why.
 - Code comments and dartdoc in English. Docs under `doc/` may be Japanese.
 
 ## Pull requests
