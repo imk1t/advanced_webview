@@ -148,6 +148,35 @@ void main() {
     expect(requests, contains('${_baseUrl}allowed'));
   });
 
+  testWidgets('app-initiated loads do not consult the navigation delegate', (
+    tester,
+  ) async {
+    final requests = <String>[];
+    final harness = _Harness(
+      onNavigationRequest: (request) {
+        requests.add(request.url);
+        return NavigationDecision.prevent;
+      },
+    );
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    // Both loads would time out if the delegate were asked and prevented them.
+    await harness.loadHtml('<html><body>one</body></html>');
+    await harness.loadHtml('<html><body>two</body></html>');
+    await harness.controller.loadUrl('https://does-not-exist.invalid/');
+    await _pumpUntil(tester, () => harness.errors.isNotEmpty);
+    expect(requests, isEmpty);
+
+    // A navigation started by the page is still reported.
+    await harness.loadHtml('<html><body>three</body></html>');
+    await harness.controller.runJavaScript(
+      'window.location.href = "${_baseUrl}blocked";',
+    );
+    await _pumpUntil(tester, () => requests.isNotEmpty);
+    expect(requests, ['${_baseUrl}blocked']);
+  });
+
   testWidgets('reports main-frame load errors', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);

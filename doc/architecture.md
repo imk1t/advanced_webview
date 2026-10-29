@@ -75,7 +75,7 @@ Pigeon には、ネイティブクラスを1対1で Dart に写す **ProxyApi**�
 
 | 機能 | Android | iOS | 方針 |
 | --- | --- | --- | --- |
-| ナビゲーション判定 | 同期で答える必要がある | `decisionHandler` で非同期可 | Android はいったんキャンセル→Dartに問い合わせ→許可なら再ロード。両OSとも **メインフレームのみ** Dart に問い合わせる |
+| ナビゲーション判定 | 同期で答える必要がある | `decisionHandler` で非同期可 | Android はいったんキャンセル→Dartに問い合わせ→許可なら再ロード。両OSとも **メインフレームかつページ起点の遷移のみ** Dart に問い合わせる（`loadUrl` / `loadHtmlString` / reload / 戻る・進む は問い合わせない） |
 | JS チャネル | `addJavascriptInterface` | `WKScriptMessageHandler` | iOS でユーザースクリプトを注入し、両OSとも `window.<name>.postMessage(String)` に統一 |
 | JS 実行結果 | JSON 文字列 | `Any` | iOS 側で JSON 化し、Dart で `jsonDecode`。`undefined` は両OS `null` |
 | 設定の後変更 | ほぼ可能 | 一部は生成時のみ | `WebViewSettings` のドキュメントに "creation only" と明記 |
