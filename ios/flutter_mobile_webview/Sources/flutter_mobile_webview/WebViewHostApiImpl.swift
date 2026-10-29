@@ -19,7 +19,9 @@ final class WebViewHostApiImpl: MobileWebViewHostApi {
   }
 
   func disposeAll() {
-    registry.removeAll().forEach { $0.destroy() }
+    for instance in registry.removeAll() {
+      instance.destroy()
+    }
   }
 
   func loadUrl(webViewId: Int64, url: String, headers: [String: String]) throws {
@@ -27,7 +29,9 @@ final class WebViewHostApiImpl: MobileWebViewHostApi {
       throw PigeonError(code: "invalid-url", message: "Invalid URL: \(url)", details: nil)
     }
     var request = URLRequest(url: target)
-    headers.forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
+    for (field, value) in headers {
+      request.setValue(value, forHTTPHeaderField: field)
+    }
     try registry.get(webViewId).load(request)
   }
 
