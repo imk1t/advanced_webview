@@ -42,7 +42,8 @@ jobs:
           fetch-depth: 0 # git history for "last updated"
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.4.4
+          # `bun lint` is not in a stable release yet (1.4.4); switch to a pinned stable once it is.
+          bun-version: canary
       - run: bun install --frozen-lockfile
       - run: bun run lint
       - run: bun run format:check

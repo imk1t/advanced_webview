@@ -37,7 +37,7 @@ first; it takes precedence over this skill. Do not add Web, macOS, Windows or Li
 6. **Keep neighbours consistent.** If a user-visible behaviour changed, also check
    `README.md` / `README.ja.md` (keep them in sync), the dartdoc of the affected public
    members, and `CHANGELOG.md`.
-7. **Format and build locally.** In `website/`: `bun install --frozen-lockfile`, `bun run lint` (oxlint), `bun run format` (Bun's built-in `bun fmt`; Markdown pages are excluded), then `bun run build`
+7. **Format and build locally.** In `website/`: `bun install --frozen-lockfile`, `bun run lint` (`bun lint`; needs a canary Bun, `bun upgrade --canary`; it does not lint `.vue` files yet), `bun run format` (Bun's built-in `bun fmt`; Markdown pages are excluded), then `bun run build`
    (it runs `check:mapping` first). The build fails on dead internal links, so fix them rather
    than ignoring the error. Optionally preview with `bun run dev`. Do not commit
    `node_modules/` or `.vitepress/dist`/`cache`.

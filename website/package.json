@@ -9,11 +9,10 @@
     "preview": "vitepress preview",
     "format": "bun fmt --no-script",
     "format:check": "bun fmt --no-script --check",
-    "lint": "oxlint --ignore-pattern .vitepress/dist --ignore-pattern .vitepress/cache ."
+    "lint": "bun lint --no-script"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
-    "oxlint": "^1.90.0",
     "tailwindcss": "^4.3.3",
     "vitepress": "1.6.4"
   }

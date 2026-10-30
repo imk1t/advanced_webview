@@ -180,7 +180,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:d4163e3af49f205182ed4067d8aecba17641ce1dd32cf556503302b2a836098f
+  content_hash: sha256:b20f1a51fb398070a4fdcb6947cc2290fb9631b4b7694ab5994b9e6eb041105f
 - kind: project-relative
   target: claude
   value: .claude/skills/pigeon-contract
@@ -234,7 +234,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:d4163e3af49f205182ed4067d8aecba17641ce1dd32cf556503302b2a836098f
+  content_hash: sha256:b20f1a51fb398070a4fdcb6947cc2290fb9631b4b7694ab5994b9e6eb041105f
 - kind: project-relative
   target: legacy
   value: .agents/skills/pigeon-contract
@@ -328,7 +328,7 @@ local_deployed_files:
 - .claude/skills/pigeon-contract
 - .claude/skills/pigeon-contract/SKILL.md
 local_deployed_file_hashes:
-  .agents/skills/docs-site/SKILL.md: sha256:d4163e3af49f205182ed4067d8aecba17641ce1dd32cf556503302b2a836098f
+  .agents/skills/docs-site/SKILL.md: sha256:b20f1a51fb398070a4fdcb6947cc2290fb9631b4b7694ab5994b9e6eb041105f
   .agents/skills/pigeon-contract/SKILL.md: sha256:b3f2ba6144ca62dc6f5b8e5b5e47044ac2b4a96bf21509fcd138cfcf781b230a
-  .claude/skills/docs-site/SKILL.md: sha256:d4163e3af49f205182ed4067d8aecba17641ce1dd32cf556503302b2a836098f
+  .claude/skills/docs-site/SKILL.md: sha256:b20f1a51fb398070a4fdcb6947cc2290fb9631b4b7694ab5994b9e6eb041105f
   .claude/skills/pigeon-contract/SKILL.md: sha256:b3f2ba6144ca62dc6f5b8e5b5e47044ac2b4a96bf21509fcd138cfcf781b230a
