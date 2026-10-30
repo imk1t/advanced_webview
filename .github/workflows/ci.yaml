@@ -105,7 +105,7 @@ jobs:
         run: flutter build apk --debug
       - name: Kotlin unit tests (Robolectric)
         working-directory: example/android
-        run: ./gradlew :flutter_mobile_webview:testDebugUnitTest
+        run: ./gradlew :advanced_webview:testDebugUnitTest
 
   android-integration:
     runs-on: ubuntu-latest
@@ -164,8 +164,8 @@ jobs:
         working-directory: example
         run: |
           test ! -e ios/Podfile
-          grep -q flutter_mobile_webview ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift
-          find build/ios/iphonesimulator/Runner.app -path '*flutter_mobile_webview*' -name PrivacyInfo.xcprivacy | grep .
+          grep -q advanced_webview ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift
+          find build/ios/iphonesimulator/Runner.app -path '*advanced_webview*' -name PrivacyInfo.xcprivacy | grep .
       - name: Boot an iPhone simulator
         id: simulator
         run: |
@@ -197,7 +197,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO
 
   # Builds the example and runs the Swift unit tests with CocoaPods instead of
-  # Swift Package Manager, so ios/flutter_mobile_webview.podspec keeps working.
+  # Swift Package Manager, so ios/advanced_webview.podspec keeps working.
   ios-cocoapods:
     runs-on: macos-latest
     needs: dart
@@ -214,23 +214,23 @@ jobs:
           cache: true
       - run: flutter config --no-enable-swift-package-manager
       # The example references the plugin as a local Swift package
-      # (../../ios/flutter_mobile_webview) so Xcode can edit its sources. That
+      # (../../ios/advanced_webview) so Xcode can edit its sources. That
       # package depends on ../FlutterFramework, which only exists when Flutter
       # links plugins with SwiftPM, so drop the reference to build the way a
       # regular CocoaPods app does.
       - name: Remove the plugin's local package reference
         working-directory: example/ios
         run: |
-          sed -i '' '/\/\* flutter_mobile_webview \*\//d' Runner.xcodeproj/project.pbxproj
-          if grep -q 'flutter_mobile_webview' Runner.xcodeproj/project.pbxproj; then exit 1; fi
+          sed -i '' '/\/\* advanced_webview \*\//d' Runner.xcodeproj/project.pbxproj
+          if grep -q 'advanced_webview' Runner.xcodeproj/project.pbxproj; then exit 1; fi
       - name: Build example app
         working-directory: example
         run: flutter build ios --simulator --debug
       - name: Check the plugin was built with CocoaPods
         working-directory: example
         run: |
-          grep -q 'flutter_mobile_webview (from' ios/Podfile.lock
-          find build/ios/iphonesimulator/Runner.app -path '*flutter_mobile_webview*' -name PrivacyInfo.xcprivacy | grep .
+          grep -q 'advanced_webview (from' ios/Podfile.lock
+          find build/ios/iphonesimulator/Runner.app -path '*advanced_webview*' -name PrivacyInfo.xcprivacy | grep .
       - name: Boot an iPhone simulator
         id: simulator
         run: |

@@ -2,17 +2,17 @@
 
 ## コントローラ1つ = WebView 1つ
 
-`MobileWebViewController` は生成した時点でネイティブの WebView を作り、`dispose()` を呼ぶまで破棄しません。
-`MobileWebView` ウィジェットは、コントローラが持っている WebView を表示するだけです。
+`AdvancedWebViewController` は生成した時点でネイティブの WebView を作り、`dispose()` を呼ぶまで破棄しません。
+`AdvancedWebView` ウィジェットは、コントローラが持っている WebView を表示するだけです。
 
 そのため、ウィジェットがツリーから外れても（タブ切替や画面遷移）ページはリセットされません。
 不要になったら `dispose()` を呼んでください。
 
 ```dart
-final controller = MobileWebViewController()..loadUrl('https://flutter.dev');
+final controller = AdvancedWebViewController()..loadUrl('https://flutter.dev');
 
 // build
-MobileWebView(controller: controller);
+AdvancedWebView(controller: controller);
 
 // 不要になったら
 await controller.dispose();
@@ -38,7 +38,7 @@ final title = await controller.title();
 コンストラクタで渡します。
 
 ```dart
-MobileWebViewController(
+AdvancedWebViewController(
   onPageStarted: (url) {},
   onPageFinished: (url) {},
   onProgress: (progress) {},   // 0-100

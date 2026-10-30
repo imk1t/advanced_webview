@@ -16,7 +16,7 @@ final title = await controller.runJavaScriptReturningResult('document.title');
 Channels send messages from the page to Dart. Register them when you create the controller:
 
 ```dart
-final controller = MobileWebViewController(
+final controller = AdvancedWebViewController(
   javaScriptChannels: {'Bridge': (message) => print(message)},
 );
 ```

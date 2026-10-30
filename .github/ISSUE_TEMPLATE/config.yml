@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/imk1t/flutter_mobile_webview/security/advisories/new
+    url: https://github.com/imk1t/advanced_webview/security/advisories/new
     about: Please report security issues privately, not as a public issue.

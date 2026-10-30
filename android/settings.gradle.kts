@@ -1,1 +1,1 @@
-rootProject.name = "flutter_mobile_webview"
+rootProject.name = "advanced_webview"

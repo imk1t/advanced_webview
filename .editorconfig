@@ -14,7 +14,7 @@ indent_size = 4
 # Kotlin coding conventions (the style IntelliJ IDEA / Android Studio apply).
 ktlint_code_style = intellij_idea
 max_line_length = 120
-# Flutter plugin packages are named after the Dart package (dev.k1t.flutter_mobile_webview),
+# Flutter plugin packages are named after the Dart package (dev.k1t.advanced_webview),
 # which requires underscores.
 ktlint_standard_package-name = disabled
 

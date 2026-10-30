@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         Thanks for taking the time to report a bug. Please search existing issues first.
-        For security issues, follow [SECURITY.md](https://github.com/imk1t/flutter_mobile_webview/blob/main/SECURITY.md) instead of opening an issue.
+        For security issues, follow [SECURITY.md](https://github.com/imk1t/advanced_webview/blob/main/SECURITY.md) instead of opening an issue.
   - type: textarea
     id: description
     attributes:
@@ -42,7 +42,7 @@ body:
   - type: input
     id: package-version
     attributes:
-      label: flutter_mobile_webview version
+      label: advanced_webview version
       placeholder: e.g. 0.1.0
     validations:
       required: true

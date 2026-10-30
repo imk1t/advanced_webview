@@ -1,17 +1,17 @@
 import Foundation
 
 /// Implements the Dart -> native calls by dispatching to `WebViewRegistry`.
-final class WebViewHostApiImpl: MobileWebViewHostApi {
+final class WebViewHostApiImpl: AdvancedWebViewHostApi {
   private let registry: WebViewRegistry
-  private let flutterApi: MobileWebViewFlutterApi
+  private let flutterApi: AdvancedWebViewFlutterApi
 
-  init(registry: WebViewRegistry, flutterApi: MobileWebViewFlutterApi) {
+  init(registry: WebViewRegistry, flutterApi: AdvancedWebViewFlutterApi) {
     self.registry = registry
     self.flutterApi = flutterApi
   }
 
   func create(params: CreationParamsMessage) throws {
-    try registry.add(MobileWebView(params: params, flutterApi: flutterApi))
+    try registry.add(AdvancedWebView(params: params, flutterApi: flutterApi))
   }
 
   func dispose(webViewId: Int64) throws {

@@ -1,4 +1,4 @@
-package dev.k1t.flutter_mobile_webview
+package dev.k1t.advanced_webview
 
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
@@ -7,11 +7,11 @@ import kotlinx.coroutines.CoroutineScope
 class WebViewHostApiImpl(
     private val context: Context,
     private val registry: WebViewRegistry,
-    private val flutterApi: MobileWebViewFlutterApi,
+    private val flutterApi: AdvancedWebViewFlutterApi,
     private val scope: CoroutineScope,
-) : MobileWebViewHostApi {
+) : AdvancedWebViewHostApi {
     override fun create(params: CreationParamsMessage) {
-        registry.add(MobileWebView(context, params, flutterApi, scope))
+        registry.add(AdvancedWebView(context, params, flutterApi, scope))
     }
 
     override fun dispose(webViewId: Long) {

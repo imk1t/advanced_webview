@@ -1,15 +1,15 @@
-# flutter_mobile_webview
+# advanced_webview
 
 English | [日本語](README.ja.md)
 
-[![CI](https://github.com/imk1t/flutter_mobile_webview/actions/workflows/ci.yaml/badge.svg)](https://github.com/imk1t/flutter_mobile_webview/actions/workflows/ci.yaml)
+[![CI](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml/badge.svg)](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A type-safe Flutter WebView plugin for Android and iOS only, built on Pigeon.
 It borrows feature ideas from `flutter_inappwebview`, but favours maintainability with a
 small public API and a single, centralised platform contract.
 
-Documentation: https://imk1t.github.io/flutter_mobile_webview/
+Documentation: https://imk1t.github.io/advanced_webview/
 
 For design decisions (such as why Pigeon was chosen), see
 [doc/architecture.md](doc/architecture.md) (Japanese).
@@ -27,7 +27,7 @@ either, depending on your Flutter setting (`flutter config --enable-swift-packag
 ## Usage
 
 ```dart
-final controller = MobileWebViewController(
+final controller = AdvancedWebViewController(
   javaScriptChannels: {'Bridge': (message) => print(message)},
   onPageFinished: (url) => print('loaded $url'),
   onNavigationRequest: (request) => request.url.startsWith('https://')
@@ -36,7 +36,7 @@ final controller = MobileWebViewController(
 )..loadUrl('https://flutter.dev');
 
 // build
-MobileWebView(controller: controller);
+AdvancedWebView(controller: controller);
 
 // Run JavaScript (the result is already decoded from JSON)
 final title = await controller.runJavaScriptReturningResult('document.title');

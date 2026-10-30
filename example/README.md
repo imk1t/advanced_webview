@@ -1,6 +1,6 @@
-# flutter_mobile_webview_example
+# advanced_webview_example
 
-Demonstrates how to use the flutter_mobile_webview plugin.
+Demonstrates how to use the advanced_webview plugin.
 
 ## Getting Started
 

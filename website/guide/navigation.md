@@ -3,7 +3,7 @@
 Use `onNavigationRequest` to allow or block a navigation:
 
 ```dart
-final controller = MobileWebViewController(
+final controller = AdvancedWebViewController(
   onNavigationRequest: (request) => request.url.startsWith('https://')
       ? NavigationDecision.navigate
       : NavigationDecision.prevent,

@@ -3,11 +3,11 @@ import UIKit
 import WebKit
 
 /// One native WKWebView plus the delegates that forward its callbacks to Dart.
-final class MobileWebView: NSObject, FlutterPlatformView {
+final class AdvancedWebView: NSObject, FlutterPlatformView {
   let id: Int64
   let webView: WKWebView
 
-  private let flutterApi: MobileWebViewFlutterApi
+  private let flutterApi: AdvancedWebViewFlutterApi
   private let hasNavigationDelegate: Bool
   private var observations: [NSKeyValueObservation] = []
   private var isDestroyed = false
@@ -15,7 +15,7 @@ final class MobileWebView: NSObject, FlutterPlatformView {
   /// whose policy decision has not arrived yet.
   private var pendingAppInitiatedURL: String?
 
-  init(params: CreationParamsMessage, flutterApi: MobileWebViewFlutterApi) {
+  init(params: CreationParamsMessage, flutterApi: AdvancedWebViewFlutterApi) {
     self.id = params.webViewId
     self.flutterApi = flutterApi
     self.hasNavigationDelegate = params.hasNavigationDelegate
@@ -117,7 +117,7 @@ final class MobileWebView: NSObject, FlutterPlatformView {
   }
 
   /// Fire-and-forget call into Dart. Failures are logged, never thrown.
-  private func send(_ block: @escaping (MobileWebViewFlutterApi, Int64) async throws -> Void) {
+  private func send(_ block: @escaping (AdvancedWebViewFlutterApi, Int64) async throws -> Void) {
     let api = flutterApi
     let id = self.id
     Task { @MainActor [weak self] in
@@ -125,7 +125,7 @@ final class MobileWebView: NSObject, FlutterPlatformView {
       do {
         try await block(api, id)
       } catch {
-        NSLog("MobileWebView: failed to deliver event to Dart: \(error)")
+        NSLog("AdvancedWebView: failed to deliver event to Dart: \(error)")
       }
     }
   }
@@ -144,7 +144,7 @@ final class MobileWebView: NSObject, FlutterPlatformView {
   }
 }
 
-extension MobileWebView: WKNavigationDelegate {
+extension AdvancedWebView: WKNavigationDelegate {
   func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
     let url = webView.url?.absoluteString ?? ""
     send { api, id in try await api.onPageStarted(webViewId: id, url: url) }
@@ -198,7 +198,7 @@ extension MobileWebView: WKNavigationDelegate {
       do {
         decision = try await api.shouldOverrideUrlLoading(webViewId: id, request: request)
       } catch {
-        NSLog("MobileWebView: navigation delegate failed, allowing navigation: \(error)")
+        NSLog("AdvancedWebView: navigation delegate failed, allowing navigation: \(error)")
         decision = .navigate
       }
       decisionHandler(decision == .navigate ? .allow : .cancel)
@@ -206,7 +206,7 @@ extension MobileWebView: WKNavigationDelegate {
   }
 }
 
-extension MobileWebView: WKScriptMessageHandler {
+extension AdvancedWebView: WKScriptMessageHandler {
   func userContentController(
     _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
   ) {

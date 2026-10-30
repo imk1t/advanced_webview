@@ -10,28 +10,28 @@
 
 ```
 lib/
-  flutter_mobile_webview.dart            公開API（ここからexportしたものだけが公開）
+  advanced_webview.dart            公開API（ここからexportしたものだけが公開）
   src/
-    controller.dart            MobileWebViewController（WebView 1つ = コントローラ 1つ）
-    widget.dart                MobileWebView（AndroidView / UiKitView）
+    controller.dart            AdvancedWebViewController（WebView 1つ = コントローラ 1つ）
+    widget.dart                AdvancedWebView（AndroidView / UiKitView）
     settings.dart              WebViewSettings（不変オブジェクト）
     navigation.dart            NavigationRequest / WebResourceError / コールバック型
     platform/
       messages.g.dart          Pigeon生成コード（手で編集しない）
       event_dispatcher.dart    native→Dart イベントを webViewId で振り分け
 pigeons/messages.dart          Dart⇔ネイティブの契約（唯一の定義元）
-android/.../                   Kotlin 実装（MobileWebView, Registry, HostApiImpl, Factory）
-ios/flutter_mobile_webview/Sources/...   Swift 実装（同じ構成）
-ios/flutter_mobile_webview/Package.swift Swift Package Manager 用マニフェスト
-ios/flutter_mobile_webview.podspec       CocoaPods 用（Package.swift と同じソースを参照）
+android/.../                   Kotlin 実装（AdvancedWebView, Registry, HostApiImpl, Factory）
+ios/advanced_webview/Sources/...   Swift 実装（同じ構成）
+ios/advanced_webview/Package.swift Swift Package Manager 用マニフェスト
+ios/advanced_webview.podspec       CocoaPods 用（Package.swift と同じソースを参照）
 ```
 
 Android と iOS は **同じクラス構成・同じ名前** に揃えている。片方を直したらもう片方の同名ファイルを見ればよい。
 
 ### WebView のライフサイクル
 
-1. `MobileWebViewController` の生成時に Dart が `webViewId` を採番し、`HostApi.create` でネイティブWebViewを作る。
-2. `MobileWebView` ウィジェットが `create` 完了を待ってから PlatformView を要求し、ネイティブの Factory は
+1. `AdvancedWebViewController` の生成時に Dart が `webViewId` を採番し、`HostApi.create` でネイティブWebViewを作る。
+2. `AdvancedWebView` ウィジェットが `create` 完了を待ってから PlatformView を要求し、ネイティブの Factory は
    `webViewId` で Registry から既存インスタンスを引き当てるだけ。
 3. `controller.dispose()` で破棄。ウィジェットの破棄では WebView は消えない（画面遷移やタブ切替で状態を保てる）。
 

@@ -5,7 +5,7 @@ import 'platform/messages.g.dart';
 /// Per-WebView settings.
 ///
 /// Settings marked "creation only" are applied when the native view is created
-/// and ignored by [MobileWebViewController.updateSettings] on that platform.
+/// and ignored by [AdvancedWebViewController.updateSettings] on that platform.
 @immutable
 class WebViewSettings {
   const WebViewSettings({

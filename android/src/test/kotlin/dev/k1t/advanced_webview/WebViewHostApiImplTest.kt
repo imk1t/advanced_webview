@@ -1,4 +1,4 @@
-package dev.k1t.flutter_mobile_webview
+package dev.k1t.advanced_webview
 
 import android.graphics.Color
 import android.net.Uri
@@ -47,7 +47,7 @@ class WebViewHostApiImplTest {
         hostApi = WebViewHostApiImpl(
             RuntimeEnvironment.getApplication(),
             registry,
-            MobileWebViewFlutterApi(messenger),
+            AdvancedWebViewFlutterApi(messenger),
             scope,
         )
     }
@@ -145,7 +145,7 @@ class WebViewHostApiImplTest {
         shadowOf(Looper.getMainLooper()).idle()
 
         verify(messenger).send(
-            eq("dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onJavaScriptMessage"),
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptMessage"),
             any(),
             any(),
         )
@@ -176,7 +176,7 @@ class WebViewHostApiImplTest {
         val oldParent = FrameLayout(RuntimeEnvironment.getApplication())
         oldParent.addView(instance.webView)
 
-        val view = MobileWebViewFactory(registry)
+        val view = AdvancedWebViewFactory(registry)
             .create(RuntimeEnvironment.getApplication(), 0, mapOf("webViewId" to 5))
 
         assertSame(instance, view)

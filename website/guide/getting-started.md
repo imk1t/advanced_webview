@@ -1,6 +1,6 @@
 # Getting started
 
-`flutter_mobile_webview` is a Flutter WebView plugin for **Android and iOS only**, built on
+`advanced_webview` is a Flutter WebView plugin for **Android and iOS only**, built on
 [Pigeon](https://pub.dev/packages/pigeon). It borrows feature ideas from
 `flutter_inappwebview`, but favours maintainability with a small public API and a single,
 centralised platform contract.
@@ -21,16 +21,16 @@ The package is not on pub.dev yet. Until the first release, depend on the Git re
 
 ```yaml
 dependencies:
-  flutter_mobile_webview:
+  advanced_webview:
     git:
-      url: https://github.com/imk1t/flutter_mobile_webview.git
+      url: https://github.com/imk1t/advanced_webview.git
 ```
 
 ## A minimal example
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_mobile_webview/flutter_mobile_webview.dart';
+import 'package:advanced_webview/advanced_webview.dart';
 
 class BrowserPage extends StatefulWidget {
   const BrowserPage({super.key});
@@ -40,7 +40,7 @@ class BrowserPage extends StatefulWidget {
 }
 
 class _BrowserPageState extends State<BrowserPage> {
-  final controller = MobileWebViewController(
+  final controller = AdvancedWebViewController(
     onPageFinished: (url) => debugPrint('loaded $url'),
   )..loadUrl('https://flutter.dev');
 
@@ -51,7 +51,7 @@ class _BrowserPageState extends State<BrowserPage> {
   }
 
   @override
-  Widget build(BuildContext context) => MobileWebView(controller: controller);
+  Widget build(BuildContext context) => AdvancedWebView(controller: controller);
 }
 ```
 

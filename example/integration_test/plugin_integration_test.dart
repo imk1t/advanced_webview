@@ -4,13 +4,13 @@
 // place to pin down behaviour that must match on Android and iOS.
 import 'dart:async';
 
+import 'package:advanced_webview/advanced_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:flutter_mobile_webview/flutter_mobile_webview.dart';
 
 const _timeout = Duration(seconds: 20);
-const _baseUrl = 'https://flutter-mobile-webview.test/';
+const _baseUrl = 'https://advanced-webview.test/';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -67,8 +67,8 @@ void main() {
       MaterialApp(
         home: Column(
           children: [
-            Expanded(child: MobileWebView(controller: a.controller)),
-            Expanded(child: MobileWebView(controller: b.controller)),
+            Expanded(child: AdvancedWebView(controller: a.controller)),
+            Expanded(child: AdvancedWebView(controller: b.controller)),
           ],
         ),
       ),
@@ -197,7 +197,7 @@ void main() {
 
     await harness.show(tester);
     await harness.controller.updateSettings(
-      const WebViewSettings(userAgent: 'flutter_mobile_webview-test'),
+      const WebViewSettings(userAgent: 'advanced_webview-test'),
     );
     // A new document picks up the user agent on both platforms.
     await harness.loadHtml('<html><body></body></html>');
@@ -206,7 +206,7 @@ void main() {
       await harness.controller.runJavaScriptReturningResult(
         'navigator.userAgent',
       ),
-      'flutter_mobile_webview-test',
+      'advanced_webview-test',
     );
   });
 
@@ -236,7 +236,7 @@ class _Harness {
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     NavigationRequestCallback? onNavigationRequest,
   }) {
-    controller = MobileWebViewController(
+    controller = AdvancedWebViewController(
       javaScriptChannels: javaScriptChannels,
       onNavigationRequest: onNavigationRequest,
       onPageStarted: startedUrls.add,
@@ -248,14 +248,14 @@ class _Harness {
     );
   }
 
-  late final MobileWebViewController controller;
+  late final AdvancedWebViewController controller;
   final startedUrls = <String>[];
   final errors = <WebResourceError>[];
   Completer<void>? _pageFinished;
 
   Future<void> show(WidgetTester tester) async {
     await tester.pumpWidget(
-      MaterialApp(home: MobileWebView(controller: controller)),
+      MaterialApp(home: AdvancedWebView(controller: controller)),
     );
     await controller.ready;
     await tester.pumpAndSettle();

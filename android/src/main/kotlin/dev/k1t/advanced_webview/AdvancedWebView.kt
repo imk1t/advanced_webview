@@ -1,4 +1,4 @@
-package dev.k1t.flutter_mobile_webview
+package dev.k1t.advanced_webview
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -22,10 +22,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 /** One native WebView plus the clients that forward its callbacks to Dart. */
-class MobileWebView(
+class AdvancedWebView(
     context: Context,
     params: CreationParamsMessage,
-    private val flutterApi: MobileWebViewFlutterApi,
+    private val flutterApi: AdvancedWebViewFlutterApi,
     private val scope: CoroutineScope,
 ) : PlatformView {
     val id: Long = params.webViewId
@@ -90,7 +90,7 @@ class MobileWebView(
     override fun getView(): View = webView
 
     override fun dispose() {
-        // Lifetime is owned by Dart (MobileWebViewHostApi.dispose), not by the
+        // Lifetime is owned by Dart (AdvancedWebViewHostApi.dispose), not by the
         // platform view, so the WebView survives re-attachment.
     }
 
@@ -164,6 +164,6 @@ class MobileWebView(
     }
 
     private companion object {
-        const val TAG = "MobileWebView"
+        const val TAG = "AdvancedWebView"
     }
 }

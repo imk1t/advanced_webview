@@ -3,7 +3,7 @@
 `onNavigationRequest` で遷移を許可・拒否できます。
 
 ```dart
-final controller = MobileWebViewController(
+final controller = AdvancedWebViewController(
   onNavigationRequest: (request) => request.url.startsWith('https://')
       ? NavigationDecision.navigate
       : NavigationDecision.prevent,

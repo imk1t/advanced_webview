@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: flutter_mobile_webview
+  name: advanced_webview
   text: Android と iOS に絞った Flutter の WebView
   tagline: Pigeon ベースの、小さく型安全な WebView プラグイン。
   actions:
@@ -11,7 +11,7 @@ hero:
       link: /ja/guide/getting-started
     - theme: alt
       text: GitHub
-      link: https://github.com/imk1t/flutter_mobile_webview
+      link: https://github.com/imk1t/advanced_webview
 
 features:
   - title: Android と iOS のみ

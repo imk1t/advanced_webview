@@ -1,4 +1,4 @@
-group = "dev.k1t.flutter_mobile_webview"
+group = "dev.k1t.advanced_webview"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -26,7 +26,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.k1t.flutter_mobile_webview"
+    namespace = "dev.k1t.advanced_webview"
 
     compileSdk = 36
 

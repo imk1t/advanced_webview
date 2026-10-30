@@ -8,18 +8,18 @@ import 'controller.dart';
 /// Displays the native WebView owned by [controller].
 ///
 /// Disposing this widget does not destroy the WebView; call
-/// [MobileWebViewController.dispose] when it is no longer needed.
-class MobileWebView extends StatelessWidget {
-  const MobileWebView({
+/// [AdvancedWebViewController.dispose] when it is no longer needed.
+class AdvancedWebView extends StatelessWidget {
+  const AdvancedWebView({
     super.key,
     required this.controller,
     this.gestureRecognizers = const {},
   });
 
   /// Must match `VIEW_TYPE` / `viewType` in the native plugins.
-  static const String viewType = 'dev.k1t.flutter_mobile_webview/webview';
+  static const String viewType = 'dev.k1t.advanced_webview/webview';
 
-  final MobileWebViewController controller;
+  final AdvancedWebViewController controller;
   final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers;
 
   @override
@@ -59,9 +59,7 @@ class MobileWebView extends StatelessWidget {
         );
       default:
         return ErrorWidget(
-          UnsupportedError(
-            'flutter_mobile_webview supports only Android and iOS',
-          ),
+          UnsupportedError('advanced_webview supports only Android and iOS'),
         );
     }
   }

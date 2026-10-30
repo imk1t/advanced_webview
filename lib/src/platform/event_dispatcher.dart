@@ -15,9 +15,9 @@ abstract interface class WebViewEventListener {
   void onJavaScriptMessage(String channelName, String message);
 }
 
-/// Single [MobileWebViewFlutterApi] implementation that routes every event to
+/// Single [AdvancedWebViewFlutterApi] implementation that routes every event to
 /// the listener registered for its `webViewId`.
-class WebViewEventDispatcher implements MobileWebViewFlutterApi {
+class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   WebViewEventDispatcher({this.binaryMessenger});
 
   static final WebViewEventDispatcher instance = WebViewEventDispatcher();
@@ -28,7 +28,7 @@ class WebViewEventDispatcher implements MobileWebViewFlutterApi {
 
   void register(int webViewId, WebViewEventListener listener) {
     if (!_isSetUp) {
-      MobileWebViewFlutterApi.setUp(this, binaryMessenger: binaryMessenger);
+      AdvancedWebViewFlutterApi.setUp(this, binaryMessenger: binaryMessenger);
       _isSetUp = true;
     }
     _listeners[webViewId] = listener;

@@ -14,7 +14,7 @@ Until 1.0.0, only the latest published version receives security fixes.
 **Please do not report security vulnerabilities through public GitHub issues.**
 
 Report them privately via
-[GitHub Security Advisories](https://github.com/imk1t/flutter_mobile_webview/security/advisories/new)
+[GitHub Security Advisories](https://github.com/imk1t/advanced_webview/security/advisories/new)
 ("Report a vulnerability" on the Security tab).
 
 Please include:
