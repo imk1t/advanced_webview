@@ -6,11 +6,19 @@ on:
     paths:
       - website/**
       - doc/**
+      # The native API mapping is checked against the code it documents.
+      - lib/**
+      - android/src/main/**
+      - ios/advanced_webview/Sources/**
       - .github/workflows/docs.yml
   pull_request:
     paths:
       - website/**
       - doc/**
+      # The native API mapping is checked against the code it documents.
+      - lib/**
+      - android/src/main/**
+      - ios/advanced_webview/Sources/**
       - .github/workflows/docs.yml
   workflow_dispatch:
 

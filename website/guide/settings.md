@@ -22,3 +22,5 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 
 "Creation only" settings are applied when the native view is created and ignored by
 `updateSettings` on that platform.
+
+See [Platform API mapping](./api-mapping#settings) for the native API behind each setting.

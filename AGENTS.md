@@ -32,6 +32,8 @@ ios/advanced_webview.podspec        CocoaPods spec (same sources as Package.swif
 test/                              Dart unit tests with a fake HostApi
 example/                           Example app + integration_test
 website/                           Docs site (VitePress), deployed to GitHub Pages by .github/workflows/docs.yml
+website/data/api-mapping.json      Dart API -> native Android/iOS API mapping (source of the "API mapping" pages)
+website/scripts/check-api-mapping.ts  Fails when the mapping drifts from lib/ and the native sources
 ```
 
 ## Commands
@@ -51,6 +53,7 @@ fvm flutter pub publish --dry-run                   # package validation
 cd example && fvm flutter build apk --debug         # Android build check
 cd example && fvm flutter build ios --simulator --debug  # iOS build check (macOS only)
 cd website && bun install && bun run dev            # docs site preview (Bun)
+cd website && bun run check:mapping                 # API mapping vs Dart/Kotlin/Swift sources (also runs in `bun run build`)
 
 # Native lint / format (Pigeon output *.g.kt / *.g.swift is always excluded)
 ktlint --format $(git ls-files '*.kt' '*.kts' | grep -v '\.g\.kt$')            # Kotlin
@@ -119,6 +122,10 @@ claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both p
   the code rather than disabling rules; if a rule must be disabled, do it in
   `.editorconfig` / `.swift-format` with a comment explaining why.
 - Code comments and dartdoc in English. Docs under `doc/` may be Japanese.
+- **API mapping.** `website/data/api-mapping.json` maps every public Dart API to the native
+  Android and iOS APIs behind it. When you add, rename or remove a public member, or change
+  which native API it calls, update that file in the same change (English and Japanese text
+  both). `bun run check:mapping` (part of the docs build and CI) fails on drift.
 - The docs site has English pages in `website/` and Japanese in `website/ja/`; keep them in
   sync, like README.md and README.ja.md. When a user-visible behaviour changes, update the
   matching guide page too.

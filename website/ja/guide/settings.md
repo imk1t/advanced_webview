@@ -20,3 +20,5 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `userAgent` | `null`（プラットフォーム既定） | 対応 | 対応 |
 
 「生成時のみ」の設定はネイティブビューの生成時に適用され、そのプラットフォームでは `updateSettings` で変更しても無視されます。
+
+各設定が使うネイティブ API は[ネイティブ API 対応表](./api-mapping#設定)を参照してください。

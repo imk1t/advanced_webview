@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "vitepress dev",
-    "build": "vitepress build",
+    "check:mapping": "bun scripts/check-api-mapping.ts",
+    "build": "bun run check:mapping && vitepress build",
     "preview": "vitepress preview"
   },
   "devDependencies": {
