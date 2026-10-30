@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- iOS: raise the minimum iOS version to 18.0.
+- iOS: run `evaluateJavaScript` on the main thread; it could hang when called off it.
 - Make `README.md` English and move the Japanese README to `README.ja.md`.
 - Add MIT license, community health files, issue/PR templates and pub.dev metadata.
 - Pin Flutter 3.47.8 with FVM (`.fvmrc`); CI uses the same version.

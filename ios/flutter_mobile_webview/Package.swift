@@ -10,7 +10,7 @@ import PackageDescription
 let package = Package(
   name: "flutter_mobile_webview",
   platforms: [
-    .iOS("15.0")
+    .iOS("18.0")
   ],
   products: [
     .library(name: "flutter-mobile-webview", targets: ["flutter_mobile_webview"])

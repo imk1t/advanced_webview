@@ -61,6 +61,10 @@ final class MobileWebView: NSObject, FlutterPlatformView {
     webView.loadHTMLString(html, baseURL: baseURL)
   }
 
+  /// WKWebView must be used on the main thread. Without `@MainActor` this
+  /// `async` function runs on the global executor, calls WKWebView off the
+  /// main thread and can hang.
+  @MainActor
   func evaluateJavaScript(_ source: String) async throws -> String? {
     // The completion-handler API is used on purpose: the async overload
     // cannot represent `undefined`/`null` results.
