@@ -15,7 +15,7 @@ jobs:
     permissions:
       id-token: write # OIDC token for pub.dev
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Configures the pub.dev OIDC credentials.
       - uses: dart-lang/setup-dart@v1
       - name: Read Flutter version from .fvmrc
