@@ -1,24 +1,28 @@
 # flutter_mobile_webview
 
+English | [日本語](README.ja.md)
+
 [![CI](https://github.com/imk1t/flutter_mobile_webview/actions/workflows/ci.yaml/badge.svg)](https://github.com/imk1t/flutter_mobile_webview/actions/workflows/ci.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Android と iOS に絞った、Pigeon ベースの型安全な Flutter WebView プラグインです。
-`flutter_inappwebview` の機能設計を参考にしつつ、小さな公開APIと1か所に集約したプラットフォーム契約で保守性を優先しています。
+A type-safe Flutter WebView plugin for Android and iOS only, built on Pigeon.
+It borrows feature ideas from `flutter_inappwebview`, but favours maintainability with a
+small public API and a single, centralised platform contract.
 
-設計判断（Pigeon 採用理由など）は [doc/architecture.md](doc/architecture.md) を参照してください。
+For design decisions (such as why Pigeon was chosen), see
+[doc/architecture.md](doc/architecture.md) (Japanese).
 
-## 対応プラットフォーム
+## Supported platforms
 
 | Android | iOS |
 | --- | --- |
 | API 24+ | iOS 15+ |
 
-iOS は Swift Package Manager と CocoaPods の両方に対応しています。
-Flutter の設定（`flutter config --enable-swift-package-manager` /
-`--no-enable-swift-package-manager`）に応じてどちらでもビルドされ、利用側で追加の作業は不要です。
+On iOS, both Swift Package Manager and CocoaPods are supported. The plugin builds with
+either, depending on your Flutter setting (`flutter config --enable-swift-package-manager` /
+`--no-enable-swift-package-manager`); no extra setup is needed in your app.
 
-## 使い方
+## Usage
 
 ```dart
 final controller = MobileWebViewController(
@@ -32,45 +36,52 @@ final controller = MobileWebViewController(
 // build
 MobileWebView(controller: controller);
 
-// JS 実行（結果は JSON からデコード済み）
+// Run JavaScript (the result is already decoded from JSON)
 final title = await controller.runJavaScriptReturningResult('document.title');
 
-// 不要になったら
+// When you no longer need it
 await controller.dispose();
 ```
 
-JS からは両OS共通で `window.Bridge.postMessage('hello')` を呼べます。
+On both platforms, JavaScript can call `window.Bridge.postMessage('hello')`.
 
-## 現在の機能
+## Current features
 
-- URL / HTML 文字列の読み込み、リロード、停止、戻る・進む
-- 現在の URL・タイトルの取得
-- JavaScript の実行（戻り値あり／なし）
-- JavaScript チャネル（JS → Dart のメッセージ）
-- ナビゲーション判定（メインフレーム）
-- コールバック: ページ開始・完了、進捗、タイトル変更、読み込みエラー
-- 設定: JavaScript 有効化、User-Agent、メディア自動再生、インライン再生（iOS）、ズーム（Android）、背景透過
+- Load a URL or an HTML string; reload, stop, go back and forward
+- Get the current URL and title
+- Run JavaScript (with or without a return value)
+- JavaScript channels (messages from JS to Dart)
+- Navigation decisions (main frame)
+- Callbacks: page started / finished, progress, title changed, load errors
+- Settings: JavaScript enabled, User-Agent, media autoplay, inline playback (iOS),
+  zoom (Android), transparent background
 
-## 開発
+## Development
 
-Flutter は [FVM](https://fvm.app) で管理しています（バージョンは `.fvmrc` で固定）。
+Flutter is managed with [FVM](https://fvm.app) (the version is pinned in `.fvmrc`).
 
 ```sh
-fvm install                                          # 固定バージョンの Flutter を導入
+fvm install                                          # install the pinned Flutter
 fvm flutter pub get
-fvm dart run pigeon --input pigeons/messages.dart   # pigeons/messages.dart を変更したとき
+fvm dart run pigeon --input pigeons/messages.dart   # after editing pigeons/messages.dart
 fvm flutter analyze
-fvm flutter test                                     # Dart 単体テスト
-cd example && fvm flutter test integration_test      # 実機・シミュレータでの結合テスト
+fvm flutter test                                     # Dart unit tests
+cd example && fvm flutter test integration_test      # integration tests on a device or simulator
 ```
 
-## コントリビュート
+Native code is formatted and linted with ktlint (Kotlin) and swift-format (Swift).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
-Issue・Pull Request を歓迎します（日本語・英語どちらでも可）。[CONTRIBUTING.md](CONTRIBUTING.md) と [行動規範](CODE_OF_CONDUCT.md) を参照してください。
-脆弱性の報告は Issue ではなく [SECURITY.md](SECURITY.md) の手順でお願いします。
+## Contributing
 
-AI コーディングエージェント向けの指示は [AGENTS.md](AGENTS.md) にあります（[APM](https://github.com/microsoft/apm) の `apm.yml` で配布）。
+Issues and pull requests are welcome, in English or Japanese. Please read
+[CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
+Please report security vulnerabilities by following [SECURITY.md](SECURITY.md), not
+through public issues.
 
-## ライセンス
+Instructions for AI coding agents are in [AGENTS.md](AGENTS.md) (shared skills are
+distributed with [APM](https://github.com/microsoft/apm) via `apm.yml`).
+
+## License
 
 [MIT License](LICENSE)
