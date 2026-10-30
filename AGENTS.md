@@ -31,6 +31,7 @@ ios/flutter_mobile_webview/Package.swift  Swift Package Manager manifest
 ios/flutter_mobile_webview.podspec        CocoaPods spec (same sources as Package.swift)
 test/                              Dart unit tests with a fake HostApi
 example/                           Example app + integration_test
+website/                           Docs site (VitePress), deployed to GitHub Pages by .github/workflows/docs.yml
 ```
 
 ## Commands
@@ -49,6 +50,7 @@ fvm dart run pigeon --input pigeons/messages.dart   # after editing pigeons/mess
 fvm flutter pub publish --dry-run                   # package validation
 cd example && fvm flutter build apk --debug         # Android build check
 cd example && fvm flutter build ios --simulator --debug  # iOS build check (macOS only)
+cd website && npm ci && npm run dev                 # docs site preview (Node 22)
 
 # Native lint / format (Pigeon output *.g.kt / *.g.swift is always excluded)
 ktlint --format $(git ls-files '*.kt' '*.kts' | grep -v '\.g\.kt$')            # Kotlin
@@ -117,6 +119,9 @@ claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both p
   the code rather than disabling rules; if a rule must be disabled, do it in
   `.editorconfig` / `.swift-format` with a comment explaining why.
 - Code comments and dartdoc in English. Docs under `doc/` may be Japanese.
+- The docs site has English pages in `website/` and Japanese in `website/ja/`; keep them in
+  sync, like README.md and README.ja.md. When a user-visible behaviour changes, update the
+  matching guide page too.
 
 ## Pull requests
 
