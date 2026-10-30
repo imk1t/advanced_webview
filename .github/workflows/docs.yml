@@ -29,7 +29,7 @@ jobs:
       run:
         working-directory: website
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # git history for "last updated"
       - uses: oven-sh/setup-bun@v2
@@ -38,7 +38,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build
       - if: github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: website/.vitepress/dist
 
