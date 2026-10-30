@@ -7,14 +7,13 @@
     "check:mapping": "bun scripts/check-api-mapping.ts",
     "build": "bun run check:mapping && vitepress build",
     "preview": "vitepress preview",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "bun fmt --no-script",
+    "format:check": "bun fmt --no-script --check",
     "lint": "oxlint --ignore-pattern .vitepress/dist --ignore-pattern .vitepress/cache ."
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "oxlint": "^1.90.0",
-    "prettier": "^3.9.10",
     "tailwindcss": "^4.3.3",
     "vitepress": "1.6.4"
   }

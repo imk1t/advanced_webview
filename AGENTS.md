@@ -55,7 +55,7 @@ cd example && fvm flutter build apk --debug         # Android build check
 cd example && fvm flutter build ios --simulator --debug  # iOS build check (macOS only)
 cd website && bun install && bun run dev            # docs site preview (Bun)
 cd website && bun run lint                          # oxlint for website code (CI runs it too)
-cd website && bun run format                        # Prettier for website code (ts/vue/css/json; CI runs `format:check`)
+cd website && bun run format                        # `bun fmt` (built in, reads .prettierrc.json) for website code; CI runs `format:check`
 cd website && bun run check:mapping                 # API mapping vs Dart/Kotlin/Swift sources (also runs in `bun run build`)
 
 # Native lint / format (Pigeon output *.g.kt / *.g.swift is always excluded)
