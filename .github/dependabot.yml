@@ -12,3 +12,6 @@ updates:
     directory: /website
     schedule:
       interval: weekly
+    # Wait before proposing new releases (supply-chain hardening; see website/bunfig.toml).
+    cooldown:
+      default-days: 7
