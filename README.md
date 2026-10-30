@@ -9,6 +9,8 @@ A type-safe Flutter WebView plugin for Android and iOS only, built on Pigeon.
 It borrows feature ideas from `flutter_inappwebview`, but favours maintainability with a
 small public API and a single, centralised platform contract.
 
+Documentation: https://imk1t.github.io/flutter_mobile_webview/
+
 For design decisions (such as why Pigeon was chosen), see
 [doc/architecture.md](doc/architecture.md) (Japanese).
 
