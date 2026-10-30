@@ -1,0 +1,7 @@
+/*
+ * Tailwind v4 utilities for custom components. Preflight is deliberately not imported so the
+ * default VitePress theme keeps its own reset, and the `tw:` prefix avoids class-name clashes.
+ */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme) prefix(tw);
+@import 'tailwindcss/utilities.css' layer(utilities) prefix(tw);

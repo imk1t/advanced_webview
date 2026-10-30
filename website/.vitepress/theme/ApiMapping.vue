@@ -45,7 +45,12 @@ const platforms: Platform[] = ['android', 'ios']
 function refOf(platform: Platform, api: string) {
   const ref = parseRef(api)
   if (!ref) return { api, className: api, rest: '', href: undefined }
-  return { api, className: ref.className, rest: api.slice(ref.className.length), href: mapping.classes[platform][ref.className] }
+  return {
+    api,
+    className: ref.className,
+    rest: api.slice(ref.className.length),
+    href: mapping.classes[platform][ref.className],
+  }
 }
 
 const rows = computed(() =>
@@ -60,43 +65,47 @@ const rows = computed(() =>
 </script>
 
 <template>
-  <table class="api-mapping">
-    <thead>
-      <tr>
-        <th>{{ labels[locale].dart }}</th>
-        <th>{{ labels[locale].android }}</th>
-        <th>{{ labels[locale].ios }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="row in rows" :id="anchorFor(row.entry.dart)" :key="row.entry.dart">
-        <td>
-          <code>{{ row.entry.dart }}</code>
-          <p class="api-mapping__summary">{{ row.entry.summary[locale] }}</p>
-        </td>
-        <td v-if="row.entry.dartOnly" colspan="2" class="api-mapping__dart-only">
-          {{ labels[locale].dartOnly }}
-        </td>
-        <template v-else>
-          <td v-for="{ platform, side, refs } in row.sides" :key="platform">
-            <template v-if="side">
-              <span :class="['api-mapping__badge', `api-mapping__badge--${side.status}`]">
-                {{ labels[locale].status[side.status] }}
-              </span>
-              <ul v-if="refs.length" class="api-mapping__apis">
-                <li v-for="ref in refs" :key="ref.api">
-                  <code
-                    ><a v-if="ref.href" :href="ref.href" target="_blank" rel="noreferrer">{{ ref.className }}</a
-                    ><template v-else>{{ ref.className }}</template
-                    >{{ ref.rest }}</code
-                  >
-                </li>
-              </ul>
-              <p v-if="side.note" class="api-mapping__note">{{ side.note[locale] }}</p>
-            </template>
+  <div class="tw:my-4 tw:overflow-x-auto">
+    <table class="api-mapping">
+      <thead>
+        <tr>
+          <th>{{ labels[locale].dart }}</th>
+          <th>{{ labels[locale].android }}</th>
+          <th>{{ labels[locale].ios }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in rows" :id="anchorFor(row.entry.dart)" :key="row.entry.dart">
+          <td>
+            <code>{{ row.entry.dart }}</code>
+            <p class="api-mapping__summary">{{ row.entry.summary[locale] }}</p>
           </td>
-        </template>
-      </tr>
-    </tbody>
-  </table>
+          <td v-if="row.entry.dartOnly" colspan="2" class="api-mapping__dart-only">
+            {{ labels[locale].dartOnly }}
+          </td>
+          <template v-else>
+            <td v-for="{ platform, side, refs } in row.sides" :key="platform">
+              <template v-if="side">
+                <span :class="['api-mapping__badge', `api-mapping__badge--${side.status}`]">
+                  {{ labels[locale].status[side.status] }}
+                </span>
+                <ul v-if="refs.length" class="api-mapping__apis">
+                  <li v-for="ref in refs" :key="ref.api">
+                    <code
+                      ><a v-if="ref.href" :href="ref.href" target="_blank" rel="noreferrer">{{
+                        ref.className
+                      }}</a
+                      ><template v-else>{{ ref.className }}</template
+                      >{{ ref.rest }}</code
+                    >
+                  </li>
+                </ul>
+                <p v-if="side.note" class="api-mapping__note">{{ side.note[locale] }}</p>
+              </template>
+            </td>
+          </template>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>

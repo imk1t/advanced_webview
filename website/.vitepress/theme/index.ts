@@ -1,6 +1,8 @@
 import DefaultTheme from 'vitepress/theme'
 import type { Theme } from 'vitepress'
 import ApiMapping from './ApiMapping.vue'
+import './tailwind.css'
+import './layout.css'
 import './api-mapping.css'
 
 export default {

@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import tailwindcss from '@tailwindcss/vite'
 
 const repo = 'https://github.com/imk1t/advanced_webview'
 
@@ -10,6 +11,7 @@ export default defineConfig({
   base: '/advanced_webview/',
   cleanUrls: true,
   lastUpdated: true,
+  vite: { plugins: [tailwindcss()] },
 
   themeConfig: {
     socialLinks: [{ icon: 'github', link: repo }],

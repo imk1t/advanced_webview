@@ -6,9 +6,14 @@
     "dev": "vitepress dev",
     "check:mapping": "bun scripts/check-api-mapping.ts",
     "build": "bun run check:mapping && vitepress build",
-    "preview": "vitepress preview"
+    "preview": "vitepress preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "prettier": "^3.9.10",
+    "tailwindcss": "^4.3.3",
     "vitepress": "1.6.4"
   }
 }

@@ -152,7 +152,8 @@ function memberNames(className: string, head: string): string[] {
   const getter = /\bget\s+(\w+)/.exec(text)
   let name: string | undefined
   if (getter && (paren < 0 || getter.index < paren)) name = getter[1]
-  else if (equals >= 0 && (paren < 0 || equals < paren)) name = /(\w+)\s*$/.exec(text.slice(0, equals))?.[1]
+  else if (equals >= 0 && (paren < 0 || equals < paren))
+    name = /(\w+)\s*$/.exec(text.slice(0, equals))?.[1]
   else if (paren < 0) name = /(\w+)\s*$/.exec(text)?.[1]
   else {
     const before = text.slice(0, paren)
@@ -170,9 +171,10 @@ function publicDartApi(): Set<string> {
     const shown = m[2]?.split(',').map((s) => s.trim())
     const file = join(lib, m[1])
     for (const stmt of splitStatements(stripDart(readFileSync(file, 'utf8')))) {
-      const decl = /^(?:@\w+\s+)*(?:(?:abstract|final|base|sealed|interface)\s+)*(class|enum|mixin)\s+(\w+)/.exec(
-        stmt.head,
-      )
+      const decl =
+        /^(?:@\w+\s+)*(?:(?:abstract|final|base|sealed|interface)\s+)*(class|enum|mixin)\s+(\w+)/.exec(
+          stmt.head,
+        )
       if (!decl || decl[2].startsWith('_')) continue
       const name = decl[2]
       if (shown && !shown.includes(name)) continue
@@ -223,7 +225,9 @@ function androidMemberVariants(member: string): string[] {
 // ---------------------------------------------------------------------------
 // Validate the mapping
 
-const mapping: ApiMapping = JSON.parse(readFileSync(join(root, 'website/data/api-mapping.json'), 'utf8'))
+const mapping: ApiMapping = JSON.parse(
+  readFileSync(join(root, 'website/data/api-mapping.json'), 'utf8'),
+)
 const groupIds = new Set(mapping.groups.map((g) => g.id))
 const dartApi = publicDartApi()
 const seen = new Set<string>()
@@ -251,12 +255,15 @@ function checkEntry(entry: MappingEntry) {
     }
     if (!statuses.has(side.status)) fail(`${at}: ${platform}.status "${side.status}" is invalid`)
     if (side.status === 'unsupported' ? side.apis.length > 0 : side.apis.length === 0) {
-      fail(`${at}: ${platform}.apis must be ${side.status === 'unsupported' ? 'empty' : 'non-empty'} for "${side.status}"`)
+      fail(
+        `${at}: ${platform}.apis must be ${side.status === 'unsupported' ? 'empty' : 'non-empty'} for "${side.status}"`,
+      )
     }
     if (side.status !== 'supported' && !(side.note?.en && side.note?.ja)) {
       fail(`${at}: ${platform} is "${side.status}" and needs a note in "en" and "ja"`)
     }
-    if (side.note && !(side.note.en && side.note.ja)) fail(`${at}: ${platform}.note needs both "en" and "ja"`)
+    if (side.note && !(side.note.en && side.note.ja))
+      fail(`${at}: ${platform}.note needs both "en" and "ja"`)
     for (const api of side.apis) checkRef(at, platform, api)
   }
 }
@@ -265,7 +272,9 @@ function checkRef(at: string, platform: Platform, api: string) {
   const ref = parseRef(api)
   if (!ref) return fail(`${at}: cannot parse ${platform} reference "${api}"`)
   if (!mapping.classes[platform][ref.className]) {
-    return fail(`${at}: "${ref.className}" is not in classes.${platform} (add it with its documentation URL)`)
+    return fail(
+      `${at}: "${ref.className}" is not in classes.${platform} (add it with its documentation URL)`,
+    )
   }
   // Only names this plugin's own native code uses can be verified.
   const tokens: string[] = []
@@ -281,7 +290,9 @@ function checkRef(at: string, platform: Platform, api: string) {
   }
   for (const token of tokens) {
     if (!hasToken(platform, `(?:${token})`)) {
-      fail(`${at}: ${platform} reference "${api}" — "${token}" not found in the ${platform} sources (stale mapping?)`)
+      fail(
+        `${at}: ${platform} reference "${api}" — "${token}" not found in the ${platform} sources (stale mapping?)`,
+      )
     }
   }
 }
@@ -295,7 +306,9 @@ for (const symbol of [...dartApi].sort()) {
   if (isMember ? !seen.has(symbol) : !MEMBER_LEVEL.has(symbol) && !seen.has(symbol)) {
     fail(
       `${symbol}: public Dart API without an entry in website/data/api-mapping.json` +
-        (isMember ? '' : ` (or add ${className} to MEMBER_LEVEL in this script to map its members instead)`),
+        (isMember
+          ? ''
+          : ` (or add ${className} to MEMBER_LEVEL in this script to map its members instead)`),
     )
   }
 }
@@ -312,7 +325,9 @@ for (const page of ['guide/api-mapping.md', 'ja/guide/api-mapping.md']) {
 }
 
 if (errors.length > 0) {
-  console.error(`api-mapping check failed (${errors.length}):\n` + errors.map((e) => `  - ${e}`).join('\n'))
+  console.error(
+    `api-mapping check failed (${errors.length}):\n` + errors.map((e) => `  - ${e}`).join('\n'),
+  )
   console.error('\nFix website/data/api-mapping.json.')
   process.exit(1)
 }

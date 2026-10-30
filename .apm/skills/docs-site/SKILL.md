@@ -37,7 +37,7 @@ first; it takes precedence over this skill. Do not add Web, macOS, Windows or Li
 6. **Keep neighbours consistent.** If a user-visible behaviour changed, also check
    `README.md` / `README.ja.md` (keep them in sync), the dartdoc of the affected public
    members, and `CHANGELOG.md`.
-7. **Build locally.** In `website/`: `bun install --frozen-lockfile`, then `bun run build`
+7. **Format and build locally.** In `website/`: `bun install --frozen-lockfile`, `bun run format` (Prettier; Markdown pages are excluded), then `bun run build`
    (it runs `check:mapping` first). The build fails on dead internal links, so fix them rather
    than ignoring the error. Optionally preview with `bun run dev`. Do not commit
    `node_modules/` or `.vitepress/dist`/`cache`.
@@ -46,6 +46,10 @@ first; it takes precedence over this skill. Do not add Web, macOS, Windows or Li
    `main`. Mention in the PR which pages changed in both languages.
 
 ## Notes
+
+- Styling: custom components use Tailwind v4 utilities with the `tw:` prefix (`tw:overflow-x-auto`);
+  preflight is not imported, so the default VitePress theme is untouched. Content width is set
+  in `website/.vitepress/theme/layout.css`.
 
 - Site URL: https://imk1t.github.io/advanced_webview/ (`base: '/advanced_webview/'` in the
   config; change it to `/` only if a custom domain is set up).
@@ -58,5 +62,5 @@ first; it takes precedence over this skill. Do not add Web, macOS, Windows or Li
 
 - English and Japanese pages describe the same behaviour and the same API.
 - `website/data/api-mapping.json` covers every public Dart API and `bun run check:mapping` passes.
-- `website` builds without errors and the sidebar lists every page in both languages.
+- `bun run format:check` and `bun run build` pass in `website/`, with no errors and the sidebar lists every page in both languages.
 - README, dartdoc and `CHANGELOG.md` do not contradict the guide.
