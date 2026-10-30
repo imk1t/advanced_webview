@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
 
+# Cancel superseded runs of a PR so they don't hold the few macOS runners.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   dart:
     runs-on: ubuntu-latest
@@ -178,7 +183,17 @@ jobs:
           echo "udid=$udid" >> "$GITHUB_OUTPUT"
       # Runs before xcodebuild, which can leave the simulator unavailable to
       # `flutter devices` afterwards.
+      # The test run sometimes hangs after the build (simulator never starts the
+      # app) and used to burn the whole job timeout. Cap each attempt and retry once.
       - name: Integration tests on the simulator
+        id: integration
+        continue-on-error: true
+        timeout-minutes: 10
+        working-directory: example
+        run: flutter test integration_test -d ${{ steps.simulator.outputs.udid }}
+      - name: Integration tests on the simulator (retry)
+        if: steps.integration.outcome != 'success'
+        timeout-minutes: 10
         working-directory: example
         run: flutter test integration_test -d ${{ steps.simulator.outputs.udid }}
       - name: Swift unit tests (XCTest)
