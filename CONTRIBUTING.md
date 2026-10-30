@@ -1,11 +1,11 @@
-# Contributing to flutter_mobile_webview
+# Contributing to advanced_webview
 
 Thanks for your interest in contributing! Issues and pull requests are welcome in
 English or Japanese (日本語での Issue / PR も歓迎します).
 
 ## Before you start
 
-- Search existing [issues](https://github.com/imk1t/flutter_mobile_webview/issues) first.
+- Search existing [issues](https://github.com/imk1t/advanced_webview/issues) first.
 - For anything larger than a small fix (new APIs, behaviour changes), open an issue
   to discuss the design before writing code. The goal of this package is a **small,
   maintainable API for Android and iOS only**; please read
@@ -32,7 +32,7 @@ fvm flutter test                                    # Dart unit tests
 cd example && fvm flutter test integration_test     # on a device or simulator
 
 # Native unit tests (build the example once first so Gradle / Xcode are configured)
-cd example && fvm flutter build apk --debug && cd android && ./gradlew :flutter_mobile_webview:testDebugUnitTest
+cd example && fvm flutter build apk --debug && cd android && ./gradlew :advanced_webview:testDebugUnitTest
 cd example && fvm flutter build ios --simulator --debug && cd ios && \
   xcodebuild test -workspace Runner.xcworkspace -scheme Runner -only-testing:RunnerTests \
   -destination 'platform=iOS Simulator,name=iPhone 16'
@@ -64,9 +64,9 @@ Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
   (`MobileWebView`, `WebViewRegistry`, `WebViewHostApiImpl`, `MobileWebViewFactory`,
   `MobileWebViewPlugin`). A change on one side normally needs the same change on the other.
 - **iOS supports both Swift Package Manager and CocoaPods.** Keep
-  `ios/flutter_mobile_webview/Package.swift` and `ios/flutter_mobile_webview.podspec` in
+  `ios/advanced_webview/Package.swift` and `ios/advanced_webview.podspec` in
   sync (minimum iOS version, sources, resources). CI builds the example with each.
-- Only symbols exported from `lib/flutter_mobile_webview.dart` are public API.
+- Only symbols exported from `lib/advanced_webview.dart` are public API.
 - Format Dart code with `fvm dart format` (generated `*.g.dart` files are excluded).
 - Add or update tests for behaviour changes (`test/` uses a fake HostApi).
 - Update `CHANGELOG.md` under `## Unreleased` for user-visible changes.

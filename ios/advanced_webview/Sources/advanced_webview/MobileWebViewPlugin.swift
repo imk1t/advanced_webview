@@ -5,7 +5,7 @@ import UIKit
 /// engine. All per-WebView state lives in `WebViewRegistry`.
 public class MobileWebViewPlugin: NSObject, FlutterPlugin {
   /// Must match `MobileWebView.viewType` on the Dart side.
-  static let viewType = "dev.k1t.flutter_mobile_webview/webview"
+  static let viewType = "dev.k1t.advanced_webview/webview"
 
   private let hostApi: WebViewHostApiImpl
 

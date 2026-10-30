@@ -1,7 +1,7 @@
+import 'package:advanced_webview/advanced_webview.dart';
+import 'package:advanced_webview/src/platform/event_dispatcher.dart';
+import 'package:advanced_webview/src/platform/messages.g.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_mobile_webview/flutter_mobile_webview.dart';
-import 'package:flutter_mobile_webview/src/platform/event_dispatcher.dart';
-import 'package:flutter_mobile_webview/src/platform/messages.g.dart';
 
 import 'fake_host_api.dart';
 

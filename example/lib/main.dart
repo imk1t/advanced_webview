@@ -1,5 +1,5 @@
+import 'package:advanced_webview/advanced_webview.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobile_webview/flutter_mobile_webview.dart';
 
 void main() => runApp(const MaterialApp(home: BrowserPage()));
 
@@ -67,7 +67,7 @@ class _BrowserPageState extends State<BrowserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_title ?? 'flutter_mobile_webview'),
+        title: Text(_title ?? 'advanced_webview'),
         actions: [
           IconButton(icon: const Icon(Icons.arrow_back), onPressed: _goBack),
           IconButton(

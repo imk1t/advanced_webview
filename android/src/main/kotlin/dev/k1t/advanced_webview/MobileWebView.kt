@@ -1,4 +1,4 @@
-package dev.k1t.flutter_mobile_webview
+package dev.k1t.advanced_webview
 
 import android.annotation.SuppressLint
 import android.content.Context

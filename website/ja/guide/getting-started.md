@@ -1,6 +1,6 @@
 # はじめに
 
-`flutter_mobile_webview` は **Android と iOS に絞った**、[Pigeon](https://pub.dev/packages/pigeon)
+`advanced_webview` は **Android と iOS に絞った**、[Pigeon](https://pub.dev/packages/pigeon)
 ベースの型安全な Flutter WebView プラグインです。`flutter_inappwebview` の機能設計を参考にしつつ、
 小さな公開 API と1か所に集約したプラットフォーム契約で保守性を優先しています。
 
@@ -20,16 +20,16 @@ Flutter の設定（`flutter config --enable-swift-package-manager` /
 
 ```yaml
 dependencies:
-  flutter_mobile_webview:
+  advanced_webview:
     git:
-      url: https://github.com/imk1t/flutter_mobile_webview.git
+      url: https://github.com/imk1t/advanced_webview.git
 ```
 
 ## 最小の例
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_mobile_webview/flutter_mobile_webview.dart';
+import 'package:advanced_webview/advanced_webview.dart';
 
 class BrowserPage extends StatefulWidget {
   const BrowserPage({super.key});

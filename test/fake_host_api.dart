@@ -1,5 +1,5 @@
+import 'package:advanced_webview/src/platform/messages.g.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_mobile_webview/src/platform/messages.g.dart';
 
 /// In-memory [MobileWebViewHostApi] that records every call.
 class FakeHostApi extends Fake implements MobileWebViewHostApi {

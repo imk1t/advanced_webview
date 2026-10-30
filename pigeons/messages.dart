@@ -12,11 +12,11 @@ import 'package:pigeon/pigeon.dart';
 @ConfigurePigeon(
   PigeonOptions(
     dartOut: 'lib/src/platform/messages.g.dart',
-    dartPackageName: 'flutter_mobile_webview',
+    dartPackageName: 'advanced_webview',
     kotlinOut:
-        'android/src/main/kotlin/dev/k1t/flutter_mobile_webview/Messages.g.kt',
-    kotlinOptions: KotlinOptions(package: 'dev.k1t.flutter_mobile_webview'),
-    swiftOut: 'ios/flutter_mobile_webview/Sources/flutter_mobile_webview/Messages.g.swift',
+        'android/src/main/kotlin/dev/k1t/advanced_webview/Messages.g.kt',
+    kotlinOptions: KotlinOptions(package: 'dev.k1t.advanced_webview'),
+    swiftOut: 'ios/advanced_webview/Sources/advanced_webview/Messages.g.swift',
   ),
 )
 // ---------------------------------------------------------------------------

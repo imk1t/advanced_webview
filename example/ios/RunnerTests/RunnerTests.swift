@@ -3,7 +3,7 @@ import UIKit
 import WebKit
 import XCTest
 
-@testable import flutter_mobile_webview
+@testable import advanced_webview
 
 // Unit tests for the Swift implementation. They run in the example app's test
 // host: `xcodebuild test -workspace Runner.xcworkspace -scheme Runner`.

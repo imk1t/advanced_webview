@@ -2,7 +2,7 @@
 // See also: https://pub.dev/packages/pigeon
 @file:Suppress("UNCHECKED_CAST", "ArrayInDataClass")
 
-package dev.k1t.flutter_mobile_webview
+package dev.k1t.advanced_webview
 
 import android.util.Log
 import io.flutter.plugin.common.BasicMessageChannel
@@ -502,7 +502,7 @@ interface MobileWebViewHostApi {
     fun setUp(binaryMessenger: BinaryMessenger, api: MobileWebViewHostApi?, messageChannelSuffix: String = "") {
       val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.create$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.create$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -520,7 +520,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.dispose$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.dispose$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -538,7 +538,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.loadUrl$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.loadUrl$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -558,7 +558,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.loadHtmlString$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.loadHtmlString$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -578,7 +578,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.reload$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.reload$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -596,7 +596,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.stopLoading$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.stopLoading$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -614,7 +614,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.goBack$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.goBack$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -632,7 +632,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.goForward$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.goForward$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -650,7 +650,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.canGoBack$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.canGoBack$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -667,7 +667,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.canGoForward$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.canGoForward$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -684,7 +684,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.getUrl$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.getUrl$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -701,7 +701,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.getTitle$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.getTitle$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -718,7 +718,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.evaluateJavaScript$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.evaluateJavaScript$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -738,7 +738,7 @@ interface MobileWebViewHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.updateSettings$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.updateSettings$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -771,7 +771,7 @@ class MobileWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, priv
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onPageStarted$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onPageStarted$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, urlArg)) {
         if (it is List<*>) {
@@ -790,7 +790,7 @@ class MobileWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, priv
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onPageFinished$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onPageFinished$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, urlArg)) {
         if (it is List<*>) {
@@ -809,7 +809,7 @@ class MobileWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, priv
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onProgressChanged$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onProgressChanged$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, progressArg)) {
         if (it is List<*>) {
@@ -828,7 +828,7 @@ class MobileWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, priv
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onTitleChanged$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onTitleChanged$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, titleArg)) {
         if (it is List<*>) {
@@ -847,7 +847,7 @@ class MobileWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, priv
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onReceivedError$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onReceivedError$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, errorArg)) {
         if (it is List<*>) {
@@ -866,7 +866,7 @@ class MobileWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, priv
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.shouldOverrideUrlLoading$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.shouldOverrideUrlLoading$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, requestArg)) {
         if (it is List<*>) {
@@ -888,7 +888,7 @@ class MobileWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, priv
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onJavaScriptMessage$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onJavaScriptMessage$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, channelNameArg, messageArg)) {
         if (it is List<*>) {

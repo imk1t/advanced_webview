@@ -17,7 +17,7 @@ class MobileWebView extends StatelessWidget {
   });
 
   /// Must match `VIEW_TYPE` / `viewType` in the native plugins.
-  static const String viewType = 'dev.k1t.flutter_mobile_webview/webview';
+  static const String viewType = 'dev.k1t.advanced_webview/webview';
 
   final MobileWebViewController controller;
   final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers;
@@ -60,7 +60,7 @@ class MobileWebView extends StatelessWidget {
       default:
         return ErrorWidget(
           UnsupportedError(
-            'flutter_mobile_webview supports only Android and iOS',
+            'advanced_webview supports only Android and iOS',
           ),
         );
     }

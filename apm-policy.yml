@@ -1,4 +1,4 @@
-name: flutter_mobile_webview
+name: advanced_webview
 version: "0.1.0"
 enforcement: block
 fetch_failure: block

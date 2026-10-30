@@ -1,13 +1,13 @@
 import { defineConfig } from 'vitepress'
 
-const repo = 'https://github.com/imk1t/flutter_mobile_webview'
+const repo = 'https://github.com/imk1t/advanced_webview'
 
 export default defineConfig({
-  title: 'flutter_mobile_webview',
+  title: 'advanced_webview',
   description: 'A lean, type-safe WebView plugin for Android and iOS built on Pigeon.',
-  // Served from https://imk1t.github.io/flutter_mobile_webview/ (project Pages).
+  // Served from https://imk1t.github.io/advanced_webview/ (project Pages).
   // Change to '/' when a custom domain is configured.
-  base: '/flutter_mobile_webview/',
+  base: '/advanced_webview/',
   cleanUrls: true,
   lastUpdated: true,
 

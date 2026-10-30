@@ -1,6 +1,6 @@
 ---
 name: pigeon-contract
-description: Add or change a Dart <-> native API of flutter_mobile_webview via pigeons/messages.dart, regenerate the bindings, and update the Dart, Kotlin and Swift sides together. Use for any change that crosses the platform channel.
+description: Add or change a Dart <-> native API of advanced_webview via pigeons/messages.dart, regenerate the bindings, and update the Dart, Kotlin and Swift sides together. Use for any change that crosses the platform channel.
 ---
 
 # Changing the platform contract
@@ -19,9 +19,9 @@ description: Add or change a Dart <-> native API of flutter_mobile_webview via p
 2. Regenerate: `fvm dart run pigeon --input pigeons/messages.dart`. Never edit
    `messages.g.dart`, `Messages.g.kt` or `Messages.g.swift` by hand.
 3. Implement both platforms with the same shape:
-   - Android: `android/src/main/kotlin/dev/k1t/flutter_mobile_webview/WebViewHostApiImpl.kt`
+   - Android: `android/src/main/kotlin/dev/k1t/advanced_webview/WebViewHostApiImpl.kt`
      (and `MobileWebView.kt` for view behaviour).
-   - iOS: `ios/flutter_mobile_webview/Sources/flutter_mobile_webview/WebViewHostApiImpl.swift`
+   - iOS: `ios/advanced_webview/Sources/advanced_webview/WebViewHostApiImpl.swift`
      (and `MobileWebView.swift`).
    - Absorb platform differences natively so Dart sees one behaviour; document any
      unavoidable difference in dartdoc and `doc/architecture.md`.

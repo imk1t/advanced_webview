@@ -1,4 +1,4 @@
-package dev.k1t.flutter_mobile_webview
+package dev.k1t.advanced_webview
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +37,6 @@ class MobileWebViewPlugin : FlutterPlugin {
 
     companion object {
         /** Must match `MobileWebView.viewType` on the Dart side. */
-        const val VIEW_TYPE = "dev.k1t.flutter_mobile_webview/webview"
+        const val VIEW_TYPE = "dev.k1t.advanced_webview/webview"
     }
 }

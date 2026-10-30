@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: flutter_mobile_webview
+  name: advanced_webview
   text: WebView for Flutter, Android and iOS only
   tagline: A lean, type-safe WebView plugin built on Pigeon.
   actions:
@@ -11,7 +11,7 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: View on GitHub
-      link: https://github.com/imk1t/flutter_mobile_webview
+      link: https://github.com/imk1t/advanced_webview
 
 features:
   - title: Android and iOS only

@@ -1,14 +1,14 @@
-# flutter_mobile_webview
+# advanced_webview
 
 [English](README.md) | 日本語
 
-[![CI](https://github.com/imk1t/flutter_mobile_webview/actions/workflows/ci.yaml/badge.svg)](https://github.com/imk1t/flutter_mobile_webview/actions/workflows/ci.yaml)
+[![CI](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml/badge.svg)](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Android と iOS に絞った、Pigeon ベースの型安全な Flutter WebView プラグインです。
 `flutter_inappwebview` の機能設計を参考にしつつ、小さな公開APIと1か所に集約したプラットフォーム契約で保守性を優先しています。
 
-ドキュメント: https://imk1t.github.io/flutter_mobile_webview/ja/
+ドキュメント: https://imk1t.github.io/advanced_webview/ja/
 
 設計判断（Pigeon 採用理由など）は [doc/architecture.md](doc/architecture.md) を参照してください。
 

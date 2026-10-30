@@ -1,4 +1,4 @@
-package dev.k1t.flutter_mobile_webview
+package dev.k1t.advanced_webview
 
 import android.graphics.Color
 import android.net.Uri
@@ -145,7 +145,7 @@ class WebViewHostApiImplTest {
         shadowOf(Looper.getMainLooper()).idle()
 
         verify(messenger).send(
-            eq("dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onJavaScriptMessage"),
+            eq("dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onJavaScriptMessage"),
             any(),
             any(),
         )

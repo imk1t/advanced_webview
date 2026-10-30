@@ -424,7 +424,7 @@ class MobileWebViewHostApi {
   /// Creates the native WebView. Must be called before the platform view with
   /// the same `webViewId` is attached.
   Future<void> create(CreationParamsMessage params) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.create$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.create$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -442,7 +442,7 @@ class MobileWebViewHostApi {
   }
 
   Future<void> dispose(int webViewId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.dispose$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.dispose$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -460,7 +460,7 @@ class MobileWebViewHostApi {
   }
 
   Future<void> loadUrl(int webViewId, String url, Map<String, String> headers) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.loadUrl$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.loadUrl$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -478,7 +478,7 @@ class MobileWebViewHostApi {
   }
 
   Future<void> loadHtmlString(int webViewId, String html, String? baseUrl) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.loadHtmlString$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.loadHtmlString$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -496,7 +496,7 @@ class MobileWebViewHostApi {
   }
 
   Future<void> reload(int webViewId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.reload$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.reload$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -514,7 +514,7 @@ class MobileWebViewHostApi {
   }
 
   Future<void> stopLoading(int webViewId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.stopLoading$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.stopLoading$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -532,7 +532,7 @@ class MobileWebViewHostApi {
   }
 
   Future<void> goBack(int webViewId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.goBack$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.goBack$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -550,7 +550,7 @@ class MobileWebViewHostApi {
   }
 
   Future<void> goForward(int webViewId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.goForward$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.goForward$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -568,7 +568,7 @@ class MobileWebViewHostApi {
   }
 
   Future<bool> canGoBack(int webViewId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.canGoBack$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.canGoBack$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -587,7 +587,7 @@ class MobileWebViewHostApi {
   }
 
   Future<bool> canGoForward(int webViewId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.canGoForward$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.canGoForward$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -606,7 +606,7 @@ class MobileWebViewHostApi {
   }
 
   Future<String?> getUrl(int webViewId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.getUrl$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.getUrl$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -625,7 +625,7 @@ class MobileWebViewHostApi {
   }
 
   Future<String?> getTitle(int webViewId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.getTitle$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.getTitle$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -645,7 +645,7 @@ class MobileWebViewHostApi {
 
   /// Returns the evaluation result encoded as JSON (or null).
   Future<String?> evaluateJavaScript(int webViewId, String source) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.evaluateJavaScript$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.evaluateJavaScript$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -664,7 +664,7 @@ class MobileWebViewHostApi {
   }
 
   Future<void> updateSettings(int webViewId, WebViewSettingsMessage settings) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewHostApi.updateSettings$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.updateSettings$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -707,7 +707,7 @@ abstract class MobileWebViewFlutterApi {
     messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onPageStarted$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onPageStarted$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -729,7 +729,7 @@ abstract class MobileWebViewFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onPageFinished$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onPageFinished$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -751,7 +751,7 @@ abstract class MobileWebViewFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onProgressChanged$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onProgressChanged$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -773,7 +773,7 @@ abstract class MobileWebViewFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onTitleChanged$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onTitleChanged$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -795,7 +795,7 @@ abstract class MobileWebViewFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onReceivedError$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onReceivedError$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -817,7 +817,7 @@ abstract class MobileWebViewFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.shouldOverrideUrlLoading$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.shouldOverrideUrlLoading$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -839,7 +839,7 @@ abstract class MobileWebViewFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.flutter_mobile_webview.MobileWebViewFlutterApi.onJavaScriptMessage$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onJavaScriptMessage$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);

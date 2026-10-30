@@ -1,6 +1,6 @@
-name: flutter_mobile_webview
+name: advanced_webview
 version: "0.0.1"
-description: Agent configuration for developing the flutter_mobile_webview Flutter plugin.
+description: Agent configuration for developing the advanced_webview Flutter plugin.
 license: MIT
 includes:
   - .apm/skills/**

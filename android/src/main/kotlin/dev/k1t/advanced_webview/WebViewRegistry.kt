@@ -1,4 +1,4 @@
-package dev.k1t.flutter_mobile_webview
+package dev.k1t.advanced_webview
 
 /** Maps Dart-allocated `webViewId`s to live native instances. Main thread only. */
 class WebViewRegistry {
