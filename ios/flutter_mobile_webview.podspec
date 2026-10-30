@@ -18,7 +18,7 @@ A lean, type-safe WebView plugin for Android and iOS.
   # the two in sync.
   s.source_files = 'flutter_mobile_webview/Sources/flutter_mobile_webview/**/*.swift'
   s.dependency 'Flutter'
-  s.platform = :ios, '15.0'
+  s.platform = :ios, '18.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }

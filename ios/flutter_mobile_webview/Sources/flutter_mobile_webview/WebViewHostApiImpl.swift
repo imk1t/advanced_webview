@@ -71,6 +71,8 @@ final class WebViewHostApiImpl: MobileWebViewHostApi {
     return try registry.get(webViewId).webView.title
   }
 
+  // The registry and WKWebView are main-thread only; keep this async call there.
+  @MainActor
   func evaluateJavaScript(webViewId: Int64, source: String) async throws -> String? {
     return try await registry.get(webViewId).evaluateJavaScript(source)
   }

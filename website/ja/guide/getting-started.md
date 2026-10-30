@@ -8,7 +8,7 @@
 
 | Android | iOS |
 | --- | --- |
-| API 24+ | iOS 15+ |
+| API 24+ | iOS 18+ |
 
 iOS は Swift Package Manager と CocoaPods の両方に対応しています。
 Flutter の設定（`flutter config --enable-swift-package-manager` /
