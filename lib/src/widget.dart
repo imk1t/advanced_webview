@@ -59,9 +59,7 @@ class MobileWebView extends StatelessWidget {
         );
       default:
         return ErrorWidget(
-          UnsupportedError(
-            'advanced_webview supports only Android and iOS',
-          ),
+          UnsupportedError('advanced_webview supports only Android and iOS'),
         );
     }
   }

@@ -13,8 +13,7 @@ import 'package:pigeon/pigeon.dart';
   PigeonOptions(
     dartOut: 'lib/src/platform/messages.g.dart',
     dartPackageName: 'advanced_webview',
-    kotlinOut:
-        'android/src/main/kotlin/dev/k1t/advanced_webview/Messages.g.kt',
+    kotlinOut: 'android/src/main/kotlin/dev/k1t/advanced_webview/Messages.g.kt',
     kotlinOptions: KotlinOptions(package: 'dev.k1t.advanced_webview'),
     swiftOut: 'ios/advanced_webview/Sources/advanced_webview/Messages.g.swift',
   ),
