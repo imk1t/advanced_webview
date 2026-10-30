@@ -24,7 +24,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  pigeon: ^29.0.12
+  # Pinned exactly: the generated files record the Pigeon version, and CI fails
+  # when regenerating them with a newer release. Bump together with a regeneration.
+  pigeon: 29.0.12
 
 flutter:
   plugin:
