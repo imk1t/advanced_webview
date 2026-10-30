@@ -67,6 +67,10 @@ Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
   `ios/advanced_webview/Package.swift` and `ios/advanced_webview.podspec` in
   sync (minimum iOS version, sources, resources). CI builds the example with each.
 - Only symbols exported from `lib/advanced_webview.dart` are public API.
+- **Keep the API mapping current.** `website/data/api-mapping.json` maps each public Dart API
+  to the native Android and iOS APIs it uses. Update it (English and Japanese text) when you
+  add, rename or remove a public member or change the native API behind it;
+  `cd website && bun run check:mapping` fails when it drifts.
 - Format Dart code with `fvm dart format` (generated `*.g.dart` files are excluded).
 - Add or update tests for behaviour changes (`test/` uses a fake HostApi).
 - Update `CHANGELOG.md` under `## Unreleased` for user-visible changes.
