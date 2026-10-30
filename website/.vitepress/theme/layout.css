@@ -1,0 +1,27 @@
+/*
+ * Wider reading area than the VitePress default (688px content / 1104px layout).
+ * VitePress scopes its own sizes, so overriding them needs !important.
+ */
+:root {
+  --vp-layout-max-width: 1760px;
+}
+
+.VPDoc .container,
+.VPDoc:not(.has-sidebar) .container {
+  max-width: none !important;
+}
+
+.VPDoc .content,
+.VPDoc:not(.has-sidebar) .content {
+  max-width: none !important;
+}
+
+.VPDoc.has-aside .content-container,
+.VPDoc:not(.has-sidebar) .content-container {
+  max-width: 1100px !important;
+}
+
+.vp-doc table {
+  display: table;
+  width: 100%;
+}

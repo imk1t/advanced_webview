@@ -33,6 +33,7 @@ test/                              Dart unit tests with a fake HostApi
 example/                           Example app + integration_test
 website/                           Docs site (VitePress), deployed to GitHub Pages by .github/workflows/docs.yml
 website/data/api-mapping.json      Dart API -> native Android/iOS API mapping (source of the "API mapping" pages)
+website/.vitepress/theme/          Theme: Tailwind v4 (`tw:` prefix, no preflight), layout.css (content width), ApiMapping.vue
 website/scripts/check-api-mapping.ts  Fails when the mapping drifts from lib/ and the native sources
 ```
 
@@ -53,6 +54,8 @@ fvm flutter pub publish --dry-run                   # package validation
 cd example && fvm flutter build apk --debug         # Android build check
 cd example && fvm flutter build ios --simulator --debug  # iOS build check (macOS only)
 cd website && bun install && bun run dev            # docs site preview (Bun)
+cd website && bun run lint                          # oxlint for website code (CI runs it too)
+cd website && bun run format                        # Prettier for website code (ts/vue/css/json; CI runs `format:check`)
 cd website && bun run check:mapping                 # API mapping vs Dart/Kotlin/Swift sources (also runs in `bun run build`)
 
 # Native lint / format (Pigeon output *.g.kt / *.g.swift is always excluded)

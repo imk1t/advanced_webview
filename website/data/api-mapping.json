@@ -1,9 +1,15 @@
 {
   "groups": [
-    { "id": "lifecycle", "title": { "en": "Lifecycle and widget", "ja": "ライフサイクルとウィジェット" } },
+    {
+      "id": "lifecycle",
+      "title": { "en": "Lifecycle and widget", "ja": "ライフサイクルとウィジェット" }
+    },
     { "id": "loading", "title": { "en": "Loading and history", "ja": "読み込みと履歴" } },
     { "id": "javascript", "title": { "en": "JavaScript", "ja": "JavaScript" } },
-    { "id": "events", "title": { "en": "Events and navigation", "ja": "イベントとナビゲーション" } },
+    {
+      "id": "events",
+      "title": { "en": "Events and navigation", "ja": "イベントとナビゲーション" }
+    },
     { "id": "settings", "title": { "en": "Settings", "ja": "設定" } }
   ],
   "classes": {
@@ -44,7 +50,10 @@
         "ja": "ネイティブ WebView を 1 つ作成して所有します。"
       },
       "android": { "status": "supported", "apis": ["WebView(Context)"] },
-      "ios": { "status": "supported", "apis": ["WKWebView(frame:configuration:)", "WKWebViewConfiguration"] }
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView(frame:configuration:)", "WKWebViewConfiguration"]
+      }
     },
     {
       "dart": "AdvancedWebViewController.webViewId",
@@ -83,7 +92,10 @@
       "android": { "status": "supported", "apis": ["WebView.stopLoading()", "WebView.destroy()"] },
       "ios": {
         "status": "supported",
-        "apis": ["WKWebView.stopLoading()", "WKUserContentController.removeAllScriptMessageHandlers()"]
+        "apis": [
+          "WKWebView.stopLoading()",
+          "WKUserContentController.removeAllScriptMessageHandlers()"
+        ]
       }
     },
     {
@@ -141,7 +153,10 @@
         "en": "Loads an HTML string with an optional base URL.",
         "ja": "HTML 文字列を読み込みます。base URL も指定できます。"
       },
-      "android": { "status": "supported", "apis": ["WebView.loadDataWithBaseURL(String, String, String, String, String)"] },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.loadDataWithBaseURL(String, String, String, String, String)"]
+      },
       "ios": { "status": "supported", "apis": ["WKWebView.loadHTMLString(_:baseURL:)"] }
     },
     {
@@ -175,14 +190,20 @@
     {
       "dart": "AdvancedWebViewController.canGoBack",
       "group": "loading",
-      "summary": { "en": "Whether there is a previous history entry.", "ja": "戻れる履歴があるかどうかです。" },
+      "summary": {
+        "en": "Whether there is a previous history entry.",
+        "ja": "戻れる履歴があるかどうかです。"
+      },
       "android": { "status": "supported", "apis": ["WebView.canGoBack()"] },
       "ios": { "status": "supported", "apis": ["WKWebView.canGoBack"] }
     },
     {
       "dart": "AdvancedWebViewController.canGoForward",
       "group": "loading",
-      "summary": { "en": "Whether there is a next history entry.", "ja": "進める履歴があるかどうかです。" },
+      "summary": {
+        "en": "Whether there is a next history entry.",
+        "ja": "進める履歴があるかどうかです。"
+      },
       "android": { "status": "supported", "apis": ["WebView.canGoForward()"] },
       "ios": { "status": "supported", "apis": ["WKWebView.canGoForward"] }
     },
@@ -204,9 +225,18 @@
     {
       "dart": "AdvancedWebViewController.runJavaScript",
       "group": "javascript",
-      "summary": { "en": "Runs JavaScript and ignores the result.", "ja": "JavaScript を実行し、結果は無視します。" },
-      "android": { "status": "supported", "apis": ["WebView.evaluateJavascript(String, ValueCallback)"] },
-      "ios": { "status": "supported", "apis": ["WKWebView.evaluateJavaScript(_:completionHandler:)"] }
+      "summary": {
+        "en": "Runs JavaScript and ignores the result.",
+        "ja": "JavaScript を実行し、結果は無視します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.evaluateJavascript(String, ValueCallback)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:completionHandler:)"]
+      }
     },
     {
       "dart": "AdvancedWebViewController.runJavaScriptReturningResult",
@@ -261,32 +291,50 @@
       "dart": "AdvancedWebViewController.onPageStarted",
       "group": "events",
       "summary": { "en": "A page started loading.", "ja": "ページの読み込みが始まりました。" },
-      "android": { "status": "supported", "apis": ["WebViewClient.onPageStarted(WebView, String, Bitmap)"] },
-      "ios": { "status": "supported", "apis": ["WKNavigationDelegate.webView(_:didStartProvisionalNavigation:)"] }
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewClient.onPageStarted(WebView, String, Bitmap)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKNavigationDelegate.webView(_:didStartProvisionalNavigation:)"]
+      }
     },
     {
       "dart": "AdvancedWebViewController.onPageFinished",
       "group": "events",
       "summary": { "en": "A page finished loading.", "ja": "ページの読み込みが完了しました。" },
-      "android": { "status": "supported", "apis": ["WebViewClient.onPageFinished(WebView, String)"] },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewClient.onPageFinished(WebView, String)"]
+      },
       "ios": { "status": "supported", "apis": ["WKNavigationDelegate.webView(_:didFinish:)"] }
     },
     {
       "dart": "AdvancedWebViewController.onProgress",
       "group": "events",
       "summary": { "en": "Load progress from 0 to 100.", "ja": "読み込みの進捗(0〜100)です。" },
-      "android": { "status": "supported", "apis": ["WebChromeClient.onProgressChanged(WebView, int)"] },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onProgressChanged(WebView, int)"]
+      },
       "ios": {
         "status": "supported",
         "apis": ["WKWebView.estimatedProgress"],
-        "note": { "en": "Observed with KVO and scaled to 0-100.", "ja": "KVO で監視し、0〜100 に変換します。" }
+        "note": {
+          "en": "Observed with KVO and scaled to 0-100.",
+          "ja": "KVO で監視し、0〜100 に変換します。"
+        }
       }
     },
     {
       "dart": "AdvancedWebViewController.onTitleChanged",
       "group": "events",
       "summary": { "en": "The page title changed.", "ja": "ページのタイトルが変わりました。" },
-      "android": { "status": "supported", "apis": ["WebChromeClient.onReceivedTitle(WebView, String)"] },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onReceivedTitle(WebView, String)"]
+      },
       "ios": {
         "status": "supported",
         "apis": ["WKWebView.title"],
@@ -326,7 +374,10 @@
       },
       "android": {
         "status": "partial",
-        "apis": ["WebViewClient.shouldOverrideUrlLoading(WebView, WebResourceRequest)", "WebView.loadUrl(String)"],
+        "apis": [
+          "WebViewClient.shouldOverrideUrlLoading(WebView, WebResourceRequest)",
+          "WebView.loadUrl(String)"
+        ],
         "note": {
           "en": "Android needs a synchronous answer, so the navigation is cancelled, Dart is asked, and an allowed one is re-issued as a GET (POST bodies and redirects are not preserved).",
           "ja": "Android は同期的な応答が必要なため、遷移をいったんキャンセルして Dart に問い合わせ、許可された場合は GET として再実行します(POST の本文やリダイレクトは保持されません)。"
@@ -334,7 +385,10 @@
       },
       "ios": {
         "status": "supported",
-        "apis": ["WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)", "WKNavigationActionPolicy"]
+        "apis": [
+          "WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)",
+          "WKNavigationActionPolicy"
+        ]
       }
     },
     {
@@ -344,32 +398,53 @@
         "en": "The URL and frame of a navigation about to happen.",
         "ja": "これから行われる遷移の URL とフレームです。"
       },
-      "android": { "status": "supported", "apis": ["WebResourceRequest.getUrl()", "WebResourceRequest.isForMainFrame()"] },
-      "ios": { "status": "supported", "apis": ["WKNavigationAction.request", "WKNavigationAction.targetFrame"] }
+      "android": {
+        "status": "supported",
+        "apis": ["WebResourceRequest.getUrl()", "WebResourceRequest.isForMainFrame()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKNavigationAction.request", "WKNavigationAction.targetFrame"]
+      }
     },
     {
       "dart": "NavigationDecision",
       "group": "events",
-      "summary": { "en": "Whether to allow or prevent a navigation.", "ja": "遷移を許可するか拒否するかです。" },
+      "summary": {
+        "en": "Whether to allow or prevent a navigation.",
+        "ja": "遷移を許可するか拒否するかです。"
+      },
       "android": {
         "status": "supported",
         "apis": ["WebViewClient.shouldOverrideUrlLoading(WebView, WebResourceRequest)"],
-        "note": { "en": "prevent returns true (handled); navigate re-issues the load.", "ja": "prevent は true(処理済み)を返し、navigate は読み込みを再実行します。" }
+        "note": {
+          "en": "prevent returns true (handled); navigate re-issues the load.",
+          "ja": "prevent は true(処理済み)を返し、navigate は読み込みを再実行します。"
+        }
       },
       "ios": {
         "status": "supported",
         "apis": ["WKNavigationActionPolicy"],
-        "note": { "en": "navigate is .allow, prevent is .cancel.", "ja": "navigate は .allow、prevent は .cancel です。" }
+        "note": {
+          "en": "navigate is .allow, prevent is .cancel.",
+          "ja": "navigate は .allow、prevent は .cancel です。"
+        }
       }
     },
     {
       "dart": "WebResourceError",
       "group": "events",
-      "summary": { "en": "A load error reported by the native WebView.", "ja": "ネイティブ WebView が報告する読み込みエラーです。" },
+      "summary": {
+        "en": "A load error reported by the native WebView.",
+        "ja": "ネイティブ WebView が報告する読み込みエラーです。"
+      },
       "android": {
         "status": "supported",
         "apis": ["WebResourceError.getErrorCode()", "WebResourceError.getDescription()"],
-        "note": { "en": "errorCode is a WebViewClient.ERROR_* value.", "ja": "errorCode は WebViewClient.ERROR_* の値です。" }
+        "note": {
+          "en": "errorCode is a WebViewClient.ERROR_* value.",
+          "ja": "errorCode は WebViewClient.ERROR_* の値です。"
+        }
       },
       "ios": {
         "status": "supported",
@@ -381,9 +456,15 @@
     {
       "dart": "WebViewSettings",
       "group": "settings",
-      "summary": { "en": "Immutable per-WebView settings.", "ja": "WebView ごとの不変な設定です。" },
+      "summary": {
+        "en": "Immutable per-WebView settings.",
+        "ja": "WebView ごとの不変な設定です。"
+      },
       "android": { "status": "supported", "apis": ["WebSettings"] },
-      "ios": { "status": "supported", "apis": ["WKWebViewConfiguration", "WKWebpagePreferences.allowsContentJavaScript"] }
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebViewConfiguration", "WKWebpagePreferences.allowsContentJavaScript"]
+      }
     },
     {
       "dart": "AdvancedWebViewController.settings",
@@ -411,7 +492,10 @@
     {
       "dart": "WebViewSettings.javaScriptEnabled",
       "group": "settings",
-      "summary": { "en": "Enables JavaScript in the page.", "ja": "ページ内の JavaScript を有効にします。" },
+      "summary": {
+        "en": "Enables JavaScript in the page.",
+        "ja": "ページ内の JavaScript を有効にします。"
+      },
       "android": { "status": "supported", "apis": ["WebSettings.setJavaScriptEnabled(boolean)"] },
       "ios": { "status": "supported", "apis": ["WKWebpagePreferences.allowsContentJavaScript"] }
     },
@@ -422,11 +506,17 @@
         "en": "Requires a user gesture to start media playback.",
         "ja": "メディア再生の開始にユーザー操作を必須にします。"
       },
-      "android": { "status": "supported", "apis": ["WebSettings.setMediaPlaybackRequiresUserGesture(boolean)"] },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setMediaPlaybackRequiresUserGesture(boolean)"]
+      },
       "ios": {
         "status": "creationOnly",
         "apis": ["WKWebViewConfiguration.mediaTypesRequiringUserActionForPlayback"],
-        "note": { "en": "Only read when the WebView is created.", "ja": "WebView の作成時にのみ反映されます。" }
+        "note": {
+          "en": "Only read when the WebView is created.",
+          "ja": "WebView の作成時にのみ反映されます。"
+        }
       }
     },
     {
@@ -444,7 +534,10 @@
       "ios": {
         "status": "creationOnly",
         "apis": ["WKWebViewConfiguration.allowsInlineMediaPlayback"],
-        "note": { "en": "Only read when the WebView is created.", "ja": "WebView の作成時にのみ反映されます。" }
+        "note": {
+          "en": "Only read when the WebView is created.",
+          "ja": "WebView の作成時にのみ反映されます。"
+        }
       }
     },
     {
@@ -458,20 +551,32 @@
           "WebSettings.setBuiltInZoomControls(boolean)",
           "WebSettings.setDisplayZoomControls(boolean)"
         ],
-        "note": { "en": "The on-screen zoom controls are always hidden.", "ja": "画面上のズームコントロールは常に非表示です。" }
+        "note": {
+          "en": "The on-screen zoom controls are always hidden.",
+          "ja": "画面上のズームコントロールは常に非表示です。"
+        }
       },
       "ios": {
         "status": "unsupported",
         "apis": [],
-        "note": { "en": "Zoom is controlled by the page's viewport meta tag.", "ja": "ズームはページの viewport meta タグで決まります。" }
+        "note": {
+          "en": "Zoom is controlled by the page's viewport meta tag.",
+          "ja": "ズームはページの viewport meta タグで決まります。"
+        }
       }
     },
     {
       "dart": "WebViewSettings.transparentBackground",
       "group": "settings",
-      "summary": { "en": "Makes the WebView background transparent.", "ja": "WebView の背景を透明にします。" },
+      "summary": {
+        "en": "Makes the WebView background transparent.",
+        "ja": "WebView の背景を透明にします。"
+      },
       "android": { "status": "supported", "apis": ["WebView.setBackgroundColor(int)"] },
-      "ios": { "status": "supported", "apis": ["UIView.isOpaque", "UIView.backgroundColor", "UIScrollView.backgroundColor"] }
+      "ios": {
+        "status": "supported",
+        "apis": ["UIView.isOpaque", "UIView.backgroundColor", "UIScrollView.backgroundColor"]
+      }
     },
     {
       "dart": "WebViewSettings.userAgent",
@@ -480,7 +585,13 @@
         "en": "Overrides the user agent. null uses the platform default.",
         "ja": "User-Agent を上書きします。null ならプラットフォームの既定値を使います。"
       },
-      "android": { "status": "supported", "apis": ["WebSettings.setUserAgentString(String)", "WebSettings.getDefaultUserAgent(Context)"] },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebSettings.setUserAgentString(String)",
+          "WebSettings.getDefaultUserAgent(Context)"
+        ]
+      },
       "ios": { "status": "supported", "apis": ["WKWebView.customUserAgent"] }
     }
   ]
