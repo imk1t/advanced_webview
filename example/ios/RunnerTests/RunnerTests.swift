@@ -119,7 +119,7 @@ final class RunnerTests: XCTestCase {
     try hostApi.create(params: params(webViewId: 5))
     let instance = try registry.get(5)
 
-    let view = MobileWebViewFactory(registry: registry).create(
+    let view = AdvancedWebViewFactory(registry: registry).create(
       withFrame: .zero, viewIdentifier: 0, arguments: ["webViewId": 5])
 
     XCTAssertTrue(view === instance)
@@ -131,7 +131,7 @@ final class RunnerTests: XCTestCase {
     let messenger = FakeBinaryMessenger()
     let registry = WebViewRegistry()
     let hostApi = WebViewHostApiImpl(
-      registry: registry, flutterApi: MobileWebViewFlutterApi(binaryMessenger: messenger))
+      registry: registry, flutterApi: AdvancedWebViewFlutterApi(binaryMessenger: messenger))
     addTeardownBlock { @MainActor in hostApi.disposeAll() }
     return (hostApi, registry, messenger)
   }

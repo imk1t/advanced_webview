@@ -61,8 +61,8 @@ Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
   Never edit `*.g.dart`, `Messages.g.kt` or `Messages.g.swift` by hand. CI fails if
   the generated code is out of date.
 - **Keep Android and iOS mirrored.** Both platforms use the same class names
-  (`MobileWebView`, `WebViewRegistry`, `WebViewHostApiImpl`, `MobileWebViewFactory`,
-  `MobileWebViewPlugin`). A change on one side normally needs the same change on the other.
+  (`AdvancedWebView`, `WebViewRegistry`, `WebViewHostApiImpl`, `AdvancedWebViewFactory`,
+  `AdvancedWebViewPlugin`). A change on one side normally needs the same change on the other.
 - **iOS supports both Swift Package Manager and CocoaPods.** Keep
   `ios/advanced_webview/Package.swift` and `ios/advanced_webview.podspec` in
   sync (minimum iOS version, sources, resources). CI builds the example with each.

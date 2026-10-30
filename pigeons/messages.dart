@@ -89,7 +89,7 @@ class WebResourceErrorMessage {
 // ---------------------------------------------------------------------------
 
 @HostApi()
-abstract class MobileWebViewHostApi {
+abstract class AdvancedWebViewHostApi {
   /// Creates the native WebView. Must be called before the platform view with
   /// the same `webViewId` is attached.
   void create(CreationParamsMessage params);
@@ -128,7 +128,7 @@ abstract class MobileWebViewHostApi {
 // ---------------------------------------------------------------------------
 
 @FlutterApi()
-abstract class MobileWebViewFlutterApi {
+abstract class AdvancedWebViewFlutterApi {
   void onPageStarted(int webViewId, String url);
 
   void onPageFinished(int webViewId, String url);

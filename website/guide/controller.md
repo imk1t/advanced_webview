@@ -2,18 +2,18 @@
 
 ## One controller, one WebView
 
-`MobileWebViewController` creates the native WebView as soon as it is constructed, and
-destroys it only when you call `dispose()`. The `MobileWebView` widget just displays the
+`AdvancedWebViewController` creates the native WebView as soon as it is constructed, and
+destroys it only when you call `dispose()`. The `AdvancedWebView` widget just displays the
 WebView that the controller owns.
 
 Because of this, removing the widget from the tree (switching tabs, pushing a route) does
 not reset the page. Call `dispose()` when you no longer need the WebView.
 
 ```dart
-final controller = MobileWebViewController()..loadUrl('https://flutter.dev');
+final controller = AdvancedWebViewController()..loadUrl('https://flutter.dev');
 
 // build
-MobileWebView(controller: controller);
+AdvancedWebView(controller: controller);
 
 // When you no longer need it
 await controller.dispose();
@@ -39,7 +39,7 @@ final title = await controller.title();
 Pass callbacks to the constructor:
 
 ```dart
-MobileWebViewController(
+AdvancedWebViewController(
   onPageStarted: (url) {},
   onPageFinished: (url) {},
   onProgress: (progress) {},   // 0-100

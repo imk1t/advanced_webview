@@ -12,7 +12,7 @@ description: Add or change a Dart <-> native API of advanced_webview via pigeons
 
 1. Edit `pigeons/messages.dart`.
    - Every HostApi / FlutterApi method takes `int webViewId` first; keep the single
-     `MobileWebViewHostApi` / FlutterApi pair.
+     `AdvancedWebViewHostApi` / FlutterApi pair.
    - Mark host methods `@async` when the native side must await (Kotlin `suspend`,
      Swift `async`).
    - Do not use field names that clash with Swift `NSObject` (`description`, `hash`, ...).
@@ -20,12 +20,12 @@ description: Add or change a Dart <-> native API of advanced_webview via pigeons
    `messages.g.dart`, `Messages.g.kt` or `Messages.g.swift` by hand.
 3. Implement both platforms with the same shape:
    - Android: `android/src/main/kotlin/dev/k1t/advanced_webview/WebViewHostApiImpl.kt`
-     (and `MobileWebView.kt` for view behaviour).
+     (and `AdvancedWebView.kt` for view behaviour).
    - iOS: `ios/advanced_webview/Sources/advanced_webview/WebViewHostApiImpl.swift`
-     (and `MobileWebView.swift`).
+     (and `AdvancedWebView.swift`).
    - Absorb platform differences natively so Dart sees one behaviour; document any
      unavoidable difference in dartdoc and `doc/architecture.md`.
-4. Expose it in Dart through `MobileWebViewController` (wrap calls with `_call` so they
+4. Expose it in Dart through `AdvancedWebViewController` (wrap calls with `_call` so they
    wait for creation and fail after `dispose()`); for native -> Dart events, route them
    through `WebViewEventDispatcher` by `webViewId`.
 5. Update `test/fake_host_api.dart` and add tests in `test/`. Add an integration test in

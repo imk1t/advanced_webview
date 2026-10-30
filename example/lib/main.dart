@@ -11,7 +11,7 @@ class BrowserPage extends StatefulWidget {
 }
 
 class _BrowserPageState extends State<BrowserPage> {
-  late final MobileWebViewController _controller;
+  late final AdvancedWebViewController _controller;
   final _urlField = TextEditingController(text: 'https://flutter.dev');
   int _progress = 0;
   String? _title;
@@ -19,7 +19,7 @@ class _BrowserPageState extends State<BrowserPage> {
   @override
   void initState() {
     super.initState();
-    _controller = MobileWebViewController(
+    _controller = AdvancedWebViewController(
       javaScriptChannels: {'Toaster': _showMessage},
       onProgress: (progress) => setState(() => _progress = progress),
       onTitleChanged: (title) => setState(() => _title = title),
@@ -97,7 +97,7 @@ class _BrowserPageState extends State<BrowserPage> {
       body: Column(
         children: [
           if (_progress < 100) LinearProgressIndicator(value: _progress / 100),
-          Expanded(child: MobileWebView(controller: _controller)),
+          Expanded(child: AdvancedWebView(controller: _controller)),
         ],
       ),
     );

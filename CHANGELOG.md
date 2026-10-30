@@ -8,14 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Rename the package from `flutter_mobile_webview` to `advanced_webview` (Dart package,
   entry library `package:advanced_webview/advanced_webview.dart`, Android package/namespace,
-  iOS module and Pigeon channel names). Public class names are unchanged.
+  iOS module and Pigeon channel names) and the public classes from `MobileWebView` /
+  `MobileWebViewController` to `AdvancedWebView` / `AdvancedWebViewController`.
 - iOS: raise the minimum iOS version to 18.0.
 - iOS: run `evaluateJavaScript` on the main thread; it could hang when called off it.
 - Make `README.md` English and move the Japanese README to `README.ja.md`.
 - Add MIT license, community health files, issue/PR templates and pub.dev metadata.
 - Pin Flutter 3.47.8 with FVM (`.fvmrc`); CI uses the same version.
 - Android: detach the WebView from its previous container when a controller is shown
-  by a new `MobileWebView`, so re-attaching a controller does not fail.
+  by a new `AdvancedWebView`, so re-attaching a controller does not fail.
 - iOS: app-initiated loads (`loadUrl`, `loadHtmlString`, `reload`, `goBack`,
   `goForward`) no longer reach `onNavigationRequest`, matching Android.
 - Add native unit tests (Robolectric on Android, XCTest on iOS) and run the integration

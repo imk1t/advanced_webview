@@ -1,9 +1,9 @@
 import Flutter
 import UIKit
 
-/// The native WebView is created ahead of time by `MobileWebViewHostApi.create`;
+/// The native WebView is created ahead of time by `AdvancedWebViewHostApi.create`;
 /// the factory only looks it up by `webViewId` and attaches it.
-final class MobileWebViewFactory: NSObject, FlutterPlatformViewFactory {
+final class AdvancedWebViewFactory: NSObject, FlutterPlatformViewFactory {
   private let registry: WebViewRegistry
 
   init(registry: WebViewRegistry) {
@@ -21,7 +21,7 @@ final class MobileWebViewFactory: NSObject, FlutterPlatformViewFactory {
       let webViewId = (params["webViewId"] as? NSNumber)?.int64Value,
       let instance = try? registry.get(webViewId)
     else {
-      fatalError("MobileWebView: create() was not called before the platform view was built")
+      fatalError("AdvancedWebView: create() was not called before the platform view was built")
     }
     return instance
   }

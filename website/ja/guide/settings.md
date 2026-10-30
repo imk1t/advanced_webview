@@ -3,7 +3,7 @@
 `WebViewSettings` は不変オブジェクトです。コンストラクタで渡すか、後から `updateSettings` で置き換えます。
 
 ```dart
-final controller = MobileWebViewController(
+final controller = AdvancedWebViewController(
   settings: const WebViewSettings(userAgent: 'MyApp/1.0'),
 );
 

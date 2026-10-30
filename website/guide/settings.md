@@ -4,7 +4,7 @@
 `updateSettings`:
 
 ```dart
-final controller = MobileWebViewController(
+final controller = AdvancedWebViewController(
   settings: const WebViewSettings(userAgent: 'MyApp/1.0'),
 );
 

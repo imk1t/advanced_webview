@@ -16,7 +16,7 @@ final title = await controller.runJavaScriptReturningResult('document.title');
 チャネルはページから Dart へメッセージを送ります。コントローラの生成時に登録します。
 
 ```dart
-final controller = MobileWebViewController(
+final controller = AdvancedWebViewController(
   javaScriptChannels: {'Bridge': (message) => print(message)},
 );
 ```

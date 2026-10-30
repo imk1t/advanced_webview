@@ -25,7 +25,7 @@ Flutter の設定（`flutter config --enable-swift-package-manager` /
 ## 使い方
 
 ```dart
-final controller = MobileWebViewController(
+final controller = AdvancedWebViewController(
   javaScriptChannels: {'Bridge': (message) => print(message)},
   onPageFinished: (url) => print('loaded $url'),
   onNavigationRequest: (request) => request.url.startsWith('https://')
@@ -34,7 +34,7 @@ final controller = MobileWebViewController(
 )..loadUrl('https://flutter.dev');
 
 // build
-MobileWebView(controller: controller);
+AdvancedWebView(controller: controller);
 
 // JS 実行（結果は JSON からデコード済み）
 final title = await controller.runJavaScriptReturningResult('document.title');

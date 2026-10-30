@@ -27,7 +27,7 @@ either, depending on your Flutter setting (`flutter config --enable-swift-packag
 ## Usage
 
 ```dart
-final controller = MobileWebViewController(
+final controller = AdvancedWebViewController(
   javaScriptChannels: {'Bridge': (message) => print(message)},
   onPageFinished: (url) => print('loaded $url'),
   onNavigationRequest: (request) => request.url.startsWith('https://')
@@ -36,7 +36,7 @@ final controller = MobileWebViewController(
 )..loadUrl('https://flutter.dev');
 
 // build
-MobileWebView(controller: controller);
+AdvancedWebView(controller: controller);
 
 // Run JavaScript (the result is already decoded from JSON)
 final title = await controller.runJavaScriptReturningResult('document.title');

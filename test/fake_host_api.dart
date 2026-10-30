@@ -1,8 +1,8 @@
 import 'package:advanced_webview/src/platform/messages.g.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// In-memory [MobileWebViewHostApi] that records every call.
-class FakeHostApi extends Fake implements MobileWebViewHostApi {
+/// In-memory [AdvancedWebViewHostApi] that records every call.
+class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
   final List<String> calls = [];
   final Map<int, CreationParamsMessage> created = {};
   String? nextJavaScriptResult;

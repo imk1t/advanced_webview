@@ -67,8 +67,8 @@ void main() {
       MaterialApp(
         home: Column(
           children: [
-            Expanded(child: MobileWebView(controller: a.controller)),
-            Expanded(child: MobileWebView(controller: b.controller)),
+            Expanded(child: AdvancedWebView(controller: a.controller)),
+            Expanded(child: AdvancedWebView(controller: b.controller)),
           ],
         ),
       ),
@@ -236,7 +236,7 @@ class _Harness {
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     NavigationRequestCallback? onNavigationRequest,
   }) {
-    controller = MobileWebViewController(
+    controller = AdvancedWebViewController(
       javaScriptChannels: javaScriptChannels,
       onNavigationRequest: onNavigationRequest,
       onPageStarted: startedUrls.add,
@@ -248,14 +248,14 @@ class _Harness {
     );
   }
 
-  late final MobileWebViewController controller;
+  late final AdvancedWebViewController controller;
   final startedUrls = <String>[];
   final errors = <WebResourceError>[];
   Completer<void>? _pageFinished;
 
   Future<void> show(WidgetTester tester) async {
     await tester.pumpWidget(
-      MaterialApp(home: MobileWebView(controller: controller)),
+      MaterialApp(home: AdvancedWebView(controller: controller)),
     );
     await controller.ready;
     await tester.pumpAndSettle();

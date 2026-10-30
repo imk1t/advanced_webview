@@ -16,13 +16,13 @@ void main() {
     dispatcher = WebViewEventDispatcher();
   });
 
-  MobileWebViewController createController({
+  AdvancedWebViewController createController({
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     PageEventCallback? onPageFinished,
     WebResourceErrorCallback? onWebResourceError,
     NavigationRequestCallback? onNavigationRequest,
   }) {
-    return MobileWebViewController(
+    return AdvancedWebViewController(
       hostApi: hostApi,
       dispatcher: dispatcher,
       javaScriptChannels: javaScriptChannels,

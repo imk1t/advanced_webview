@@ -459,7 +459,7 @@ class MessagesPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable {
 
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
-protocol MobileWebViewHostApi {
+protocol AdvancedWebViewHostApi {
   /// Creates the native WebView. Must be called before the platform view with
   /// the same `webViewId` is attached.
   func create(params: CreationParamsMessage) throws
@@ -480,14 +480,14 @@ protocol MobileWebViewHostApi {
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
-class MobileWebViewHostApiSetup {
+class AdvancedWebViewHostApiSetup {
   static var codec: FlutterStandardMessageCodec { MessagesPigeonCodec.shared }
-  /// Sets up an instance of `MobileWebViewHostApi` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: MobileWebViewHostApi?, messageChannelSuffix: String = "") {
+  /// Sets up an instance of `AdvancedWebViewHostApi` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: AdvancedWebViewHostApi?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
     /// Creates the native WebView. Must be called before the platform view with
     /// the same `webViewId` is attached.
-    let createChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.create\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let createChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.create\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       createChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -502,7 +502,7 @@ class MobileWebViewHostApiSetup {
     } else {
       createChannel.setMessageHandler(nil)
     }
-    let disposeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.dispose\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let disposeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.dispose\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       disposeChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -517,7 +517,7 @@ class MobileWebViewHostApiSetup {
     } else {
       disposeChannel.setMessageHandler(nil)
     }
-    let loadUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.loadUrl\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let loadUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadUrl\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       loadUrlChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -534,7 +534,7 @@ class MobileWebViewHostApiSetup {
     } else {
       loadUrlChannel.setMessageHandler(nil)
     }
-    let loadHtmlStringChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.loadHtmlString\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let loadHtmlStringChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadHtmlString\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       loadHtmlStringChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -551,7 +551,7 @@ class MobileWebViewHostApiSetup {
     } else {
       loadHtmlStringChannel.setMessageHandler(nil)
     }
-    let reloadChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.reload\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let reloadChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.reload\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       reloadChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -566,7 +566,7 @@ class MobileWebViewHostApiSetup {
     } else {
       reloadChannel.setMessageHandler(nil)
     }
-    let stopLoadingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.stopLoading\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let stopLoadingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.stopLoading\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       stopLoadingChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -581,7 +581,7 @@ class MobileWebViewHostApiSetup {
     } else {
       stopLoadingChannel.setMessageHandler(nil)
     }
-    let goBackChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.goBack\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let goBackChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.goBack\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       goBackChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -596,7 +596,7 @@ class MobileWebViewHostApiSetup {
     } else {
       goBackChannel.setMessageHandler(nil)
     }
-    let goForwardChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.goForward\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let goForwardChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.goForward\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       goForwardChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -611,7 +611,7 @@ class MobileWebViewHostApiSetup {
     } else {
       goForwardChannel.setMessageHandler(nil)
     }
-    let canGoBackChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.canGoBack\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let canGoBackChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.canGoBack\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       canGoBackChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -626,7 +626,7 @@ class MobileWebViewHostApiSetup {
     } else {
       canGoBackChannel.setMessageHandler(nil)
     }
-    let canGoForwardChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.canGoForward\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let canGoForwardChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.canGoForward\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       canGoForwardChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -641,7 +641,7 @@ class MobileWebViewHostApiSetup {
     } else {
       canGoForwardChannel.setMessageHandler(nil)
     }
-    let getUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.getUrl\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let getUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getUrl\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getUrlChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -656,7 +656,7 @@ class MobileWebViewHostApiSetup {
     } else {
       getUrlChannel.setMessageHandler(nil)
     }
-    let getTitleChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.getTitle\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let getTitleChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getTitle\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getTitleChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -672,7 +672,7 @@ class MobileWebViewHostApiSetup {
       getTitleChannel.setMessageHandler(nil)
     }
     /// Returns the evaluation result encoded as JSON (or null).
-    let evaluateJavaScriptChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.evaluateJavaScript\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let evaluateJavaScriptChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.evaluateJavaScript\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       evaluateJavaScriptChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -690,7 +690,7 @@ class MobileWebViewHostApiSetup {
     } else {
       evaluateJavaScriptChannel.setMessageHandler(nil)
     }
-    let updateSettingsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.MobileWebViewHostApi.updateSettings\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let updateSettingsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.updateSettings\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       updateSettingsChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -710,7 +710,7 @@ class MobileWebViewHostApiSetup {
 }
 
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
-protocol MobileWebViewFlutterApiProtocol {
+protocol AdvancedWebViewFlutterApiProtocol {
   @MainActor func onPageStarted(webViewId webViewIdArg: Int64, url urlArg: String) async throws
   @MainActor func onPageFinished(webViewId webViewIdArg: Int64, url urlArg: String) async throws
   @MainActor func onProgressChanged(webViewId webViewIdArg: Int64, progress progressArg: Int64) async throws
@@ -719,7 +719,7 @@ protocol MobileWebViewFlutterApiProtocol {
   @MainActor func shouldOverrideUrlLoading(webViewId webViewIdArg: Int64, request requestArg: NavigationRequestMessage) async throws -> NavigationDecisionMessage
   @MainActor func onJavaScriptMessage(webViewId webViewIdArg: Int64, channelName channelNameArg: String, message messageArg: String) async throws
 }
-class MobileWebViewFlutterApi: MobileWebViewFlutterApiProtocol {
+class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
   private let messageChannelSuffix: String
   init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
@@ -731,7 +731,7 @@ class MobileWebViewFlutterApi: MobileWebViewFlutterApiProtocol {
   }
   @MainActor func onPageStarted(webViewId webViewIdArg: Int64, url urlArg: String) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onPageStarted\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPageStarted\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, urlArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
@@ -751,7 +751,7 @@ class MobileWebViewFlutterApi: MobileWebViewFlutterApiProtocol {
   }
   @MainActor func onPageFinished(webViewId webViewIdArg: Int64, url urlArg: String) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onPageFinished\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPageFinished\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, urlArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
@@ -771,7 +771,7 @@ class MobileWebViewFlutterApi: MobileWebViewFlutterApiProtocol {
   }
   @MainActor func onProgressChanged(webViewId webViewIdArg: Int64, progress progressArg: Int64) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onProgressChanged\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onProgressChanged\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, progressArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
@@ -791,7 +791,7 @@ class MobileWebViewFlutterApi: MobileWebViewFlutterApiProtocol {
   }
   @MainActor func onTitleChanged(webViewId webViewIdArg: Int64, title titleArg: String?) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onTitleChanged\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onTitleChanged\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, titleArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
@@ -811,7 +811,7 @@ class MobileWebViewFlutterApi: MobileWebViewFlutterApiProtocol {
   }
   @MainActor func onReceivedError(webViewId webViewIdArg: Int64, error errorArg: WebResourceErrorMessage) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onReceivedError\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onReceivedError\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, errorArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
@@ -831,7 +831,7 @@ class MobileWebViewFlutterApi: MobileWebViewFlutterApiProtocol {
   }
   @MainActor func shouldOverrideUrlLoading(webViewId webViewIdArg: Int64, request requestArg: NavigationRequestMessage) async throws -> NavigationDecisionMessage {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.shouldOverrideUrlLoading\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.shouldOverrideUrlLoading\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, requestArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
@@ -854,7 +854,7 @@ class MobileWebViewFlutterApi: MobileWebViewFlutterApiProtocol {
   }
   @MainActor func onJavaScriptMessage(webViewId webViewIdArg: Int64, channelName channelNameArg: String, message messageArg: String) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.advanced_webview.MobileWebViewFlutterApi.onJavaScriptMessage\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptMessage\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, channelNameArg, messageArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {

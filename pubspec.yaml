@@ -33,6 +33,6 @@ flutter:
     platforms:
       android:
         package: dev.k1t.advanced_webview
-        pluginClass: MobileWebViewPlugin
+        pluginClass: AdvancedWebViewPlugin
       ios:
-        pluginClass: MobileWebViewPlugin
+        pluginClass: AdvancedWebViewPlugin

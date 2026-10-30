@@ -11,9 +11,10 @@ import 'settings.dart';
 /// Controls one native WebView.
 ///
 /// The native view is created as soon as the controller is constructed and
-/// lives until [dispose] is called, independently of the [MobileWebView] widget.
-class MobileWebViewController {
-  MobileWebViewController({
+/// lives until [dispose] is called, independently of the [AdvancedWebView]
+/// widget.
+class AdvancedWebViewController {
+  AdvancedWebViewController({
     WebViewSettings settings = const WebViewSettings(),
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     this.onPageStarted,
@@ -22,12 +23,12 @@ class MobileWebViewController {
     this.onTitleChanged,
     this.onWebResourceError,
     this.onNavigationRequest,
-    @visibleForTesting MobileWebViewHostApi? hostApi,
+    @visibleForTesting AdvancedWebViewHostApi? hostApi,
     @visibleForTesting WebViewEventDispatcher? dispatcher,
   }) : webViewId = _nextWebViewId++,
        _settings = settings,
        _javaScriptChannels = Map.unmodifiable(javaScriptChannels),
-       _hostApi = hostApi ?? MobileWebViewHostApi(),
+       _hostApi = hostApi ?? AdvancedWebViewHostApi(),
        _dispatcher = dispatcher ?? WebViewEventDispatcher.instance {
     _dispatcher.register(webViewId, _EventListener(this));
     _created = _hostApi.create(
@@ -45,7 +46,7 @@ class MobileWebViewController {
   /// Identifies this WebView across the platform channel.
   final int webViewId;
 
-  final MobileWebViewHostApi _hostApi;
+  final AdvancedWebViewHostApi _hostApi;
   final WebViewEventDispatcher _dispatcher;
   final Map<String, JavaScriptMessageCallback> _javaScriptChannels;
   late final Future<void> _created;
@@ -123,7 +124,7 @@ class MobileWebViewController {
 
   Future<T> _call<T>(Future<T> Function() body) async {
     if (_isDisposed) {
-      throw StateError('MobileWebViewController($webViewId) was disposed');
+      throw StateError('AdvancedWebViewController($webViewId) was disposed');
     }
     await _created;
     return body();
@@ -135,7 +136,7 @@ class MobileWebViewController {
 class _EventListener implements WebViewEventListener {
   _EventListener(this._controller);
 
-  final MobileWebViewController _controller;
+  final AdvancedWebViewController _controller;
 
   @override
   void onPageStarted(String url) => _controller.onPageStarted?.call(url);

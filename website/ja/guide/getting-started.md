@@ -39,7 +39,7 @@ class BrowserPage extends StatefulWidget {
 }
 
 class _BrowserPageState extends State<BrowserPage> {
-  final controller = MobileWebViewController(
+  final controller = AdvancedWebViewController(
     onPageFinished: (url) => debugPrint('loaded $url'),
   )..loadUrl('https://flutter.dev');
 
@@ -50,7 +50,7 @@ class _BrowserPageState extends State<BrowserPage> {
   }
 
   @override
-  Widget build(BuildContext context) => MobileWebView(controller: controller);
+  Widget build(BuildContext context) => AdvancedWebView(controller: controller);
 }
 ```
 
