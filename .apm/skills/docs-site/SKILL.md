@@ -37,7 +37,7 @@ first; it takes precedence over this skill. Do not add Web, macOS, Windows or Li
 6. **Keep neighbours consistent.** If a user-visible behaviour changed, also check
    `README.md` / `README.ja.md` (keep them in sync), the dartdoc of the affected public
    members, and `CHANGELOG.md`.
-7. **Format and build locally.** In `website/`: `bun install --frozen-lockfile`, `bun run format` (Prettier; Markdown pages are excluded), then `bun run build`
+7. **Format and build locally.** In `website/`: `bun install --frozen-lockfile`, `bun run lint` (oxlint), `bun run format` (Prettier; Markdown pages are excluded), then `bun run build`
    (it runs `check:mapping` first). The build fails on dead internal links, so fix them rather
    than ignoring the error. Optionally preview with `bun run dev`. Do not commit
    `node_modules/` or `.vitepress/dist`/`cache`.
@@ -62,5 +62,5 @@ first; it takes precedence over this skill. Do not add Web, macOS, Windows or Li
 
 - English and Japanese pages describe the same behaviour and the same API.
 - `website/data/api-mapping.json` covers every public Dart API and `bun run check:mapping` passes.
-- `bun run format:check` and `bun run build` pass in `website/`, with no errors and the sidebar lists every page in both languages.
+- `bun run lint`, `bun run format:check` and `bun run build` pass in `website/`, with no errors and the sidebar lists every page in both languages.
 - README, dartdoc and `CHANGELOG.md` do not contradict the guide.
