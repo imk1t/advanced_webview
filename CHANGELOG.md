@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Docs site: pin npm dependencies to exact versions and harden installs against supply-chain
+  attacks (`website/.npmrc`, `website/bunfig.toml`: no lifecycle scripts, 7-day minimum release
+  age, frozen lockfile, Dependabot cooldown).
 - Rename the package from `flutter_mobile_webview` to `advanced_webview` (Dart package,
   entry library `package:advanced_webview/advanced_webview.dart`, Android package/namespace,
   iOS module and Pigeon channel names) and the public classes from `MobileWebView` /

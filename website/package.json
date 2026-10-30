@@ -12,8 +12,8 @@
     "lint": "bun lint --no-script"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.3",
-    "tailwindcss": "^4.3.3",
+    "@tailwindcss/vite": "4.3.3",
+    "tailwindcss": "4.3.3",
     "vitepress": "1.6.4"
   }
 }
