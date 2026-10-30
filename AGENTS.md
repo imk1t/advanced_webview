@@ -50,7 +50,7 @@ fvm dart run pigeon --input pigeons/messages.dart   # after editing pigeons/mess
 fvm flutter pub publish --dry-run                   # package validation
 cd example && fvm flutter build apk --debug         # Android build check
 cd example && fvm flutter build ios --simulator --debug  # iOS build check (macOS only)
-cd website && npm ci && npm run dev                 # docs site preview (Node 22)
+cd website && bun install && bun run dev            # docs site preview (Bun)
 
 # Native lint / format (Pigeon output *.g.kt / *.g.swift is always excluded)
 ktlint --format $(git ls-files '*.kt' '*.kts' | grep -v '\.g\.kt$')            # Kotlin
