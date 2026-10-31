@@ -60,15 +60,15 @@ On both platforms, JavaScript can call `window.Bridge.postMessage('hello')`.
 
 ## Development
 
-Flutter is managed with [FVM](https://fvm.app) (the version is pinned in `.fvmrc`).
+Flutter is managed with [mise](https://mise.jdx.dev) (the version is pinned in `mise.toml`).
 
 ```sh
-fvm install                                          # install the pinned Flutter
-fvm flutter pub get
-fvm dart run pigeon --input pigeons/messages.dart   # after editing pigeons/messages.dart
-fvm flutter analyze
-fvm flutter test                                     # Dart unit tests
-cd example && fvm flutter test integration_test      # integration tests on a device or simulator
+mise install                                         # install the pinned Flutter
+flutter pub get
+dart run pigeon --input pigeons/messages.dart   # after editing pigeons/messages.dart
+flutter analyze
+flutter test                                     # Dart unit tests
+cd example && flutter test integration_test      # integration tests on a device or simulator
 ```
 
 Native code is formatted and linted with ktlint (Kotlin) and swift-format (Swift).

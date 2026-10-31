@@ -14,7 +14,7 @@ English or Japanese (日本語での Issue / PR も歓迎します).
 
 ## Development setup
 
-Requirements: [FVM](https://fvm.app) (the Flutter version is pinned in `.fvmrc`; run `fvm install` once), Xcode for iOS, Android SDK + JDK 17 for Android. All Flutter / Dart commands below go through `fvm`.
+Requirements: [mise](https://mise.jdx.dev) (the Flutter version is pinned in `mise.toml`; run `mise install` once), Xcode for iOS, Android SDK + JDK 17 for Android. All Flutter / Dart commands below use the pinned version (activate mise in your shell, or prefix with `mise exec --`).
 
 For native code you also need [ktlint](https://pinterest.github.io/ktlint/) 1.8.0 (Kotlin) and
 [swift-format](https://github.com/swiftlang/swift-format) (Swift). swift-format ships with
@@ -26,14 +26,14 @@ swift format --version  # CI uses the Swift 6.4.1 toolchain
 ```
 
 ```sh
-fvm flutter pub get
-fvm flutter analyze
-fvm flutter test                                    # Dart unit tests
-cd example && fvm flutter test integration_test     # on a device or simulator
+flutter pub get
+flutter analyze
+flutter test                                    # Dart unit tests
+cd example && flutter test integration_test     # on a device or simulator
 
 # Native unit tests (build the example once first so Gradle / Xcode are configured)
-cd example && fvm flutter build apk --debug && cd android && ./gradlew :advanced_webview:testDebugUnitTest
-cd example && fvm flutter build ios --simulator --debug && cd ios && \
+cd example && flutter build apk --debug && cd android && ./gradlew :advanced_webview:testDebugUnitTest
+cd example && flutter build ios --simulator --debug && cd ios && \
   xcodebuild test -workspace Runner.xcworkspace -scheme Runner -only-testing:RunnerTests \
   -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
@@ -55,7 +55,7 @@ Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
   regenerate the bindings and commit the generated files:
 
   ```sh
-  fvm dart run pigeon --input pigeons/messages.dart
+  dart run pigeon --input pigeons/messages.dart
   ```
 
   Never edit `*.g.dart`, `Messages.g.kt` or `Messages.g.swift` by hand. CI fails if
@@ -71,7 +71,7 @@ Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
   to the native Android and iOS APIs it uses. Update it (English and Japanese text) when you
   add, rename or remove a public member or change the native API behind it;
   `cd website && bun run check:mapping` fails when it drifts.
-- Format Dart code with `fvm dart format` (generated `*.g.dart` files are excluded).
+- Format Dart code with `dart format` (generated `*.g.dart` files are excluded).
 - Add or update tests for behaviour changes (`test/` uses a fake HostApi).
 - Update `CHANGELOG.md` under `## Unreleased` for user-visible changes.
 
@@ -79,7 +79,7 @@ Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
 
 1. Fork the repository and create a branch from `main`.
 2. Make your change, keeping the PR focused on one topic.
-3. Make sure `fvm flutter analyze`, `fvm flutter test` and formatting (Dart, and ktlint /
+3. Make sure `flutter analyze`, `flutter test` and formatting (Dart, and ktlint /
    swift-format for native code) pass locally.
 4. Fill in the pull request template. CI builds the example app for Android and iOS.
 

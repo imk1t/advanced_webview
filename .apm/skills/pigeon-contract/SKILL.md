@@ -16,7 +16,7 @@ description: Add or change a Dart <-> native API of advanced_webview via pigeons
    - Mark host methods `@async` when the native side must await (Kotlin `suspend`,
      Swift `async`).
    - Do not use field names that clash with Swift `NSObject` (`description`, `hash`, ...).
-2. Regenerate: `fvm dart run pigeon --input pigeons/messages.dart`. Never edit
+2. Regenerate: `dart run pigeon --input pigeons/messages.dart`. Never edit
    `messages.g.dart`, `Messages.g.kt` or `Messages.g.swift` by hand.
 3. Implement both platforms with the same shape:
    - Android: `android/src/main/kotlin/dev/k1t/advanced_webview/WebViewHostApiImpl.kt`
@@ -30,7 +30,7 @@ description: Add or change a Dart <-> native API of advanced_webview via pigeons
    through `WebViewEventDispatcher` by `webViewId`.
 5. Update `test/fake_host_api.dart` and add tests in `test/`. Add an integration test in
    `example/integration_test/` when the behaviour depends on the real WebView.
-6. Run `fvm dart format`, `fvm flutter analyze`, `fvm flutter test`, and record the change in
+6. Run `dart format`, `flutter analyze`, `flutter test`, and record the change in
    `CHANGELOG.md` under `## Unreleased`.
 
 ## Done when

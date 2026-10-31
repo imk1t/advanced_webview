@@ -13,9 +13,9 @@ dependencies:
     - imk1t/apm-shared#v0.1.3
   mcp:
     # Dart and Flutter MCP server (ships with the Dart SDK 3.9+), run with the
-    # FVM-pinned SDK.
+    # mise-pinned SDK.
     - name: dart
       registry: false
       transport: stdio
-      command: fvm
-      args: [dart, mcp-server]
+      command: mise
+      args: [exec, --, dart, mcp-server]
