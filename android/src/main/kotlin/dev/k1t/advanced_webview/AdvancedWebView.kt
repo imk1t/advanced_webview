@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -37,6 +38,7 @@ class AdvancedWebView(
     params: CreationParamsMessage,
     private val flutterApi: AdvancedWebViewFlutterApi,
     private val scope: CoroutineScope,
+    private val fileChooser: FileChooser,
 ) : PlatformView {
     val id: Long = params.webViewId
 
@@ -239,6 +241,12 @@ class AdvancedWebView(
         override fun onReceivedTitle(view: WebView, title: String?) {
             send { flutterApi.onTitleChanged(id, title) }
         }
+
+        override fun onShowFileChooser(
+            webView: WebView,
+            filePathCallback: ValueCallback<Array<Uri>>,
+            fileChooserParams: FileChooserParams,
+        ): Boolean = fileChooser.show(filePathCallback, fileChooserParams)
 
         override fun onCreateWindow(
             view: WebView,

@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Android: `<input type="file">` now opens the system file picker (it did nothing before). iOS
+  already used WebKit's built-in picker.
 - Add `AdvancedWebViewController.onNewWindow` for `window.open` and `target="_blank"`. Without it,
   the URL now loads in the same WebView on both platforms (previously nothing happened on iOS).
 - Add user scripts: `UserScript`, the `userScripts` constructor parameter, and

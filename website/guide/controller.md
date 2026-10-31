@@ -50,3 +50,14 @@ AdvancedWebViewController(
   },
 );
 ```
+
+## File uploads
+
+`<input type="file">` works on both platforms without any Dart code.
+
+- **iOS** uses WebKit's built-in picker. Add `NSPhotoLibraryUsageDescription` and, if pages may
+  capture photos or video, `NSCameraUsageDescription` / `NSMicrophoneUsageDescription` to your
+  app's `Info.plist`.
+- **Android** opens the system document picker (`FileChooserParams.createIntent()`). It needs a
+  foreground Activity, which Flutter apps have. `capture` (camera) attributes are not handled
+  specially.
