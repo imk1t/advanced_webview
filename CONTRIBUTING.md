@@ -86,6 +86,16 @@ Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
 By contributing, you agree that your contributions will be licensed under the
 [MIT License](LICENSE).
 
+## Releasing (maintainers)
+
+1. In a PR, set `version` in `pubspec.yaml` and rename `## Unreleased` in `CHANGELOG.md` to
+   `## X.Y.Z - YYYY-MM-DD` (leave an empty `## Unreleased` above it). Merge it.
+2. Tag the merge commit and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+3. `.github/workflows/publish.yml` checks that the tag matches `pubspec.yaml`, has a
+   `CHANGELOG.md` section and is on `main`, then runs analyze and tests, publishes to pub.dev and
+   creates a GitHub Release from the changelog section. The first release must be published
+   manually (`fvm flutter pub publish`) and automated publishing enabled on pub.dev.
+
 ## Using AI coding agents
 
 AI-assisted contributions are welcome. Agent instructions live in [AGENTS.md](AGENTS.md)
