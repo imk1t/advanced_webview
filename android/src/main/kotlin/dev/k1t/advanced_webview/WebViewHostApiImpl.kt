@@ -9,9 +9,10 @@ class WebViewHostApiImpl(
     private val registry: WebViewRegistry,
     private val flutterApi: AdvancedWebViewFlutterApi,
     private val scope: CoroutineScope,
+    private val fileChooser: FileChooser = FileChooser(),
 ) : AdvancedWebViewHostApi {
     override fun create(params: CreationParamsMessage) {
-        registry.add(AdvancedWebView(context, params, flutterApi, scope))
+        registry.add(AdvancedWebView(context, params, flutterApi, scope, fileChooser))
     }
 
     override fun dispose(webViewId: Long) {

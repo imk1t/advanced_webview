@@ -49,3 +49,12 @@ AdvancedWebViewController(
   },
 );
 ```
+
+## ファイルのアップロード
+
+`<input type="file">` は、Dart 側のコードなしで両プラットフォームで動作します。
+
+- **iOS** は WebKit 標準のピッカーを使います。アプリの `Info.plist` に `NSPhotoLibraryUsageDescription` を、
+  ページが写真や動画を撮影する場合は `NSCameraUsageDescription` / `NSMicrophoneUsageDescription` も追加してください。
+- **Android** はシステムのドキュメントピッカー(`FileChooserParams.createIntent()`)を開きます。前面の Activity が必要ですが、
+  Flutter アプリには常にあります。`capture`(カメラ)属性は特別扱いしません。
