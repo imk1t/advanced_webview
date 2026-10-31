@@ -25,3 +25,15 @@
   display: table;
   width: 100%;
 }
+
+/* Keep Japanese hero text from breaking in the middle of a word. */
+.VPHero .text,
+.VPHero .tagline {
+  word-break: auto-phrase;
+}
+
+@media (min-width: 960px) {
+  .VPHero:not(.has-image) .container .main {
+    max-width: 900px;
+  }
+}

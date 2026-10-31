@@ -5,7 +5,7 @@ const repo = 'https://github.com/imk1t/advanced_webview'
 
 export default defineConfig({
   title: 'advanced_webview',
-  description: 'A lean, type-safe WebView plugin for Android and iOS built on Pigeon.',
+  description: 'A lean, type-safe WebView plugin for Android and iOS.',
   // Served from https://imk1t.github.io/advanced_webview/ (project Pages).
   // Change to '/' when a custom domain is configured.
   base: '/advanced_webview/',

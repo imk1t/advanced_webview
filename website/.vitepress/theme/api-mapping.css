@@ -52,3 +52,29 @@
   background: var(--vp-c-danger-soft);
   color: var(--vp-c-danger-1);
 }
+
+.api-mapping {
+  table-layout: fixed;
+}
+
+.api-mapping th:nth-child(1) {
+  width: 30%;
+}
+
+.api-mapping th:nth-child(2),
+.api-mapping th:nth-child(3) {
+  width: 35%;
+}
+
+.api-mapping td {
+  vertical-align: top;
+}
+
+.api-mapping__apis code {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.api-mapping td > code {
+  overflow-wrap: anywhere;
+}
