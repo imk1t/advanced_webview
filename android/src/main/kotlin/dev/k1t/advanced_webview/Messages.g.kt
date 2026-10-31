@@ -411,6 +411,68 @@ data class WebResourceErrorMessage (
     return "WebResourceErrorMessage(errorCode=$errorCode, message=$message, isMainFrame=$isMainFrame, url=$url)"
   }
 }
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class CookieMessage (
+  val name: String,
+  val value: String,
+  val domain: String,
+  val path: String,
+  val isSecure: Boolean,
+  val isHttpOnly: Boolean,
+  /** Expiry as milliseconds since the Unix epoch; null for a session cookie. */
+  val expiresMillis: Long? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): CookieMessage {
+      val name = pigeonVar_list[0] as String
+      val value = pigeonVar_list[1] as String
+      val domain = pigeonVar_list[2] as String
+      val path = pigeonVar_list[3] as String
+      val isSecure = pigeonVar_list[4] as Boolean
+      val isHttpOnly = pigeonVar_list[5] as Boolean
+      val expiresMillis = pigeonVar_list[6] as Long?
+      return CookieMessage(name, value, domain, path, isSecure, isHttpOnly, expiresMillis)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      name,
+      value,
+      domain,
+      path,
+      isSecure,
+      isHttpOnly,
+      expiresMillis,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as CookieMessage
+    return MessagesPigeonUtils.deepEquals(this.name, other.name) && MessagesPigeonUtils.deepEquals(this.value, other.value) && MessagesPigeonUtils.deepEquals(this.domain, other.domain) && MessagesPigeonUtils.deepEquals(this.path, other.path) && MessagesPigeonUtils.deepEquals(this.isSecure, other.isSecure) && MessagesPigeonUtils.deepEquals(this.isHttpOnly, other.isHttpOnly) && MessagesPigeonUtils.deepEquals(this.expiresMillis, other.expiresMillis)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.name)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.value)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.domain)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.path)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.isSecure)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.isHttpOnly)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.expiresMillis)
+    return result
+  }
+  override fun toString(): String {
+    return "CookieMessage(name=$name, value=$value, domain=$domain, path=$path, isSecure=$isSecure, isHttpOnly=$isHttpOnly, expiresMillis=$expiresMillis)"
+  }
+}
 private open class MessagesPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -439,6 +501,11 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
           WebResourceErrorMessage.fromList(it)
         }
       }
+      134.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CookieMessage.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -462,6 +529,10 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       is WebResourceErrorMessage -> {
         stream.write(133)
+        writeValue(stream, value.toList())
+      }
+      is CookieMessage -> {
+        stream.write(134)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -491,6 +562,10 @@ interface AdvancedWebViewHostApi {
   /** Returns the evaluation result encoded as JSON (or null). */
   suspend fun evaluateJavaScript(webViewId: Long, source: String): String?
   fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage)
+  suspend fun setCookie(webViewId: Long, cookie: CookieMessage)
+  /** Returns the cookies the WebView would send to `url`. */
+  suspend fun getCookies(webViewId: Long, url: String): List<CookieMessage>
+  suspend fun clearCookies(webViewId: Long)
 
   companion object {
     /** The codec used by AdvancedWebViewHostApi. */
@@ -751,6 +826,67 @@ interface AdvancedWebViewHostApi {
               MessagesPigeonUtils.wrapError(exception)
             }
             reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setCookie$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val cookieArg = args[1] as CookieMessage
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                api.setCookie(webViewIdArg, cookieArg)
+                listOf(null)
+              } catch (exception: Throwable) {
+                MessagesPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getCookies$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val urlArg = args[1] as String
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.getCookies(webViewIdArg, urlArg))
+              } catch (exception: Throwable) {
+                MessagesPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearCookies$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                api.clearCookies(webViewIdArg)
+                listOf(null)
+              } catch (exception: Throwable) {
+                MessagesPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
           }
         } else {
           channel.setMessageHandler(null)

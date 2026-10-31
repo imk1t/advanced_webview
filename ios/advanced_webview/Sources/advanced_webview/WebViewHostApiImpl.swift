@@ -80,4 +80,22 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
   func updateSettings(webViewId: Int64, settings: WebViewSettingsMessage) throws {
     try registry.get(webViewId).apply(settings: settings)
   }
+
+  @MainActor
+  func setCookie(webViewId: Int64, cookie: CookieMessage) async throws {
+    try await registry.get(webViewId).setCookie(cookie)
+  }
+
+  @MainActor
+  func getCookies(webViewId: Int64, url: String) async throws -> [CookieMessage] {
+    guard let target = URL(string: url) else {
+      throw PigeonError(code: "invalid-url", message: "Invalid URL: \(url)", details: nil)
+    }
+    return try await registry.get(webViewId).cookies(for: target)
+  }
+
+  @MainActor
+  func clearCookies(webViewId: Int64) async throws {
+    await registry.get(webViewId).clearCookies()
+  }
 }

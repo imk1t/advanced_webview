@@ -84,6 +84,28 @@ class WebResourceErrorMessage {
   String? url;
 }
 
+class CookieMessage {
+  CookieMessage({
+    required this.name,
+    required this.value,
+    required this.domain,
+    required this.path,
+    required this.isSecure,
+    required this.isHttpOnly,
+    this.expiresMillis,
+  });
+
+  String name;
+  String value;
+  String domain;
+  String path;
+  bool isSecure;
+  bool isHttpOnly;
+
+  /// Expiry as milliseconds since the Unix epoch; null for a session cookie.
+  int? expiresMillis;
+}
+
 // ---------------------------------------------------------------------------
 // Dart -> native
 // ---------------------------------------------------------------------------
@@ -121,6 +143,16 @@ abstract class AdvancedWebViewHostApi {
   String? evaluateJavaScript(int webViewId, String source);
 
   void updateSettings(int webViewId, WebViewSettingsMessage settings);
+
+  @async
+  void setCookie(int webViewId, CookieMessage cookie);
+
+  /// Returns the cookies the WebView would send to `url`.
+  @async
+  List<CookieMessage> getCookies(int webViewId, String url);
+
+  @async
+  void clearCookies(int webViewId);
 }
 
 // ---------------------------------------------------------------------------

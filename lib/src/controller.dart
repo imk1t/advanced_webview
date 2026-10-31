@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+import 'cookie.dart';
 import 'navigation.dart';
 import 'platform/event_dispatcher.dart';
 import 'platform/messages.g.dart';
@@ -112,6 +113,38 @@ class AdvancedWebViewController {
     await _call(() => _hostApi.updateSettings(webViewId, settings.toMessage()));
     _settings = settings;
   }
+
+  /// Stores [cookie] in the WebView's cookie store.
+  ///
+  /// Completes when the cookie has been stored; load or reload a page
+  /// afterwards for it to be sent.
+  ///
+  /// Android and iOS differ: Android's cookie store is shared by all WebViews
+  /// of the app, iOS's by all WebViews that use the default data store.
+  ///
+  /// Android: `CookieManager.setCookie(String, String, ValueCallback)`.
+  /// iOS: `WKHTTPCookieStore.setCookie(_:)`.
+  Future<void> setCookie(WebViewCookie cookie) =>
+      _call(() => _hostApi.setCookie(webViewId, cookie.toMessage()));
+
+  /// Returns the cookies the WebView would send to [url].
+  ///
+  /// Android and iOS differ: Android only reports [WebViewCookie.name] and
+  /// [WebViewCookie.value]; the other fields are filled with the host of [url],
+  /// `/` and `false`. iOS reports every attribute.
+  ///
+  /// Android: `CookieManager.getCookie(String)`.
+  /// iOS: `WKHTTPCookieStore.allCookies()`, filtered by [url].
+  Future<List<WebViewCookie>> getCookies(String url) async {
+    final cookies = await _call(() => _hostApi.getCookies(webViewId, url));
+    return cookies.map(WebViewCookie.fromMessage).toList();
+  }
+
+  /// Removes every cookie from the WebView's cookie store.
+  ///
+  /// Android: `CookieManager.removeAllCookies(ValueCallback)`.
+  /// iOS: `WKHTTPCookieStore.allCookies()` and `deleteCookie(_:)` for each cookie.
+  Future<void> clearCookies() => _call(() => _hostApi.clearCookies(webViewId));
 
   /// Destroys the native WebView. The controller cannot be used afterwards.
   Future<void> dispose() async {

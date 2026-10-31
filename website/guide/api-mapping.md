@@ -36,3 +36,7 @@ cited native API no longer appears in the Kotlin / Swift sources.
 ## Settings
 
 <ApiMapping group="settings" />
+
+## Cookies
+
+<ApiMapping group="cookies" />

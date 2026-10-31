@@ -36,3 +36,7 @@
 ## 設定
 
 <ApiMapping group="settings" />
+
+## Cookie
+
+<ApiMapping group="cookies" />

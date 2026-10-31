@@ -210,6 +210,45 @@ void main() {
     );
   });
 
+  testWidgets('cookies can be set, read and cleared', (tester) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.controller.clearCookies();
+    await harness.controller.setCookie(
+      const WebViewCookie(
+        name: 'visible',
+        value: '1',
+        domain: 'advanced-webview.test',
+      ),
+    );
+    await harness.controller.setCookie(
+      const WebViewCookie(
+        name: 'hidden',
+        value: '2',
+        domain: 'advanced-webview.test',
+        isHttpOnly: true,
+      ),
+    );
+
+    final cookies = await harness.controller.getCookies(_baseUrl);
+    expect(
+      {for (final c in cookies) c.name: c.value},
+      {'visible': '1', 'hidden': '2'},
+    );
+
+    // JavaScript only sees the cookie that is not HttpOnly.
+    await harness.loadHtml('<html><body></body></html>');
+    expect(
+      await harness.controller.runJavaScriptReturningResult('document.cookie'),
+      'visible=1',
+    );
+
+    await harness.controller.clearCookies();
+    expect(await harness.controller.getCookies(_baseUrl), isEmpty);
+  });
+
   testWidgets('the WebView outlives its widget', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);

@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add cookie management: `AdvancedWebViewController.setCookie`, `getCookies` and `clearCookies`
+  with the `WebViewCookie` type. On Android `getCookies` only reports name and value.
 - Docs site: pin npm dependencies to exact versions and harden installs against supply-chain
   attacks (`website/.npmrc`, `website/bunfig.toml`: no lifecycle scripts, 7-day minimum release
   age, frozen lockfile, Dependabot cooldown).
