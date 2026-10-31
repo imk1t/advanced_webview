@@ -40,7 +40,7 @@ website/scripts/check-api-mapping.ts  Fails when the mapping drifts from lib/ an
 ## Commands
 
 Flutter is managed with [mise](https://mise.jdx.dev); the version is pinned in `mise.toml`.
-Run `mise install` once after cloning. Always use the pinned toolchain: plain `flutter` / `dart`
+Run `mise trust && mise install` once after cloning. Always use the pinned toolchain: plain `flutter` / `dart`
 work when mise is activated in the shell, otherwise (agents, scripts) prefix them with
 `mise exec --`, e.g. `mise exec -- flutter test`.
 To upgrade Flutter, change the version in `mise.toml` and commit it; CI (`jdx/mise-action`)

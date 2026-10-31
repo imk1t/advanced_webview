@@ -14,7 +14,7 @@ English or Japanese (日本語での Issue / PR も歓迎します).
 
 ## Development setup
 
-Requirements: [mise](https://mise.jdx.dev) (the Flutter version is pinned in `mise.toml`; run `mise install` once), Xcode for iOS, Android SDK + JDK 17 for Android. All Flutter / Dart commands below use the pinned version (activate mise in your shell, or prefix with `mise exec --`).
+Requirements: [mise](https://mise.jdx.dev) (the Flutter version is pinned in `mise.toml`; run `mise trust && mise install` once), Xcode for iOS, Android SDK + JDK 17 for Android. All Flutter / Dart commands below use the pinned version (activate mise in your shell, or prefix with `mise exec --`).
 
 For native code you also need [ktlint](https://pinterest.github.io/ktlint/) 1.8.0 (Kotlin) and
 [swift-format](https://github.com/swiftlang/swift-format) (Swift). swift-format ships with
