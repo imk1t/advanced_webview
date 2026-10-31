@@ -68,7 +68,6 @@ export default defineConfig({
               { text: 'Cookie', link: '/ja/guide/cookies' },
               { text: '設定', link: '/ja/guide/settings' },
               { text: 'ネイティブ API 対応表', link: '/ja/guide/api-mapping' },
-              { text: 'アーキテクチャ', link: '/ja/guide/architecture' },
             ],
           },
         ],
