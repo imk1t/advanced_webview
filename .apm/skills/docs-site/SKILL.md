@@ -31,9 +31,8 @@ first; it takes precedence over this skill. Do not add Web, macOS, Windows or Li
    both pages. Run `cd website && bun run check:mapping`; it fails on any drift from `lib/` and
    the native sources.
 5. **New page?** Add it to both sidebars in `website/.vitepress/config.mts` (`root` and
-   `ja` locales) and link it from a related page. `website/ja/guide/architecture.md`
-   `@include`s `doc/architecture.md`; edit `doc/architecture.md` (Japanese) rather than
-   copying it.
+   `ja` locales) and link it from a related page. The architecture document
+   (`doc/architecture.md`) is intentionally not published on the site.
 6. **Keep neighbours consistent.** If a user-visible behaviour changed, also check
    `README.md` / `README.ja.md` (keep them in sync), the dartdoc of the affected public
    members, and `CHANGELOG.md`.

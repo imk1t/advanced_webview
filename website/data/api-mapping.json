@@ -110,8 +110,8 @@
       "group": "lifecycle",
       "dartOnly": true,
       "summary": {
-        "en": "Identifies the WebView in every Pigeon call.",
-        "ja": "すべての Pigeon 呼び出しで WebView を識別する ID です。"
+        "en": "Identifies the WebView in every call to the native side.",
+        "ja": "ネイティブ側へのすべての呼び出しで WebView を識別する ID です。"
       }
     },
     {

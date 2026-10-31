@@ -4,7 +4,7 @@ layout: home
 hero:
   name: advanced_webview
   text: Android と iOS に絞った Flutter の WebView
-  tagline: Pigeon ベースの、小さく型安全な WebView プラグイン。
+  tagline: 小さく型安全な WebView プラグイン。
   actions:
     - theme: brand
       text: はじめる
@@ -16,8 +16,8 @@ hero:
 features:
   - title: Android と iOS のみ
     details: Web やデスクトップは対象外。2つのプラットフォームの振る舞いを揃えることに集中しています。
-  - title: 型安全なプラットフォーム契約
-    details: Dart・Kotlin・Swift 間の呼び出しはすべて1つの Pigeon ファイルで定義。MethodChannel の文字列を手書きしません。
+  - title: 実用的な機能
+    details: JavaScript チャンネル、ナビゲーション制御、Cookie、ユーザースクリプト、ポップアップ、ファイル選択を、型付きの Dart API からまとめて扱えます。
   - title: 小さな公開 API
     details: コントローラ、ウィジェット、不変の設定だけ。WebView の寿命はコントローラが持つので、ウィジェットを作り直しても状態が残ります。
 ---
