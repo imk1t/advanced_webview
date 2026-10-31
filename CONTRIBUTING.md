@@ -93,8 +93,13 @@ By contributing, you agree that your contributions will be licensed under the
 2. Tag the merge commit and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
 3. `.github/workflows/publish.yml` checks that the tag matches `pubspec.yaml`, has a
    `CHANGELOG.md` section and is on `main`, then runs analyze and tests, publishes to pub.dev and
-   creates a GitHub Release from the changelog section. The first release must be published
-   manually (`fvm flutter pub publish`) and automated publishing enabled on pub.dev.
+   creates a GitHub Release from the changelog section. If the exact version is already on
+   pub.dev, it still runs analyze and tests, but skips pub.dev credentials and publication
+   (including the publish dry-run) and proceeds to the GitHub Release. A missing package
+   (HTTP 404) follows the normal publish path; other HTTP/network errors or invalid package
+   metadata stop the workflow rather than assuming publication succeeded.
+   The first release must be published manually (`fvm flutter pub publish`) before pushing
+   its tag, and automated publishing enabled on pub.dev for subsequent versions.
 
 ## Using AI coding agents
 

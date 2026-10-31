@@ -1,4 +1,4 @@
-# Publishes to pub.dev when a version tag (e.g. v0.1.0) is pushed, then creates a GitHub Release.
+# Publishes unpublished version tags to pub.dev, then creates a GitHub Release.
 # Requires automated publishing to be enabled for this repository on pub.dev
 # (package admin page > Automated publishing > GitHub Actions, tag pattern `v{{version}}`).
 # The very first release must be published manually (`flutter pub publish`) beforehand.
@@ -36,8 +36,19 @@ jobs:
             echo "::error::Tag $GITHUB_REF_NAME is not on main"
             exit 1
           fi
-      # Configures the pub.dev OIDC credentials.
+      - name: Check whether this version is already on pub.dev
+        id: pub-dev
+        run: |
+          package="$(sed -n 's/^name: *//p' pubspec.yaml)"
+          version="${GITHUB_REF_NAME#v}"
+          published="$(bash .github/scripts/pub-dev-version-published.sh "$package" "$version")"
+          echo "published=$published" >> "$GITHUB_OUTPUT"
+          if [ "$published" = true ]; then
+            echo "$package $version is already published; skipping pub.dev upload"
+          fi
+      # Configures the pub.dev OIDC credentials only when an upload is needed.
       - uses: dart-lang/setup-dart@v1
+        if: steps.pub-dev.outputs.published == 'false'
       - name: Read Flutter version from .fvmrc
         id: fvm
         run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
@@ -50,10 +61,12 @@ jobs:
       - run: flutter analyze
       - run: flutter test
       - run: flutter pub publish --dry-run
+        if: steps.pub-dev.outputs.published == 'false'
       - run: flutter pub publish --force
+        if: steps.pub-dev.outputs.published == 'false'
 
-  # Runs only after pub.dev accepted the package. Kept separate so the write token and
-  # the pub.dev OIDC token are never in the same job.
+  # Runs after pub.dev accepted the package or the exact version was already present.
+  # Kept separate so the write token and pub.dev OIDC token are never in the same job.
   github-release:
     needs: publish
     runs-on: ubuntu-latest
