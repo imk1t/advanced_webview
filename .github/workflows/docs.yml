@@ -40,10 +40,11 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # git history for "last updated"
-      - uses: oven-sh/setup-bun@v2
+      - uses: jdx/mise-action@v5
         with:
-          # `bun lint` is not in a stable release yet (1.4.4); switch to a pinned stable once it is.
-          bun-version: canary
+          # Only Bun (canary, see mise.toml); the docs build does not need Flutter.
+          install_args: github:oven-sh/bun
+          working_directory: .
       - run: bun install --frozen-lockfile
       - run: bun run lint
       - run: bun run format:check
