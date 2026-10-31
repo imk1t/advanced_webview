@@ -15,14 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.1
-      - name: Read Flutter version from .fvmrc
-        id: fvm
-        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
-      - uses: subosito/flutter-action@v2.23.0
-        with:
-          flutter-version: ${{ steps.fvm.outputs.version }}
-          channel: stable
-          cache: true
+      - uses: jdx/mise-action@v5.2.5
       - run: flutter pub get
       # Pigeon output (*.g.dart) is committed as generated and not reformatted.
       - name: Check formatting
@@ -112,14 +105,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Read Flutter version from .fvmrc
-        id: fvm
-        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
-      - uses: subosito/flutter-action@v2.23.0
-        with:
-          flutter-version: ${{ steps.fvm.outputs.version }}
-          channel: stable
-          cache: true
+      - uses: jdx/mise-action@v5.2.5
       - name: Build example APK
         working-directory: example
         run: flutter build apk --debug
@@ -137,14 +123,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Read Flutter version from .fvmrc
-        id: fvm
-        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
-      - uses: subosito/flutter-action@v2.23.0
-        with:
-          flutter-version: ${{ steps.fvm.outputs.version }}
-          channel: stable
-          cache: true
+      - uses: jdx/mise-action@v5.2.5
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -166,14 +145,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7.0.1
-      - name: Read Flutter version from .fvmrc
-        id: fvm
-        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
-      - uses: subosito/flutter-action@v2.23.0
-        with:
-          flutter-version: ${{ steps.fvm.outputs.version }}
-          channel: stable
-          cache: true
+      - uses: jdx/mise-action@v5.2.5
       # Swift Package Manager is Flutter's default; enable it explicitly so this
       # job keeps covering it. The `ios-cocoapods` job covers the podspec.
       - run: flutter config --enable-swift-package-manager
@@ -234,14 +206,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7.0.1
-      - name: Read Flutter version from .fvmrc
-        id: fvm
-        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
-      - uses: subosito/flutter-action@v2.23.0
-        with:
-          flutter-version: ${{ steps.fvm.outputs.version }}
-          channel: stable
-          cache: true
+      - uses: jdx/mise-action@v5.2.5
       - run: flutter config --no-enable-swift-package-manager
       # The example references the plugin as a local Swift package
       # (../../ios/advanced_webview) so Xcode can edit its sources. That

@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - iOS: run `evaluateJavaScript` on the main thread; it could hang when called off it.
 - Make `README.md` English and move the Japanese README to `README.ja.md`.
 - Add MIT license, community health files, issue/PR templates and pub.dev metadata.
-- Pin Flutter 3.47.8 with FVM (`.fvmrc`); CI uses the same version.
+- Pin Flutter 3.47.8 with mise (`mise.toml`); CI uses the same version.
 - Android: detach the WebView from its previous container when a controller is shown
   by a new `AdvancedWebView`, so re-attaching a controller does not fail.
 - iOS: app-initiated loads (`loadUrl`, `loadHtmlString`, `reload`, `goBack`,
