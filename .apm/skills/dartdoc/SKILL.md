@@ -1,6 +1,6 @@
 ---
 name: dartdoc
-description: Write and verify dartdoc (`///`) API reference comments for the advanced_webview public API, including the Android/iOS native API each member uses, and check them with `fvm dart doc`. Use when adding or changing public members, or when improving the pub.dev API reference.
+description: Write and verify dartdoc (`///`) API reference comments for the advanced_webview public API, including the Android/iOS native API each member uses, and check them with `dart doc`. Use when adding or changing public members, or when improving the pub.dev API reference.
 ---
 
 # Writing dartdoc
@@ -70,12 +70,12 @@ not exported.
 
 ## Verify
 
-Run from the repo root, through FVM:
+Run from the repo root, through the mise-pinned toolchain (`mise exec -- <cmd>` if mise is not activated):
 
 ```sh
-fvm dart format $(git ls-files '*.dart' | grep -v '\.g\.dart$')
-fvm flutter analyze
-fvm dart doc --validate-links
+dart format $(git ls-files '*.dart' | grep -v '\.g\.dart$')
+flutter analyze
+dart doc --validate-links
 ```
 
 - `dart doc` output goes to `doc/api/` (git-ignored; never commit it). Read the warnings:
@@ -84,9 +84,9 @@ fvm dart doc --validate-links
   from `README.md`, "linked to from" is `package-advanced_webview`) about repo files such as
   `README.ja.md`, `LICENSE`, `CONTRIBUTING.md` or `AGENTS.md` are expected: dartdoc doesn't
   copy those files into `doc/api/`, so the relative links dangle only there.
-- Optionally open `doc/api/index.html` (or run `fvm dart pub global activate dhttpd` /
+- Optionally open `doc/api/index.html` (or run `dart pub global activate dhttpd` /
   any static server) and check the class and member pages read like the pub.dev reference.
-- If `fvm` or the Dart SDK is not available in your environment, say so instead of
+- If `mise` or the Dart SDK is not available in your environment, say so instead of
   claiming the docs were verified.
 - Enabling the `public_member_api_docs` lint in `analysis_options.yaml` makes `flutter
   analyze` flag missing comments; do it only together with a change that documents the
@@ -97,8 +97,8 @@ fvm dart doc --validate-links
 - Every public member exported from `lib/advanced_webview.dart` has a summary sentence,
   and every member that calls native code has Android and iOS notes.
 - Platform notes match `website/data/api-mapping.json` and `bun run check:mapping` passes.
-- `fvm dart doc --validate-links` reports no warnings for `lib/` (README link warnings aside), and `fvm dart format`
-  and `fvm flutter analyze` are clean.
+- `dart doc --validate-links` reports no warnings for `lib/` (README link warnings aside), and `dart format`
+  and `flutter analyze` are clean.
 - User-visible changes are in `CHANGELOG.md` under `## Unreleased`; the guide pages in
   `website/guide/` and `website/ja/guide/` do not contradict the comments.
 

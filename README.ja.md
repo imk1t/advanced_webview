@@ -57,15 +57,15 @@ JS からは両OS共通で `window.Bridge.postMessage('hello')` を呼べます�
 
 ## 開発
 
-Flutter は [FVM](https://fvm.app) で管理しています（バージョンは `.fvmrc` で固定）。
+Flutter は [mise](https://mise.jdx.dev) で管理しています（バージョンは `mise.toml` で固定）。
 
 ```sh
-fvm install                                          # 固定バージョンの Flutter を導入
-fvm flutter pub get
-fvm dart run pigeon --input pigeons/messages.dart   # pigeons/messages.dart を変更したとき
-fvm flutter analyze
-fvm flutter test                                     # Dart 単体テスト
-cd example && fvm flutter test integration_test      # 実機・シミュレータでの結合テスト
+mise install                                         # 固定バージョンの Flutter を導入
+flutter pub get
+dart run pigeon --input pigeons/messages.dart   # pigeons/messages.dart を変更したとき
+flutter analyze
+flutter test                                     # Dart 単体テスト
+cd example && flutter test integration_test      # 実機・シミュレータでの結合テスト
 ```
 
 ネイティブコードは ktlint（Kotlin）と swift-format（Swift）で整形・検査しています。手順の詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。

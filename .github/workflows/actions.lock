@@ -9,25 +9,20 @@ workflows:
     '.github/workflows/ci.yaml':
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-java@v4.9.1'
+        - 'jdx/mise-action@v5.2.5'
         - 'reactivecircus/android-emulator-runner@v2.38.0'
-        - 'subosito/flutter-action@v2.23.0'
     '.github/workflows/docs.yml':
         - 'actions/checkout@v7.0.1'
         - 'actions/deploy-pages@v5.0.1'
         - 'actions/upload-pages-artifact@v5.0.0'
-        - 'oven-sh/setup-bun@v2.2.0'
+        - 'jdx/mise-action@v5.2.5'
     '.github/workflows/publish.yml':
         - 'actions/checkout@v7.0.1'
         - 'dart-lang/setup-dart@v1.8.1'
-        - 'subosito/flutter-action@v2.23.0'
+        - 'jdx/mise-action@v5.2.5'
     '.github/workflows/verify-lockfile.yml':
         - 'actions/checkout@v7.0.1'
 dependencies:
-    'actions/cache@v5':
-        ref: 'v5'
-        commit: 'sha1-caa296126883cff596d87d8935842f9db880ef25'
-        owner_id: 44036562
-        repo_id: 215566462
     'actions/checkout@v7.0.1':
         ref: 'v7.0.1'
         commit: 'sha1-3d3c42e5aac5ba805825da76410c181273ba90b1'
@@ -72,20 +67,13 @@ dependencies:
         repo_id: 1423830292
         uses:
             - 'actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97'
-    'oven-sh/setup-bun@v2.2.0':
-        ref: 'v2.2.0'
-        commit: 'sha1-0c5077e51419868618aeaa5fe8019c62421857d6'
-        owner_id: 108928776
-        repo_id: 512644635
+    'jdx/mise-action@v5.2.5':
+        ref: 'v5.2.5'
+        commit: 'sha1-6612f0ef07ed2a736cd1e00a94a065522dd41195'
+        owner_id: 216188
+        repo_id: 738284564
     'reactivecircus/android-emulator-runner@v2.38.0':
         ref: 'v2.38.0'
         commit: 'sha1-a421e43855164a8197daf9d8d40fe71c6996bb0d'
         owner_id: 51352484
         repo_id: 219782401
-    'subosito/flutter-action@v2.23.0':
-        ref: 'v2.23.0'
-        commit: 'sha1-1a449444c387b1966244ae4d4f8c696479add0b2'
-        owner_id: 73028
-        repo_id: 202116560
-        uses:
-            - 'actions/cache@v5'

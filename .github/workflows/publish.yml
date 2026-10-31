@@ -49,14 +49,7 @@ jobs:
       # Configures the pub.dev OIDC credentials only when an upload is needed.
       - uses: dart-lang/setup-dart@v1.8.1
         if: steps.pub-dev.outputs.published == 'false'
-      - name: Read Flutter version from .fvmrc
-        id: fvm
-        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
-      - uses: subosito/flutter-action@v2.23.0
-        with:
-          flutter-version: ${{ steps.fvm.outputs.version }}
-          channel: stable
-          cache: true
+      - uses: jdx/mise-action@v5.2.5
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
