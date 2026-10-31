@@ -33,6 +33,21 @@ jobs:
           git diff --exit-code
       - run: flutter analyze
       - run: flutter test
+      # README links to repo files (README.ja.md, AGENTS.md, ...) dangle on the generated
+      # landing page; those warnings are expected. Any other warning fails the job.
+      - name: Check dartdoc
+        run: |
+          dart doc --validate-links 2>&1 | tee "$RUNNER_TEMP/dartdoc.log"
+          unexpected=$(awk '
+            /^[[:space:]]*(warning|error):/ { if (pending != "") print pending; pending = $0; next }
+            /^[[:space:]]+linked to from package-advanced_webview:/ && pending ~ /broken link to/ { pending = ""; next }
+            END { if (pending != "") print pending }
+          ' "$RUNNER_TEMP/dartdoc.log")
+          if [ -n "$unexpected" ]; then
+            echo "$unexpected"
+            echo '::error::dart doc reported warnings outside the README landing page'
+            exit 1
+          fi
       - name: Validate package for pub.dev
         run: flutter pub publish --dry-run
 
