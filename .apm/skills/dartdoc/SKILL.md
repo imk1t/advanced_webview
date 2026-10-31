@@ -80,7 +80,10 @@ fvm dart doc --validate-links
 
 - `dart doc` output goes to `doc/api/` (git-ignored; never commit it). Read the warnings:
   unresolved `[references]`, "no documentation" for public members, broken links. Fix
-  every warning that points at `lib/`.
+  every warning that points at `lib/`. Warnings on the package landing page (generated
+  from `README.md`, "linked to from" is `package-advanced_webview`) about repo files such as
+  `README.ja.md`, `LICENSE`, `CONTRIBUTING.md` or `AGENTS.md` are expected: dartdoc doesn't
+  copy those files into `doc/api/`, so the relative links dangle only there.
 - Optionally open `doc/api/index.html` (or run `fvm dart pub global activate dhttpd` /
   any static server) and check the class and member pages read like the pub.dev reference.
 - If `fvm` or the Dart SDK is not available in your environment, say so instead of
@@ -94,7 +97,7 @@ fvm dart doc --validate-links
 - Every public member exported from `lib/advanced_webview.dart` has a summary sentence,
   and every member that calls native code has Android and iOS notes.
 - Platform notes match `website/data/api-mapping.json` and `bun run check:mapping` passes.
-- `fvm dart doc --validate-links` reports no warnings for `lib/`, and `fvm dart format`
+- `fvm dart doc --validate-links` reports no warnings for `lib/` (README link warnings aside), and `fvm dart format`
   and `fvm flutter analyze` are clean.
 - User-visible changes are in `CHANGELOG.md` under `## Unreleased`; the guide pages in
   `website/guide/` and `website/ja/guide/` do not contradict the comments.
