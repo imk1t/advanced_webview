@@ -6,6 +6,7 @@ import android.content.MutableContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
+import android.os.Message
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
@@ -45,11 +46,15 @@ class AdvancedWebView(
     val webView: WebView = WebView(contextWrapper)
 
     private val hasNavigationDelegate = params.hasNavigationDelegate
+    private val hasNewWindowDelegate = params.hasNewWindowDelegate
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
 
     init {
         webView.settings.domStorageEnabled = true
+        // Without a delegate, window.open and target=_blank load in this WebView.
+        webView.settings.setSupportMultipleWindows(hasNewWindowDelegate)
+        webView.settings.javaScriptCanOpenWindowsAutomatically = true
         applySettings(params.settings)
         webView.webViewClient = Client()
         webView.webChromeClient = ChromeClient()
@@ -233,6 +238,42 @@ class AdvancedWebView(
 
         override fun onReceivedTitle(view: WebView, title: String?) {
             send { flutterApi.onTitleChanged(id, title) }
+        }
+
+        override fun onCreateWindow(
+            view: WebView,
+            isDialog: Boolean,
+            isUserGesture: Boolean,
+            resultMsg: Message,
+        ): Boolean {
+            if (!hasNewWindowDelegate) return false
+            // The URL is only known once the new window starts loading, so hand
+            // the page a throwaway WebView, report the first URL it navigates
+            // to, and destroy it.
+            val popup = WebView(view.context)
+            popup.webViewClient = object : WebViewClient() {
+                private var reported = false
+
+                override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                    report(view, request.url.toString())
+                    return true
+                }
+
+                override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+                    report(view, url)
+                }
+
+                private fun report(view: WebView, url: String) {
+                    if (reported || url == "about:blank") return
+                    reported = true
+                    send { flutterApi.onNewWindowRequest(id, url) }
+                    view.stopLoading()
+                    view.post { view.destroy() }
+                }
+            }
+            (resultMsg.obj as WebView.WebViewTransport).webView = popup
+            resultMsg.sendToTarget()
+            return true
         }
     }
 

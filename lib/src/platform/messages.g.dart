@@ -250,6 +250,7 @@ class CreationParamsMessage {
     required this.settings,
     required this.javaScriptChannelNames,
     required this.hasNavigationDelegate,
+    required this.hasNewWindowDelegate,
     required this.userScripts,
   });
 
@@ -263,6 +264,10 @@ class CreationParamsMessage {
   /// When false, native code never round-trips navigation decisions to Dart.
   bool hasNavigationDelegate;
 
+  /// When false, `window.open` and `target="_blank"` load in the same WebView
+  /// and never round-trip to Dart.
+  bool hasNewWindowDelegate;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 
@@ -272,6 +277,7 @@ class CreationParamsMessage {
       settings,
       javaScriptChannelNames,
       hasNavigationDelegate,
+      hasNewWindowDelegate,
       userScripts,
     ];
   }
@@ -286,7 +292,8 @@ class CreationParamsMessage {
       settings: result[1]! as WebViewSettingsMessage,
       javaScriptChannelNames: (result[2]! as List<Object?>).cast<String>(),
       hasNavigationDelegate: result[3]! as bool,
-      userScripts: (result[4]! as List<Object?>).cast<UserScriptMessage>(),
+      hasNewWindowDelegate: result[4]! as bool,
+      userScripts: (result[5]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -299,7 +306,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -308,7 +315,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, hasNavigationDelegate: $hasNavigationDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, userScripts: $userScripts)';
   }
 }
 
@@ -950,6 +957,9 @@ abstract class AdvancedWebViewFlutterApi {
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
 
+  /// The page asked for a new window; the WebView did not load `url` itself.
+  void onNewWindowRequest(int webViewId, String url);
+
   static void setUp(AdvancedWebViewFlutterApi? api, {
     BinaryMessenger? binaryMessenger, 
     String messageChannelSuffix = '',
@@ -1102,6 +1112,28 @@ abstract class AdvancedWebViewFlutterApi {
           final String arg_message = args[2]! as String;
           try {
             api.onJavaScriptMessage(arg_webViewId, arg_channelName, arg_message);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onNewWindowRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final String arg_url = args[1]! as String;
+          try {
+            api.onNewWindowRequest(arg_webViewId, arg_url);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
