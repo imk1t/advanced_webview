@@ -96,6 +96,6 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
 
   @MainActor
   func clearCookies(webViewId: Int64) async throws {
-    await registry.get(webViewId).clearCookies()
+    try await registry.get(webViewId).clearCookies()
   }
 }
