@@ -18,6 +18,7 @@ void main() {
 
   AdvancedWebViewController createController({
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
+    List<UserScript> userScripts = const [],
     PageEventCallback? onPageFinished,
     WebResourceErrorCallback? onWebResourceError,
     NavigationRequestCallback? onNavigationRequest,
@@ -26,6 +27,7 @@ void main() {
       hostApi: hostApi,
       dispatcher: dispatcher,
       javaScriptChannels: javaScriptChannels,
+      userScripts: userScripts,
       onPageFinished: onPageFinished,
       onWebResourceError: onWebResourceError,
       onNavigationRequest: onNavigationRequest,
@@ -124,6 +126,41 @@ void main() {
       );
       expect(hostApi.cookies.values.single.expiresMillis, isNull);
       expect(hostApi.cookies.values.single.path, '/');
+    });
+  });
+
+  group('user scripts', () {
+    test('constructor scripts are part of the creation params', () {
+      final controller = createController(
+        userScripts: const [
+          UserScript(
+            source: 'a()',
+            injectionTime: UserScriptInjectionTime.atDocumentEnd,
+            mainFrameOnly: false,
+          ),
+        ],
+      );
+      final script = hostApi.created[controller.webViewId]!.userScripts.single;
+      expect(script.source, 'a()');
+      expect(
+        script.injectionTime,
+        UserScriptInjectionTimeMessage.atDocumentEnd,
+      );
+      expect(script.mainFrameOnly, isFalse);
+    });
+
+    test('can be added and removed', () async {
+      final controller = createController();
+      await controller.addUserScript(const UserScript(source: 'b()'));
+      expect(hostApi.userScripts.single.source, 'b()');
+      expect(
+        hostApi.userScripts.single.injectionTime,
+        UserScriptInjectionTimeMessage.atDocumentStart,
+      );
+      expect(hostApi.userScripts.single.mainFrameOnly, isTrue);
+
+      await controller.removeAllUserScripts();
+      expect(hostApi.userScripts, isEmpty);
     });
   });
 

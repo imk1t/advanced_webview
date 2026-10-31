@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add user scripts: `UserScript`, the `userScripts` constructor parameter, and
+  `AdvancedWebViewController.addUserScript` / `removeAllUserScripts`. Android uses
+  `androidx.webkit` (`DOCUMENT_START_SCRIPT`).
 - Add cookie management: `AdvancedWebViewController.setCookie`, `getCookies` and `clearCookies`
   with the `WebViewCookie` type. On Android `getCookies` only reports name and value.
 - Docs site: pin npm dependencies to exact versions and harden installs against supply-chain

@@ -195,7 +195,8 @@ class WebViewHostApiImplTest {
         settings: WebViewSettingsMessage = settings(),
         channels: List<String> = emptyList(),
         hasNavigationDelegate: Boolean = false,
-    ) = CreationParamsMessage(webViewId, settings, channels, hasNavigationDelegate)
+        userScripts: List<UserScriptMessage> = emptyList(),
+    ) = CreationParamsMessage(webViewId, settings, channels, hasNavigationDelegate, userScripts)
 
     private fun settings(
         javaScriptEnabled: Boolean = true,

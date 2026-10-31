@@ -9,6 +9,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
 
   private let flutterApi: AdvancedWebViewFlutterApi
   private let hasNavigationDelegate: Bool
+  private var javaScriptChannelNames: [String] = []
   private var observations: [NSKeyValueObservation] = []
   private var isDestroyed = false
   /// URL of the load started by `load(_:)` / `loadHTMLString(_:baseURL:)`
@@ -31,6 +32,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     webView.navigationDelegate = self
     apply(settings: params.settings)
     params.javaScriptChannelNames.forEach(addJavaScriptChannel)
+    params.userScripts.forEach(addUserScript)
     observeProperties()
   }
 
@@ -143,9 +145,29 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     webView.configuration.userContentController.removeAllScriptMessageHandlers()
   }
 
+  func addUserScript(_ script: UserScriptMessage) {
+    let time: WKUserScriptInjectionTime =
+      script.injectionTime == .atDocumentStart ? .atDocumentStart : .atDocumentEnd
+    webView.configuration.userContentController.addUserScript(
+      WKUserScript(
+        source: script.source, injectionTime: time, forMainFrameOnly: script.mainFrameOnly))
+  }
+
+  /// Removes the scripts added by the app. WebKit has no way to remove a single
+  /// script, so the JavaScript channel shims are registered again.
+  func removeAllUserScripts() {
+    webView.configuration.userContentController.removeAllUserScripts()
+    javaScriptChannelNames.forEach(addChannelShim)
+  }
+
   private func addJavaScriptChannel(_ name: String) {
+    javaScriptChannelNames.append(name)
+    webView.configuration.userContentController.add(WeakScriptMessageHandler(self), name: name)
+    addChannelShim(name)
+  }
+
+  private func addChannelShim(_ name: String) {
     let controller = webView.configuration.userContentController
-    controller.add(WeakScriptMessageHandler(self), name: name)
     // Expose the same `window.<name>.postMessage(String)` shape as Android.
     let source = """
       window['\(name)'] = { postMessage: function(m) { \

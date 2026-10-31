@@ -8,6 +8,7 @@ import 'navigation.dart';
 import 'platform/event_dispatcher.dart';
 import 'platform/messages.g.dart';
 import 'settings.dart';
+import 'user_script.dart';
 
 /// Controls one native WebView.
 ///
@@ -18,6 +19,7 @@ class AdvancedWebViewController {
   AdvancedWebViewController({
     WebViewSettings settings = const WebViewSettings(),
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
+    List<UserScript> userScripts = const [],
     this.onPageStarted,
     this.onPageFinished,
     this.onProgress,
@@ -38,6 +40,7 @@ class AdvancedWebViewController {
         settings: settings.toMessage(),
         javaScriptChannelNames: _javaScriptChannels.keys.toList(),
         hasNavigationDelegate: onNavigationRequest != null,
+        userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
   }
@@ -113,6 +116,27 @@ class AdvancedWebViewController {
     await _call(() => _hostApi.updateSettings(webViewId, settings.toMessage()));
     _settings = settings;
   }
+
+  /// Registers [script] to run in pages loaded from now on.
+  ///
+  /// It does not run in the page that is currently shown; load or reload a
+  /// page afterwards. Scripts passed to the constructor are registered before
+  /// the first load.
+  ///
+  /// Android: `WebViewCompat.addDocumentStartJavaScript(WebView, String, Set)`;
+  /// requires `WebViewFeature.DOCUMENT_START_SCRIPT`. `atDocumentEnd` scripts
+  /// are wrapped to wait for `DOMContentLoaded`.
+  /// iOS: `WKUserContentController.addUserScript(_:)` with a `WKUserScript`.
+  Future<void> addUserScript(UserScript script) =>
+      _call(() => _hostApi.addUserScript(webViewId, script.toMessage()));
+
+  /// Removes every script added with [addUserScript] or the constructor.
+  ///
+  /// Android: `ScriptHandler.remove()` for each registered script.
+  /// iOS: `WKUserContentController.removeAllUserScripts()`; the JavaScript
+  /// channel shims are registered again afterwards.
+  Future<void> removeAllUserScripts() =>
+      _call(() => _hostApi.removeAllUserScripts(webViewId));
 
   /// Stores [cookie] in the WebView's cookie store.
   ///

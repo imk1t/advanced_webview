@@ -43,12 +43,27 @@ class WebViewSettingsMessage {
   String? userAgent;
 }
 
+enum UserScriptInjectionTimeMessage { atDocumentStart, atDocumentEnd }
+
+class UserScriptMessage {
+  UserScriptMessage({
+    required this.source,
+    required this.injectionTime,
+    required this.mainFrameOnly,
+  });
+
+  String source;
+  UserScriptInjectionTimeMessage injectionTime;
+  bool mainFrameOnly;
+}
+
 class CreationParamsMessage {
   CreationParamsMessage({
     required this.webViewId,
     required this.settings,
     required this.javaScriptChannelNames,
     required this.hasNavigationDelegate,
+    required this.userScripts,
   });
 
   int webViewId;
@@ -59,6 +74,9 @@ class CreationParamsMessage {
 
   /// When false, native code never round-trips navigation decisions to Dart.
   bool hasNavigationDelegate;
+
+  /// Scripts injected into every page loaded after creation.
+  List<UserScriptMessage> userScripts;
 }
 
 class NavigationRequestMessage {
@@ -153,6 +171,11 @@ abstract class AdvancedWebViewHostApi {
 
   @async
   void clearCookies(int webViewId);
+
+  /// Registers a script for pages loaded from now on.
+  void addUserScript(int webViewId, UserScriptMessage script);
+
+  void removeAllUserScripts(int webViewId);
 }
 
 // ---------------------------------------------------------------------------

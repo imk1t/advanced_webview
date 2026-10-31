@@ -16,6 +16,9 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.webkit.ScriptHandler
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 import io.flutter.Log
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.CoroutineScope
@@ -42,6 +45,7 @@ class AdvancedWebView(
     val webView: WebView = WebView(contextWrapper)
 
     private val hasNavigationDelegate = params.hasNavigationDelegate
+    private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
 
     init {
@@ -50,6 +54,7 @@ class AdvancedWebView(
         webView.webViewClient = Client()
         webView.webChromeClient = ChromeClient()
         params.javaScriptChannelNames.forEach(::addJavaScriptChannel)
+        params.userScripts.forEach(::addUserScript)
     }
 
     fun attachToContext(context: Context) {
@@ -77,6 +82,33 @@ class AdvancedWebView(
             // Android already returns JSON; "null" covers both null and undefined.
             cont.resume(if (result == null || result == "null") null else result)
         }
+    }
+
+    fun addUserScript(script: UserScriptMessage) {
+        check(WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            "User scripts need a WebView that supports DOCUMENT_START_SCRIPT"
+        }
+        scriptHandlers += WebViewCompat.addDocumentStartJavaScript(webView, script.wrapped(), setOf("*"))
+    }
+
+    fun removeAllUserScripts() {
+        scriptHandlers.forEach { it.remove() }
+        scriptHandlers.clear()
+    }
+
+    /**
+     * Document-start scripts run in every frame, so a main-frame-only script
+     * checks `window.top`, and an at-document-end script waits for the DOM.
+     */
+    private fun UserScriptMessage.wrapped(): String {
+        val frameGuard = if (mainFrameOnly) "if (window.top !== window) return;" else ""
+        val schedule = if (injectionTime == UserScriptInjectionTimeMessage.AT_DOCUMENT_END) {
+            "if (document.readyState === 'loading') " +
+                "document.addEventListener('DOMContentLoaded', run); else run();"
+        } else {
+            "run();"
+        }
+        return "(function() { $frameGuard function run() {\n$source\n} $schedule })();"
     }
 
     suspend fun setCookie(cookie: CookieMessage) {

@@ -107,6 +107,11 @@ int _deepHash(Object? value) {
 }
 
 
+enum UserScriptInjectionTimeMessage {
+  atDocumentStart,
+  atDocumentEnd;
+}
+
 enum NavigationDecisionMessage {
   navigate,
   prevent;
@@ -184,12 +189,68 @@ class WebViewSettingsMessage {
   }
 }
 
+class UserScriptMessage {
+  UserScriptMessage({
+    required this.source,
+    required this.injectionTime,
+    required this.mainFrameOnly,
+  });
+
+  String source;
+
+  UserScriptInjectionTimeMessage injectionTime;
+
+  bool mainFrameOnly;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      source,
+      injectionTime,
+      mainFrameOnly,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static UserScriptMessage decode(Object result) {
+    result as List<Object?>;
+    return UserScriptMessage(
+      source: result[0]! as String,
+      injectionTime: result[1]! as UserScriptInjectionTimeMessage,
+      mainFrameOnly: result[2]! as bool,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! UserScriptMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(source, other.source) && _deepEquals(injectionTime, other.injectionTime) && _deepEquals(mainFrameOnly, other.mainFrameOnly);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'UserScriptMessage(source: $source, injectionTime: $injectionTime, mainFrameOnly: $mainFrameOnly)';
+  }
+}
+
 class CreationParamsMessage {
   CreationParamsMessage({
     required this.webViewId,
     required this.settings,
     required this.javaScriptChannelNames,
     required this.hasNavigationDelegate,
+    required this.userScripts,
   });
 
   int webViewId;
@@ -202,12 +263,16 @@ class CreationParamsMessage {
   /// When false, native code never round-trips navigation decisions to Dart.
   bool hasNavigationDelegate;
 
+  /// Scripts injected into every page loaded after creation.
+  List<UserScriptMessage> userScripts;
+
   List<Object?> _toList() {
     return <Object?>[
       webViewId,
       settings,
       javaScriptChannelNames,
       hasNavigationDelegate,
+      userScripts,
     ];
   }
 
@@ -221,6 +286,7 @@ class CreationParamsMessage {
       settings: result[1]! as WebViewSettingsMessage,
       javaScriptChannelNames: (result[2]! as List<Object?>).cast<String>(),
       hasNavigationDelegate: result[3]! as bool,
+      userScripts: (result[4]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -233,7 +299,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -242,7 +308,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, hasNavigationDelegate: $hasNavigationDelegate)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, hasNavigationDelegate: $hasNavigationDelegate, userScripts: $userScripts)';
   }
 }
 
@@ -440,23 +506,29 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is NavigationDecisionMessage) {
+    }    else if (value is UserScriptInjectionTimeMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    }    else if (value is WebViewSettingsMessage) {
+    }    else if (value is NavigationDecisionMessage) {
       buffer.putUint8(130);
-      writeValue(buffer, value.encode());
-    }    else if (value is CreationParamsMessage) {
+      writeValue(buffer, value.index);
+    }    else if (value is WebViewSettingsMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    }    else if (value is NavigationRequestMessage) {
+    }    else if (value is UserScriptMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    }    else if (value is WebResourceErrorMessage) {
+    }    else if (value is CreationParamsMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is NavigationRequestMessage) {
       buffer.putUint8(134);
+      writeValue(buffer, value.encode());
+    }    else if (value is WebResourceErrorMessage) {
+      buffer.putUint8(135);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(136);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -468,16 +540,21 @@ class _PigeonCodec extends StandardMessageCodec {
     switch (type) {
       case 129:
         final value = readValue(buffer) as int?;
-        return value == null ? null : NavigationDecisionMessage.values[value];
+        return value == null ? null : UserScriptInjectionTimeMessage.values[value];
       case 130:
-        return WebViewSettingsMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : NavigationDecisionMessage.values[value];
       case 131:
-        return CreationParamsMessage.decode(readValue(buffer)!);
+        return WebViewSettingsMessage.decode(readValue(buffer)!);
       case 132:
-        return NavigationRequestMessage.decode(readValue(buffer)!);
+        return UserScriptMessage.decode(readValue(buffer)!);
       case 133:
-        return WebResourceErrorMessage.decode(readValue(buffer)!);
+        return CreationParamsMessage.decode(readValue(buffer)!);
       case 134:
+        return NavigationRequestMessage.decode(readValue(buffer)!);
+      case 135:
+        return WebResourceErrorMessage.decode(readValue(buffer)!);
+      case 136:
         return CookieMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -802,6 +879,43 @@ class AdvancedWebViewHostApi {
 
   Future<void> clearCookies(int webViewId) async {
     final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearCookies$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// Registers a script for pages loaded from now on.
+  Future<void> addUserScript(int webViewId, UserScriptMessage script) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.addUserScript$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, script]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  Future<void> removeAllUserScripts(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.removeAllUserScripts$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,

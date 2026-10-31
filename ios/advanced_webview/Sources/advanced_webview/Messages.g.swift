@@ -188,6 +188,11 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
 }
 
 
+enum UserScriptInjectionTimeMessage: Int, CaseIterable {
+  case atDocumentStart = 0
+  case atDocumentEnd = 1
+}
+
 enum NavigationDecisionMessage: Int, CaseIterable {
   case navigate = 0
   case prevent = 1
@@ -256,6 +261,51 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct UserScriptMessage: Hashable, CustomStringConvertible {
+  var source: String
+  var injectionTime: UserScriptInjectionTimeMessage
+  var mainFrameOnly: Bool
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> UserScriptMessage? {
+    let source = pigeonVar_list[0] as! String
+    let injectionTime = pigeonVar_list[1] as! UserScriptInjectionTimeMessage
+    let mainFrameOnly = pigeonVar_list[2] as! Bool
+
+    return UserScriptMessage(
+      source: source,
+      injectionTime: injectionTime,
+      mainFrameOnly: mainFrameOnly
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      source,
+      injectionTime,
+      mainFrameOnly,
+    ]
+  }
+  static func == (lhs: UserScriptMessage, rhs: UserScriptMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.source, rhs.source) && MessagesPigeonInternal.deepEquals(lhs.injectionTime, rhs.injectionTime) && MessagesPigeonInternal.deepEquals(lhs.mainFrameOnly, rhs.mainFrameOnly)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("UserScriptMessage")
+    MessagesPigeonInternal.deepHash(value: source, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: injectionTime, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: mainFrameOnly, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "UserScriptMessage(source: \(String(describing: source)), injectionTime: \(String(describing: injectionTime)), mainFrameOnly: \(String(describing: mainFrameOnly)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct CreationParamsMessage: Hashable, CustomStringConvertible {
   var webViewId: Int64
   var settings: WebViewSettingsMessage
@@ -263,6 +313,8 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
   var javaScriptChannelNames: [String]
   /// When false, native code never round-trips navigation decisions to Dart.
   var hasNavigationDelegate: Bool
+  /// Scripts injected into every page loaded after creation.
+  var userScripts: [UserScriptMessage]
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -271,12 +323,14 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     let settings = pigeonVar_list[1] as! WebViewSettingsMessage
     let javaScriptChannelNames = pigeonVar_list[2] as! [String]
     let hasNavigationDelegate = pigeonVar_list[3] as! Bool
+    let userScripts = pigeonVar_list[4] as! [UserScriptMessage]
 
     return CreationParamsMessage(
       webViewId: webViewId,
       settings: settings,
       javaScriptChannelNames: javaScriptChannelNames,
-      hasNavigationDelegate: hasNavigationDelegate
+      hasNavigationDelegate: hasNavigationDelegate,
+      userScripts: userScripts
     )
   }
   func toList() -> [Any?] {
@@ -285,13 +339,14 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       settings,
       javaScriptChannelNames,
       hasNavigationDelegate,
+      userScripts,
     ]
   }
   static func == (lhs: CreationParamsMessage, rhs: CreationParamsMessage) -> Bool {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate)
+    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -300,10 +355,11 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: settings, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: javaScriptChannelNames, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasNavigationDelegate, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: userScripts, hasher: &hasher)
   }
 
   public var description: String {
-    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)))"
+    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), userScripts: \(String(describing: userScripts)))"
   }
 }
 
@@ -469,18 +525,26 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 129:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return NavigationDecisionMessage(rawValue: enumResultAsInt)
+        return UserScriptInjectionTimeMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 130:
-      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return NavigationDecisionMessage(rawValue: enumResultAsInt)
+      }
+      return nil
     case 131:
-      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
+      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
     case 132:
-      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
+      return UserScriptMessage.fromList(self.readValue() as! [Any?])
     case 133:
-      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
     case 134:
+      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
+    case 135:
+      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+    case 136:
       return CookieMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -490,23 +554,29 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
 
 private class MessagesPigeonCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? NavigationDecisionMessage {
+    if let value = value as? UserScriptInjectionTimeMessage {
       super.writeByte(129)
       super.writeValue(value.rawValue)
-    } else if let value = value as? WebViewSettingsMessage {
+    } else if let value = value as? NavigationDecisionMessage {
       super.writeByte(130)
-      super.writeValue(value.toList())
-    } else if let value = value as? CreationParamsMessage {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? WebViewSettingsMessage {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? NavigationRequestMessage {
+    } else if let value = value as? UserScriptMessage {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? WebResourceErrorMessage {
+    } else if let value = value as? CreationParamsMessage {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? NavigationRequestMessage {
       super.writeByte(134)
+      super.writeValue(value.toList())
+    } else if let value = value as? WebResourceErrorMessage {
+      super.writeByte(135)
+      super.writeValue(value.toList())
+    } else if let value = value as? CookieMessage {
+      super.writeByte(136)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -552,6 +622,9 @@ protocol AdvancedWebViewHostApi {
   /// Returns the cookies the WebView would send to `url`.
   func getCookies(webViewId: Int64, url: String) async throws -> [CookieMessage]
   func clearCookies(webViewId: Int64) async throws
+  /// Registers a script for pages loaded from now on.
+  func addUserScript(webViewId: Int64, script: UserScriptMessage) throws
+  func removeAllUserScripts(webViewId: Int64) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -834,6 +907,38 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       clearCookiesChannel.setMessageHandler(nil)
+    }
+    /// Registers a script for pages loaded from now on.
+    let addUserScriptChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.addUserScript\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      addUserScriptChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let scriptArg = args[1] as! UserScriptMessage
+        do {
+          try api.addUserScript(webViewId: webViewIdArg, script: scriptArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      addUserScriptChannel.setMessageHandler(nil)
+    }
+    let removeAllUserScriptsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.removeAllUserScripts\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      removeAllUserScriptsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        do {
+          try api.removeAllUserScripts(webViewId: webViewIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      removeAllUserScriptsChannel.setMessageHandler(nil)
     }
   }
 }

@@ -85,4 +85,18 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     calls.add('clearCookies');
     cookies.clear();
   }
+
+  final List<UserScriptMessage> userScripts = [];
+
+  @override
+  Future<void> addUserScript(int webViewId, UserScriptMessage script) async {
+    calls.add('addUserScript');
+    userScripts.add(script);
+  }
+
+  @override
+  Future<void> removeAllUserScripts(int webViewId) async {
+    calls.add('removeAllUserScripts');
+    userScripts.clear();
+  }
 }

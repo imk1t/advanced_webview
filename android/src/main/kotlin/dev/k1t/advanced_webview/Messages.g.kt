@@ -201,6 +201,17 @@ class FlutterError (
   val details: Any? = null
 ) : RuntimeException()
 
+enum class UserScriptInjectionTimeMessage(val raw: Int) {
+  AT_DOCUMENT_START(0),
+  AT_DOCUMENT_END(1);
+
+  companion object {
+    fun ofRaw(raw: Int): UserScriptInjectionTimeMessage? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class NavigationDecisionMessage(val raw: Int) {
   NAVIGATE(0),
   PREVENT(1);
@@ -272,13 +283,60 @@ data class WebViewSettingsMessage (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class UserScriptMessage (
+  val source: String,
+  val injectionTime: UserScriptInjectionTimeMessage,
+  val mainFrameOnly: Boolean
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): UserScriptMessage {
+      val source = pigeonVar_list[0] as String
+      val injectionTime = pigeonVar_list[1] as UserScriptInjectionTimeMessage
+      val mainFrameOnly = pigeonVar_list[2] as Boolean
+      return UserScriptMessage(source, injectionTime, mainFrameOnly)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      source,
+      injectionTime,
+      mainFrameOnly,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as UserScriptMessage
+    return MessagesPigeonUtils.deepEquals(this.source, other.source) && MessagesPigeonUtils.deepEquals(this.injectionTime, other.injectionTime) && MessagesPigeonUtils.deepEquals(this.mainFrameOnly, other.mainFrameOnly)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.source)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.injectionTime)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.mainFrameOnly)
+    return result
+  }
+  override fun toString(): String {
+    return "UserScriptMessage(source=$source, injectionTime=$injectionTime, mainFrameOnly=$mainFrameOnly)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class CreationParamsMessage (
   val webViewId: Long,
   val settings: WebViewSettingsMessage,
   /** Names exposed to JS as `window.<name>.postMessage(String)`. */
   val javaScriptChannelNames: List<String>,
   /** When false, native code never round-trips navigation decisions to Dart. */
-  val hasNavigationDelegate: Boolean
+  val hasNavigationDelegate: Boolean,
+  /** Scripts injected into every page loaded after creation. */
+  val userScripts: List<UserScriptMessage>
 )
  {
   companion object {
@@ -287,7 +345,8 @@ data class CreationParamsMessage (
       val settings = pigeonVar_list[1] as WebViewSettingsMessage
       val javaScriptChannelNames = pigeonVar_list[2] as List<String>
       val hasNavigationDelegate = pigeonVar_list[3] as Boolean
-      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, hasNavigationDelegate)
+      val userScripts = pigeonVar_list[4] as List<UserScriptMessage>
+      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, hasNavigationDelegate, userScripts)
     }
   }
   fun toList(): List<Any?> {
@@ -296,6 +355,7 @@ data class CreationParamsMessage (
       settings,
       javaScriptChannelNames,
       hasNavigationDelegate,
+      userScripts,
     )
   }
   override fun equals(other: Any?): Boolean {
@@ -306,7 +366,7 @@ data class CreationParamsMessage (
       return true
     }
     val other = other as CreationParamsMessage
-    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate)
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
   }
 
   override fun hashCode(): Int {
@@ -315,10 +375,11 @@ data class CreationParamsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.settings)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.javaScriptChannelNames)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNavigationDelegate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.userScripts)
     return result
   }
   override fun toString(): String {
-    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, hasNavigationDelegate=$hasNavigationDelegate)"
+    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, hasNavigationDelegate=$hasNavigationDelegate, userScripts=$userScripts)"
   }
 }
 
@@ -478,30 +539,40 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
     return when (type) {
       129.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          NavigationDecisionMessage.ofRaw(it.toInt())
+          UserScriptInjectionTimeMessage.ofRaw(it.toInt())
         }
       }
       130.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          WebViewSettingsMessage.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          NavigationDecisionMessage.ofRaw(it.toInt())
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CreationParamsMessage.fromList(it)
+          WebViewSettingsMessage.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          NavigationRequestMessage.fromList(it)
+          UserScriptMessage.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          WebResourceErrorMessage.fromList(it)
+          CreationParamsMessage.fromList(it)
         }
       }
       134.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          NavigationRequestMessage.fromList(it)
+        }
+      }
+      135.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          WebResourceErrorMessage.fromList(it)
+        }
+      }
+      136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           CookieMessage.fromList(it)
         }
@@ -511,28 +582,36 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
   }
   override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     when (value) {
-      is NavigationDecisionMessage -> {
+      is UserScriptInjectionTimeMessage -> {
         stream.write(129)
         writeValue(stream, value.raw.toLong())
       }
-      is WebViewSettingsMessage -> {
+      is NavigationDecisionMessage -> {
         stream.write(130)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is CreationParamsMessage -> {
+      is WebViewSettingsMessage -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is NavigationRequestMessage -> {
+      is UserScriptMessage -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is WebResourceErrorMessage -> {
+      is CreationParamsMessage -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is NavigationRequestMessage -> {
         stream.write(134)
+        writeValue(stream, value.toList())
+      }
+      is WebResourceErrorMessage -> {
+        stream.write(135)
+        writeValue(stream, value.toList())
+      }
+      is CookieMessage -> {
+        stream.write(136)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -566,6 +645,9 @@ interface AdvancedWebViewHostApi {
   /** Returns the cookies the WebView would send to `url`. */
   suspend fun getCookies(webViewId: Long, url: String): List<CookieMessage>
   suspend fun clearCookies(webViewId: Long)
+  /** Registers a script for pages loaded from now on. */
+  fun addUserScript(webViewId: Long, script: UserScriptMessage)
+  fun removeAllUserScripts(webViewId: Long)
 
   companion object {
     /** The codec used by AdvancedWebViewHostApi. */
@@ -887,6 +969,43 @@ interface AdvancedWebViewHostApi {
               }
               reply.reply(wrapped)
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.addUserScript$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val scriptArg = args[1] as UserScriptMessage
+            val wrapped: List<Any?> = try {
+              api.addUserScript(webViewIdArg, scriptArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.removeAllUserScripts$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val wrapped: List<Any?> = try {
+              api.removeAllUserScripts(webViewIdArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

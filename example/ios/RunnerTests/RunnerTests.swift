@@ -140,13 +140,15 @@ final class RunnerTests: XCTestCase {
     webViewId: Int64,
     settings: WebViewSettingsMessage? = nil,
     channels: [String] = [],
-    hasNavigationDelegate: Bool = false
+    hasNavigationDelegate: Bool = false,
+    userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
     return CreationParamsMessage(
       webViewId: webViewId,
       settings: settings ?? self.settings(),
       javaScriptChannelNames: channels,
-      hasNavigationDelegate: hasNavigationDelegate)
+      hasNavigationDelegate: hasNavigationDelegate,
+      userScripts: userScripts)
   }
 
   private func settings(
