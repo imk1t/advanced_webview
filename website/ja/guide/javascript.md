@@ -28,3 +28,27 @@ window.Bridge.postMessage('hello');
 ```
 
 メッセージは文字列です。構造化データを送るときは JavaScript 側で `JSON.stringify` してください。
+
+## ユーザースクリプト
+
+ユーザースクリプトは、WebView が読み込むすべてのページに、DOM の解析前または解析後に注入されます。
+
+```dart
+final controller = AdvancedWebViewController(
+  userScripts: const [
+    UserScript(source: 'window.isApp = true;'), // ページ自身のスクリプトより前
+    UserScript(
+      source: 'document.body.classList.add("in-app");',
+      injectionTime: UserScriptInjectionTime.atDocumentEnd, // DOMContentLoaded 後
+    ),
+  ],
+);
+
+await controller.addUserScript(const UserScript(source: '...'));
+await controller.removeAllUserScripts();
+```
+
+スクリプトは追加後に読み込むページにのみ作用します。`mainFrameOnly` の既定値は `true` です。
+
+Android では `DOCUMENT_START_SCRIPT` に対応した WebView が必要です（現行端末のシステム WebView は対応しています）。
+`mainFrameOnly` と `atDocumentEnd` が iOS と同じ動きになるよう、プラグインがソースをラップします。

@@ -40,3 +40,7 @@ cited native API no longer appears in the Kotlin / Swift sources.
 ## Cookies
 
 <ApiMapping group="cookies" />
+
+## User scripts
+
+<ApiMapping group="userScripts" />

@@ -72,6 +72,8 @@ kotlin {
 dependencies {
     // Required by the Pigeon-generated suspend APIs.
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    // Document-start scripts (WebViewCompat.addDocumentStartJavaScript).
+    implementation("androidx.webkit:webkit:1.14.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("org.mockito:mockito-core:5.14.2")

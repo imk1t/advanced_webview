@@ -41,6 +41,13 @@
         "en": "Cookies",
         "ja": "Cookie"
       }
+    },
+    {
+      "id": "userScripts",
+      "title": {
+        "en": "User scripts",
+        "ja": "ユーザースクリプト"
+      }
     }
   ],
   "classes": {
@@ -53,7 +60,9 @@
       "WebResourceError": "https://developer.android.com/reference/android/webkit/WebResourceError",
       "JavascriptInterface": "https://developer.android.com/reference/android/webkit/JavascriptInterface",
       "PlatformView": "https://api.flutter.dev/javadoc/io/flutter/plugin/platform/PlatformView.html",
-      "CookieManager": "https://developer.android.com/reference/android/webkit/CookieManager"
+      "CookieManager": "https://developer.android.com/reference/android/webkit/CookieManager",
+      "WebViewCompat": "https://developer.android.com/reference/androidx/webkit/WebViewCompat",
+      "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler"
     },
     "ios": {
       "WKWebView": "https://developer.apple.com/documentation/webkit/wkwebview",
@@ -840,6 +849,98 @@
       "ios": {
         "status": "supported",
         "apis": ["WKHTTPCookieStore.allCookies()", "WKHTTPCookieStore.deleteCookie(_:)"]
+      }
+    },
+    {
+      "dart": "UserScript",
+      "group": "userScripts",
+      "summary": {
+        "en": "JavaScript injected into every page the WebView loads.",
+        "ja": "WebView が読み込むすべてのページに注入される JavaScript です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewCompat.addDocumentStartJavaScript(WebView, String, Set)"],
+        "note": {
+          "en": "Document-start scripts run in all frames; the plugin wraps the source for main-frame-only and document-end scripts.",
+          "ja": "document-start スクリプトは全フレームで動くため、メインフレームのみ・document-end 指定はプラグインがソースをラップして実現します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKUserScript"]
+      }
+    },
+    {
+      "dart": "UserScriptInjectionTime",
+      "group": "userScripts",
+      "summary": {
+        "en": "When a user script runs while a page loads.",
+        "ja": "ページ読み込み中にユーザースクリプトが実行されるタイミングです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewCompat.addDocumentStartJavaScript(WebView, String, Set)"],
+        "note": {
+          "en": "atDocumentEnd waits for DOMContentLoaded.",
+          "ja": "atDocumentEnd は DOMContentLoaded を待ちます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKUserScript"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.addUserScript",
+      "group": "userScripts",
+      "summary": {
+        "en": "Registers a user script for pages loaded from now on.",
+        "ja": "以降に読み込むページ向けにユーザースクリプトを登録します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewCompat.addDocumentStartJavaScript(WebView, String, Set)"],
+        "note": {
+          "en": "Needs a WebView with DOCUMENT_START_SCRIPT support.",
+          "ja": "DOCUMENT_START_SCRIPT 対応の WebView が必要です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKUserContentController.addUserScript(_:)", "WKUserScript"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.removeAllUserScripts",
+      "group": "userScripts",
+      "summary": {
+        "en": "Removes every registered user script.",
+        "ja": "登録済みのユーザースクリプトをすべて削除します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["ScriptHandler.remove()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKUserContentController.removeAllUserScripts()"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.userScripts",
+      "group": "userScripts",
+      "summary": {
+        "en": "Constructor parameter: scripts registered before the first load.",
+        "ja": "コンストラクタ引数: 最初の読み込み前に登録されるスクリプトです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewCompat.addDocumentStartJavaScript(WebView, String, Set)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKUserContentController.addUserScript(_:)", "WKUserScript"]
       }
     }
   ]

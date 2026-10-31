@@ -40,3 +40,7 @@
 ## Cookie
 
 <ApiMapping group="cookies" />
+
+## ユーザースクリプト
+
+<ApiMapping group="userScripts" />

@@ -249,6 +249,43 @@ void main() {
     expect(await harness.controller.getCookies(_baseUrl), isEmpty);
   });
 
+  testWidgets('user scripts run at document start and end', (tester) async {
+    final harness = _Harness(
+      userScripts: const [
+        UserScript(source: 'window.startState = document.readyState;'),
+        UserScript(
+          source: 'window.endBody = document.body.textContent;',
+          injectionTime: UserScriptInjectionTime.atDocumentEnd,
+        ),
+      ],
+    );
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body>content</body></html>');
+
+    expect(
+      await harness.controller.runJavaScriptReturningResult(
+        'window.startState',
+      ),
+      'loading',
+    );
+    expect(
+      await harness.controller.runJavaScriptReturningResult('window.endBody'),
+      'content',
+    );
+
+    // Removed scripts no longer run on later loads.
+    await harness.controller.removeAllUserScripts();
+    await harness.loadHtml('<html><body>again</body></html>');
+    expect(
+      await harness.controller.runJavaScriptReturningResult(
+        'window.startState',
+      ),
+      isNull,
+    );
+  });
+
   testWidgets('the WebView outlives its widget', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);
@@ -274,9 +311,11 @@ class _Harness {
   _Harness({
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     NavigationRequestCallback? onNavigationRequest,
+    List<UserScript> userScripts = const [],
   }) {
     controller = AdvancedWebViewController(
       javaScriptChannels: javaScriptChannels,
+      userScripts: userScripts,
       onNavigationRequest: onNavigationRequest,
       onPageStarted: startedUrls.add,
       onPageFinished: (url) {
