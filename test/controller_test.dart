@@ -22,6 +22,7 @@ void main() {
     PageEventCallback? onPageFinished,
     WebResourceErrorCallback? onWebResourceError,
     NavigationRequestCallback? onNavigationRequest,
+    NewWindowCallback? onNewWindow,
   }) {
     return AdvancedWebViewController(
       hostApi: hostApi,
@@ -31,6 +32,7 @@ void main() {
       onPageFinished: onPageFinished,
       onWebResourceError: onWebResourceError,
       onNavigationRequest: onNavigationRequest,
+      onNewWindow: onNewWindow,
     );
   }
 
@@ -92,6 +94,25 @@ void main() {
       await controller.dispose();
       expect(hostApi.calls.last, 'dispose(${controller.webViewId})');
       expect(controller.reload, throwsStateError);
+    });
+  });
+
+  group('new windows', () {
+    test('are reported only when a callback is set', () {
+      expect(
+        hostApi.created[createController().webViewId]!.hasNewWindowDelegate,
+        isFalse,
+      );
+
+      final urls = <String>[];
+      final controller = createController(onNewWindow: urls.add);
+      expect(
+        hostApi.created[controller.webViewId]!.hasNewWindowDelegate,
+        isTrue,
+      );
+
+      dispatcher.onNewWindowRequest(controller.webViewId, 'https://a.dev/');
+      expect(urls, ['https://a.dev/']);
     });
   });
 

@@ -13,6 +13,7 @@ abstract interface class WebViewEventListener {
     NavigationRequestMessage request,
   );
   void onJavaScriptMessage(String channelName, String message);
+  void onNewWindowRequest(String url);
 }
 
 /// Single [AdvancedWebViewFlutterApi] implementation that routes every event to
@@ -69,4 +70,8 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   @override
   void onJavaScriptMessage(int webViewId, String channelName, String message) =>
       _listeners[webViewId]?.onJavaScriptMessage(channelName, message);
+
+  @override
+  void onNewWindowRequest(int webViewId, String url) =>
+      _listeners[webViewId]?.onNewWindowRequest(url);
 }

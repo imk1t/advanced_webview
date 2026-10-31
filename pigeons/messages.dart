@@ -63,6 +63,7 @@ class CreationParamsMessage {
     required this.settings,
     required this.javaScriptChannelNames,
     required this.hasNavigationDelegate,
+    required this.hasNewWindowDelegate,
     required this.userScripts,
   });
 
@@ -74,6 +75,10 @@ class CreationParamsMessage {
 
   /// When false, native code never round-trips navigation decisions to Dart.
   bool hasNavigationDelegate;
+
+  /// When false, `window.open` and `target="_blank"` load in the same WebView
+  /// and never round-trip to Dart.
+  bool hasNewWindowDelegate;
 
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
@@ -201,4 +206,7 @@ abstract class AdvancedWebViewFlutterApi {
   );
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
+
+  /// The page asked for a new window; the WebView did not load `url` itself.
+  void onNewWindowRequest(int webViewId, String url);
 }

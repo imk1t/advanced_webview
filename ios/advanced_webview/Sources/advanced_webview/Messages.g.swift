@@ -313,6 +313,9 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
   var javaScriptChannelNames: [String]
   /// When false, native code never round-trips navigation decisions to Dart.
   var hasNavigationDelegate: Bool
+  /// When false, `window.open` and `target="_blank"` load in the same WebView
+  /// and never round-trip to Dart.
+  var hasNewWindowDelegate: Bool
   /// Scripts injected into every page loaded after creation.
   var userScripts: [UserScriptMessage]
 
@@ -323,13 +326,15 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     let settings = pigeonVar_list[1] as! WebViewSettingsMessage
     let javaScriptChannelNames = pigeonVar_list[2] as! [String]
     let hasNavigationDelegate = pigeonVar_list[3] as! Bool
-    let userScripts = pigeonVar_list[4] as! [UserScriptMessage]
+    let hasNewWindowDelegate = pigeonVar_list[4] as! Bool
+    let userScripts = pigeonVar_list[5] as! [UserScriptMessage]
 
     return CreationParamsMessage(
       webViewId: webViewId,
       settings: settings,
       javaScriptChannelNames: javaScriptChannelNames,
       hasNavigationDelegate: hasNavigationDelegate,
+      hasNewWindowDelegate: hasNewWindowDelegate,
       userScripts: userScripts
     )
   }
@@ -339,6 +344,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       settings,
       javaScriptChannelNames,
       hasNavigationDelegate,
+      hasNewWindowDelegate,
       userScripts,
     ]
   }
@@ -346,7 +352,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
+    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -355,11 +361,12 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: settings, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: javaScriptChannelNames, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasNavigationDelegate, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: hasNewWindowDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userScripts, hasher: &hasher)
   }
 
   public var description: String {
-    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), userScripts: \(String(describing: userScripts)))"
+    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), userScripts: \(String(describing: userScripts)))"
   }
 }
 
@@ -952,6 +959,8 @@ protocol AdvancedWebViewFlutterApiProtocol {
   @MainActor func onReceivedError(webViewId webViewIdArg: Int64, error errorArg: WebResourceErrorMessage) async throws
   @MainActor func shouldOverrideUrlLoading(webViewId webViewIdArg: Int64, request requestArg: NavigationRequestMessage) async throws -> NavigationDecisionMessage
   @MainActor func onJavaScriptMessage(webViewId webViewIdArg: Int64, channelName channelNameArg: String, message messageArg: String) async throws
+  /// The page asked for a new window; the WebView did not load `url` itself.
+  @MainActor func onNewWindowRequest(webViewId webViewIdArg: Int64, url urlArg: String) async throws
 }
 class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -1091,6 +1100,27 @@ class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
       let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptMessage\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, channelNameArg, messageArg] as [Any?]) { response in
+        guard let listResponse = response as? [Any?] else {
+          continuation.resume(throwing: createConnectionError(withChannelName: channelName))
+          return
+        }
+        if listResponse.count > 1 {
+          let code: String = listResponse[0] as! String
+          let message: String? = nilOrValue(listResponse[1])
+          let details: String? = nilOrValue(listResponse[2])
+          continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
+        } else {
+          continuation.resume()
+        }
+      }
+    }
+  }
+  /// The page asked for a new window; the WebView did not load `url` itself.
+  @MainActor func onNewWindowRequest(webViewId webViewIdArg: Int64, url urlArg: String) async throws {
+    return try await withCheckedThrowingContinuation { continuation in
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onNewWindowRequest\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([webViewIdArg, urlArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
           continuation.resume(throwing: createConnectionError(withChannelName: channelName))
           return
