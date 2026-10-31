@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `WebViewSettings.passkeysEnabled` to enable WebAuthn / passkeys on Android
+  (`WebSettingsCompat.setWebAuthenticationSupport`). iOS needs no setting; the app must have the
+  Associated Domains `webcredentials` entitlement.
 - Android: `<input type="file">` now opens the system file picker (it did nothing before). iOS
   already used WebKit's built-in picker.
 - Add `AdvancedWebViewController.onNewWindow` for `window.open` and `target="_blank"`. Without it,

@@ -217,6 +217,7 @@ class WebViewHostApiImplTest {
         allowsInlineMediaPlayback = false,
         supportZoom = supportZoom,
         transparentBackground = transparentBackground,
+        passkeysEnabled = false,
         userAgent = userAgent,
     )
 }

@@ -232,6 +232,8 @@ data class WebViewSettingsMessage (
   /** Android only. Ignored on iOS. */
   val supportZoom: Boolean,
   val transparentBackground: Boolean,
+  /** Android only. Ignored on iOS, where WebAuthn is governed by entitlements. */
+  val passkeysEnabled: Boolean,
   val userAgent: String? = null
 )
  {
@@ -242,8 +244,9 @@ data class WebViewSettingsMessage (
       val allowsInlineMediaPlayback = pigeonVar_list[2] as Boolean
       val supportZoom = pigeonVar_list[3] as Boolean
       val transparentBackground = pigeonVar_list[4] as Boolean
-      val userAgent = pigeonVar_list[5] as String?
-      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, transparentBackground, userAgent)
+      val passkeysEnabled = pigeonVar_list[5] as Boolean
+      val userAgent = pigeonVar_list[6] as String?
+      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, transparentBackground, passkeysEnabled, userAgent)
     }
   }
   fun toList(): List<Any?> {
@@ -253,6 +256,7 @@ data class WebViewSettingsMessage (
       allowsInlineMediaPlayback,
       supportZoom,
       transparentBackground,
+      passkeysEnabled,
       userAgent,
     )
   }
@@ -264,7 +268,7 @@ data class WebViewSettingsMessage (
       return true
     }
     val other = other as WebViewSettingsMessage
-    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent)
+    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent)
   }
 
   override fun hashCode(): Int {
@@ -274,11 +278,12 @@ data class WebViewSettingsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.allowsInlineMediaPlayback)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.supportZoom)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.transparentBackground)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.passkeysEnabled)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userAgent)
     return result
   }
   override fun toString(): String {
-    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, transparentBackground=$transparentBackground, userAgent=$userAgent)"
+    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, userAgent=$userAgent)"
   }
 }
 

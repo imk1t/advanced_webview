@@ -19,6 +19,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.webkit.ScriptHandler
+import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import io.flutter.Log
@@ -80,6 +81,12 @@ class AdvancedWebView(
             builtInZoomControls = settings.supportZoom
             displayZoomControls = false
             userAgentString = settings.userAgent ?: WebSettings.getDefaultUserAgent(webView.context)
+        }
+        if (settings.passkeysEnabled && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+            WebSettingsCompat.setWebAuthenticationSupport(
+                webView.settings,
+                WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP,
+            )
         }
         webView.setBackgroundColor(if (settings.transparentBackground) Color.TRANSPARENT else Color.WHITE)
     }

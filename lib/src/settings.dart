@@ -14,6 +14,7 @@ class WebViewSettings {
     this.allowsInlineMediaPlayback = false,
     this.supportZoom = true,
     this.transparentBackground = false,
+    this.passkeysEnabled = false,
     this.userAgent,
   });
 
@@ -30,6 +31,16 @@ class WebViewSettings {
 
   final bool transparentBackground;
 
+  /// Enables WebAuthn / passkeys for web content loaded in the WebView.
+  ///
+  /// Android only: turns on `WebSettingsCompat.setWebAuthenticationSupport`
+  /// (a no-op when the installed WebView does not support it). On iOS the
+  /// setting is ignored; WKWebView supports passkeys whenever the app has the
+  /// Associated Domains `webcredentials:` entitlement for the site's domain.
+  /// Either way, the site's domain must be associated with the app (Digital
+  /// Asset Links on Android, `apple-app-site-association` on iOS).
+  final bool passkeysEnabled;
+
   /// `null` uses the platform default user agent.
   final String? userAgent;
 
@@ -39,6 +50,7 @@ class WebViewSettings {
     bool? allowsInlineMediaPlayback,
     bool? supportZoom,
     bool? transparentBackground,
+    bool? passkeysEnabled,
     ValueGetter<String?>? userAgent,
   }) {
     return WebViewSettings(
@@ -51,6 +63,7 @@ class WebViewSettings {
       supportZoom: supportZoom ?? this.supportZoom,
       transparentBackground:
           transparentBackground ?? this.transparentBackground,
+      passkeysEnabled: passkeysEnabled ?? this.passkeysEnabled,
       userAgent: userAgent != null ? userAgent() : this.userAgent,
     );
   }
@@ -61,6 +74,7 @@ class WebViewSettings {
     allowsInlineMediaPlayback: allowsInlineMediaPlayback,
     supportZoom: supportZoom,
     transparentBackground: transparentBackground,
+    passkeysEnabled: passkeysEnabled,
     userAgent: userAgent,
   );
 
@@ -73,6 +87,7 @@ class WebViewSettings {
       other.allowsInlineMediaPlayback == allowsInlineMediaPlayback &&
       other.supportZoom == supportZoom &&
       other.transparentBackground == transparentBackground &&
+      other.passkeysEnabled == passkeysEnabled &&
       other.userAgent == userAgent;
 
   @override
@@ -82,6 +97,7 @@ class WebViewSettings {
     allowsInlineMediaPlayback,
     supportZoom,
     transparentBackground,
+    passkeysEnabled,
     userAgent,
   );
 }

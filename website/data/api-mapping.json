@@ -62,7 +62,9 @@
       "PlatformView": "https://api.flutter.dev/javadoc/io/flutter/plugin/platform/PlatformView.html",
       "CookieManager": "https://developer.android.com/reference/android/webkit/CookieManager",
       "WebViewCompat": "https://developer.android.com/reference/androidx/webkit/WebViewCompat",
-      "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler"
+      "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler",
+      "WebSettingsCompat": "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat",
+      "WebViewFeature": "https://developer.android.com/reference/androidx/webkit/WebViewFeature"
     },
     "ios": {
       "WKWebView": "https://developer.apple.com/documentation/webkit/wkwebview",
@@ -752,6 +754,33 @@
       "ios": {
         "status": "supported",
         "apis": ["UIView.isOpaque", "UIView.backgroundColor", "UIScrollView.backgroundColor"]
+      }
+    },
+    {
+      "dart": "WebViewSettings.passkeysEnabled",
+      "group": "settings",
+      "summary": {
+        "en": "Enables WebAuthn / passkeys for web content (Android).",
+        "ja": "Web コンテンツで WebAuthn / パスキーを有効にします（Android）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewFeature.isFeatureSupported(WEB_AUTHENTICATION)",
+          "WebSettingsCompat.setWebAuthenticationSupport(WEB_AUTHENTICATION_SUPPORT_FOR_APP)"
+        ],
+        "note": {
+          "en": "Needs Digital Asset Links for the site's domain. Ignored when the installed WebView does not support WebAuthn.",
+          "ja": "サイトのドメインに Digital Asset Links の設定が必要です。インストール済みの WebView が WebAuthn に対応していない場合は無視されます。"
+        }
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "WKWebView supports passkeys when the app has the Associated Domains webcredentials entitlement for the site's domain.",
+          "ja": "アプリがサイトのドメインの Associated Domains（webcredentials）entitlement を持っていれば、WKWebView でパスキーが使えます。"
+        }
       }
     },
     {
