@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
 
 # Cancel superseded runs of a PR so they don't hold the few macOS runners.
 concurrency:
@@ -11,6 +12,28 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # macOS runners are expensive. Run the iOS jobs only on main (and only when iOS-relevant
+  # files changed), or on a PR carrying the `ios-ci` label. Otherwise run
+  # `mise run check:ios` locally (see CONTRIBUTING.md).
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      ios: ${{ steps.filter.outputs.ios }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 2
+      - id: filter
+        run: |
+          if [ "${{ github.event_name }}" = pull_request ]; then
+            run=${{ contains(github.event.pull_request.labels.*.name, 'ios-ci') }}
+          elif git diff --name-only HEAD^ HEAD | grep -qE '^(ios/|example/(ios|integration_test|lib|pubspec)|pigeons/|lib/|pubspec.yaml|mise.toml|tool/check-ios.sh|.github/workflows/ci.yaml)'; then
+            run=true
+          else
+            run=false
+          fi
+          echo "ios=$run" >> "$GITHUB_OUTPUT"
+
   dart:
     runs-on: ubuntu-latest
     steps:
@@ -141,7 +164,8 @@ jobs:
 
   ios:
     runs-on: macos-latest
-    needs: dart
+    needs: [dart, changes]
+    if: needs.changes.outputs.ios == 'true'
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7.0.1
@@ -202,7 +226,8 @@ jobs:
   # Swift Package Manager, so ios/advanced_webview.podspec keeps working.
   ios-cocoapods:
     runs-on: macos-latest
-    needs: dart
+    needs: [dart, changes]
+    if: needs.changes.outputs.ios == 'true'
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7.0.1

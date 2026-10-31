@@ -38,6 +38,17 @@ cd example && flutter build ios --simulator --debug && cd ios && \
   -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
+Run the CI checks locally with mise (macOS runners are costly, so iOS CI is limited):
+
+```sh
+mise run check          # Dart format/Pigeon/analyze/test + ktlint + swift-format
+mise run check:ios      # macOS only: SwiftPM build, integration test, XCTest (`tool/check-ios.sh cocoapods|all` for the podspec)
+git config core.hooksPath .githooks   # optional pre-push hook running the above (SKIP_IOS=1 skips the simulator)
+```
+
+CI runs the macOS iOS jobs only on pushes to `main` that touch iOS-relevant files, or on a
+PR with the `ios-ci` label.
+
 Format and lint native code (generated Pigeon files are excluded):
 
 ```sh
