@@ -60,6 +60,8 @@ cd website && bun install && bun run dev            # docs site preview (Bun)
 cd website && bun run lint                          # `bun lint` (built in; canary Bun via mise until it reaches stable) for website TS (not .vue), CI runs it too
 cd website && bun run format                        # `bun fmt` (built in, reads .prettierrc.json) for website code; CI runs `format:check`
 cd website && bun run check:mapping                 # API mapping vs Dart/Kotlin/Swift sources (also runs in `bun run build`)
+gh actions-lock                                     # after changing any `uses:` in .github/workflows (updates actions.lock)
+gh actions-lock --verify                            # check the workflow lockfile (CI: verify-lockfile.yml)
 
 # Native lint / format (Pigeon output *.g.kt / *.g.swift is always excluded)
 ktlint --format $(git ls-files '*.kt' '*.kts' | grep -v '\.g\.kt$')            # Kotlin
@@ -101,6 +103,11 @@ claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both p
    the example with each (`ios` and `ios-cocoapods` jobs).
 8. Pigeon field names must not clash with Swift `NSObject` members (e.g. use `message`,
    not `description`).
+9. **Keep `.github/workflows/actions.lock` in sync.** After adding, removing or changing any
+   `uses:` in a workflow, rerun `gh actions-lock` (extension: `gh extension install
+   github/gh-actions-lock`) and commit the lockfile with the workflow change. Never edit the
+   lockfile by hand. CI (`verify-lockfile.yml`) fails when it is stale. Dependabot regenerates
+   it in its action-update PRs.
 
 ## Testing
 
