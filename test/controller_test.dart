@@ -93,6 +93,40 @@ void main() {
     });
   });
 
+  group('cookies', () {
+    test('round-trip through the host API', () async {
+      final controller = createController();
+      final expires = DateTime.fromMillisecondsSinceEpoch(1893456000000);
+      final cookie = WebViewCookie(
+        name: 'sid',
+        value: 'abc',
+        domain: 'example.com',
+        expires: expires,
+        isSecure: true,
+        isHttpOnly: true,
+      );
+
+      await controller.setCookie(cookie);
+      expect(await controller.getCookies('https://example.com/'), [cookie]);
+
+      await controller.clearCookies();
+      expect(await controller.getCookies('https://example.com/'), isEmpty);
+      expect(
+        hostApi.calls,
+        containsAllInOrder(['setCookie(sid)', 'clearCookies']),
+      );
+    });
+
+    test('session cookies have no expiry', () async {
+      final controller = createController();
+      await controller.setCookie(
+        const WebViewCookie(name: 'a', value: 'b', domain: 'example.com'),
+      );
+      expect(hostApi.cookies.values.single.expiresMillis, isNull);
+      expect(hostApi.cookies.values.single.path, '/');
+    });
+  });
+
   group('events', () {
     test('are routed to the controller with the matching id', () {
       final finishedA = <String>[];

@@ -397,6 +397,72 @@ struct WebResourceErrorMessage: Hashable, CustomStringConvertible {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct CookieMessage: Hashable, CustomStringConvertible {
+  var name: String
+  var value: String
+  var domain: String
+  var path: String
+  var isSecure: Bool
+  var isHttpOnly: Bool
+  /// Expiry as milliseconds since the Unix epoch; null for a session cookie.
+  var expiresMillis: Int64? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> CookieMessage? {
+    let name = pigeonVar_list[0] as! String
+    let value = pigeonVar_list[1] as! String
+    let domain = pigeonVar_list[2] as! String
+    let path = pigeonVar_list[3] as! String
+    let isSecure = pigeonVar_list[4] as! Bool
+    let isHttpOnly = pigeonVar_list[5] as! Bool
+    let expiresMillis: Int64? = nilOrValue(pigeonVar_list[6])
+
+    return CookieMessage(
+      name: name,
+      value: value,
+      domain: domain,
+      path: path,
+      isSecure: isSecure,
+      isHttpOnly: isHttpOnly,
+      expiresMillis: expiresMillis
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      name,
+      value,
+      domain,
+      path,
+      isSecure,
+      isHttpOnly,
+      expiresMillis,
+    ]
+  }
+  static func == (lhs: CookieMessage, rhs: CookieMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.name, rhs.name) && MessagesPigeonInternal.deepEquals(lhs.value, rhs.value) && MessagesPigeonInternal.deepEquals(lhs.domain, rhs.domain) && MessagesPigeonInternal.deepEquals(lhs.path, rhs.path) && MessagesPigeonInternal.deepEquals(lhs.isSecure, rhs.isSecure) && MessagesPigeonInternal.deepEquals(lhs.isHttpOnly, rhs.isHttpOnly) && MessagesPigeonInternal.deepEquals(lhs.expiresMillis, rhs.expiresMillis)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("CookieMessage")
+    MessagesPigeonInternal.deepHash(value: name, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: value, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: domain, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: path, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: isSecure, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: isHttpOnly, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: expiresMillis, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "CookieMessage(name: \(String(describing: name)), value: \(String(describing: value)), domain: \(String(describing: domain)), path: \(String(describing: path)), isSecure: \(String(describing: isSecure)), isHttpOnly: \(String(describing: isHttpOnly)), expiresMillis: \(String(describing: expiresMillis)))"
+  }
+}
+
 private class MessagesPigeonCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -414,6 +480,8 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
       return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
     case 133:
       return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+    case 134:
+      return CookieMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
     }
@@ -436,6 +504,9 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
       super.writeValue(value.toList())
     } else if let value = value as? WebResourceErrorMessage {
       super.writeByte(133)
+      super.writeValue(value.toList())
+    } else if let value = value as? CookieMessage {
+      super.writeByte(134)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -477,6 +548,10 @@ protocol AdvancedWebViewHostApi {
   /// Returns the evaluation result encoded as JSON (or null).
   func evaluateJavaScript(webViewId: Int64, source: String) async throws -> String?
   func updateSettings(webViewId: Int64, settings: WebViewSettingsMessage) throws
+  func setCookie(webViewId: Int64, cookie: CookieMessage) async throws
+  /// Returns the cookies the WebView would send to `url`.
+  func getCookies(webViewId: Int64, url: String) async throws -> [CookieMessage]
+  func clearCookies(webViewId: Int64) async throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -705,6 +780,60 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       updateSettingsChannel.setMessageHandler(nil)
+    }
+    let setCookieChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setCookie\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setCookieChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let cookieArg = args[1] as! CookieMessage
+        Task { @MainActor in
+          do {
+            try await api.setCookie(webViewId: webViewIdArg, cookie: cookieArg)
+            reply(wrapResult(nil))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      setCookieChannel.setMessageHandler(nil)
+    }
+    /// Returns the cookies the WebView would send to `url`.
+    let getCookiesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getCookies\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getCookiesChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let urlArg = args[1] as! String
+        Task { @MainActor in
+          do {
+            let result = try await api.getCookies(webViewId: webViewIdArg, url: urlArg)
+            reply(wrapResult(result))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getCookiesChannel.setMessageHandler(nil)
+    }
+    let clearCookiesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearCookies\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      clearCookiesChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        Task { @MainActor in
+          do {
+            try await api.clearCookies(webViewId: webViewIdArg)
+            reply(wrapResult(nil))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      clearCookiesChannel.setMessageHandler(nil)
     }
   }
 }

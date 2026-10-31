@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.MutableContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -19,6 +21,10 @@ import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import kotlin.coroutines.resume
 
 /** One native WebView plus the clients that forward its callbacks to Dart. */
@@ -71,6 +77,41 @@ class AdvancedWebView(
             // Android already returns JSON; "null" covers both null and undefined.
             cont.resume(if (result == null || result == "null") null else result)
         }
+    }
+
+    suspend fun setCookie(cookie: CookieMessage) {
+        val scheme = if (cookie.isSecure) "https" else "http"
+        val url = "$scheme://${cookie.domain.trimStart('.')}${cookie.path}"
+        val stored = suspendCancellableCoroutine { cont ->
+            CookieManager.getInstance().setCookie(url, cookie.toSetCookieHeader()) { cont.resume(it) }
+        }
+        check(stored) { "The cookie '${cookie.name}' was rejected for $url" }
+        CookieManager.getInstance().flush()
+    }
+
+    /** Android only exposes `name=value` pairs, so the other attributes are defaults. */
+    fun getCookies(url: String): List<CookieMessage> {
+        val host = Uri.parse(url).host.orEmpty()
+        val header = CookieManager.getInstance().getCookie(url) ?: return emptyList()
+        return header.split(";").mapNotNull { pair ->
+            val separator = pair.indexOf('=')
+            if (separator <= 0) return@mapNotNull null
+            CookieMessage(
+                name = pair.substring(0, separator).trim(),
+                value = pair.substring(separator + 1).trim(),
+                domain = host,
+                path = "/",
+                isSecure = false,
+                isHttpOnly = false,
+            )
+        }
+    }
+
+    suspend fun clearCookies() {
+        suspendCancellableCoroutine<Boolean> { cont ->
+            CookieManager.getInstance().removeAllCookies { cont.resume(it) }
+        }
+        CookieManager.getInstance().flush()
     }
 
     @SuppressLint("JavascriptInterface", "AddJavascriptInterface")
@@ -161,6 +202,17 @@ class AdvancedWebView(
         override fun onReceivedTitle(view: WebView, title: String?) {
             send { flutterApi.onTitleChanged(id, title) }
         }
+    }
+
+    private fun CookieMessage.toSetCookieHeader(): String = buildString {
+        append("$name=$value; Domain=$domain; Path=$path")
+        expiresMillis?.let {
+            val format = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US)
+            format.timeZone = TimeZone.getTimeZone("GMT")
+            append("; Expires=${format.format(Date(it))}")
+        }
+        if (isSecure) append("; Secure")
+        if (isHttpOnly) append("; HttpOnly")
     }
 
     private companion object {

@@ -65,4 +65,24 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     int webViewId,
     WebViewSettingsMessage settings,
   ) async => calls.add('updateSettings(js: ${settings.javaScriptEnabled})');
+
+  final Map<String, CookieMessage> cookies = {};
+
+  @override
+  Future<void> setCookie(int webViewId, CookieMessage cookie) async {
+    calls.add('setCookie(${cookie.name})');
+    cookies['${cookie.domain}|${cookie.name}'] = cookie;
+  }
+
+  @override
+  Future<List<CookieMessage>> getCookies(int webViewId, String url) async {
+    calls.add('getCookies($url)');
+    return cookies.values.toList();
+  }
+
+  @override
+  Future<void> clearCookies(int webViewId) async {
+    calls.add('clearCookies');
+    cookies.clear();
+  }
 }

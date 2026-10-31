@@ -82,6 +82,58 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     return String(data: data, encoding: .utf8)
   }
 
+  @MainActor
+  func setCookie(_ cookie: CookieMessage) async throws {
+    var properties: [HTTPCookiePropertyKey: Any] = [
+      .name: cookie.name,
+      .value: cookie.value,
+      .domain: cookie.domain,
+      .path: cookie.path,
+    ]
+    if let millis = cookie.expiresMillis {
+      properties[.expires] = Date(timeIntervalSince1970: TimeInterval(millis) / 1000)
+    }
+    if cookie.isSecure { properties[.secure] = "TRUE" }
+    if cookie.isHttpOnly { properties[HTTPCookiePropertyKey("HttpOnly")] = "TRUE" }
+    guard let httpCookie = HTTPCookie(properties: properties) else {
+      throw PigeonError(
+        code: "invalid-cookie", message: "Invalid cookie: \(cookie.name)", details: nil)
+    }
+    await webView.configuration.websiteDataStore.httpCookieStore.setCookie(httpCookie)
+  }
+
+  /// Returns the cookies WebKit would send to `url`.
+  @MainActor
+  func cookies(for url: URL) async -> [CookieMessage] {
+    let all = await webView.configuration.websiteDataStore.httpCookieStore.allCookies()
+    let host = url.host?.lowercased() ?? ""
+    let path = url.path.isEmpty ? "/" : url.path
+    let isSecureScheme = url.scheme?.lowercased() == "https"
+    return all.filter { cookie in
+      let domain = cookie.domain.lowercased()
+      let bare = domain.hasPrefix(".") ? String(domain.dropFirst()) : domain
+      let hostMatches = host == bare || (domain.hasPrefix(".") && host.hasSuffix("." + bare))
+      return hostMatches && path.hasPrefix(cookie.path) && (!cookie.isSecure || isSecureScheme)
+    }.map { cookie in
+      CookieMessage(
+        name: cookie.name,
+        value: cookie.value,
+        domain: cookie.domain,
+        path: cookie.path,
+        isSecure: cookie.isSecure,
+        isHttpOnly: cookie.isHTTPOnly,
+        expiresMillis: cookie.expiresDate.map { Int64($0.timeIntervalSince1970 * 1000) })
+    }
+  }
+
+  @MainActor
+  func clearCookies() async {
+    let store = webView.configuration.websiteDataStore.httpCookieStore
+    for cookie in await store.allCookies() {
+      await store.deleteCookie(cookie)
+    }
+  }
+
   func destroy() {
     guard !isDestroyed else { return }
     isDestroyed = true

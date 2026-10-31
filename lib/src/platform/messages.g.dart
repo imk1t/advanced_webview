@@ -356,6 +356,82 @@ class WebResourceErrorMessage {
   }
 }
 
+class CookieMessage {
+  CookieMessage({
+    required this.name,
+    required this.value,
+    required this.domain,
+    required this.path,
+    required this.isSecure,
+    required this.isHttpOnly,
+    this.expiresMillis,
+  });
+
+  String name;
+
+  String value;
+
+  String domain;
+
+  String path;
+
+  bool isSecure;
+
+  bool isHttpOnly;
+
+  /// Expiry as milliseconds since the Unix epoch; null for a session cookie.
+  int? expiresMillis;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      name,
+      value,
+      domain,
+      path,
+      isSecure,
+      isHttpOnly,
+      expiresMillis,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static CookieMessage decode(Object result) {
+    result as List<Object?>;
+    return CookieMessage(
+      name: result[0]! as String,
+      value: result[1]! as String,
+      domain: result[2]! as String,
+      path: result[3]! as String,
+      isSecure: result[4]! as bool,
+      isHttpOnly: result[5]! as bool,
+      expiresMillis: result[6] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! CookieMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(name, other.name) && _deepEquals(value, other.value) && _deepEquals(domain, other.domain) && _deepEquals(path, other.path) && _deepEquals(isSecure, other.isSecure) && _deepEquals(isHttpOnly, other.isHttpOnly) && _deepEquals(expiresMillis, other.expiresMillis);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'CookieMessage(name: $name, value: $value, domain: $domain, path: $path, isSecure: $isSecure, isHttpOnly: $isHttpOnly, expiresMillis: $expiresMillis)';
+  }
+}
+
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -379,6 +455,9 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is WebResourceErrorMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(134);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -398,6 +477,8 @@ class _PigeonCodec extends StandardMessageCodec {
         return NavigationRequestMessage.decode(readValue(buffer)!);
       case 133:
         return WebResourceErrorMessage.decode(readValue(buffer)!);
+      case 134:
+        return CookieMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -671,6 +752,62 @@ class AdvancedWebViewHostApi {
       binaryMessenger: pigeonVar_binaryMessenger,
     );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, settings]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  Future<void> setCookie(int webViewId, CookieMessage cookie) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setCookie$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, cookie]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// Returns the cookies the WebView would send to `url`.
+  Future<List<CookieMessage>> getCookies(int webViewId, String url) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getCookies$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, url]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return (pigeonVar_replyValue! as List<Object?>).cast<CookieMessage>();
+  }
+
+  Future<void> clearCookies(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearCookies$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
