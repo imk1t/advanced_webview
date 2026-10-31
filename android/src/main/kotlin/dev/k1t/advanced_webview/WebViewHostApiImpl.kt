@@ -50,8 +50,7 @@ class WebViewHostApiImpl(
     override fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage) =
         registry.get(webViewId).applySettings(settings)
 
-    override suspend fun setCookie(webViewId: Long, cookie: CookieMessage) =
-        registry.get(webViewId).setCookie(cookie)
+    override suspend fun setCookie(webViewId: Long, cookie: CookieMessage) = registry.get(webViewId).setCookie(cookie)
 
     override suspend fun getCookies(webViewId: Long, url: String): List<CookieMessage> =
         registry.get(webViewId).getCookies(url)
