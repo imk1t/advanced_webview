@@ -1,8 +1,7 @@
 # はじめに
 
-`advanced_webview` は **Android と iOS に絞った**、[Pigeon](https://pub.dev/packages/pigeon)
-ベースの型安全な Flutter WebView プラグインです。`flutter_inappwebview` の機能設計を参考にしつつ、
-小さな公開 API と1か所に集約したプラットフォーム契約で保守性を優先しています。
+`advanced_webview` は **Android と iOS に絞った**、型安全な Flutter WebView プラグインです。`flutter_inappwebview` の機能設計を参考にしつつ、
+小さな公開 API と、両プラットフォームで揃えた振る舞いを重視しています。
 
 ## 対応プラットフォーム
 

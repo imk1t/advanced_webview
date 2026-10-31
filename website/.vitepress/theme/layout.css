@@ -1,27 +1,38 @@
 /*
  * Wider reading area than the VitePress default (688px content / 1104px layout).
- * VitePress scopes its own sizes, so overriding them needs !important.
+ * These rules target VitePress' own markup, so they stay as selectors, but the declarations are
+ * Tailwind utilities. VitePress styles are unlayered, so overriding them needs `!`.
  */
+@reference './tailwind.css';
+
 :root {
   --vp-layout-max-width: 1760px;
 }
 
 .VPDoc .container,
-.VPDoc:not(.has-sidebar) .container {
-  max-width: none !important;
-}
-
+.VPDoc:not(.has-sidebar) .container,
 .VPDoc .content,
 .VPDoc:not(.has-sidebar) .content {
-  max-width: none !important;
+  @apply tw:max-w-none!;
 }
 
 .VPDoc.has-aside .content-container,
 .VPDoc:not(.has-sidebar) .content-container {
-  max-width: 1100px !important;
+  @apply tw:max-w-[1100px]!;
 }
 
 .vp-doc table {
-  display: table;
-  width: 100%;
+  @apply tw:table tw:w-full;
+}
+
+/* Keep Japanese hero text from breaking in the middle of a word. */
+.VPHero .text,
+.VPHero .tagline {
+  @apply tw:[word-break:auto-phrase];
+}
+
+@media (min-width: 960px) {
+  .VPHero:not(.has-image) .container .main {
+    @apply tw:max-w-[900px];
+  }
 }

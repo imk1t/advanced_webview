@@ -1,9 +1,9 @@
 # Getting started
 
-`advanced_webview` is a Flutter WebView plugin for **Android and iOS only**, built on
-[Pigeon](https://pub.dev/packages/pigeon). It borrows feature ideas from
-`flutter_inappwebview`, but favours maintainability with a small public API and a single,
-centralised platform contract.
+`advanced_webview` is a Flutter WebView plugin for **Android and iOS only**, with a typed
+Dart API. It borrows feature ideas from
+`flutter_inappwebview`, but favours maintainability with a small public API and identical behaviour on both
+platforms.
 
 ## Supported platforms
 
