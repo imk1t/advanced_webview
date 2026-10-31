@@ -39,22 +39,25 @@ website/scripts/check-api-mapping.ts  Fails when the mapping drifts from lib/ an
 
 ## Commands
 
-Flutter is managed with [FVM](https://fvm.app); the version is pinned in `.fvmrc`.
-Always run Flutter and Dart through `fvm` (run `fvm install` once after cloning).
-To upgrade Flutter, use `fvm use <version>` and commit `.fvmrc`; CI reads the same file.
+Flutter is managed with [mise](https://mise.jdx.dev); the version is pinned in `mise.toml`.
+Run `mise trust && mise install` once after cloning. Always use the pinned toolchain: plain `flutter` / `dart`
+work when mise is activated in the shell, otherwise (agents, scripts) prefix them with
+`mise exec --`, e.g. `mise exec -- flutter test`.
+To upgrade Flutter, change the version in `mise.toml` and commit it; CI (`jdx/mise-action`)
+reads the same file.
 
 ```sh
-fvm install                                     # install the pinned Flutter
-fvm flutter pub get
-fvm dart format $(git ls-files '*.dart' | grep -v '\.g\.dart$')
-fvm flutter analyze
-fvm flutter test
-fvm dart run pigeon --input pigeons/messages.dart   # after editing pigeons/messages.dart
-fvm flutter pub publish --dry-run                   # package validation
-cd example && fvm flutter build apk --debug         # Android build check
-cd example && fvm flutter build ios --simulator --debug  # iOS build check (macOS only)
+mise install                                   # install the pinned Flutter
+flutter pub get
+dart format $(git ls-files '*.dart' | grep -v '\.g\.dart$')
+flutter analyze
+flutter test
+dart run pigeon --input pigeons/messages.dart   # after editing pigeons/messages.dart
+flutter pub publish --dry-run                   # package validation
+cd example && flutter build apk --debug         # Android build check
+cd example && flutter build ios --simulator --debug  # iOS build check (macOS only)
 cd website && bun install && bun run dev            # docs site preview (Bun)
-cd website && bun run lint                          # `bun lint` (built in; canary Bun until it reaches stable) for website TS (not .vue), CI runs it too
+cd website && bun run lint                          # `bun lint` (built in; canary Bun via mise until it reaches stable) for website TS (not .vue), CI runs it too
 cd website && bun run format                        # `bun fmt` (built in, reads .prettierrc.json) for website code; CI runs `format:check`
 cd website && bun run check:mapping                 # API mapping vs Dart/Kotlin/Swift sources (also runs in `bun run build`)
 gh actions-lock                                     # after changing any `uses:` in .github/workflows (updates actions.lock)
@@ -66,7 +69,7 @@ swift format --in-place $(git ls-files '*.swift' | grep -v '\.g\.swift$')      #
 swift format lint --strict $(git ls-files '*.swift' | grep -v '\.g\.swift$')
 ```
 
-Run `fvm dart format`, `fvm flutter analyze` and `fvm flutter test` before finishing a change.
+Run `dart format`, `flutter analyze` and `flutter test` before finishing a change.
 When you touch Kotlin or Swift, also run ktlint and swift-format as above.
 If Flutter or a platform SDK is not available in your environment, say so instead of
 claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both platforms.

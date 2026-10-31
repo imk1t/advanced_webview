@@ -1,0 +1,7 @@
+# Tool versions for local development and CI (https://mise.jdx.dev).
+# Run `mise install` once after cloning. To upgrade Flutter, change the version here.
+[tools]
+flutter = "3.47.8"
+# `bun lint` / `bun fmt` are not in a stable Bun release yet (1.4.4); switch to a pinned stable once they are.
+# The core `bun` backend cannot resolve "canary" (it requests bun-vcanary), so use the GitHub release.
+"github:oven-sh/bun" = "canary"

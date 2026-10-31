@@ -41,5 +41,3 @@ apm_modules/
 .codex/
 .mcp.json
 
-# FVM (Flutter version is pinned in .fvmrc)
-.fvm/
