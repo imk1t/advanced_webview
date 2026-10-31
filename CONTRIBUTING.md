@@ -67,6 +67,11 @@ Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
   `ios/advanced_webview/Package.swift` and `ios/advanced_webview.podspec` in
   sync (minimum iOS version, sources, resources). CI builds the example with each.
 - Only symbols exported from `lib/advanced_webview.dart` are public API.
+- **Workflow dependencies are locked.** `.github/workflows/actions.lock` pins every GitHub
+  Action (including transitive ones) to a commit SHA. After changing any `uses:` in
+  `.github/workflows/`, install the extension once (`gh extension install
+  github/gh-actions-lock`), run `gh actions-lock` and commit the updated lockfile.
+  CI (`verify-lockfile`) fails if it is out of sync.
 - **Keep the API mapping current.** `website/data/api-mapping.json` maps each public Dart API
   to the native Android and iOS APIs it uses. Update it (English and Japanese text) when you
   add, rename or remove a public member or change the native API behind it;

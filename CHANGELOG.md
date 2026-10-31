@@ -18,6 +18,9 @@ First release on pub.dev.
   already used WebKit's built-in picker.
 - Add `AdvancedWebViewController.onNewWindow` for `window.open` and `target="_blank"`. Without it,
   the URL now loads in the same WebView on both platforms (previously nothing happened on iOS).
+- CI: lock GitHub Actions dependencies with `gh actions-lock` (`.github/workflows/actions.lock`
+  pins every action, including transitive ones, to a commit SHA), verify it in the new
+  `verify-lockfile` workflow, and reference actions by exact release tag.
 - Add user scripts: `UserScript`, the `userScripts` constructor parameter, and
   `AdvancedWebViewController.addUserScript` / `removeAllUserScripts`. Android uses
   `androidx.webkit` (`DOCUMENT_START_SCRIPT`).
