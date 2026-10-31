@@ -46,8 +46,8 @@ mise run check:ios      # macOS only: SwiftPM build, integration test, XCTest (`
 git config core.hooksPath .githooks   # optional pre-push hook running the above (SKIP_IOS=1 skips the simulator)
 ```
 
-CI runs the macOS iOS jobs only on pushes to `main` that touch iOS-relevant files, or on a
-PR with the `ios-ci` label.
+CI runs only the Dart and lint jobs on every PR. The Android and iOS build/test jobs run on a PR
+labelled `full-ci`, or manually from the Actions tab (Run workflow).
 
 Format and lint native code (generated Pigeon files are excluded):
 
