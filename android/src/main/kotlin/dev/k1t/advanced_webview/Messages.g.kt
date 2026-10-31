@@ -340,6 +340,11 @@ data class CreationParamsMessage (
   val javaScriptChannelNames: List<String>,
   /** When false, native code never round-trips navigation decisions to Dart. */
   val hasNavigationDelegate: Boolean,
+  /**
+   * When false, `window.open` and `target="_blank"` load in the same WebView
+   * and never round-trip to Dart.
+   */
+  val hasNewWindowDelegate: Boolean,
   /** Scripts injected into every page loaded after creation. */
   val userScripts: List<UserScriptMessage>
 )
@@ -350,8 +355,9 @@ data class CreationParamsMessage (
       val settings = pigeonVar_list[1] as WebViewSettingsMessage
       val javaScriptChannelNames = pigeonVar_list[2] as List<String>
       val hasNavigationDelegate = pigeonVar_list[3] as Boolean
-      val userScripts = pigeonVar_list[4] as List<UserScriptMessage>
-      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, hasNavigationDelegate, userScripts)
+      val hasNewWindowDelegate = pigeonVar_list[4] as Boolean
+      val userScripts = pigeonVar_list[5] as List<UserScriptMessage>
+      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, hasNavigationDelegate, hasNewWindowDelegate, userScripts)
     }
   }
   fun toList(): List<Any?> {
@@ -360,6 +366,7 @@ data class CreationParamsMessage (
       settings,
       javaScriptChannelNames,
       hasNavigationDelegate,
+      hasNewWindowDelegate,
       userScripts,
     )
   }
@@ -371,7 +378,7 @@ data class CreationParamsMessage (
       return true
     }
     val other = other as CreationParamsMessage
-    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
   }
 
   override fun hashCode(): Int {
@@ -380,11 +387,12 @@ data class CreationParamsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.settings)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.javaScriptChannelNames)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNavigationDelegate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNewWindowDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userScripts)
     return result
   }
   override fun toString(): String {
-    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, hasNavigationDelegate=$hasNavigationDelegate, userScripts=$userScripts)"
+    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, userScripts=$userScripts)"
   }
 }
 
@@ -1151,6 +1159,26 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
       val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptMessage$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, channelNameArg, messageArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else {
+            continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /** The page asked for a new window; the WebView did not load `url` itself. */
+  suspend fun onNewWindowRequest(webViewIdArg: Long, urlArg: String)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onNewWindowRequest$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg, urlArg)) {
         if (it is List<*>) {
           if (it.size > 1) {
             continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))

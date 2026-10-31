@@ -141,6 +141,7 @@ final class RunnerTests: XCTestCase {
     settings: WebViewSettingsMessage? = nil,
     channels: [String] = [],
     hasNavigationDelegate: Bool = false,
+    hasNewWindowDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
     return CreationParamsMessage(
@@ -148,6 +149,7 @@ final class RunnerTests: XCTestCase {
       settings: settings ?? self.settings(),
       javaScriptChannelNames: channels,
       hasNavigationDelegate: hasNavigationDelegate,
+      hasNewWindowDelegate: hasNewWindowDelegate,
       userScripts: userScripts)
   }
 

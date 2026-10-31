@@ -9,6 +9,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
 
   private let flutterApi: AdvancedWebViewFlutterApi
   private let hasNavigationDelegate: Bool
+  private let hasNewWindowDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private var observations: [NSKeyValueObservation] = []
   private var isDestroyed = false
@@ -20,16 +21,20 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.id = params.webViewId
     self.flutterApi = flutterApi
     self.hasNavigationDelegate = params.hasNavigationDelegate
+    self.hasNewWindowDelegate = params.hasNewWindowDelegate
 
     // Some WKWebView options can only be set at creation time.
     let configuration = WKWebViewConfiguration()
     configuration.allowsInlineMediaPlayback = params.settings.allowsInlineMediaPlayback
     configuration.mediaTypesRequiringUserActionForPlayback =
       params.settings.mediaPlaybackRequiresUserGesture ? .all : []
+    // Same as Android: let scripts call window.open without a user gesture.
+    configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
     self.webView = WKWebView(frame: .zero, configuration: configuration)
     super.init()
 
     webView.navigationDelegate = self
+    webView.uiDelegate = self
     apply(settings: params.settings)
     params.javaScriptChannelNames.forEach(addJavaScriptChannel)
     params.userScripts.forEach(addUserScript)
@@ -142,6 +147,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     observations.removeAll()
     webView.stopLoading()
     webView.navigationDelegate = nil
+    webView.uiDelegate = nil
     webView.configuration.userContentController.removeAllScriptMessageHandlers()
   }
 
@@ -277,6 +283,27 @@ extension AdvancedWebView: WKNavigationDelegate {
       }
       decisionHandler(decision == .navigate ? .allow : .cancel)
     }
+  }
+}
+
+extension AdvancedWebView: WKUIDelegate {
+  /// `window.open` and `target="_blank"`. WebKit never opens a window on its
+  /// own here: the URL is either reported to Dart or loaded in this WebView,
+  /// like Android without a delegate.
+  func webView(
+    _ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
+    for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures
+  ) -> WKWebView? {
+    guard navigationAction.targetFrame == nil, let url = navigationAction.request.url else {
+      return nil
+    }
+    if hasNewWindowDelegate {
+      let target = url.absoluteString
+      send { api, id in try await api.onNewWindowRequest(webViewId: id, url: target) }
+    } else {
+      webView.load(navigationAction.request)
+    }
+    return nil
   }
 }
 

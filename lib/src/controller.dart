@@ -26,6 +26,7 @@ class AdvancedWebViewController {
     this.onTitleChanged,
     this.onWebResourceError,
     this.onNavigationRequest,
+    this.onNewWindow,
     @visibleForTesting AdvancedWebViewHostApi? hostApi,
     @visibleForTesting WebViewEventDispatcher? dispatcher,
   }) : webViewId = _nextWebViewId++,
@@ -40,6 +41,7 @@ class AdvancedWebViewController {
         settings: settings.toMessage(),
         javaScriptChannelNames: _javaScriptChannels.keys.toList(),
         hasNavigationDelegate: onNavigationRequest != null,
+        hasNewWindowDelegate: onNewWindow != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
@@ -69,6 +71,20 @@ class AdvancedWebViewController {
   /// reported. On Android an allowed navigation is re-issued as a GET, so POST
   /// bodies and redirects are not preserved.
   final NavigationRequestCallback? onNavigationRequest;
+
+  /// Called when the page asks for a new window (`window.open`, links with
+  /// `target="_blank"`) with the URL it wants to open.
+  ///
+  /// When set, the WebView does not load the URL itself; open it wherever
+  /// suits the app, for example in another controller or the system browser.
+  /// When `null`, the URL loads in this WebView (and goes through
+  /// [onNavigationRequest] like any page-initiated navigation).
+  ///
+  /// Android: `WebChromeClient.onCreateWindow(WebView, boolean, boolean, Message)`
+  /// with `WebSettings.setSupportMultipleWindows(true)`; the URL is read from a
+  /// temporary WebView that is destroyed right away.
+  /// iOS: `WKUIDelegate.webView(_:createWebViewWith:for:windowFeatures:)`.
+  final NewWindowCallback? onNewWindow;
 
   /// Completes once the native WebView exists.
   Future<void> get ready => _created;
@@ -237,4 +253,7 @@ class _EventListener implements WebViewEventListener {
   @override
   void onJavaScriptMessage(String channelName, String message) =>
       _controller._javaScriptChannels[channelName]?.call(message);
+
+  @override
+  void onNewWindowRequest(String url) => _controller.onNewWindow?.call(url);
 }

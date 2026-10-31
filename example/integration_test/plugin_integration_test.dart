@@ -286,6 +286,37 @@ void main() {
     );
   });
 
+  testWidgets('window.open is reported to onNewWindow instead of loading', (
+    tester,
+  ) async {
+    final urls = <String>[];
+    final harness = _Harness(onNewWindow: urls.add);
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body>start</body></html>');
+    await harness.controller.runJavaScript('window.open("${_baseUrl}popup");');
+    await _pumpUntil(tester, () => urls.isNotEmpty);
+
+    expect(urls, ['${_baseUrl}popup']);
+    expect(harness.startedUrls.where((u) => u.endsWith('popup')), isEmpty);
+  });
+
+  testWidgets('window.open loads in the same WebView without onNewWindow', (
+    tester,
+  ) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body>start</body></html>');
+    await harness.controller.runJavaScript('window.open("${_baseUrl}popup");');
+    await _pumpUntil(
+      tester,
+      () => harness.startedUrls.contains('${_baseUrl}popup'),
+    );
+  });
+
   testWidgets('the WebView outlives its widget', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);
@@ -312,11 +343,13 @@ class _Harness {
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     NavigationRequestCallback? onNavigationRequest,
     List<UserScript> userScripts = const [],
+    NewWindowCallback? onNewWindow,
   }) {
     controller = AdvancedWebViewController(
       javaScriptChannels: javaScriptChannels,
       userScripts: userScripts,
       onNavigationRequest: onNavigationRequest,
+      onNewWindow: onNewWindow,
       onPageStarted: startedUrls.add,
       onPageFinished: (url) {
         _pageFinished?.complete();

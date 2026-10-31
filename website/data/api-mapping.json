@@ -83,7 +83,9 @@
       "JSONSerialization": "https://developer.apple.com/documentation/foundation/jsonserialization",
       "FlutterPlatformView": "https://api.flutter.dev/ios-embedder/protocol_flutter_platform_view-p.html",
       "WKHTTPCookieStore": "https://developer.apple.com/documentation/webkit/wkhttpcookiestore",
-      "HTTPCookie": "https://developer.apple.com/documentation/foundation/httpcookie"
+      "HTTPCookie": "https://developer.apple.com/documentation/foundation/httpcookie",
+      "WKUIDelegate": "https://developer.apple.com/documentation/webkit/wkuidelegate",
+      "WKWindowFeatures": "https://developer.apple.com/documentation/webkit/wkwindowfeatures"
     }
   },
   "entries": [
@@ -970,6 +972,33 @@
       "ios": {
         "status": "supported",
         "apis": ["WKUserContentController.addUserScript(_:)", "WKUserScript"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onNewWindow",
+      "group": "events",
+      "summary": {
+        "en": "Called when the page asks for a new window (window.open, target=\"_blank\").",
+        "ja": "ページが新しいウィンドウ(window.open、target=\"_blank\")を要求したときに呼ばれます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebChromeClient.onCreateWindow(WebView, boolean, boolean, Message)",
+          "WebSettings.setSupportMultipleWindows(boolean)"
+        ],
+        "note": {
+          "en": "The URL is read from a temporary WebView that is destroyed right away. Without a callback, multiple windows stay off and the URL loads in the same WebView.",
+          "ja": "URL は一時的な WebView から取得し、すぐ破棄します。コールバックがない場合はマルチウィンドウを無効のままにし、同じ WebView で読み込みます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKUIDelegate.webView(_:createWebViewWith:for:windowFeatures:)"],
+        "note": {
+          "en": "Always returns nil; without a callback the request is loaded in the same WKWebView.",
+          "ja": "常に nil を返します。コールバックがない場合は同じ WKWebView で読み込みます。"
+        }
       }
     }
   ]

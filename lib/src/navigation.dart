@@ -40,4 +40,7 @@ typedef WebResourceErrorCallback = void Function(WebResourceError error);
 typedef NavigationRequestCallback = FutureOr<NavigationDecision> Function(
   NavigationRequest request,
 );
+
+/// Called with the URL a page asked to open in a new window.
+typedef NewWindowCallback = void Function(String url);
 typedef JavaScriptMessageCallback = void Function(String message);
