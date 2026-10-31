@@ -5,3 +5,30 @@ flutter = "3.47.8"
 # `bun lint` / `bun fmt` are not in a stable Bun release yet (1.4.4); switch to a pinned stable once they are.
 # The core `bun` backend cannot resolve "canary" (it requests bun-vcanary), so use the GitHub release.
 "github:oven-sh/bun" = "canary"
+
+# Local checks, so CI does not have to spend macOS minutes on every push.
+# `mise run check` = what CI's Linux jobs do; `mise run check:ios` = the macOS jobs.
+[tasks."check:dart"]
+description = "Format, Pigeon freshness, analyze, test"
+run = [
+  "flutter pub get",
+  "dart format --output=none --set-exit-if-changed $(git ls-files '*.dart' | grep -v '\\.g\\.dart$')",
+  "dart run pigeon --input pigeons/messages.dart && git diff --exit-code",
+  "flutter analyze",
+  "flutter test",
+]
+
+[tasks."check:native-lint"]
+description = "ktlint + swift-format (needs ktlint and swift on PATH)"
+run = [
+  "ktlint --relative $(git ls-files '*.kt' '*.kts' | grep -v '\\.g\\.kt$')",
+  "swift format lint --strict $(git ls-files '*.swift' | grep -v '\\.g\\.swift$')",
+]
+
+[tasks.check]
+description = "Everything CI's Linux jobs check, minus Android builds"
+depends = ["check:dart", "check:native-lint"]
+
+[tasks."check:ios"]
+description = "Build + integration + XCTest on a simulator (SwiftPM); pass `cocoapods` or `all` for the podspec path"
+run = "tool/check-ios.sh"
