@@ -38,7 +38,13 @@ jobs:
       - name: Check dartdoc
         run: |
           dart doc --validate-links 2>&1 | tee "$RUNNER_TEMP/dartdoc.log"
-          if grep -iE '^\s*(warning|error)' "$RUNNER_TEMP/dartdoc.log" | grep -v 'package-advanced_webview'; then
+          unexpected=$(awk '
+            /^[[:space:]]*(warning|error):/ { if (pending != "") print pending; pending = $0; next }
+            /^[[:space:]]+linked to from package-advanced_webview:/ && pending ~ /broken link to/ { pending = ""; next }
+            END { if (pending != "") print pending }
+          ' "$RUNNER_TEMP/dartdoc.log")
+          if [ -n "$unexpected" ]; then
+            echo "$unexpected"
             echo '::error::dart doc reported warnings outside the README landing page'
             exit 1
           fi
