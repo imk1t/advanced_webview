@@ -164,6 +164,7 @@ final class RunnerTests: XCTestCase {
       allowsInlineMediaPlayback: allowsInlineMediaPlayback,
       supportZoom: true,
       transparentBackground: transparentBackground,
+      passkeysEnabled: false,
       userAgent: userAgent)
   }
 }

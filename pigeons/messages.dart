@@ -28,6 +28,7 @@ class WebViewSettingsMessage {
     required this.allowsInlineMediaPlayback,
     required this.supportZoom,
     required this.transparentBackground,
+    required this.passkeysEnabled,
     this.userAgent,
   });
 
@@ -40,6 +41,9 @@ class WebViewSettingsMessage {
   /// Android only. Ignored on iOS.
   bool supportZoom;
   bool transparentBackground;
+
+  /// Android only. Ignored on iOS, where WebAuthn is governed by entitlements.
+  bool passkeysEnabled;
   String? userAgent;
 }
 

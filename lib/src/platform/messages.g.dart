@@ -124,6 +124,7 @@ class WebViewSettingsMessage {
     required this.allowsInlineMediaPlayback,
     required this.supportZoom,
     required this.transparentBackground,
+    required this.passkeysEnabled,
     this.userAgent,
   });
 
@@ -139,6 +140,9 @@ class WebViewSettingsMessage {
 
   bool transparentBackground;
 
+  /// Android only. Ignored on iOS, where WebAuthn is governed by entitlements.
+  bool passkeysEnabled;
+
   String? userAgent;
 
   List<Object?> _toList() {
@@ -148,6 +152,7 @@ class WebViewSettingsMessage {
       allowsInlineMediaPlayback,
       supportZoom,
       transparentBackground,
+      passkeysEnabled,
       userAgent,
     ];
   }
@@ -163,7 +168,8 @@ class WebViewSettingsMessage {
       allowsInlineMediaPlayback: result[2]! as bool,
       supportZoom: result[3]! as bool,
       transparentBackground: result[4]! as bool,
-      userAgent: result[5] as String?,
+      passkeysEnabled: result[5]! as bool,
+      userAgent: result[6] as String?,
     );
   }
 
@@ -176,7 +182,7 @@ class WebViewSettingsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(userAgent, other.userAgent);
+    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(userAgent, other.userAgent);
   }
 
   @override
@@ -185,7 +191,7 @@ class WebViewSettingsMessage {
 
   @override
   String toString() {
-    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, userAgent: $userAgent)';
+    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, userAgent: $userAgent)';
   }
 }
 

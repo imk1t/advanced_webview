@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `WebViewSettings.passkeysEnabled` to enable WebAuthn / passkeys on Android
+  (`WebSettingsCompat.setWebAuthenticationSupport`). iOS needs no setting; the app must have the
+  Associated Domains `webcredentials` entitlement.
 - Add user scripts: `UserScript`, the `userScripts` constructor parameter, and
   `AdvancedWebViewController.addUserScript` / `removeAllUserScripts`. Android uses
   `androidx.webkit` (`DOCUMENT_START_SCRIPT`).

@@ -79,6 +79,16 @@ void main() {
       expect(await controller.runJavaScriptReturningResult('x'), isNull);
     });
 
+    test('passkeysEnabled is passed to the native settings', () {
+      expect(const WebViewSettings().toMessage().passkeysEnabled, isFalse);
+      expect(
+        const WebViewSettings(passkeysEnabled: true)
+            .toMessage()
+            .passkeysEnabled,
+        isTrue,
+      );
+    });
+
     test('updateSettings stores the new settings', () async {
       final controller = createController();
       const settings = WebViewSettings(javaScriptEnabled: false);
