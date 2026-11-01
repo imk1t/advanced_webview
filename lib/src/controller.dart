@@ -19,6 +19,7 @@ class AdvancedWebViewController {
   AdvancedWebViewController({
     WebViewSettings settings = const WebViewSettings(),
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
+    Map<String, JavaScriptHandler> javaScriptHandlers = const {},
     List<UserScript> userScripts = const [],
     this.onPageStarted,
     this.onPageFinished,
@@ -32,6 +33,7 @@ class AdvancedWebViewController {
   }) : webViewId = _nextWebViewId++,
        _settings = settings,
        _javaScriptChannels = Map.unmodifiable(javaScriptChannels),
+       _javaScriptHandlers = Map.unmodifiable(javaScriptHandlers),
        _hostApi = hostApi ?? AdvancedWebViewHostApi(),
        _dispatcher = dispatcher ?? WebViewEventDispatcher.instance {
     _dispatcher.register(webViewId, _EventListener(this));
@@ -40,6 +42,7 @@ class AdvancedWebViewController {
         webViewId: webViewId,
         settings: settings.toMessage(),
         javaScriptChannelNames: _javaScriptChannels.keys.toList(),
+        javaScriptHandlerNames: _javaScriptHandlers.keys.toList(),
         hasNavigationDelegate: onNavigationRequest != null,
         hasNewWindowDelegate: onNewWindow != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
@@ -55,6 +58,7 @@ class AdvancedWebViewController {
   final AdvancedWebViewHostApi _hostApi;
   final WebViewEventDispatcher _dispatcher;
   final Map<String, JavaScriptMessageCallback> _javaScriptChannels;
+  final Map<String, JavaScriptHandler> _javaScriptHandlers;
   late final Future<void> _created;
   WebViewSettings _settings;
   bool _isDisposed = false;
@@ -258,4 +262,17 @@ class _EventListener implements WebViewEventListener {
 
   @override
   void onNewWindowRequest(String url) => _controller.onNewWindow?.call(url);
+
+  @override
+  Future<String> onJavaScriptHandlerCall(
+    String handlerName,
+    String argsJson,
+  ) async {
+    final handler = _controller._javaScriptHandlers[handlerName];
+    if (handler == null) {
+      throw ArgumentError('No JavaScript handler named "$handlerName"');
+    }
+    final arguments = (jsonDecode(argsJson) as List).cast<Object?>();
+    return jsonEncode(await handler(arguments));
+  }
 }

@@ -11,6 +11,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasNavigationDelegate: Bool
   private let hasNewWindowDelegate: Bool
   private var javaScriptChannelNames: [String] = []
+  private let hasJavaScriptHandlers: Bool
   private var observations: [NSKeyValueObservation] = []
   private var isDestroyed = false
   /// URL of the load started by `load(_:)` / `loadHTMLString(_:baseURL:)`
@@ -22,6 +23,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.flutterApi = flutterApi
     self.hasNavigationDelegate = params.hasNavigationDelegate
     self.hasNewWindowDelegate = params.hasNewWindowDelegate
+    self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
 
     // Some WKWebView options can only be set at creation time.
     let configuration = WKWebViewConfiguration()
@@ -38,6 +40,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     apply(settings: params.settings)
     params.javaScriptChannelNames.forEach(addJavaScriptChannel)
     params.userScripts.forEach(addUserScript)
+    if hasJavaScriptHandlers { installHandlerBridge() }
     observeProperties()
   }
 
@@ -172,6 +175,40 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   func removeAllUserScripts() {
     webView.configuration.userContentController.removeAllUserScripts()
     javaScriptChannelNames.forEach(addChannelShim)
+    if hasJavaScriptHandlers { addHandlerShim() }
+  }
+
+  private static let handlerBridgeName = "advancedWebView"
+
+  /// `window.advancedWebView.callHandler(name, ...args)` returns a promise. The reply
+  /// handler of `WKScriptMessageHandlerWithReply` settles it, so no call ids are needed.
+  private func installHandlerBridge() {
+    webView.configuration.userContentController.addScriptMessageHandler(
+      WeakReplyScriptMessageHandler(self), contentWorld: .page, name: Self.handlerBridgeName)
+    addHandlerShim()
+  }
+
+  private func addHandlerShim() {
+    let source = """
+      (function () {
+        if (window.advancedWebView) return;
+        var bridge = window.webkit.messageHandlers['\(Self.handlerBridgeName)'];
+        window.advancedWebView = Object.freeze({
+          callHandler: function (name) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            return Promise.resolve().then(function () {
+              return bridge.postMessage({ name: String(name), args: JSON.stringify(args) });
+            }).then(function (value) {
+              return JSON.parse(value);
+            }, function (error) {
+              throw new Error(error && error.message ? error.message : String(error));
+            });
+          }
+        });
+      })();
+      """
+    webView.configuration.userContentController.addUserScript(
+      WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false))
   }
 
   private func addJavaScriptChannel(_ name: String) {
@@ -327,6 +364,32 @@ extension AdvancedWebView: WKScriptMessageHandler {
   }
 }
 
+extension AdvancedWebView: WKScriptMessageHandlerWithReply {
+  func userContentController(
+    _ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
+    replyHandler: @escaping @MainActor (Any?, String?) -> Void
+  ) {
+    guard let body = message.body as? [String: Any],
+      let name = body["name"] as? String,
+      let argsJson = body["args"] as? String
+    else {
+      replyHandler(nil, "Invalid JavaScript handler call")
+      return
+    }
+    let api = flutterApi
+    let id = self.id
+    Task { @MainActor in
+      do {
+        let result = try await api.onJavaScriptHandlerCall(
+          webViewId: id, handlerName: name, argsJson: argsJson)
+        replyHandler(result, nil)
+      } catch {
+        replyHandler(nil, (error as? PigeonError)?.message ?? String(describing: error))
+      }
+    }
+  }
+}
+
 /// WKUserContentController retains its handlers strongly; this breaks the cycle.
 private final class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
   private weak var target: WKScriptMessageHandler?
@@ -339,5 +402,25 @@ private final class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
     _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
   ) {
     target?.userContentController(userContentController, didReceive: message)
+  }
+}
+
+private final class WeakReplyScriptMessageHandler: NSObject, WKScriptMessageHandlerWithReply {
+  private weak var target: WKScriptMessageHandlerWithReply?
+
+  init(_ target: WKScriptMessageHandlerWithReply) {
+    self.target = target
+  }
+
+  func userContentController(
+    _ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
+    replyHandler: @escaping @MainActor (Any?, String?) -> Void
+  ) {
+    guard let target = target else {
+      replyHandler(nil, "The WebView was destroyed")
+      return
+    }
+    target.userContentController(
+      userContentController, didReceive: message, replyHandler: replyHandler)
   }
 }

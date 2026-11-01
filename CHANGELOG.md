@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add JavaScript handlers with return values: the `javaScriptHandlers` constructor parameter and
+  `window.advancedWebView.callHandler(name, ...args)`, which returns a promise settled with the
+  Dart handler's result (or rejected when it throws). Android needs `WEB_MESSAGE_LISTENER`.
+
 ## 0.1.0 - 2026-10-31
 
 First release on pub.dev.

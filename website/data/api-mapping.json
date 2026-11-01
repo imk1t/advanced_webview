@@ -63,6 +63,7 @@
       "CookieManager": "https://developer.android.com/reference/android/webkit/CookieManager",
       "WebViewCompat": "https://developer.android.com/reference/androidx/webkit/WebViewCompat",
       "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler",
+      "JavaScriptReplyProxy": "https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy",
       "WebSettingsCompat": "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat",
       "WebViewFeature": "https://developer.android.com/reference/androidx/webkit/WebViewFeature"
     },
@@ -76,6 +77,7 @@
       "WKUserContentController": "https://developer.apple.com/documentation/webkit/wkusercontentcontroller",
       "WKUserScript": "https://developer.apple.com/documentation/webkit/wkuserscript",
       "WKScriptMessageHandler": "https://developer.apple.com/documentation/webkit/wkscriptmessagehandler",
+      "WKScriptMessageHandlerWithReply": "https://developer.apple.com/documentation/webkit/wkscriptmessagehandlerwithreply",
       "UIView": "https://developer.apple.com/documentation/uikit/uiview",
       "UIScrollView": "https://developer.apple.com/documentation/uikit/uiscrollview",
       "NSError": "https://developer.apple.com/documentation/foundation/nserror",
@@ -415,6 +417,38 @@
         "note": {
           "en": "A user script at document start defines window.<name>.postMessage to match Android.",
           "ja": "Android と揃えるため、ドキュメント開始時のユーザースクリプトで window.<name>.postMessage を定義します。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.javaScriptHandlers",
+      "group": "javascript",
+      "summary": {
+        "en": "Named handlers the page can call as window.advancedWebView.callHandler(name, ...args); the Dart return value resolves the page's promise.",
+        "ja": "ページから window.advancedWebView.callHandler(name, ...args) で呼べる名前付きハンドラです。Dart の戻り値がページ側の Promise の結果になります。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewCompat.addWebMessageListener",
+          "WebViewCompat.addDocumentStartJavaScript",
+          "JavaScriptReplyProxy"
+        ],
+        "note": {
+          "en": "Needs WEB_MESSAGE_LISTENER and DOCUMENT_START_SCRIPT. A document-start shim turns web messages into promises; replies go back to the frame that asked.",
+          "ja": "WEB_MESSAGE_LISTENER と DOCUMENT_START_SCRIPT が必要です。ドキュメント開始時のシムが Web メッセージを Promise に変換し、返信は呼び出したフレームに届きます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKUserContentController.addScriptMessageHandler(_:contentWorld:name:)",
+          "WKScriptMessageHandlerWithReply",
+          "WKUserScript"
+        ],
+        "note": {
+          "en": "The reply handler settles the promise; a document-start user script defines window.advancedWebView.",
+          "ja": "reply ハンドラが Promise を解決します。ドキュメント開始時のユーザースクリプトが window.advancedWebView を定義します。"
         }
       }
     },
