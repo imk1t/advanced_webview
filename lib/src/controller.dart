@@ -20,7 +20,7 @@ class AdvancedWebViewController {
     WebViewSettings settings = const WebViewSettings(),
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     Map<String, JavaScriptHandler> javaScriptHandlers = const {},
-    String javaScriptHandlerObjectName = defaultJavaScriptHandlerObjectName,
+    String javaScriptHandlerObjectName = 'advanced_webView',
     List<UserScript> userScripts = const [],
     this.onPageStarted,
     this.onPageFinished,
@@ -60,11 +60,6 @@ class AdvancedWebViewController {
   }
 
   static int _nextWebViewId = 0;
-
-  /// Name of the global the page uses to call [javaScriptHandlers]:
-  /// `window.advanced_webView.callHandler(...)`. Override it with the
-  /// `javaScriptHandlerObjectName` constructor parameter.
-  static const defaultJavaScriptHandlerObjectName = 'advanced_webView';
 
   static final _identifier = RegExp(r'^[A-Za-z_$][A-Za-z0-9_$]*$');
 
