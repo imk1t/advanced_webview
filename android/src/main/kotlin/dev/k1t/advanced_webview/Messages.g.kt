@@ -338,6 +338,16 @@ data class CreationParamsMessage (
   val settings: WebViewSettingsMessage,
   /** Names exposed to JS as `window.<name>.postMessage(String)`. */
   val javaScriptChannelNames: List<String>,
+  /**
+   * Handlers the page can call with `window.advanced_webview.callHandler`.
+   * The bridge is only installed when this is not empty.
+   */
+  val javaScriptHandlerNames: List<String>,
+  /**
+   * Name of the global object (`window.<name>`) that exposes `callHandler`.
+   * Always a valid JavaScript identifier.
+   */
+  val javaScriptHandlerObjectName: String,
   /** When false, native code never round-trips navigation decisions to Dart. */
   val hasNavigationDelegate: Boolean,
   /**
@@ -354,10 +364,12 @@ data class CreationParamsMessage (
       val webViewId = pigeonVar_list[0] as Long
       val settings = pigeonVar_list[1] as WebViewSettingsMessage
       val javaScriptChannelNames = pigeonVar_list[2] as List<String>
-      val hasNavigationDelegate = pigeonVar_list[3] as Boolean
-      val hasNewWindowDelegate = pigeonVar_list[4] as Boolean
-      val userScripts = pigeonVar_list[5] as List<UserScriptMessage>
-      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, hasNavigationDelegate, hasNewWindowDelegate, userScripts)
+      val javaScriptHandlerNames = pigeonVar_list[3] as List<String>
+      val javaScriptHandlerObjectName = pigeonVar_list[4] as String
+      val hasNavigationDelegate = pigeonVar_list[5] as Boolean
+      val hasNewWindowDelegate = pigeonVar_list[6] as Boolean
+      val userScripts = pigeonVar_list[7] as List<UserScriptMessage>
+      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, userScripts)
     }
   }
   fun toList(): List<Any?> {
@@ -365,6 +377,8 @@ data class CreationParamsMessage (
       webViewId,
       settings,
       javaScriptChannelNames,
+      javaScriptHandlerNames,
+      javaScriptHandlerObjectName,
       hasNavigationDelegate,
       hasNewWindowDelegate,
       userScripts,
@@ -378,7 +392,7 @@ data class CreationParamsMessage (
       return true
     }
     val other = other as CreationParamsMessage
-    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
   }
 
   override fun hashCode(): Int {
@@ -386,13 +400,15 @@ data class CreationParamsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.webViewId)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.settings)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.javaScriptChannelNames)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.javaScriptHandlerNames)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.javaScriptHandlerObjectName)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNavigationDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNewWindowDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userScripts)
     return result
   }
   override fun toString(): String {
-    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, userScripts=$userScripts)"
+    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, userScripts=$userScripts)"
   }
 }
 
@@ -1164,6 +1180,33 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
             continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
           } else {
             continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /**
+   * A page called a JavaScript handler. `argsJson` is the JSON-encoded
+   * argument list; the result is the JSON-encoded return value. Throwing
+   * rejects the page's promise.
+   */
+  suspend fun onJavaScriptHandlerCall(webViewIdArg: Long, handlerNameArg: String, argsJsonArg: String): String
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptHandlerCall$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg, handlerNameArg, argsJsonArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else if (it[0] == null) {
+            continuation.resumeWithException(FlutterError("null-error", "Flutter api returned null value for non-null return value.", ""))
+          } else {
+            val output = it[0] as String
+            continuation.resume(output)
           }
         } else {
           continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))

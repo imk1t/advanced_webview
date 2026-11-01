@@ -66,6 +66,8 @@ class CreationParamsMessage {
     required this.webViewId,
     required this.settings,
     required this.javaScriptChannelNames,
+    required this.javaScriptHandlerNames,
+    required this.javaScriptHandlerObjectName,
     required this.hasNavigationDelegate,
     required this.hasNewWindowDelegate,
     required this.userScripts,
@@ -76,6 +78,14 @@ class CreationParamsMessage {
 
   /// Names exposed to JS as `window.<name>.postMessage(String)`.
   List<String> javaScriptChannelNames;
+
+  /// Handlers the page can call with `window.advanced_webview.callHandler`.
+  /// The bridge is only installed when this is not empty.
+  List<String> javaScriptHandlerNames;
+
+  /// Name of the global object (`window.<name>`) that exposes `callHandler`.
+  /// Always a valid JavaScript identifier.
+  String javaScriptHandlerObjectName;
 
   /// When false, native code never round-trips navigation decisions to Dart.
   bool hasNavigationDelegate;
@@ -210,6 +220,16 @@ abstract class AdvancedWebViewFlutterApi {
   );
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
+
+  /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
+  /// argument list; the result is the JSON-encoded return value. Throwing
+  /// rejects the page's promise.
+  @async
+  String onJavaScriptHandlerCall(
+    int webViewId,
+    String handlerName,
+    String argsJson,
+  );
 
   /// The page asked for a new window; the WebView did not load `url` itself.
   void onNewWindowRequest(int webViewId, String url);

@@ -3,6 +3,7 @@
 // These tests exercise the native implementations end to end, so they are the
 // place to pin down behaviour that must match on Android and iOS.
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:advanced_webview/advanced_webview.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +83,50 @@ void main() {
 
     expect(first, ['from a']);
     expect(second, ['from b']);
+  });
+
+  testWidgets('JavaScript handlers return values and reject on errors', (
+    tester,
+  ) async {
+    final results = <String>[];
+    final harness = _Harness(
+      javaScriptChannels: {'Out': results.add},
+      javaScriptHandlers: {
+        'sum': (args) => args.fold<num>(0, (a, b) => a + (b as num)),
+        'echo': (args) async => {'args': args},
+        'fail': (_) => throw StateError('boom'),
+      },
+    );
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body></body></html>');
+
+    // runJavaScript does not await promises, so report through a channel.
+    // `void` keeps WKWebView from rejecting the Promise as an unsupported result.
+    await harness.controller.runJavaScript('''
+      void (async () => {
+        const total = await window.advanced_webview.callHandler('sum', 1, 2, 3);
+        const echoed = await window.advanced_webview.callHandler('echo', 'a', {b: [1]});
+        let error = null;
+        try { await window.advanced_webview.callHandler('fail'); }
+        catch (e) { error = String(e.message); }
+        Out.postMessage(JSON.stringify({total, echoed, error}));
+      })();
+    ''');
+    await _pumpUntil(tester, () => results.isNotEmpty);
+
+    final result = jsonDecode(results.single) as Map<String, Object?>;
+    expect(result['total'], 6);
+    expect(result['echoed'], {
+      'args': [
+        'a',
+        {
+          'b': [1],
+        },
+      ],
+    });
+    expect(result['error'], contains('boom'));
   });
 
   testWidgets('navigation delegate can prevent a main-frame navigation', (
@@ -341,12 +386,14 @@ void main() {
 class _Harness {
   _Harness({
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
+    Map<String, JavaScriptHandler> javaScriptHandlers = const {},
     NavigationRequestCallback? onNavigationRequest,
     List<UserScript> userScripts = const [],
     NewWindowCallback? onNewWindow,
   }) {
     controller = AdvancedWebViewController(
       javaScriptChannels: javaScriptChannels,
+      javaScriptHandlers: javaScriptHandlers,
       userScripts: userScripts,
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,

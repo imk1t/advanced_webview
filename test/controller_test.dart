@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:advanced_webview/advanced_webview.dart';
 import 'package:advanced_webview/src/platform/event_dispatcher.dart';
 import 'package:advanced_webview/src/platform/messages.g.dart';
@@ -18,6 +20,8 @@ void main() {
 
   AdvancedWebViewController createController({
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
+    Map<String, JavaScriptHandler> javaScriptHandlers = const {},
+    String javaScriptHandlerObjectName = 'advanced_webview',
     List<UserScript> userScripts = const [],
     PageEventCallback? onPageFinished,
     WebResourceErrorCallback? onWebResourceError,
@@ -28,6 +32,8 @@ void main() {
       hostApi: hostApi,
       dispatcher: dispatcher,
       javaScriptChannels: javaScriptChannels,
+      javaScriptHandlers: javaScriptHandlers,
+      javaScriptHandlerObjectName: javaScriptHandlerObjectName,
       userScripts: userScripts,
       onPageFinished: onPageFinished,
       onWebResourceError: onWebResourceError,
@@ -192,6 +198,102 @@ void main() {
 
       await controller.removeAllUserScripts();
       expect(hostApi.userScripts, isEmpty);
+    });
+  });
+
+  group('JavaScript handlers', () {
+    test('are part of the creation params', () async {
+      final controller = createController(
+        javaScriptHandlers: {'sum': (_) => 0},
+      );
+      await controller.ready;
+
+      expect(hostApi.created[controller.webViewId]!.javaScriptHandlerNames, [
+        'sum',
+      ]);
+    });
+
+    test('use advanced_webview as the default object name', () async {
+      final controller = createController(javaScriptHandlers: {'a': (_) => 1});
+      await controller.ready;
+      expect(
+        hostApi.created[controller.webViewId]!.javaScriptHandlerObjectName,
+        'advanced_webview',
+      );
+    });
+
+    test('accept a custom object name and reject invalid ones', () async {
+      final controller = createController(
+        javaScriptHandlers: {'a': (_) => 1},
+        javaScriptHandlerObjectName: 'app',
+      );
+      await controller.ready;
+      expect(
+        hostApi.created[controller.webViewId]!.javaScriptHandlerObjectName,
+        'app',
+      );
+      for (final bad in ['', '1a', 'a.b', 'a;alert(1)']) {
+        expect(
+          () => createController(javaScriptHandlerObjectName: bad),
+          throwsArgumentError,
+        );
+      }
+    });
+
+    test('receive decoded arguments and return JSON', () async {
+      final controller = createController(
+        javaScriptHandlers: {
+          'sum': (args) async => {
+            'total': args.fold<num>(0, (a, b) => a + (b as num)),
+          },
+        },
+      );
+
+      final result = await dispatcher.onJavaScriptHandlerCall(
+        controller.webViewId,
+        'sum',
+        '[1, 2, 3]',
+      );
+
+      expect(jsonDecode(result), {'total': 6});
+    });
+
+    test('encode a null result as JSON null', () async {
+      final controller = createController(
+        javaScriptHandlers: {'noop': (_) => null},
+      );
+      expect(
+        await dispatcher.onJavaScriptHandlerCall(
+          controller.webViewId,
+          'noop',
+          '[]',
+        ),
+        'null',
+      );
+    });
+
+    test('reject unknown handlers and propagate errors', () async {
+      final controller = createController(
+        javaScriptHandlers: {'fail': (_) => throw StateError('boom')},
+      );
+
+      expect(
+        dispatcher.onJavaScriptHandlerCall(controller.webViewId, 'nope', '[]'),
+        throwsArgumentError,
+      );
+      expect(
+        dispatcher.onJavaScriptHandlerCall(controller.webViewId, 'fail', '[]'),
+        throwsStateError,
+      );
+    });
+
+    test('are rejected after dispose', () async {
+      final controller = createController(javaScriptHandlers: {'a': (_) => 1});
+      await controller.dispose();
+      expect(
+        dispatcher.onJavaScriptHandlerCall(controller.webViewId, 'a', '[]'),
+        throwsStateError,
+      );
     });
   });
 

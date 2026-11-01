@@ -78,6 +78,7 @@ On both platforms, JavaScript can call `window.Bridge.postMessage('hello')`.
 - Get the current URL and title
 - Run JavaScript (with or without a return value)
 - JavaScript channels (messages from JS to Dart)
+- JavaScript handlers (JS calls Dart and gets a value back)
 - Navigation decisions (main frame)
 - Callbacks: page started / finished, progress, title changed, load errors
 - Settings: JavaScript enabled, User-Agent, media autoplay, inline playback (iOS),

@@ -96,6 +96,32 @@ final class RunnerTests: XCTestCase {
     XCTAssertEqual(scripts[0].injectionTime, .atDocumentStart)
   }
 
+  func testJavaScriptHandlersInstallTheBridgeShim() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, handlers: ["sum"]))
+
+    let scripts = try registry.get(1).webView.configuration.userContentController.userScripts
+    XCTAssertEqual(scripts.count, 1)
+    XCTAssertTrue(scripts[0].source.contains("window.advanced_webview"))
+    XCTAssertEqual(scripts[0].injectionTime, .atDocumentStart)
+  }
+
+  func testJavaScriptHandlerObjectNameIsConfigurable() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, handlers: ["sum"], handlerObjectName: "bridge"))
+
+    let scripts = try registry.get(1).webView.configuration.userContentController.userScripts
+    XCTAssertTrue(scripts[0].source.contains("window.bridge = "))
+  }
+
+  func testNoBridgeShimWithoutHandlers() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+
+    XCTAssertTrue(
+      try registry.get(1).webView.configuration.userContentController.userScripts.isEmpty)
+  }
+
   func testEvaluateJavaScriptReturnsJson() async throws {
     let (hostApi, _, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))
@@ -163,6 +189,8 @@ final class RunnerTests: XCTestCase {
     webViewId: Int64,
     settings: WebViewSettingsMessage? = nil,
     channels: [String] = [],
+    handlers: [String] = [],
+    handlerObjectName: String = "advanced_webview",
     hasNavigationDelegate: Bool = false,
     hasNewWindowDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []
@@ -171,6 +199,8 @@ final class RunnerTests: XCTestCase {
       webViewId: webViewId,
       settings: settings ?? self.settings(),
       javaScriptChannelNames: channels,
+      javaScriptHandlerNames: handlers,
+      javaScriptHandlerObjectName: handlerObjectName,
       hasNavigationDelegate: hasNavigationDelegate,
       hasNewWindowDelegate: hasNewWindowDelegate,
       userScripts: userScripts)

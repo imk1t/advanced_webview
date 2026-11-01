@@ -255,6 +255,8 @@ class CreationParamsMessage {
     required this.webViewId,
     required this.settings,
     required this.javaScriptChannelNames,
+    required this.javaScriptHandlerNames,
+    required this.javaScriptHandlerObjectName,
     required this.hasNavigationDelegate,
     required this.hasNewWindowDelegate,
     required this.userScripts,
@@ -266,6 +268,14 @@ class CreationParamsMessage {
 
   /// Names exposed to JS as `window.<name>.postMessage(String)`.
   List<String> javaScriptChannelNames;
+
+  /// Handlers the page can call with `window.advanced_webview.callHandler`.
+  /// The bridge is only installed when this is not empty.
+  List<String> javaScriptHandlerNames;
+
+  /// Name of the global object (`window.<name>`) that exposes `callHandler`.
+  /// Always a valid JavaScript identifier.
+  String javaScriptHandlerObjectName;
 
   /// When false, native code never round-trips navigation decisions to Dart.
   bool hasNavigationDelegate;
@@ -282,6 +292,8 @@ class CreationParamsMessage {
       webViewId,
       settings,
       javaScriptChannelNames,
+      javaScriptHandlerNames,
+      javaScriptHandlerObjectName,
       hasNavigationDelegate,
       hasNewWindowDelegate,
       userScripts,
@@ -297,9 +309,11 @@ class CreationParamsMessage {
       webViewId: result[0]! as int,
       settings: result[1]! as WebViewSettingsMessage,
       javaScriptChannelNames: (result[2]! as List<Object?>).cast<String>(),
-      hasNavigationDelegate: result[3]! as bool,
-      hasNewWindowDelegate: result[4]! as bool,
-      userScripts: (result[5]! as List<Object?>).cast<UserScriptMessage>(),
+      javaScriptHandlerNames: (result[3]! as List<Object?>).cast<String>(),
+      javaScriptHandlerObjectName: result[4]! as String,
+      hasNavigationDelegate: result[5]! as bool,
+      hasNewWindowDelegate: result[6]! as bool,
+      userScripts: (result[7]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -312,7 +326,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -321,7 +335,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, userScripts: $userScripts)';
   }
 }
 
@@ -963,6 +977,11 @@ abstract class AdvancedWebViewFlutterApi {
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
 
+  /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
+  /// argument list; the result is the JSON-encoded return value. Throwing
+  /// rejects the page's promise.
+  Future<String> onJavaScriptHandlerCall(int webViewId, String handlerName, String argsJson);
+
   /// The page asked for a new window; the WebView did not load `url` itself.
   void onNewWindowRequest(int webViewId, String url);
 
@@ -1119,6 +1138,29 @@ abstract class AdvancedWebViewFlutterApi {
           try {
             api.onJavaScriptMessage(arg_webViewId, arg_channelName, arg_message);
             return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptHandlerCall$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final String arg_handlerName = args[1]! as String;
+          final String arg_argsJson = args[2]! as String;
+          try {
+            final String output = await api.onJavaScriptHandlerCall(arg_webViewId, arg_handlerName, arg_argsJson);
+            return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
           }          catch (e) {

@@ -7,6 +7,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import io.flutter.plugin.common.BinaryMessenger
 import kotlinx.coroutines.CoroutineScope
@@ -194,6 +195,58 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun javaScriptHandlersInstallTheBridgeAndShim() {
+        mockStatic(WebViewFeature::class.java).use { features ->
+            features.`when`<Boolean> { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
+                .thenReturn(true)
+            features.`when`<Boolean> { WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) }
+                .thenReturn(true)
+            mockStatic(WebViewCompat::class.java).use { compat ->
+                hostApi.create(params(webViewId = 1, handlers = listOf("sum")))
+                val webView = registry.get(1).webView
+
+                compat.verify {
+                    WebViewCompat.addWebMessageListener(
+                        eq(webView),
+                        eq("advancedWebViewBridge"),
+                        eq(setOf("*")),
+                        any<WebViewCompat.WebMessageListener>(),
+                    )
+                }
+                compat.verify {
+                    WebViewCompat.addDocumentStartJavaScript(eq(webView), any<String>(), eq(setOf("*")))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun handlerShimUsesTheConfiguredObjectName() {
+        val shim = AdvancedWebView.handlerShim("bridge")
+
+        assertTrue(shim.contains("window.bridge = Object.freeze"))
+    }
+
+    @Test
+    fun noBridgeIsInstalledWithoutHandlers() {
+        mockStatic(WebViewCompat::class.java).use { compat ->
+            hostApi.create(params(webViewId = 1))
+            compat.verifyNoInteractions()
+        }
+    }
+
+    @Test
+    fun javaScriptHandlersNeedWebMessageListenerSupport() {
+        mockStatic(WebViewFeature::class.java).use { features ->
+            features.`when`<Boolean> { WebViewFeature.isFeatureSupported(any()) }.thenReturn(false)
+
+            assertFailsWith<IllegalStateException> {
+                hostApi.create(params(webViewId = 1, handlers = listOf("sum")))
+            }
+        }
+    }
+
+    @Test
     fun navigationIsNotInterceptedWithoutADelegate() {
         hostApi.create(params(webViewId = 1, hasNavigationDelegate = false))
         val webView = registry.get(1).webView
@@ -236,6 +289,8 @@ class WebViewHostApiImplTest {
         webViewId: Long,
         settings: WebViewSettingsMessage = settings(),
         channels: List<String> = emptyList(),
+        handlers: List<String> = emptyList(),
+        handlerObjectName: String = "advanced_webview",
         hasNavigationDelegate: Boolean = false,
         hasNewWindowDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),
@@ -243,6 +298,8 @@ class WebViewHostApiImplTest {
         webViewId,
         settings,
         channels,
+        handlers,
+        handlerObjectName,
         hasNavigationDelegate,
         hasNewWindowDelegate,
         userScripts,

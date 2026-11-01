@@ -18,6 +18,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
@@ -27,6 +28,8 @@ import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.json.JSONException
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -63,6 +66,7 @@ class AdvancedWebView(
         webView.webChromeClient = ChromeClient()
         params.javaScriptChannelNames.forEach(::addJavaScriptChannel)
         params.userScripts.forEach(::addUserScript)
+        if (params.javaScriptHandlerNames.isNotEmpty()) installHandlerBridge(params.javaScriptHandlerObjectName)
     }
 
     fun attachToContext(context: Context) {
@@ -176,6 +180,54 @@ class AdvancedWebView(
             },
             name,
         )
+    }
+
+    /**
+     * Exposes `window.<objectName>.callHandler(name, ...args)`. Requests travel over a
+     * `WebMessageListener` (which replies to the frame that asked), and a document-start
+     * shim turns them into promises. The shim is not tracked in [scriptHandlers], so
+     * [removeAllUserScripts] leaves it alone.
+     */
+    private fun installHandlerBridge(objectName: String) {
+        check(
+            WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
+                WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT),
+        ) {
+            "JavaScript handlers need a WebView that supports WEB_MESSAGE_LISTENER and DOCUMENT_START_SCRIPT"
+        }
+        WebViewCompat.addWebMessageListener(webView, BRIDGE_NAME, setOf("*")) { _, message, _, _, replyProxy ->
+            handleHandlerCall(message.data, replyProxy)
+        }
+        WebViewCompat.addDocumentStartJavaScript(webView, handlerShim(objectName), setOf("*"))
+    }
+
+    private fun handleHandlerCall(data: String?, replyProxy: JavaScriptReplyProxy) {
+        val request = try {
+            JSONObject(data ?: return)
+        } catch (e: JSONException) {
+            return
+        }
+        val callId = request.optString("id")
+        scope.launch {
+            val response = JSONObject().put("id", callId)
+            try {
+                val value = flutterApi.onJavaScriptHandlerCall(
+                    id,
+                    request.getString("name"),
+                    request.getString("args"),
+                )
+                response.put("ok", true).put("value", value)
+            } catch (e: Throwable) {
+                response.put("ok", false).put("error", e.message ?: e.toString())
+            }
+            if (isDestroyed) return@launch
+            try {
+                replyProxy.postMessage(response.toString())
+            } catch (e: Throwable) {
+                // The frame went away (navigation) before the answer was ready.
+                Log.w(TAG, "Failed to reply to a JavaScript handler call: ${e.message}")
+            }
+        }
     }
 
     override fun getView(): View = webView
@@ -307,7 +359,42 @@ class AdvancedWebView(
         if (isHttpOnly) append("; HttpOnly")
     }
 
-    private companion object {
-        const val TAG = "AdvancedWebView"
+    companion object {
+        private const val TAG = "AdvancedWebView"
+        private const val BRIDGE_NAME = "advancedWebViewBridge"
+
+        // Same contract as the iOS shim: callHandler(name, ...args) returns a promise.
+        internal fun handlerShim(objectName: String) = """
+            (function () {
+              if (window.$objectName) return;
+              var bridge = window.$BRIDGE_NAME;
+              var pending = {};
+              var counter = 0;
+              var prefix = Math.random().toString(36).slice(2) + '-';
+              bridge.onmessage = function (event) {
+                var reply = JSON.parse(event.data);
+                var call = pending[reply.id];
+                if (!call) return;
+                delete pending[reply.id];
+                if (reply.ok) call.resolve(JSON.parse(reply.value));
+                else call.reject(new Error(reply.error));
+              };
+              window.$objectName = Object.freeze({
+                callHandler: function (name) {
+                  var args = Array.prototype.slice.call(arguments, 1);
+                  return new Promise(function (resolve, reject) {
+                    var id = prefix + (++counter);
+                    pending[id] = { resolve: resolve, reject: reject };
+                    try {
+                      bridge.postMessage(JSON.stringify({ id: id, name: String(name), args: JSON.stringify(args) }));
+                    } catch (e) {
+                      delete pending[id];
+                      reject(e);
+                    }
+                  });
+                }
+              });
+            })();
+        """.trimIndent()
     }
 }

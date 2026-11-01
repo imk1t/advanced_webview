@@ -14,6 +14,7 @@ abstract interface class WebViewEventListener {
   );
   void onJavaScriptMessage(String channelName, String message);
   void onNewWindowRequest(String url);
+  Future<String> onJavaScriptHandlerCall(String handlerName, String argsJson);
 }
 
 /// Single [AdvancedWebViewFlutterApi] implementation that routes every event to
@@ -74,4 +75,17 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   @override
   void onNewWindowRequest(int webViewId, String url) =>
       _listeners[webViewId]?.onNewWindowRequest(url);
+
+  @override
+  Future<String> onJavaScriptHandlerCall(
+    int webViewId,
+    String handlerName,
+    String argsJson,
+  ) async {
+    final listener = _listeners[webViewId];
+    if (listener == null) {
+      throw StateError('WebView $webViewId is no longer registered');
+    }
+    return listener.onJavaScriptHandlerCall(handlerName, argsJson);
+  }
 }
