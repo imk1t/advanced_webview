@@ -3,6 +3,8 @@ package dev.k1t.advanced_webview
 import android.graphics.Color
 import android.net.Uri
 import android.os.Looper
+import android.webkit.GeolocationPermissions
+import android.webkit.PermissionRequest
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.widget.FrameLayout
@@ -228,6 +230,38 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun mediaPermissionsAreDeniedWithoutADelegate() {
+        hostApi.create(params(webViewId = 1, hasPermissionDelegate = false))
+        val request = mock(PermissionRequest::class.java)
+        `when`(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+
+        registry.get(1).webView.webChromeClient!!.onPermissionRequest(request)
+
+        verify(request).deny()
+    }
+
+    @Test
+    fun resourcesWithoutADartEquivalentAreDenied() {
+        hostApi.create(params(webViewId = 1, hasPermissionDelegate = true))
+        val request = mock(PermissionRequest::class.java)
+        `when`(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+
+        registry.get(1).webView.webChromeClient!!.onPermissionRequest(request)
+
+        verify(request).deny()
+    }
+
+    @Test
+    fun geolocationIsDeniedWithoutADelegate() {
+        hostApi.create(params(webViewId = 1, hasPermissionDelegate = false))
+        val callback = mock(GeolocationPermissions.Callback::class.java)
+
+        registry.get(1).webView.webChromeClient!!.onGeolocationPermissionsShowPrompt("https://a.test", callback)
+
+        verify(callback).invoke("https://a.test", false, false)
+    }
+
+    @Test
     fun noBridgeIsInstalledWithoutHandlers() {
         mockStatic(WebViewCompat::class.java).use { compat ->
             hostApi.create(params(webViewId = 1))
@@ -293,6 +327,7 @@ class WebViewHostApiImplTest {
         handlerObjectName: String = "advanced_webview",
         hasNavigationDelegate: Boolean = false,
         hasNewWindowDelegate: Boolean = false,
+        hasPermissionDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
         webViewId,
@@ -302,6 +337,7 @@ class WebViewHostApiImplTest {
         handlerObjectName,
         hasNavigationDelegate,
         hasNewWindowDelegate,
+        hasPermissionDelegate,
         userScripts,
     )
 

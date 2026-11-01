@@ -193,6 +193,7 @@ final class RunnerTests: XCTestCase {
     handlerObjectName: String = "advanced_webview",
     hasNavigationDelegate: Bool = false,
     hasNewWindowDelegate: Bool = false,
+    hasPermissionDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
     return CreationParamsMessage(
@@ -203,6 +204,7 @@ final class RunnerTests: XCTestCase {
       javaScriptHandlerObjectName: handlerObjectName,
       hasNavigationDelegate: hasNavigationDelegate,
       hasNewWindowDelegate: hasNewWindowDelegate,
+      hasPermissionDelegate: hasPermissionDelegate,
       userScripts: userScripts)
   }
 

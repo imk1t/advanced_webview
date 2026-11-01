@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import 'cookie.dart';
 import 'navigation.dart';
+import 'permission.dart';
 import 'platform/event_dispatcher.dart';
 import 'platform/messages.g.dart';
 import 'settings.dart';
@@ -29,6 +30,7 @@ class AdvancedWebViewController {
     this.onWebResourceError,
     this.onNavigationRequest,
     this.onNewWindow,
+    this.onPermissionRequest,
     @visibleForTesting AdvancedWebViewHostApi? hostApi,
     @visibleForTesting WebViewEventDispatcher? dispatcher,
   }) : webViewId = _nextWebViewId++,
@@ -54,6 +56,7 @@ class AdvancedWebViewController {
         javaScriptHandlerObjectName: javaScriptHandlerObjectName,
         hasNavigationDelegate: onNavigationRequest != null,
         hasNewWindowDelegate: onNewWindow != null,
+        hasPermissionDelegate: onPermissionRequest != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
@@ -102,6 +105,28 @@ class AdvancedWebViewController {
   /// temporary WebView that is destroyed right away.
   /// iOS: `WKUIDelegate.webView(_:createWebViewWith:for:windowFeatures:)`.
   final NewWindowCallback? onNewWindow;
+
+  /// Called when a page asks for camera, microphone or location access.
+  ///
+  /// Return [PermissionDecision.grant] to allow it. Without a callback every
+  /// request is denied on both platforms. Errors in the callback deny the
+  /// request.
+  ///
+  /// Granting only gives the *page* access. The app itself still needs the
+  /// operating system permission: on Android, declare it in the manifest
+  /// (`CAMERA`, `RECORD_AUDIO`, `ACCESS_FINE_LOCATION`) and the plugin asks the
+  /// user at runtime when needed; the request is denied if the user refuses. On
+  /// iOS add `NSCameraUsageDescription` / `NSMicrophoneUsageDescription` to
+  /// `Info.plist`; WebKit shows the system prompt.
+  ///
+  /// [PermissionResource.geolocation] is Android only. On iOS, WebKit has no
+  /// delegate for it and asks the user itself, based on the app's location
+  /// permission (`NSLocationWhenInUseUsageDescription`).
+  ///
+  /// Android: `WebChromeClient.onPermissionRequest(PermissionRequest)` and
+  /// `onGeolocationPermissionsShowPrompt(String, GeolocationPermissions.Callback)`.
+  /// iOS: `WKUIDelegate.webView(_:requestMediaCapturePermissionFor:initiatedByFrame:type:decisionHandler:)`.
+  final PermissionRequestCallback? onPermissionRequest;
 
   /// Completes once the native WebView exists.
   Future<void> get ready => _created;
@@ -273,6 +298,33 @@ class _EventListener implements WebViewEventListener {
 
   @override
   void onNewWindowRequest(String url) => _controller.onNewWindow?.call(url);
+
+  @override
+  Future<PermissionDecisionMessage> onPermissionRequest(
+    PermissionRequestMessage request,
+  ) async {
+    final callback = _controller.onPermissionRequest;
+    if (callback == null) return PermissionDecisionMessage.deny;
+    final decision = await callback(
+      PermissionRequest(
+        origin: request.origin,
+        resources: [
+          for (final resource in request.resources)
+            switch (resource) {
+              PermissionResourceMessage.camera => PermissionResource.camera,
+              PermissionResourceMessage.microphone =>
+                PermissionResource.microphone,
+              PermissionResourceMessage.geolocation =>
+                PermissionResource.geolocation,
+            },
+        ],
+      ),
+    );
+    return switch (decision) {
+      PermissionDecision.grant => PermissionDecisionMessage.grant,
+      PermissionDecision.deny => PermissionDecisionMessage.deny,
+    };
+  }
 
   @override
   Future<String> onJavaScriptHandlerCall(

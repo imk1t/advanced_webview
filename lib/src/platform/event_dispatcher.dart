@@ -14,6 +14,9 @@ abstract interface class WebViewEventListener {
   );
   void onJavaScriptMessage(String channelName, String message);
   void onNewWindowRequest(String url);
+  Future<PermissionDecisionMessage> onPermissionRequest(
+    PermissionRequestMessage request,
+  );
   Future<String> onJavaScriptHandlerCall(String handlerName, String argsJson);
 }
 
@@ -75,6 +78,16 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   @override
   void onNewWindowRequest(int webViewId, String url) =>
       _listeners[webViewId]?.onNewWindowRequest(url);
+
+  @override
+  Future<PermissionDecisionMessage> onPermissionRequest(
+    int webViewId,
+    PermissionRequestMessage request,
+  ) async {
+    final listener = _listeners[webViewId];
+    if (listener == null) return PermissionDecisionMessage.deny;
+    return listener.onPermissionRequest(request);
+  }
 
   @override
   Future<String> onJavaScriptHandlerCall(
