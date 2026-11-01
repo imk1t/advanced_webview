@@ -102,8 +102,16 @@ final class RunnerTests: XCTestCase {
 
     let scripts = try registry.get(1).webView.configuration.userContentController.userScripts
     XCTAssertEqual(scripts.count, 1)
-    XCTAssertTrue(scripts[0].source.contains("window.advancedWebView"))
+    XCTAssertTrue(scripts[0].source.contains("window.advanced_webView"))
     XCTAssertEqual(scripts[0].injectionTime, .atDocumentStart)
+  }
+
+  func testJavaScriptHandlerObjectNameIsConfigurable() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, handlers: ["sum"], handlerObjectName: "bridge"))
+
+    let scripts = try registry.get(1).webView.configuration.userContentController.userScripts
+    XCTAssertTrue(scripts[0].source.contains("window.bridge = "))
   }
 
   func testNoBridgeShimWithoutHandlers() throws {
@@ -182,6 +190,7 @@ final class RunnerTests: XCTestCase {
     settings: WebViewSettingsMessage? = nil,
     channels: [String] = [],
     handlers: [String] = [],
+    handlerObjectName: String = "advanced_webView",
     hasNavigationDelegate: Bool = false,
     hasNewWindowDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []
@@ -191,6 +200,7 @@ final class RunnerTests: XCTestCase {
       settings: settings ?? self.settings(),
       javaScriptChannelNames: channels,
       javaScriptHandlerNames: handlers,
+      javaScriptHandlerObjectName: handlerObjectName,
       hasNavigationDelegate: hasNavigationDelegate,
       hasNewWindowDelegate: hasNewWindowDelegate,
       userScripts: userScripts)

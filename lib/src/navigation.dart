@@ -45,7 +45,7 @@ typedef NavigationRequestCallback = FutureOr<NavigationDecision> Function(
 typedef NewWindowCallback = void Function(String url);
 typedef JavaScriptMessageCallback = void Function(String message);
 
-/// Handles a call from `window.advancedWebView.callHandler(name, ...args)`.
+/// Handles a call from `window.advanced_webView.callHandler(name, ...args)`.
 ///
 /// [arguments] holds the JSON-decoded arguments the page passed. The returned
 /// value must be JSON-encodable (`null`, `bool`, `num`, `String`, `List` or

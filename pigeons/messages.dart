@@ -67,6 +67,7 @@ class CreationParamsMessage {
     required this.settings,
     required this.javaScriptChannelNames,
     required this.javaScriptHandlerNames,
+    required this.javaScriptHandlerObjectName,
     required this.hasNavigationDelegate,
     required this.hasNewWindowDelegate,
     required this.userScripts,
@@ -78,9 +79,13 @@ class CreationParamsMessage {
   /// Names exposed to JS as `window.<name>.postMessage(String)`.
   List<String> javaScriptChannelNames;
 
-  /// Handlers the page can call with `window.advancedWebView.callHandler`.
+  /// Handlers the page can call with `window.advanced_webView.callHandler`.
   /// The bridge is only installed when this is not empty.
   List<String> javaScriptHandlerNames;
+
+  /// Name of the global object (`window.<name>`) that exposes `callHandler`.
+  /// Always a valid JavaScript identifier.
+  String javaScriptHandlerObjectName;
 
   /// When false, native code never round-trips navigation decisions to Dart.
   bool hasNavigationDelegate;

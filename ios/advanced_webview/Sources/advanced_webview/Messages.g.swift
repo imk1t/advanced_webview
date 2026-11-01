@@ -317,9 +317,12 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
   var settings: WebViewSettingsMessage
   /// Names exposed to JS as `window.<name>.postMessage(String)`.
   var javaScriptChannelNames: [String]
-  /// Handlers the page can call with `window.advancedWebView.callHandler`.
+  /// Handlers the page can call with `window.advanced_webView.callHandler`.
   /// The bridge is only installed when this is not empty.
   var javaScriptHandlerNames: [String]
+  /// Name of the global object (`window.<name>`) that exposes `callHandler`.
+  /// Always a valid JavaScript identifier.
+  var javaScriptHandlerObjectName: String
   /// When false, native code never round-trips navigation decisions to Dart.
   var hasNavigationDelegate: Bool
   /// When false, `window.open` and `target="_blank"` load in the same WebView
@@ -335,15 +338,17 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     let settings = pigeonVar_list[1] as! WebViewSettingsMessage
     let javaScriptChannelNames = pigeonVar_list[2] as! [String]
     let javaScriptHandlerNames = pigeonVar_list[3] as! [String]
-    let hasNavigationDelegate = pigeonVar_list[4] as! Bool
-    let hasNewWindowDelegate = pigeonVar_list[5] as! Bool
-    let userScripts = pigeonVar_list[6] as! [UserScriptMessage]
+    let javaScriptHandlerObjectName = pigeonVar_list[4] as! String
+    let hasNavigationDelegate = pigeonVar_list[5] as! Bool
+    let hasNewWindowDelegate = pigeonVar_list[6] as! Bool
+    let userScripts = pigeonVar_list[7] as! [UserScriptMessage]
 
     return CreationParamsMessage(
       webViewId: webViewId,
       settings: settings,
       javaScriptChannelNames: javaScriptChannelNames,
       javaScriptHandlerNames: javaScriptHandlerNames,
+      javaScriptHandlerObjectName: javaScriptHandlerObjectName,
       hasNavigationDelegate: hasNavigationDelegate,
       hasNewWindowDelegate: hasNewWindowDelegate,
       userScripts: userScripts
@@ -355,6 +360,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       settings,
       javaScriptChannelNames,
       javaScriptHandlerNames,
+      javaScriptHandlerObjectName,
       hasNavigationDelegate,
       hasNewWindowDelegate,
       userScripts,
@@ -364,7 +370,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
+    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -373,13 +379,14 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: settings, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: javaScriptChannelNames, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: javaScriptHandlerNames, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: javaScriptHandlerObjectName, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasNavigationDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasNewWindowDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userScripts, hasher: &hasher)
   }
 
   public var description: String {
-    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), userScripts: \(String(describing: userScripts)))"
+    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), userScripts: \(String(describing: userScripts)))"
   }
 }
 

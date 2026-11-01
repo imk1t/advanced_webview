@@ -43,16 +43,24 @@ final controller = AdvancedWebViewController(
 );
 ```
 
-The page calls `window.advancedWebView.callHandler(name, ...args)`, which returns a promise:
+The page calls `window.advanced_webView.callHandler(name, ...args)`, which returns a promise:
 
 ```js
-const total = await window.advancedWebView.callHandler('sum', 1, 2, 3); // 6
-const user = await window.advancedWebView.callHandler('user', 'abc'); // { name: ... }
+const total = await window.advanced_webView.callHandler('sum', 1, 2, 3); // 6
+const user = await window.advanced_webView.callHandler('user', 'abc'); // { name: ... }
 ```
 
 Arguments and results are JSON: `null`, `bool`, `num`, `String`, `List` or `Map`. If the Dart handler
 throws, or no handler has that name, the promise rejects with an `Error` that carries the message.
-`window.advancedWebView` only exists when at least one handler is registered.
+`window.advanced_webView` only exists when at least one handler is registered. To use another name,
+pass `javaScriptHandlerObjectName` (it must be a valid JavaScript identifier):
+
+```dart
+AdvancedWebViewController(
+  javaScriptHandlers: {...},
+  javaScriptHandlerObjectName: 'app', // the page calls window.app.callHandler(...)
+);
+```
 
 Android needs a WebView that supports `WEB_MESSAGE_LISTENER` and `DOCUMENT_START_SCRIPT` (the system
 WebView on current devices does). Creating the controller fails otherwise.
@@ -88,7 +96,7 @@ iOS injects the channel shim with `forMainFrameOnly: false`.
 Dart receives the channel name and string message, with no sender origin or frame information.
 `UserScript.mainFrameOnly` controls user scripts only; it does not restrict channel exposure.
 
-Handlers have the same trust boundary: `window.advancedWebView` is available in every frame, and
+Handlers have the same trust boundary: `window.advanced_webView` is available in every frame, and
 Dart receives only the handler name and arguments, not the sender's origin or frame.
 
 Load only trusted content, including its iframes, in a WebView with channels or handlers. Validate message

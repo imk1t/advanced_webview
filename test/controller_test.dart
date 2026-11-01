@@ -21,6 +21,7 @@ void main() {
   AdvancedWebViewController createController({
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     Map<String, JavaScriptHandler> javaScriptHandlers = const {},
+    String javaScriptHandlerObjectName = 'advanced_webView',
     List<UserScript> userScripts = const [],
     PageEventCallback? onPageFinished,
     WebResourceErrorCallback? onWebResourceError,
@@ -32,6 +33,7 @@ void main() {
       dispatcher: dispatcher,
       javaScriptChannels: javaScriptChannels,
       javaScriptHandlers: javaScriptHandlers,
+      javaScriptHandlerObjectName: javaScriptHandlerObjectName,
       userScripts: userScripts,
       onPageFinished: onPageFinished,
       onWebResourceError: onWebResourceError,
@@ -209,6 +211,33 @@ void main() {
       expect(hostApi.created[controller.webViewId]!.javaScriptHandlerNames, [
         'sum',
       ]);
+    });
+
+    test('use advanced_webView as the default object name', () async {
+      final controller = createController(javaScriptHandlers: {'a': (_) => 1});
+      await controller.ready;
+      expect(
+        hostApi.created[controller.webViewId]!.javaScriptHandlerObjectName,
+        'advanced_webView',
+      );
+    });
+
+    test('accept a custom object name and reject invalid ones', () async {
+      final controller = createController(
+        javaScriptHandlers: {'a': (_) => 1},
+        javaScriptHandlerObjectName: 'app',
+      );
+      await controller.ready;
+      expect(
+        hostApi.created[controller.webViewId]!.javaScriptHandlerObjectName,
+        'app',
+      );
+      for (final bad in ['', '1a', 'a.b', 'a;alert(1)']) {
+        expect(
+          () => createController(javaScriptHandlerObjectName: bad),
+          throwsArgumentError,
+        );
+      }
     });
 
     test('receive decoded arguments and return JSON', () async {

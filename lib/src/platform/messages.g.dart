@@ -256,6 +256,7 @@ class CreationParamsMessage {
     required this.settings,
     required this.javaScriptChannelNames,
     required this.javaScriptHandlerNames,
+    required this.javaScriptHandlerObjectName,
     required this.hasNavigationDelegate,
     required this.hasNewWindowDelegate,
     required this.userScripts,
@@ -268,9 +269,13 @@ class CreationParamsMessage {
   /// Names exposed to JS as `window.<name>.postMessage(String)`.
   List<String> javaScriptChannelNames;
 
-  /// Handlers the page can call with `window.advancedWebView.callHandler`.
+  /// Handlers the page can call with `window.advanced_webView.callHandler`.
   /// The bridge is only installed when this is not empty.
   List<String> javaScriptHandlerNames;
+
+  /// Name of the global object (`window.<name>`) that exposes `callHandler`.
+  /// Always a valid JavaScript identifier.
+  String javaScriptHandlerObjectName;
 
   /// When false, native code never round-trips navigation decisions to Dart.
   bool hasNavigationDelegate;
@@ -288,6 +293,7 @@ class CreationParamsMessage {
       settings,
       javaScriptChannelNames,
       javaScriptHandlerNames,
+      javaScriptHandlerObjectName,
       hasNavigationDelegate,
       hasNewWindowDelegate,
       userScripts,
@@ -304,9 +310,10 @@ class CreationParamsMessage {
       settings: result[1]! as WebViewSettingsMessage,
       javaScriptChannelNames: (result[2]! as List<Object?>).cast<String>(),
       javaScriptHandlerNames: (result[3]! as List<Object?>).cast<String>(),
-      hasNavigationDelegate: result[4]! as bool,
-      hasNewWindowDelegate: result[5]! as bool,
-      userScripts: (result[6]! as List<Object?>).cast<UserScriptMessage>(),
+      javaScriptHandlerObjectName: result[4]! as String,
+      hasNavigationDelegate: result[5]! as bool,
+      hasNewWindowDelegate: result[6]! as bool,
+      userScripts: (result[7]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -319,7 +326,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -328,7 +335,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, userScripts: $userScripts)';
   }
 }
 

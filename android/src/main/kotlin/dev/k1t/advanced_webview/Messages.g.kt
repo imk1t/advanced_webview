@@ -339,10 +339,15 @@ data class CreationParamsMessage (
   /** Names exposed to JS as `window.<name>.postMessage(String)`. */
   val javaScriptChannelNames: List<String>,
   /**
-   * Handlers the page can call with `window.advancedWebView.callHandler`.
+   * Handlers the page can call with `window.advanced_webView.callHandler`.
    * The bridge is only installed when this is not empty.
    */
   val javaScriptHandlerNames: List<String>,
+  /**
+   * Name of the global object (`window.<name>`) that exposes `callHandler`.
+   * Always a valid JavaScript identifier.
+   */
+  val javaScriptHandlerObjectName: String,
   /** When false, native code never round-trips navigation decisions to Dart. */
   val hasNavigationDelegate: Boolean,
   /**
@@ -360,10 +365,11 @@ data class CreationParamsMessage (
       val settings = pigeonVar_list[1] as WebViewSettingsMessage
       val javaScriptChannelNames = pigeonVar_list[2] as List<String>
       val javaScriptHandlerNames = pigeonVar_list[3] as List<String>
-      val hasNavigationDelegate = pigeonVar_list[4] as Boolean
-      val hasNewWindowDelegate = pigeonVar_list[5] as Boolean
-      val userScripts = pigeonVar_list[6] as List<UserScriptMessage>
-      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, hasNavigationDelegate, hasNewWindowDelegate, userScripts)
+      val javaScriptHandlerObjectName = pigeonVar_list[4] as String
+      val hasNavigationDelegate = pigeonVar_list[5] as Boolean
+      val hasNewWindowDelegate = pigeonVar_list[6] as Boolean
+      val userScripts = pigeonVar_list[7] as List<UserScriptMessage>
+      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, userScripts)
     }
   }
   fun toList(): List<Any?> {
@@ -372,6 +378,7 @@ data class CreationParamsMessage (
       settings,
       javaScriptChannelNames,
       javaScriptHandlerNames,
+      javaScriptHandlerObjectName,
       hasNavigationDelegate,
       hasNewWindowDelegate,
       userScripts,
@@ -385,7 +392,7 @@ data class CreationParamsMessage (
       return true
     }
     val other = other as CreationParamsMessage
-    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
   }
 
   override fun hashCode(): Int {
@@ -394,13 +401,14 @@ data class CreationParamsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.settings)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.javaScriptChannelNames)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.javaScriptHandlerNames)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.javaScriptHandlerObjectName)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNavigationDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNewWindowDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userScripts)
     return result
   }
   override fun toString(): String {
-    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, userScripts=$userScripts)"
+    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, userScripts=$userScripts)"
   }
 }
 

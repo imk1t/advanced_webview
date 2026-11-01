@@ -20,6 +20,7 @@ class AdvancedWebViewController {
     WebViewSettings settings = const WebViewSettings(),
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     Map<String, JavaScriptHandler> javaScriptHandlers = const {},
+    String javaScriptHandlerObjectName = defaultJavaScriptHandlerObjectName,
     List<UserScript> userScripts = const [],
     this.onPageStarted,
     this.onPageFinished,
@@ -36,6 +37,13 @@ class AdvancedWebViewController {
        _javaScriptHandlers = Map.unmodifiable(javaScriptHandlers),
        _hostApi = hostApi ?? AdvancedWebViewHostApi(),
        _dispatcher = dispatcher ?? WebViewEventDispatcher.instance {
+    if (!_identifier.hasMatch(javaScriptHandlerObjectName)) {
+      throw ArgumentError.value(
+        javaScriptHandlerObjectName,
+        'javaScriptHandlerObjectName',
+        'must be a valid JavaScript identifier',
+      );
+    }
     _dispatcher.register(webViewId, _EventListener(this));
     _created = _hostApi.create(
       CreationParamsMessage(
@@ -43,6 +51,7 @@ class AdvancedWebViewController {
         settings: settings.toMessage(),
         javaScriptChannelNames: _javaScriptChannels.keys.toList(),
         javaScriptHandlerNames: _javaScriptHandlers.keys.toList(),
+        javaScriptHandlerObjectName: javaScriptHandlerObjectName,
         hasNavigationDelegate: onNavigationRequest != null,
         hasNewWindowDelegate: onNewWindow != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
@@ -51,6 +60,13 @@ class AdvancedWebViewController {
   }
 
   static int _nextWebViewId = 0;
+
+  /// Name of the global the page uses to call [javaScriptHandlers]:
+  /// `window.advanced_webView.callHandler(...)`. Override it with the
+  /// `javaScriptHandlerObjectName` constructor parameter.
+  static const defaultJavaScriptHandlerObjectName = 'advanced_webView';
+
+  static final _identifier = RegExp(r'^[A-Za-z_$][A-Za-z0-9_$]*$');
 
   /// Identifies this WebView across the platform channel.
   final int webViewId;

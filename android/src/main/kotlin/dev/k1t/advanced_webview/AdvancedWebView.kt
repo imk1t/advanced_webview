@@ -66,7 +66,7 @@ class AdvancedWebView(
         webView.webChromeClient = ChromeClient()
         params.javaScriptChannelNames.forEach(::addJavaScriptChannel)
         params.userScripts.forEach(::addUserScript)
-        if (params.javaScriptHandlerNames.isNotEmpty()) installHandlerBridge()
+        if (params.javaScriptHandlerNames.isNotEmpty()) installHandlerBridge(params.javaScriptHandlerObjectName)
     }
 
     fun attachToContext(context: Context) {
@@ -183,12 +183,12 @@ class AdvancedWebView(
     }
 
     /**
-     * Exposes `window.advancedWebView.callHandler(name, ...args)`. Requests travel over a
+     * Exposes `window.<objectName>.callHandler(name, ...args)`. Requests travel over a
      * `WebMessageListener` (which replies to the frame that asked), and a document-start
      * shim turns them into promises. The shim is not tracked in [scriptHandlers], so
      * [removeAllUserScripts] leaves it alone.
      */
-    private fun installHandlerBridge() {
+    private fun installHandlerBridge(objectName: String) {
         check(
             WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
                 WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT),
@@ -198,7 +198,7 @@ class AdvancedWebView(
         WebViewCompat.addWebMessageListener(webView, BRIDGE_NAME, setOf("*")) { _, message, _, _, replyProxy ->
             handleHandlerCall(message.data, replyProxy)
         }
-        WebViewCompat.addDocumentStartJavaScript(webView, HANDLER_SHIM, setOf("*"))
+        WebViewCompat.addDocumentStartJavaScript(webView, handlerShim(objectName), setOf("*"))
     }
 
     private fun handleHandlerCall(data: String?, replyProxy: JavaScriptReplyProxy) {
@@ -359,14 +359,14 @@ class AdvancedWebView(
         if (isHttpOnly) append("; HttpOnly")
     }
 
-    private companion object {
-        const val TAG = "AdvancedWebView"
-        const val BRIDGE_NAME = "advancedWebViewBridge"
+    companion object {
+        private const val TAG = "AdvancedWebView"
+        private const val BRIDGE_NAME = "advancedWebViewBridge"
 
         // Same contract as the iOS shim: callHandler(name, ...args) returns a promise.
-        val HANDLER_SHIM = """
+        internal fun handlerShim(objectName: String) = """
             (function () {
-              if (window.advancedWebView) return;
+              if (window.$objectName) return;
               var bridge = window.$BRIDGE_NAME;
               var pending = {};
               var counter = 0;
@@ -379,7 +379,7 @@ class AdvancedWebView(
                 if (reply.ok) call.resolve(JSON.parse(reply.value));
                 else call.reject(new Error(reply.error));
               };
-              window.advancedWebView = Object.freeze({
+              window.$objectName = Object.freeze({
                 callHandler: function (name) {
                   var args = Array.prototype.slice.call(arguments, 1);
                   return new Promise(function (resolve, reject) {

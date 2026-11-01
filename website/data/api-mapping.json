@@ -424,8 +424,8 @@
       "dart": "AdvancedWebViewController.javaScriptHandlers",
       "group": "javascript",
       "summary": {
-        "en": "Named handlers the page can call as window.advancedWebView.callHandler(name, ...args); the Dart return value resolves the page's promise.",
-        "ja": "ページから window.advancedWebView.callHandler(name, ...args) で呼べる名前付きハンドラです。Dart の戻り値がページ側の Promise の結果になります。"
+        "en": "Named handlers the page can call as window.advanced_webView.callHandler(name, ...args); the Dart return value resolves the page's promise.",
+        "ja": "ページから window.advanced_webView.callHandler(name, ...args) で呼べる名前付きハンドラです。Dart の戻り値がページ側の Promise の結果になります。"
       },
       "android": {
         "status": "supported",
@@ -447,8 +447,32 @@
           "WKUserScript"
         ],
         "note": {
-          "en": "The reply handler settles the promise; a document-start user script defines window.advancedWebView.",
-          "ja": "reply ハンドラが Promise を解決します。ドキュメント開始時のユーザースクリプトが window.advancedWebView を定義します。"
+          "en": "The reply handler settles the promise; a document-start user script defines window.advanced_webView.",
+          "ja": "reply ハンドラが Promise を解決します。ドキュメント開始時のユーザースクリプトが window.advanced_webView を定義します。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.javaScriptHandlerObjectName",
+      "group": "javascript",
+      "summary": {
+        "en": "Name of the global (window.<name>) that exposes callHandler. Defaults to advanced_webView.",
+        "ja": "callHandler を公開するグローバル（window.<name>）の名前です。既定値は advanced_webView です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewCompat.addDocumentStartJavaScript"],
+        "note": {
+          "en": "The document-start shim assigns the global under this name.",
+          "ja": "ドキュメント開始時のシムが、この名前でグローバルを定義します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKUserScript"],
+        "note": {
+          "en": "The document-start user script assigns the global under this name.",
+          "ja": "ドキュメント開始時のユーザースクリプトが、この名前でグローバルを定義します。"
         }
       }
     },

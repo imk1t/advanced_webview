@@ -221,6 +221,13 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun handlerShimUsesTheConfiguredObjectName() {
+        val shim = AdvancedWebView.handlerShim("bridge")
+
+        assertTrue(shim.contains("window.bridge = Object.freeze"))
+    }
+
+    @Test
     fun noBridgeIsInstalledWithoutHandlers() {
         mockStatic(WebViewCompat::class.java).use { compat ->
             hostApi.create(params(webViewId = 1))
@@ -283,6 +290,7 @@ class WebViewHostApiImplTest {
         settings: WebViewSettingsMessage = settings(),
         channels: List<String> = emptyList(),
         handlers: List<String> = emptyList(),
+        handlerObjectName: String = "advanced_webView",
         hasNavigationDelegate: Boolean = false,
         hasNewWindowDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),
@@ -291,6 +299,7 @@ class WebViewHostApiImplTest {
         settings,
         channels,
         handlers,
+        handlerObjectName,
         hasNavigationDelegate,
         hasNewWindowDelegate,
         userScripts,

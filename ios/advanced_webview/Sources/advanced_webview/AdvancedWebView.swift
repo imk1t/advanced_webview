@@ -12,6 +12,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasNewWindowDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private let hasJavaScriptHandlers: Bool
+  private let handlerObjectName: String
   private var observations: [NSKeyValueObservation] = []
   private var isDestroyed = false
   /// URL of the load started by `load(_:)` / `loadHTMLString(_:baseURL:)`
@@ -24,6 +25,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.hasNavigationDelegate = params.hasNavigationDelegate
     self.hasNewWindowDelegate = params.hasNewWindowDelegate
     self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
+    self.handlerObjectName = params.javaScriptHandlerObjectName
 
     // Some WKWebView options can only be set at creation time.
     let configuration = WKWebViewConfiguration()
@@ -180,7 +182,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
 
   private static let handlerBridgeName = "advancedWebView"
 
-  /// `window.advancedWebView.callHandler(name, ...args)` returns a promise. The reply
+  /// `window.<objectName>.callHandler(name, ...args)` returns a promise. The reply
   /// handler of `WKScriptMessageHandlerWithReply` settles it, so no call ids are needed.
   private func installHandlerBridge() {
     webView.configuration.userContentController.addScriptMessageHandler(
@@ -191,9 +193,9 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private func addHandlerShim() {
     let source = """
       (function () {
-        if (window.advancedWebView) return;
+        if (window.\(handlerObjectName)) return;
         var bridge = window.webkit.messageHandlers['\(Self.handlerBridgeName)'];
-        window.advancedWebView = Object.freeze({
+        window.\(handlerObjectName) = Object.freeze({
           callHandler: function (name) {
             var args = Array.prototype.slice.call(arguments, 1);
             return Promise.resolve().then(function () {
