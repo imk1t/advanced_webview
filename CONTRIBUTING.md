@@ -109,7 +109,7 @@ By contributing, you agree that your contributions will be licensed under the
 2. Tag the merge commit and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
 3. `.github/workflows/publish.yml` checks that the tag matches `pubspec.yaml`, has a
    `CHANGELOG.md` section and is on `main`, then runs analyze and tests, publishes to pub.dev and
-   creates a GitHub Release from the changelog section. If the exact version is already on
+   creates a GitHub Release from the changelog section (skipped if a release for the tag already exists). If the exact version is already on
    pub.dev, it still runs analyze and tests, but skips pub.dev credentials and publication
    (including the publish dry-run) and proceeds to the GitHub Release. A missing package
    (HTTP 404) follows the normal publish path; other HTTP/network errors or invalid package
