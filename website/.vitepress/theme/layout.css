@@ -21,8 +21,98 @@
   @apply tw:max-w-[1100px]!;
 }
 
-.vp-doc table {
-  @apply tw:table tw:w-full;
+/*
+ * Tables. VitePress' defaults (zebra stripes, 16px cell padding, 28px line height) make the
+ * reference tables tall and hard to scan, so tighten them and rely on row dividers instead.
+ * Below 640px VitePress' own scrollable block table is kept for plain Markdown tables.
+ */
+@media (min-width: 640px) {
+  .vp-doc table {
+    @apply tw:table tw:w-full;
+  }
+}
+
+.vp-doc th {
+  @apply tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:tracking-wide tw:text-(--vp-c-text-2);
+}
+
+.vp-doc td {
+  @apply tw:px-3 tw:py-2 tw:text-sm tw:leading-6;
+}
+
+.vp-doc tr,
+.vp-doc tr:nth-child(2n) {
+  @apply tw:bg-transparent;
+}
+
+.vp-doc tbody tr:hover {
+  @apply tw:bg-(--vp-c-bg-soft);
+}
+
+.vp-doc td code {
+  @apply tw:text-[0.8125rem];
+}
+
+/* API mapping table (ApiMapping.vue). */
+.vp-doc .api-map table {
+  @apply tw:table-fixed;
+}
+
+.vp-doc .api-map td {
+  @apply tw:align-top;
+}
+
+.vp-doc .api-map ul {
+  @apply tw:mt-1.5 tw:mb-0 tw:list-none tw:p-0;
+}
+
+.vp-doc .api-map li {
+  @apply tw:my-0.5 tw:leading-5;
+}
+
+.vp-doc .api-map td p {
+  @apply tw:mt-1 tw:mb-0 tw:text-[13px] tw:leading-5 tw:text-(--vp-c-text-2);
+}
+
+.vp-doc .api-map td > code {
+  @apply tw:text-[0.8125rem] tw:font-semibold tw:[overflow-wrap:anywhere];
+}
+
+.vp-doc .api-map li code {
+  @apply tw:text-xs tw:[overflow-wrap:anywhere];
+}
+
+.vp-doc .api-map .api-map-platform {
+  @apply tw:border-l tw:border-(--vp-c-divider);
+}
+
+/* On narrow screens each row becomes a card: Dart API on top, then Android and iOS. */
+@media (max-width: 639px) {
+  .vp-doc .api-map thead {
+    @apply tw:sr-only;
+  }
+
+  .vp-doc .api-map table,
+  .vp-doc .api-map tbody {
+    @apply tw:block;
+  }
+
+  .vp-doc .api-map tr {
+    @apply tw:mb-3 tw:block tw:overflow-hidden tw:rounded-lg tw:border tw:border-(--vp-c-divider);
+  }
+
+  .vp-doc .api-map td {
+    @apply tw:block tw:border-0;
+  }
+
+  .vp-doc .api-map td.api-map-platform {
+    @apply tw:border-t tw:border-l-0 tw:border-(--vp-c-divider);
+  }
+
+  .vp-doc .api-map td[data-label]::before {
+    content: attr(data-label);
+    @apply tw:mb-1 tw:block tw:text-xs tw:font-semibold tw:text-(--vp-c-text-2);
+  }
 }
 
 /* Keep Japanese hero text from breaking in the middle of a word. */
