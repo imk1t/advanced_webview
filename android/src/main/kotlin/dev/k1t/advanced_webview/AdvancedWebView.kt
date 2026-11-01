@@ -7,13 +7,16 @@ import android.content.MutableContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
+import android.net.http.SslError
 import android.os.Message
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.GeolocationPermissions
+import android.webkit.HttpAuthHandler
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -59,6 +62,8 @@ class AdvancedWebView(
     private val hasNavigationDelegate = params.hasNavigationDelegate
     private val hasNewWindowDelegate = params.hasNewWindowDelegate
     private val hasPermissionDelegate = params.hasPermissionDelegate
+    private val hasSslErrorDelegate = params.hasSslErrorDelegate
+    private val hasHttpAuthDelegate = params.hasHttpAuthDelegate
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
 
@@ -298,6 +303,45 @@ class AdvancedWebView(
             send { flutterApi.onReceivedError(id, message) }
         }
 
+        override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
+            if (!hasSslErrorDelegate) {
+                handler.cancel()
+                return
+            }
+            val url = error.url.orEmpty()
+            val message = SslErrorMessage(url, Uri.parse(url).host.orEmpty(), error.describe())
+            scope.launch {
+                val decision = try {
+                    flutterApi.onSslError(id, message)
+                } catch (e: Throwable) {
+                    Log.w(TAG, "SSL error delegate failed, refusing the load: ${e.message}")
+                    SslErrorDecisionMessage.CANCEL
+                }
+                if (decision == SslErrorDecisionMessage.PROCEED && !isDestroyed) handler.proceed() else handler.cancel()
+            }
+        }
+
+        override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String?) {
+            if (!hasHttpAuthDelegate) {
+                handler.cancel()
+                return
+            }
+            val request = HttpAuthRequestMessage(host, realm?.takeIf { it.isNotEmpty() })
+            scope.launch {
+                val credentials = try {
+                    flutterApi.onHttpAuthRequest(id, request)
+                } catch (e: Throwable) {
+                    Log.w(TAG, "HTTP auth delegate failed, cancelling: ${e.message}")
+                    null
+                }
+                if (credentials != null && !isDestroyed) {
+                    handler.proceed(credentials.username, credentials.password)
+                } else {
+                    handler.cancel()
+                }
+            }
+        }
+
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             // Android needs a synchronous answer. For main-frame navigations we
             // cancel, ask Dart, and re-issue the load if allowed. Sub-frame
@@ -429,6 +473,15 @@ class AdvancedWebView(
             resultMsg.sendToTarget()
             return true
         }
+    }
+
+    private fun SslError.describe(): String = when (primaryError) {
+        SslError.SSL_NOTYETVALID -> "The certificate is not valid yet"
+        SslError.SSL_EXPIRED -> "The certificate has expired"
+        SslError.SSL_IDMISMATCH -> "The certificate does not match the host name"
+        SslError.SSL_UNTRUSTED -> "The certificate authority is not trusted"
+        SslError.SSL_DATE_INVALID -> "The certificate date is invalid"
+        else -> "The certificate is invalid"
     }
 
     private fun CookieMessage.toSetCookieHeader(): String = buildString {

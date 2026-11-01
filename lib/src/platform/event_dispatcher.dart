@@ -15,6 +15,10 @@ abstract interface class WebViewEventListener {
   void onJavaScriptMessage(String channelName, String message);
   void onNewWindowRequest(String url);
   void onDownloadStart(DownloadRequestMessage request);
+  Future<SslErrorDecisionMessage> onSslError(SslErrorMessage error);
+  Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(
+    HttpAuthRequestMessage request,
+  );
   Future<PermissionDecisionMessage> onPermissionRequest(
     PermissionRequestMessage request,
   );
@@ -83,6 +87,22 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   @override
   void onDownloadStart(int webViewId, DownloadRequestMessage request) =>
       _listeners[webViewId]?.onDownloadStart(request);
+
+  @override
+  Future<SslErrorDecisionMessage> onSslError(
+    int webViewId,
+    SslErrorMessage error,
+  ) async {
+    final listener = _listeners[webViewId];
+    if (listener == null) return SslErrorDecisionMessage.cancel;
+    return listener.onSslError(error);
+  }
+
+  @override
+  Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(
+    int webViewId,
+    HttpAuthRequestMessage request,
+  ) async => _listeners[webViewId]?.onHttpAuthRequest(request);
 
   @override
   Future<PermissionDecisionMessage> onPermissionRequest(
