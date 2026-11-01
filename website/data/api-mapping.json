@@ -63,6 +63,8 @@
       "CookieManager": "https://developer.android.com/reference/android/webkit/CookieManager",
       "WebViewCompat": "https://developer.android.com/reference/androidx/webkit/WebViewCompat",
       "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler",
+      "PermissionRequest": "https://developer.android.com/reference/android/webkit/PermissionRequest",
+      "GeolocationPermissions": "https://developer.android.com/reference/android/webkit/GeolocationPermissions",
       "JavaScriptReplyProxy": "https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy",
       "WebSettingsCompat": "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat",
       "WebViewFeature": "https://developer.android.com/reference/androidx/webkit/WebViewFeature"
@@ -77,6 +79,9 @@
       "WKUserContentController": "https://developer.apple.com/documentation/webkit/wkusercontentcontroller",
       "WKUserScript": "https://developer.apple.com/documentation/webkit/wkuserscript",
       "WKScriptMessageHandler": "https://developer.apple.com/documentation/webkit/wkscriptmessagehandler",
+      "WKSecurityOrigin": "https://developer.apple.com/documentation/webkit/wksecurityorigin",
+      "WKMediaCaptureType": "https://developer.apple.com/documentation/webkit/wkmediacapturetype",
+      "WKPermissionDecision": "https://developer.apple.com/documentation/webkit/wkpermissiondecision",
       "WKScriptMessageHandlerWithReply": "https://developer.apple.com/documentation/webkit/wkscriptmessagehandlerwithreply",
       "UIView": "https://developer.apple.com/documentation/uikit/uiview",
       "UIScrollView": "https://developer.apple.com/documentation/uikit/uiscrollview",
@@ -602,6 +607,61 @@
       }
     },
     {
+      "dart": "PermissionRequest",
+      "group": "events",
+      "summary": {
+        "en": "The origin and resources a page asks for.",
+        "ja": "ページが要求しているオリジンとリソースです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["PermissionRequest.getOrigin()", "PermissionRequest.getResources()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKSecurityOrigin", "WKMediaCaptureType"]
+      }
+    },
+    {
+      "dart": "PermissionResource",
+      "group": "events",
+      "summary": {
+        "en": "Camera, microphone or geolocation.",
+        "ja": "カメラ、マイク、または位置情報です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "PermissionRequest.RESOURCE_VIDEO_CAPTURE",
+          "PermissionRequest.RESOURCE_AUDIO_CAPTURE"
+        ]
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["WKMediaCaptureType"],
+        "note": {
+          "en": "geolocation is never reported on iOS.",
+          "ja": "iOS では geolocation は通知されません。"
+        }
+      }
+    },
+    {
+      "dart": "PermissionDecision",
+      "group": "events",
+      "summary": {
+        "en": "Whether to grant or deny a permission request.",
+        "ja": "権限リクエストを許可するか拒否するかです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["PermissionRequest.grant(String[])", "PermissionRequest.deny()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKPermissionDecision"]
+      }
+    },
+    {
       "dart": "NavigationRequest",
       "group": "events",
       "summary": {
@@ -1031,6 +1091,35 @@
       "ios": {
         "status": "supported",
         "apis": ["WKUserContentController.addUserScript(_:)", "WKUserScript"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onPermissionRequest",
+      "group": "events",
+      "summary": {
+        "en": "Decides whether a page may use the camera, microphone or location. Without a callback every request is denied.",
+        "ja": "ページにカメラ・マイク・位置情報の使用を許可するかを決めます。コールバックがない場合はすべて拒否します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebChromeClient.onPermissionRequest(PermissionRequest)",
+          "WebChromeClient.onGeolocationPermissionsShowPrompt(String, GeolocationPermissions.Callback)"
+        ],
+        "note": {
+          "en": "After Dart allows a request, the plugin also asks for the Android runtime permission (CAMERA, RECORD_AUDIO, ACCESS_FINE_LOCATION); the request is denied if the user refuses. Protected media and MIDI are always denied.",
+          "ja": "Dart が許可した後、プラグインが Android の実行時権限（CAMERA、RECORD_AUDIO、ACCESS_FINE_LOCATION）も要求し、ユーザーが拒否した場合は拒否します。保護メディアと MIDI は常に拒否します。"
+        }
+      },
+      "ios": {
+        "status": "partial",
+        "apis": [
+          "WKUIDelegate.webView(_:requestMediaCapturePermissionFor:initiatedByFrame:type:decisionHandler:)"
+        ],
+        "note": {
+          "en": "Camera and microphone only. WebKit has no delegate for geolocation, so it asks the user itself and the callback is never called for it.",
+          "ja": "カメラとマイクのみです。WebKit には位置情報用のデリゲートがなく、WebKit 自身がユーザーに確認するため、位置情報ではコールバックは呼ばれません。"
+        }
       }
     },
     {

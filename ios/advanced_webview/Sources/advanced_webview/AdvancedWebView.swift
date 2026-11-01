@@ -10,6 +10,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let flutterApi: AdvancedWebViewFlutterApi
   private let hasNavigationDelegate: Bool
   private let hasNewWindowDelegate: Bool
+  private let hasPermissionDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private let hasJavaScriptHandlers: Bool
   private let handlerObjectName: String
@@ -24,6 +25,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.flutterApi = flutterApi
     self.hasNavigationDelegate = params.hasNavigationDelegate
     self.hasNewWindowDelegate = params.hasNewWindowDelegate
+    self.hasPermissionDelegate = params.hasPermissionDelegate
     self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
     self.handlerObjectName = params.javaScriptHandlerObjectName
 
@@ -351,6 +353,43 @@ extension AdvancedWebView: WKUIDelegate {
       webView.load(navigationAction.request)
     }
     return nil
+  }
+
+  /// Camera and microphone. Without a Dart delegate the request is denied, like Android.
+  /// WebKit has no delegate for geolocation; it asks the user itself.
+  func webView(
+    _ webView: WKWebView, requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+    initiatedByFrame frame: WKFrameInfo, type: WKMediaCaptureType,
+    decisionHandler: @escaping (WKPermissionDecision) -> Void
+  ) {
+    guard hasPermissionDelegate else {
+      decisionHandler(.deny)
+      return
+    }
+    let resources: [PermissionResourceMessage]
+    switch type {
+    case .camera: resources = [.camera]
+    case .microphone: resources = [.microphone]
+    case .cameraAndMicrophone: resources = [.camera, .microphone]
+    @unknown default:
+      decisionHandler(.deny)
+      return
+    }
+    let port = origin.port == 0 ? "" : ":\(origin.port)"
+    let request = PermissionRequestMessage(
+      origin: "\(origin.protocol)://\(origin.host)\(port)", resources: resources)
+    let api = flutterApi
+    let id = self.id
+    Task { @MainActor in
+      let decision: PermissionDecisionMessage
+      do {
+        decision = try await api.onPermissionRequest(webViewId: id, request: request)
+      } catch {
+        NSLog("AdvancedWebView: permission delegate failed, denying: \(error)")
+        decision = .deny
+      }
+      decisionHandler(decision == .grant ? .grant : .deny)
+    }
   }
 }
 

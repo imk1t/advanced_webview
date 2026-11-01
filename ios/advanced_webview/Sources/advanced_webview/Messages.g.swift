@@ -198,6 +198,17 @@ enum NavigationDecisionMessage: Int, CaseIterable {
   case prevent = 1
 }
 
+enum PermissionResourceMessage: Int, CaseIterable {
+  case camera = 0
+  case microphone = 1
+  case geolocation = 2
+}
+
+enum PermissionDecisionMessage: Int, CaseIterable {
+  case grant = 0
+  case deny = 1
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   var javaScriptEnabled: Bool
@@ -328,6 +339,9 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
   /// When false, `window.open` and `target="_blank"` load in the same WebView
   /// and never round-trip to Dart.
   var hasNewWindowDelegate: Bool
+  /// When false, permission requests (camera, microphone, geolocation) are
+  /// denied natively without a round trip to Dart.
+  var hasPermissionDelegate: Bool
   /// Scripts injected into every page loaded after creation.
   var userScripts: [UserScriptMessage]
 
@@ -341,7 +355,8 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     let javaScriptHandlerObjectName = pigeonVar_list[4] as! String
     let hasNavigationDelegate = pigeonVar_list[5] as! Bool
     let hasNewWindowDelegate = pigeonVar_list[6] as! Bool
-    let userScripts = pigeonVar_list[7] as! [UserScriptMessage]
+    let hasPermissionDelegate = pigeonVar_list[7] as! Bool
+    let userScripts = pigeonVar_list[8] as! [UserScriptMessage]
 
     return CreationParamsMessage(
       webViewId: webViewId,
@@ -351,6 +366,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       javaScriptHandlerObjectName: javaScriptHandlerObjectName,
       hasNavigationDelegate: hasNavigationDelegate,
       hasNewWindowDelegate: hasNewWindowDelegate,
+      hasPermissionDelegate: hasPermissionDelegate,
       userScripts: userScripts
     )
   }
@@ -363,6 +379,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       javaScriptHandlerObjectName,
       hasNavigationDelegate,
       hasNewWindowDelegate,
+      hasPermissionDelegate,
       userScripts,
     ]
   }
@@ -370,7 +387,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
+    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -382,11 +399,12 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: javaScriptHandlerObjectName, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasNavigationDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasNewWindowDelegate, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: hasPermissionDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userScripts, hasher: &hasher)
   }
 
   public var description: String {
-    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), userScripts: \(String(describing: userScripts)))"
+    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), userScripts: \(String(describing: userScripts)))"
   }
 }
 
@@ -481,6 +499,47 @@ struct WebResourceErrorMessage: Hashable, CustomStringConvertible {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct PermissionRequestMessage: Hashable, CustomStringConvertible {
+  /// Origin of the requesting page, e.g. `https://example.com`.
+  var origin: String
+  var resources: [PermissionResourceMessage]
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> PermissionRequestMessage? {
+    let origin = pigeonVar_list[0] as! String
+    let resources = pigeonVar_list[1] as! [PermissionResourceMessage]
+
+    return PermissionRequestMessage(
+      origin: origin,
+      resources: resources
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      origin,
+      resources,
+    ]
+  }
+  static func == (lhs: PermissionRequestMessage, rhs: PermissionRequestMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.origin, rhs.origin) && MessagesPigeonInternal.deepEquals(lhs.resources, rhs.resources)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("PermissionRequestMessage")
+    MessagesPigeonInternal.deepHash(value: origin, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: resources, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "PermissionRequestMessage(origin: \(String(describing: origin)), resources: \(String(describing: resources)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct CookieMessage: Hashable, CustomStringConvertible {
   var name: String
   var value: String
@@ -562,16 +621,30 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
       }
       return nil
     case 131:
-      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return PermissionResourceMessage(rawValue: enumResultAsInt)
+      }
+      return nil
     case 132:
-      return UserScriptMessage.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return PermissionDecisionMessage(rawValue: enumResultAsInt)
+      }
+      return nil
     case 133:
-      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
+      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
     case 134:
-      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
+      return UserScriptMessage.fromList(self.readValue() as! [Any?])
     case 135:
-      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
     case 136:
+      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
+    case 137:
+      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+    case 138:
+      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
+    case 139:
       return CookieMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -587,23 +660,32 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? NavigationDecisionMessage {
       super.writeByte(130)
       super.writeValue(value.rawValue)
-    } else if let value = value as? WebViewSettingsMessage {
+    } else if let value = value as? PermissionResourceMessage {
       super.writeByte(131)
-      super.writeValue(value.toList())
-    } else if let value = value as? UserScriptMessage {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? PermissionDecisionMessage {
       super.writeByte(132)
-      super.writeValue(value.toList())
-    } else if let value = value as? CreationParamsMessage {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? WebViewSettingsMessage {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? NavigationRequestMessage {
+    } else if let value = value as? UserScriptMessage {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? WebResourceErrorMessage {
+    } else if let value = value as? CreationParamsMessage {
       super.writeByte(135)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? NavigationRequestMessage {
       super.writeByte(136)
+      super.writeValue(value.toList())
+    } else if let value = value as? WebResourceErrorMessage {
+      super.writeByte(137)
+      super.writeValue(value.toList())
+    } else if let value = value as? PermissionRequestMessage {
+      super.writeByte(138)
+      super.writeValue(value.toList())
+    } else if let value = value as? CookieMessage {
+      super.writeByte(139)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -979,6 +1061,8 @@ protocol AdvancedWebViewFlutterApiProtocol {
   @MainActor func onReceivedError(webViewId webViewIdArg: Int64, error errorArg: WebResourceErrorMessage) async throws
   @MainActor func shouldOverrideUrlLoading(webViewId webViewIdArg: Int64, request requestArg: NavigationRequestMessage) async throws -> NavigationDecisionMessage
   @MainActor func onJavaScriptMessage(webViewId webViewIdArg: Int64, channelName channelNameArg: String, message messageArg: String) async throws
+  /// The page asked for camera, microphone or location access.
+  @MainActor func onPermissionRequest(webViewId webViewIdArg: Int64, request requestArg: PermissionRequestMessage) async throws -> PermissionDecisionMessage
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
   /// argument list; the result is the JSON-encoded return value. Throwing
   /// rejects the page's promise.
@@ -1135,6 +1219,30 @@ class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
           continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
         } else {
           continuation.resume()
+        }
+      }
+    }
+  }
+  /// The page asked for camera, microphone or location access.
+  @MainActor func onPermissionRequest(webViewId webViewIdArg: Int64, request requestArg: PermissionRequestMessage) async throws -> PermissionDecisionMessage {
+    return try await withCheckedThrowingContinuation { continuation in
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPermissionRequest\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([webViewIdArg, requestArg] as [Any?]) { response in
+        guard let listResponse = response as? [Any?] else {
+          continuation.resume(throwing: createConnectionError(withChannelName: channelName))
+          return
+        }
+        if listResponse.count > 1 {
+          let code: String = listResponse[0] as! String
+          let message: String? = nilOrValue(listResponse[1])
+          let details: String? = nilOrValue(listResponse[2])
+          continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
+        } else if MessagesPigeonInternal.isNullish(listResponse[0]) {
+          continuation.resume(throwing: PigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: ""))
+        } else {
+          let result = listResponse[0] as! PermissionDecisionMessage
+          continuation.resume(returning: result)
         }
       }
     }

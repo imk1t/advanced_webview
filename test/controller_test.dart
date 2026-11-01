@@ -27,6 +27,7 @@ void main() {
     WebResourceErrorCallback? onWebResourceError,
     NavigationRequestCallback? onNavigationRequest,
     NewWindowCallback? onNewWindow,
+    PermissionRequestCallback? onPermissionRequest,
   }) {
     return AdvancedWebViewController(
       hostApi: hostApi,
@@ -39,6 +40,7 @@ void main() {
       onWebResourceError: onWebResourceError,
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
+      onPermissionRequest: onPermissionRequest,
     );
   }
 
@@ -198,6 +200,72 @@ void main() {
 
       await controller.removeAllUserScripts();
       expect(hostApi.userScripts, isEmpty);
+    });
+  });
+
+  group('permissions', () {
+    test('are only delegated when a callback is set', () async {
+      final without = createController();
+      final withCallback = createController(
+        onPermissionRequest: (_) => PermissionDecision.grant,
+      );
+      await without.ready;
+      await withCallback.ready;
+
+      expect(hostApi.created[without.webViewId]!.hasPermissionDelegate, false);
+      expect(
+        hostApi.created[withCallback.webViewId]!.hasPermissionDelegate,
+        true,
+      );
+    });
+
+    test('map the request and the decision', () async {
+      PermissionRequest? seen;
+      final controller = createController(
+        onPermissionRequest: (request) async {
+          seen = request;
+          return PermissionDecision.grant;
+        },
+      );
+
+      final decision = await dispatcher.onPermissionRequest(
+        controller.webViewId,
+        PermissionRequestMessage(
+          origin: 'https://example.com',
+          resources: [
+            PermissionResourceMessage.camera,
+            PermissionResourceMessage.microphone,
+          ],
+        ),
+      );
+
+      expect(decision, PermissionDecisionMessage.grant);
+      expect(seen!.origin, 'https://example.com');
+      expect(seen!.resources, [
+        PermissionResource.camera,
+        PermissionResource.microphone,
+      ]);
+    });
+
+    test('are denied without a callback or after dispose', () async {
+      final request = PermissionRequestMessage(
+        origin: 'https://example.com',
+        resources: [PermissionResourceMessage.geolocation],
+      );
+      final without = createController();
+      final disposed = createController(
+        onPermissionRequest: (_) => PermissionDecision.grant,
+      );
+      await disposed.dispose();
+
+      expect(
+        await dispatcher.onPermissionRequest(without.webViewId, request),
+        PermissionDecisionMessage.deny,
+      );
+      expect(
+        await dispatcher.onPermissionRequest(disposed.webViewId, request),
+        PermissionDecisionMessage.deny,
+      );
     });
   });
 

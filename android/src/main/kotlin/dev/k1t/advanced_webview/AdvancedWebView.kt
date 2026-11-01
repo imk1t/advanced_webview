@@ -1,5 +1,6 @@
 package dev.k1t.advanced_webview
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.MutableContextWrapper
@@ -10,7 +11,9 @@ import android.os.Message
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
+import android.webkit.GeolocationPermissions
 import android.webkit.JavascriptInterface
+import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -43,6 +46,7 @@ class AdvancedWebView(
     private val flutterApi: AdvancedWebViewFlutterApi,
     private val scope: CoroutineScope,
     private val fileChooser: FileChooser,
+    private val permissionRequester: PermissionRequester,
 ) : PlatformView {
     val id: Long = params.webViewId
 
@@ -53,6 +57,7 @@ class AdvancedWebView(
 
     private val hasNavigationDelegate = params.hasNavigationDelegate
     private val hasNewWindowDelegate = params.hasNewWindowDelegate
+    private val hasPermissionDelegate = params.hasPermissionDelegate
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
 
@@ -296,6 +301,20 @@ class AdvancedWebView(
         }
     }
 
+    /** Asks Dart whether a page may use [resources]. Errors count as a denial. */
+    private fun askDart(origin: String, resources: List<PermissionResourceMessage>, onDecision: (Boolean) -> Unit) {
+        scope.launch {
+            val allowed = try {
+                flutterApi.onPermissionRequest(id, PermissionRequestMessage(origin, resources)) ==
+                    PermissionDecisionMessage.GRANT
+            } catch (e: Throwable) {
+                Log.w(TAG, "Permission delegate failed, denying: ${e.message}")
+                false
+            }
+            if (!isDestroyed) onDecision(allowed)
+        }
+    }
+
     private inner class ChromeClient : WebChromeClient() {
         override fun onProgressChanged(view: WebView, newProgress: Int) {
             send { flutterApi.onProgressChanged(id, newProgress.toLong()) }
@@ -310,6 +329,52 @@ class AdvancedWebView(
             filePathCallback: ValueCallback<Array<Uri>>,
             fileChooserParams: FileChooserParams,
         ): Boolean = fileChooser.show(filePathCallback, fileChooserParams)
+
+        override fun onPermissionRequest(request: PermissionRequest) {
+            // Resources without a Dart equivalent (protected media, MIDI) are never granted.
+            val mapped = request.resources.mapNotNull { resource ->
+                when (resource) {
+                    PermissionRequest.RESOURCE_VIDEO_CAPTURE ->
+                        Triple(resource, PermissionResourceMessage.CAMERA, Manifest.permission.CAMERA)
+
+                    PermissionRequest.RESOURCE_AUDIO_CAPTURE ->
+                        Triple(resource, PermissionResourceMessage.MICROPHONE, Manifest.permission.RECORD_AUDIO)
+
+                    else -> null
+                }
+            }
+            if (!hasPermissionDelegate || mapped.isEmpty() || mapped.size != request.resources.size) {
+                request.deny()
+                return
+            }
+            askDart(request.origin.toString(), mapped.map { it.second }) { allowed ->
+                if (!allowed) {
+                    request.deny()
+                    return@askDart
+                }
+                // The page may only use what the user also allowed the app to use.
+                permissionRequester.request(mapped.map { it.third }) { held ->
+                    val granted = mapped.filter { it.third in held }.map { it.first }
+                    if (granted.size == mapped.size) request.grant(granted.toTypedArray()) else request.deny()
+                }
+            }
+        }
+
+        override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+            if (!hasPermissionDelegate) {
+                callback.invoke(origin, false, false)
+                return
+            }
+            askDart(origin, listOf(PermissionResourceMessage.GEOLOCATION)) { allowed ->
+                if (!allowed) {
+                    callback.invoke(origin, false, false)
+                    return@askDart
+                }
+                permissionRequester.request(listOf(Manifest.permission.ACCESS_FINE_LOCATION)) { held ->
+                    callback.invoke(origin, Manifest.permission.ACCESS_FINE_LOCATION in held, false)
+                }
+            }
+        }
 
         override fun onCreateWindow(
             view: WebView,

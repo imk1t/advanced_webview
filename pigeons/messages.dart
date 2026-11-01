@@ -70,6 +70,7 @@ class CreationParamsMessage {
     required this.javaScriptHandlerObjectName,
     required this.hasNavigationDelegate,
     required this.hasNewWindowDelegate,
+    required this.hasPermissionDelegate,
     required this.userScripts,
   });
 
@@ -93,6 +94,10 @@ class CreationParamsMessage {
   /// When false, `window.open` and `target="_blank"` load in the same WebView
   /// and never round-trip to Dart.
   bool hasNewWindowDelegate;
+
+  /// When false, permission requests (camera, microphone, geolocation) are
+  /// denied natively without a round trip to Dart.
+  bool hasPermissionDelegate;
 
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
@@ -120,6 +125,18 @@ class WebResourceErrorMessage {
   bool isMainFrame;
   String? url;
 }
+
+enum PermissionResourceMessage { camera, microphone, geolocation }
+
+class PermissionRequestMessage {
+  PermissionRequestMessage({required this.origin, required this.resources});
+
+  /// Origin of the requesting page, e.g. `https://example.com`.
+  String origin;
+  List<PermissionResourceMessage> resources;
+}
+
+enum PermissionDecisionMessage { grant, deny }
 
 class CookieMessage {
   CookieMessage({
@@ -220,6 +237,13 @@ abstract class AdvancedWebViewFlutterApi {
   );
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
+
+  /// The page asked for camera, microphone or location access.
+  @async
+  PermissionDecisionMessage onPermissionRequest(
+    int webViewId,
+    PermissionRequestMessage request,
+  );
 
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
   /// argument list; the result is the JSON-encoded return value. Throwing

@@ -117,6 +117,17 @@ enum NavigationDecisionMessage {
   prevent;
 }
 
+enum PermissionResourceMessage {
+  camera,
+  microphone,
+  geolocation;
+}
+
+enum PermissionDecisionMessage {
+  grant,
+  deny;
+}
+
 class WebViewSettingsMessage {
   WebViewSettingsMessage({
     required this.javaScriptEnabled,
@@ -259,6 +270,7 @@ class CreationParamsMessage {
     required this.javaScriptHandlerObjectName,
     required this.hasNavigationDelegate,
     required this.hasNewWindowDelegate,
+    required this.hasPermissionDelegate,
     required this.userScripts,
   });
 
@@ -284,6 +296,10 @@ class CreationParamsMessage {
   /// and never round-trip to Dart.
   bool hasNewWindowDelegate;
 
+  /// When false, permission requests (camera, microphone, geolocation) are
+  /// denied natively without a round trip to Dart.
+  bool hasPermissionDelegate;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 
@@ -296,6 +312,7 @@ class CreationParamsMessage {
       javaScriptHandlerObjectName,
       hasNavigationDelegate,
       hasNewWindowDelegate,
+      hasPermissionDelegate,
       userScripts,
     ];
   }
@@ -313,7 +330,8 @@ class CreationParamsMessage {
       javaScriptHandlerObjectName: result[4]! as String,
       hasNavigationDelegate: result[5]! as bool,
       hasNewWindowDelegate: result[6]! as bool,
-      userScripts: (result[7]! as List<Object?>).cast<UserScriptMessage>(),
+      hasPermissionDelegate: result[7]! as bool,
+      userScripts: (result[8]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -326,7 +344,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -335,7 +353,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, userScripts: $userScripts)';
   }
 }
 
@@ -449,6 +467,57 @@ class WebResourceErrorMessage {
   }
 }
 
+class PermissionRequestMessage {
+  PermissionRequestMessage({
+    required this.origin,
+    required this.resources,
+  });
+
+  /// Origin of the requesting page, e.g. `https://example.com`.
+  String origin;
+
+  List<PermissionResourceMessage> resources;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      origin,
+      resources,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static PermissionRequestMessage decode(Object result) {
+    result as List<Object?>;
+    return PermissionRequestMessage(
+      origin: result[0]! as String,
+      resources: (result[1]! as List<Object?>).cast<PermissionResourceMessage>(),
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! PermissionRequestMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(origin, other.origin) && _deepEquals(resources, other.resources);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'PermissionRequestMessage(origin: $origin, resources: $resources)';
+  }
+}
+
 class CookieMessage {
   CookieMessage({
     required this.name,
@@ -539,23 +608,32 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is NavigationDecisionMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    }    else if (value is WebViewSettingsMessage) {
+    }    else if (value is PermissionResourceMessage) {
       buffer.putUint8(131);
-      writeValue(buffer, value.encode());
-    }    else if (value is UserScriptMessage) {
+      writeValue(buffer, value.index);
+    }    else if (value is PermissionDecisionMessage) {
       buffer.putUint8(132);
-      writeValue(buffer, value.encode());
-    }    else if (value is CreationParamsMessage) {
+      writeValue(buffer, value.index);
+    }    else if (value is WebViewSettingsMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    }    else if (value is NavigationRequestMessage) {
+    }    else if (value is UserScriptMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    }    else if (value is WebResourceErrorMessage) {
+    }    else if (value is CreationParamsMessage) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is NavigationRequestMessage) {
       buffer.putUint8(136);
+      writeValue(buffer, value.encode());
+    }    else if (value is WebResourceErrorMessage) {
+      buffer.putUint8(137);
+      writeValue(buffer, value.encode());
+    }    else if (value is PermissionRequestMessage) {
+      buffer.putUint8(138);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(139);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -572,16 +650,24 @@ class _PigeonCodec extends StandardMessageCodec {
         final value = readValue(buffer) as int?;
         return value == null ? null : NavigationDecisionMessage.values[value];
       case 131:
-        return WebViewSettingsMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : PermissionResourceMessage.values[value];
       case 132:
-        return UserScriptMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : PermissionDecisionMessage.values[value];
       case 133:
-        return CreationParamsMessage.decode(readValue(buffer)!);
+        return WebViewSettingsMessage.decode(readValue(buffer)!);
       case 134:
-        return NavigationRequestMessage.decode(readValue(buffer)!);
+        return UserScriptMessage.decode(readValue(buffer)!);
       case 135:
-        return WebResourceErrorMessage.decode(readValue(buffer)!);
+        return CreationParamsMessage.decode(readValue(buffer)!);
       case 136:
+        return NavigationRequestMessage.decode(readValue(buffer)!);
+      case 137:
+        return WebResourceErrorMessage.decode(readValue(buffer)!);
+      case 138:
+        return PermissionRequestMessage.decode(readValue(buffer)!);
+      case 139:
         return CookieMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -977,6 +1063,9 @@ abstract class AdvancedWebViewFlutterApi {
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
 
+  /// The page asked for camera, microphone or location access.
+  Future<PermissionDecisionMessage> onPermissionRequest(int webViewId, PermissionRequestMessage request);
+
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
   /// argument list; the result is the JSON-encoded return value. Throwing
   /// rejects the page's promise.
@@ -1138,6 +1227,28 @@ abstract class AdvancedWebViewFlutterApi {
           try {
             api.onJavaScriptMessage(arg_webViewId, arg_channelName, arg_message);
             return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPermissionRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final PermissionRequestMessage arg_request = args[1]! as PermissionRequestMessage;
+          try {
+            final PermissionDecisionMessage output = await api.onPermissionRequest(arg_webViewId, arg_request);
+            return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
           }          catch (e) {

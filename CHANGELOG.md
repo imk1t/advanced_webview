@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.onPermissionRequest` to decide whether a page may use the camera,
+  microphone or location (`PermissionRequest`, `PermissionResource`, `PermissionDecision`).
+  Without a callback every request is denied. On Android the plugin also asks for the runtime
+  permission after you grant; geolocation is Android only because WebKit has no delegate for it.
+
 - Add JavaScript handlers with return values: the `javaScriptHandlers` constructor parameter and
   `window.advanced_webview.callHandler(name, ...args)`, which returns a promise settled with the
   Dart handler's result (or rejected when it throws). The global is `window.advanced_webview` by

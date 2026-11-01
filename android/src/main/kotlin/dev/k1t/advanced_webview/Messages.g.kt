@@ -223,6 +223,29 @@ enum class NavigationDecisionMessage(val raw: Int) {
   }
 }
 
+enum class PermissionResourceMessage(val raw: Int) {
+  CAMERA(0),
+  MICROPHONE(1),
+  GEOLOCATION(2);
+
+  companion object {
+    fun ofRaw(raw: Int): PermissionResourceMessage? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class PermissionDecisionMessage(val raw: Int) {
+  GRANT(0),
+  DENY(1);
+
+  companion object {
+    fun ofRaw(raw: Int): PermissionDecisionMessage? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class WebViewSettingsMessage (
   val javaScriptEnabled: Boolean,
@@ -355,6 +378,11 @@ data class CreationParamsMessage (
    * and never round-trip to Dart.
    */
   val hasNewWindowDelegate: Boolean,
+  /**
+   * When false, permission requests (camera, microphone, geolocation) are
+   * denied natively without a round trip to Dart.
+   */
+  val hasPermissionDelegate: Boolean,
   /** Scripts injected into every page loaded after creation. */
   val userScripts: List<UserScriptMessage>
 )
@@ -368,8 +396,9 @@ data class CreationParamsMessage (
       val javaScriptHandlerObjectName = pigeonVar_list[4] as String
       val hasNavigationDelegate = pigeonVar_list[5] as Boolean
       val hasNewWindowDelegate = pigeonVar_list[6] as Boolean
-      val userScripts = pigeonVar_list[7] as List<UserScriptMessage>
-      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, userScripts)
+      val hasPermissionDelegate = pigeonVar_list[7] as Boolean
+      val userScripts = pigeonVar_list[8] as List<UserScriptMessage>
+      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, userScripts)
     }
   }
   fun toList(): List<Any?> {
@@ -381,6 +410,7 @@ data class CreationParamsMessage (
       javaScriptHandlerObjectName,
       hasNavigationDelegate,
       hasNewWindowDelegate,
+      hasPermissionDelegate,
       userScripts,
     )
   }
@@ -392,7 +422,7 @@ data class CreationParamsMessage (
       return true
     }
     val other = other as CreationParamsMessage
-    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
   }
 
   override fun hashCode(): Int {
@@ -404,11 +434,12 @@ data class CreationParamsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.javaScriptHandlerObjectName)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNavigationDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNewWindowDelegate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.hasPermissionDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userScripts)
     return result
   }
   override fun toString(): String {
-    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, userScripts=$userScripts)"
+    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, userScripts=$userScripts)"
   }
 }
 
@@ -503,6 +534,48 @@ data class WebResourceErrorMessage (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class PermissionRequestMessage (
+  /** Origin of the requesting page, e.g. `https://example.com`. */
+  val origin: String,
+  val resources: List<PermissionResourceMessage>
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): PermissionRequestMessage {
+      val origin = pigeonVar_list[0] as String
+      val resources = pigeonVar_list[1] as List<PermissionResourceMessage>
+      return PermissionRequestMessage(origin, resources)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      origin,
+      resources,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as PermissionRequestMessage
+    return MessagesPigeonUtils.deepEquals(this.origin, other.origin) && MessagesPigeonUtils.deepEquals(this.resources, other.resources)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.origin)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.resources)
+    return result
+  }
+  override fun toString(): String {
+    return "PermissionRequestMessage(origin=$origin, resources=$resources)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class CookieMessage (
   val name: String,
   val value: String,
@@ -577,31 +650,46 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         }
       }
       131.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          WebViewSettingsMessage.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          PermissionResourceMessage.ofRaw(it.toInt())
         }
       }
       132.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          UserScriptMessage.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          PermissionDecisionMessage.ofRaw(it.toInt())
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CreationParamsMessage.fromList(it)
+          WebViewSettingsMessage.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          NavigationRequestMessage.fromList(it)
+          UserScriptMessage.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          WebResourceErrorMessage.fromList(it)
+          CreationParamsMessage.fromList(it)
         }
       }
       136.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          NavigationRequestMessage.fromList(it)
+        }
+      }
+      137.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          WebResourceErrorMessage.fromList(it)
+        }
+      }
+      138.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PermissionRequestMessage.fromList(it)
+        }
+      }
+      139.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           CookieMessage.fromList(it)
         }
@@ -619,28 +707,40 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(130)
         writeValue(stream, value.raw.toLong())
       }
-      is WebViewSettingsMessage -> {
+      is PermissionResourceMessage -> {
         stream.write(131)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is UserScriptMessage -> {
+      is PermissionDecisionMessage -> {
         stream.write(132)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is CreationParamsMessage -> {
+      is WebViewSettingsMessage -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is NavigationRequestMessage -> {
+      is UserScriptMessage -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is WebResourceErrorMessage -> {
+      is CreationParamsMessage -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is NavigationRequestMessage -> {
         stream.write(136)
+        writeValue(stream, value.toList())
+      }
+      is WebResourceErrorMessage -> {
+        stream.write(137)
+        writeValue(stream, value.toList())
+      }
+      is PermissionRequestMessage -> {
+        stream.write(138)
+        writeValue(stream, value.toList())
+      }
+      is CookieMessage -> {
+        stream.write(139)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1180,6 +1280,29 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
             continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
           } else {
             continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /** The page asked for camera, microphone or location access. */
+  suspend fun onPermissionRequest(webViewIdArg: Long, requestArg: PermissionRequestMessage): PermissionDecisionMessage
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPermissionRequest$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg, requestArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else if (it[0] == null) {
+            continuation.resumeWithException(FlutterError("null-error", "Flutter api returned null value for non-null return value.", ""))
+          } else {
+            val output = it[0] as PermissionDecisionMessage
+            continuation.resume(output)
           }
         } else {
           continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
