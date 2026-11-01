@@ -64,7 +64,7 @@ jobs:
       KTLINT_SHA256: a3fd620207d5c40da6ca789b95e7f823c54e854b7fade7f613e91096a3706d75
     steps:
       - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-java@v4.9.1
+      - uses: actions/setup-java@v6.1.0
         with:
           distribution: temurin
           java-version: '17'
@@ -115,7 +115,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-java@v4.9.1
+      - uses: actions/setup-java@v6.1.0
         with:
           distribution: temurin
           java-version: '17'
@@ -134,7 +134,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-java@v4.9.1
+      - uses: actions/setup-java@v6.1.0
         with:
           distribution: temurin
           java-version: '17'
