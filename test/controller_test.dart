@@ -21,7 +21,7 @@ void main() {
   AdvancedWebViewController createController({
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     Map<String, JavaScriptHandler> javaScriptHandlers = const {},
-    String javaScriptHandlerObjectName = 'advanced_webView',
+    String javaScriptHandlerObjectName = 'advanced_webview',
     List<UserScript> userScripts = const [],
     PageEventCallback? onPageFinished,
     WebResourceErrorCallback? onWebResourceError,
@@ -213,12 +213,12 @@ void main() {
       ]);
     });
 
-    test('use advanced_webView as the default object name', () async {
+    test('use advanced_webview as the default object name', () async {
       final controller = createController(javaScriptHandlers: {'a': (_) => 1});
       await controller.ready;
       expect(
         hostApi.created[controller.webViewId]!.javaScriptHandlerObjectName,
-        'advanced_webView',
+        'advanced_webview',
       );
     });
 

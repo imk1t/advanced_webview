@@ -290,7 +290,7 @@ class WebViewHostApiImplTest {
         settings: WebViewSettingsMessage = settings(),
         channels: List<String> = emptyList(),
         handlers: List<String> = emptyList(),
-        handlerObjectName: String = "advanced_webView",
+        handlerObjectName: String = "advanced_webview",
         hasNavigationDelegate: Boolean = false,
         hasNewWindowDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),

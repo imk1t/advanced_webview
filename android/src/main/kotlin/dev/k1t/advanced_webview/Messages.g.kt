@@ -339,7 +339,7 @@ data class CreationParamsMessage (
   /** Names exposed to JS as `window.<name>.postMessage(String)`. */
   val javaScriptChannelNames: List<String>,
   /**
-   * Handlers the page can call with `window.advanced_webView.callHandler`.
+   * Handlers the page can call with `window.advanced_webview.callHandler`.
    * The bridge is only installed when this is not empty.
    */
   val javaScriptHandlerNames: List<String>,

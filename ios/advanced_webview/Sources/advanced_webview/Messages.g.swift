@@ -317,7 +317,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
   var settings: WebViewSettingsMessage
   /// Names exposed to JS as `window.<name>.postMessage(String)`.
   var javaScriptChannelNames: [String]
-  /// Handlers the page can call with `window.advanced_webView.callHandler`.
+  /// Handlers the page can call with `window.advanced_webview.callHandler`.
   /// The bridge is only installed when this is not empty.
   var javaScriptHandlerNames: [String]
   /// Name of the global object (`window.<name>`) that exposes `callHandler`.

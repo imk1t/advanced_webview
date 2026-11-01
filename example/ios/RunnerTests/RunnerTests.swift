@@ -102,7 +102,7 @@ final class RunnerTests: XCTestCase {
 
     let scripts = try registry.get(1).webView.configuration.userContentController.userScripts
     XCTAssertEqual(scripts.count, 1)
-    XCTAssertTrue(scripts[0].source.contains("window.advanced_webView"))
+    XCTAssertTrue(scripts[0].source.contains("window.advanced_webview"))
     XCTAssertEqual(scripts[0].injectionTime, .atDocumentStart)
   }
 
@@ -190,7 +190,7 @@ final class RunnerTests: XCTestCase {
     settings: WebViewSettingsMessage? = nil,
     channels: [String] = [],
     handlers: [String] = [],
-    handlerObjectName: String = "advanced_webView",
+    handlerObjectName: String = "advanced_webview",
     hasNavigationDelegate: Bool = false,
     hasNewWindowDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []

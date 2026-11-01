@@ -20,7 +20,7 @@ class AdvancedWebViewController {
     WebViewSettings settings = const WebViewSettings(),
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
     Map<String, JavaScriptHandler> javaScriptHandlers = const {},
-    String javaScriptHandlerObjectName = 'advanced_webView',
+    String javaScriptHandlerObjectName = 'advanced_webview',
     List<UserScript> userScripts = const [],
     this.onPageStarted,
     this.onPageFinished,

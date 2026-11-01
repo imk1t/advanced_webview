@@ -106,10 +106,10 @@ void main() {
     // `void` keeps WKWebView from rejecting the Promise as an unsupported result.
     await harness.controller.runJavaScript('''
       void (async () => {
-        const total = await window.advanced_webView.callHandler('sum', 1, 2, 3);
-        const echoed = await window.advanced_webView.callHandler('echo', 'a', {b: [1]});
+        const total = await window.advanced_webview.callHandler('sum', 1, 2, 3);
+        const echoed = await window.advanced_webview.callHandler('echo', 'a', {b: [1]});
         let error = null;
-        try { await window.advanced_webView.callHandler('fail'); }
+        try { await window.advanced_webview.callHandler('fail'); }
         catch (e) { error = String(e.message); }
         Out.postMessage(JSON.stringify({total, echoed, error}));
       })();

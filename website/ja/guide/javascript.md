@@ -42,16 +42,16 @@ final controller = AdvancedWebViewController(
 );
 ```
 
-ページ側は `window.advanced_webView.callHandler(name, ...args)` を呼びます。戻り値は Promise です。
+ページ側は `window.advanced_webview.callHandler(name, ...args)` を呼びます。戻り値は Promise です。
 
 ```js
-const total = await window.advanced_webView.callHandler('sum', 1, 2, 3); // 6
-const user = await window.advanced_webView.callHandler('user', 'abc'); // { name: ... }
+const total = await window.advanced_webview.callHandler('sum', 1, 2, 3); // 6
+const user = await window.advanced_webview.callHandler('user', 'abc'); // { name: ... }
 ```
 
 引数と結果は JSON（`null`、`bool`、`num`、`String`、`List`、`Map`）です。Dart のハンドラが例外を投げた場合や、
 その名前のハンドラがない場合は、メッセージを持つ `Error` で Promise が reject されます。
-`window.advanced_webView` は、ハンドラを 1 つ以上登録したときだけ存在します。別の名前にしたい場合は
+`window.advanced_webview` は、ハンドラを 1 つ以上登録したときだけ存在します。別の名前にしたい場合は
 `javaScriptHandlerObjectName` を渡します（有効な JavaScript の識別子である必要があります）。
 
 ```dart
@@ -95,7 +95,7 @@ iOS のチャネル shim は `forMainFrameOnly: false` で注入されます。
 Dart に届くのはチャネル名と文字列メッセージで、送信元 origin やフレーム情報は含まれません。
 `UserScript.mainFrameOnly` はユーザースクリプトだけの設定で、チャネルの公開範囲は制限しません。
 
-ハンドラも同じ信頼境界です。`window.advanced_webView` は全フレームで使え、Dart に届くのはハンドラ名と引数だけで、
+ハンドラも同じ信頼境界です。`window.advanced_webview` は全フレームで使え、Dart に届くのはハンドラ名と引数だけで、
 送信元の origin やフレーム情報は含まれません。
 
 チャネルまたはハンドラを持つ WebView には、iframe を含め信頼できるコンテンツだけを読み込んでください。

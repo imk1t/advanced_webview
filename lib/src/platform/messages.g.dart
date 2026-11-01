@@ -269,7 +269,7 @@ class CreationParamsMessage {
   /// Names exposed to JS as `window.<name>.postMessage(String)`.
   List<String> javaScriptChannelNames;
 
-  /// Handlers the page can call with `window.advanced_webView.callHandler`.
+  /// Handlers the page can call with `window.advanced_webview.callHandler`.
   /// The bridge is only installed when this is not empty.
   List<String> javaScriptHandlerNames;
 
