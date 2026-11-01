@@ -71,6 +71,7 @@ class CreationParamsMessage {
     required this.hasNavigationDelegate,
     required this.hasNewWindowDelegate,
     required this.hasPermissionDelegate,
+    required this.hasDownloadDelegate,
     required this.userScripts,
   });
 
@@ -99,6 +100,10 @@ class CreationParamsMessage {
   /// denied natively without a round trip to Dart.
   bool hasPermissionDelegate;
 
+  /// When false, downloads are left to the platform default and never
+  /// round-trip to Dart.
+  bool hasDownloadDelegate;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 }
@@ -124,6 +129,22 @@ class WebResourceErrorMessage {
   String message;
   bool isMainFrame;
   String? url;
+}
+
+class DownloadRequestMessage {
+  DownloadRequestMessage({
+    required this.url,
+    this.suggestedFilename,
+    this.mimeType,
+    this.contentLength,
+  });
+
+  String url;
+  String? suggestedFilename;
+  String? mimeType;
+
+  /// Size in bytes; null when the server did not say.
+  int? contentLength;
 }
 
 enum PermissionResourceMessage { camera, microphone, geolocation }
@@ -237,6 +258,9 @@ abstract class AdvancedWebViewFlutterApi {
   );
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
+
+  /// The page started a download. The WebView does not save the file.
+  void onDownloadStart(int webViewId, DownloadRequestMessage request);
 
   /// The page asked for camera, microphone or location access.
   @async

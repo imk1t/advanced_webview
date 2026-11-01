@@ -11,6 +11,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasNavigationDelegate: Bool
   private let hasNewWindowDelegate: Bool
   private let hasPermissionDelegate: Bool
+  private let hasDownloadDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private let hasJavaScriptHandlers: Bool
   private let handlerObjectName: String
@@ -26,6 +27,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.hasNavigationDelegate = params.hasNavigationDelegate
     self.hasNewWindowDelegate = params.hasNewWindowDelegate
     self.hasPermissionDelegate = params.hasPermissionDelegate
+    self.hasDownloadDelegate = params.hasDownloadDelegate
     self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
     self.handlerObjectName = params.javaScriptHandlerObjectName
 
@@ -263,6 +265,8 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     let nsError = error as NSError
     // Navigations cancelled by us (e.g. a delegate decision) are not errors.
     if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled { return }
+    // "Frame load interrupted": the response was turned into a download event.
+    if nsError.domain == "WebKitErrorDomain" && nsError.code == 102 { return }
     let message = WebResourceErrorMessage(
       errorCode: Int64(nsError.code),
       message: nsError.localizedDescription,
@@ -297,10 +301,47 @@ extension AdvancedWebView: WKNavigationDelegate {
     reportError(error, url: webView.url)
   }
 
+  /// Attachments and types WebKit cannot show are reported to Dart instead of being loaded.
+  func webView(
+    _ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
+    decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
+  ) {
+    guard hasDownloadDelegate, let url = navigationResponse.response.url else {
+      decisionHandler(.allow)
+      return
+    }
+    let response = navigationResponse.response
+    let disposition = (response as? HTTPURLResponse)?
+      .value(forHTTPHeaderField: "Content-Disposition")?.lowercased()
+    let isAttachment = disposition?.hasPrefix("attachment") ?? false
+    guard isAttachment || !navigationResponse.canShowMIMEType else {
+      decisionHandler(.allow)
+      return
+    }
+    let length = response.expectedContentLength
+    let request = DownloadRequestMessage(
+      url: url.absoluteString,
+      suggestedFilename: response.suggestedFilename,
+      mimeType: response.mimeType,
+      contentLength: length > 0 ? length : nil)
+    send { api, id in try await api.onDownloadStart(webViewId: id, request: request) }
+    decisionHandler(.cancel)
+  }
+
   func webView(
     _ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
   ) {
+    // `<a download>` links: WebKit marks the action instead of loading a response.
+    if hasDownloadDelegate, navigationAction.shouldPerformDownload,
+      let url = navigationAction.request.url
+    {
+      let request = DownloadRequestMessage(
+        url: url.absoluteString, suggestedFilename: nil, mimeType: nil, contentLength: nil)
+      send { api, id in try await api.onDownloadStart(webViewId: id, request: request) }
+      decisionHandler(.cancel)
+      return
+    }
     // Same rules as Android: only main-frame navigations started by the page
     // reach Dart. App-initiated loads, reloads and back/forward never do.
     let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true

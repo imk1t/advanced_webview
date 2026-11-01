@@ -271,6 +271,7 @@ class CreationParamsMessage {
     required this.hasNavigationDelegate,
     required this.hasNewWindowDelegate,
     required this.hasPermissionDelegate,
+    required this.hasDownloadDelegate,
     required this.userScripts,
   });
 
@@ -300,6 +301,10 @@ class CreationParamsMessage {
   /// denied natively without a round trip to Dart.
   bool hasPermissionDelegate;
 
+  /// When false, downloads are left to the platform default and never
+  /// round-trip to Dart.
+  bool hasDownloadDelegate;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 
@@ -313,6 +318,7 @@ class CreationParamsMessage {
       hasNavigationDelegate,
       hasNewWindowDelegate,
       hasPermissionDelegate,
+      hasDownloadDelegate,
       userScripts,
     ];
   }
@@ -331,7 +337,8 @@ class CreationParamsMessage {
       hasNavigationDelegate: result[5]! as bool,
       hasNewWindowDelegate: result[6]! as bool,
       hasPermissionDelegate: result[7]! as bool,
-      userScripts: (result[8]! as List<Object?>).cast<UserScriptMessage>(),
+      hasDownloadDelegate: result[8]! as bool,
+      userScripts: (result[9]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -344,7 +351,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -353,7 +360,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, userScripts: $userScripts)';
   }
 }
 
@@ -464,6 +471,67 @@ class WebResourceErrorMessage {
   @override
   String toString() {
     return 'WebResourceErrorMessage(errorCode: $errorCode, message: $message, isMainFrame: $isMainFrame, url: $url)';
+  }
+}
+
+class DownloadRequestMessage {
+  DownloadRequestMessage({
+    required this.url,
+    this.suggestedFilename,
+    this.mimeType,
+    this.contentLength,
+  });
+
+  String url;
+
+  String? suggestedFilename;
+
+  String? mimeType;
+
+  /// Size in bytes; null when the server did not say.
+  int? contentLength;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      url,
+      suggestedFilename,
+      mimeType,
+      contentLength,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static DownloadRequestMessage decode(Object result) {
+    result as List<Object?>;
+    return DownloadRequestMessage(
+      url: result[0]! as String,
+      suggestedFilename: result[1] as String?,
+      mimeType: result[2] as String?,
+      contentLength: result[3] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! DownloadRequestMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(url, other.url) && _deepEquals(suggestedFilename, other.suggestedFilename) && _deepEquals(mimeType, other.mimeType) && _deepEquals(contentLength, other.contentLength);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'DownloadRequestMessage(url: $url, suggestedFilename: $suggestedFilename, mimeType: $mimeType, contentLength: $contentLength)';
   }
 }
 
@@ -629,11 +697,14 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is WebResourceErrorMessage) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    }    else if (value is PermissionRequestMessage) {
+    }    else if (value is DownloadRequestMessage) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is PermissionRequestMessage) {
       buffer.putUint8(139);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(140);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -666,8 +737,10 @@ class _PigeonCodec extends StandardMessageCodec {
       case 137:
         return WebResourceErrorMessage.decode(readValue(buffer)!);
       case 138:
-        return PermissionRequestMessage.decode(readValue(buffer)!);
+        return DownloadRequestMessage.decode(readValue(buffer)!);
       case 139:
+        return PermissionRequestMessage.decode(readValue(buffer)!);
+      case 140:
         return CookieMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1063,6 +1136,9 @@ abstract class AdvancedWebViewFlutterApi {
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
 
+  /// The page started a download. The WebView does not save the file.
+  void onDownloadStart(int webViewId, DownloadRequestMessage request);
+
   /// The page asked for camera, microphone or location access.
   Future<PermissionDecisionMessage> onPermissionRequest(int webViewId, PermissionRequestMessage request);
 
@@ -1226,6 +1302,28 @@ abstract class AdvancedWebViewFlutterApi {
           final String arg_message = args[2]! as String;
           try {
             api.onJavaScriptMessage(arg_webViewId, arg_channelName, arg_message);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onDownloadStart$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final DownloadRequestMessage arg_request = args[1]! as DownloadRequestMessage;
+          try {
+            api.onDownloadStart(arg_webViewId, arg_request);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

@@ -14,6 +14,7 @@ import android.webkit.CookieManager
 import android.webkit.GeolocationPermissions
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
+import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -71,7 +72,24 @@ class AdvancedWebView(
         webView.webChromeClient = ChromeClient()
         params.javaScriptChannelNames.forEach(::addJavaScriptChannel)
         params.userScripts.forEach(::addUserScript)
+        if (params.hasDownloadDelegate) webView.setDownloadListener(::onDownload)
         if (params.javaScriptHandlerNames.isNotEmpty()) installHandlerBridge(params.javaScriptHandlerObjectName)
+    }
+
+    private fun onDownload(
+        url: String,
+        @Suppress("UNUSED_PARAMETER") userAgent: String?,
+        contentDisposition: String?,
+        mimeType: String?,
+        contentLength: Long,
+    ) {
+        val request = DownloadRequestMessage(
+            url = url,
+            suggestedFilename = URLUtil.guessFileName(url, contentDisposition, mimeType),
+            mimeType = mimeType?.takeIf { it.isNotEmpty() },
+            contentLength = contentLength.takeIf { it > 0 },
+        )
+        send { flutterApi.onDownloadStart(id, request) }
     }
 
     fun attachToContext(context: Context) {

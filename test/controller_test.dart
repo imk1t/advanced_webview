@@ -28,6 +28,7 @@ void main() {
     NavigationRequestCallback? onNavigationRequest,
     NewWindowCallback? onNewWindow,
     PermissionRequestCallback? onPermissionRequest,
+    DownloadStartCallback? onDownloadStart,
   }) {
     return AdvancedWebViewController(
       hostApi: hostApi,
@@ -41,6 +42,7 @@ void main() {
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
       onPermissionRequest: onPermissionRequest,
+      onDownloadStart: onDownloadStart,
     );
   }
 
@@ -200,6 +202,42 @@ void main() {
 
       await controller.removeAllUserScripts();
       expect(hostApi.userScripts, isEmpty);
+    });
+  });
+
+  group('downloads', () {
+    test('are only delegated when a callback is set', () async {
+      final without = createController();
+      final withCallback = createController(onDownloadStart: (_) {});
+      await without.ready;
+      await withCallback.ready;
+
+      expect(hostApi.created[without.webViewId]!.hasDownloadDelegate, false);
+      expect(
+        hostApi.created[withCallback.webViewId]!.hasDownloadDelegate,
+        true,
+      );
+    });
+
+    test('are mapped and delivered to the matching controller', () {
+      final received = <DownloadRequest>[];
+      final controller = createController(onDownloadStart: received.add);
+      createController(onDownloadStart: (_) => fail('wrong controller'));
+
+      dispatcher.onDownloadStart(
+        controller.webViewId,
+        DownloadRequestMessage(
+          url: 'https://example.com/a.pdf',
+          suggestedFilename: 'a.pdf',
+          mimeType: 'application/pdf',
+          contentLength: 42,
+        ),
+      );
+
+      expect(received.single.url, 'https://example.com/a.pdf');
+      expect(received.single.suggestedFilename, 'a.pdf');
+      expect(received.single.mimeType, 'application/pdf');
+      expect(received.single.contentLength, 42);
     });
   });
 

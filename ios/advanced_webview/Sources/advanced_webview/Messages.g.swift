@@ -342,6 +342,9 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
   /// When false, permission requests (camera, microphone, geolocation) are
   /// denied natively without a round trip to Dart.
   var hasPermissionDelegate: Bool
+  /// When false, downloads are left to the platform default and never
+  /// round-trip to Dart.
+  var hasDownloadDelegate: Bool
   /// Scripts injected into every page loaded after creation.
   var userScripts: [UserScriptMessage]
 
@@ -356,7 +359,8 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     let hasNavigationDelegate = pigeonVar_list[5] as! Bool
     let hasNewWindowDelegate = pigeonVar_list[6] as! Bool
     let hasPermissionDelegate = pigeonVar_list[7] as! Bool
-    let userScripts = pigeonVar_list[8] as! [UserScriptMessage]
+    let hasDownloadDelegate = pigeonVar_list[8] as! Bool
+    let userScripts = pigeonVar_list[9] as! [UserScriptMessage]
 
     return CreationParamsMessage(
       webViewId: webViewId,
@@ -367,6 +371,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       hasNavigationDelegate: hasNavigationDelegate,
       hasNewWindowDelegate: hasNewWindowDelegate,
       hasPermissionDelegate: hasPermissionDelegate,
+      hasDownloadDelegate: hasDownloadDelegate,
       userScripts: userScripts
     )
   }
@@ -380,6 +385,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       hasNavigationDelegate,
       hasNewWindowDelegate,
       hasPermissionDelegate,
+      hasDownloadDelegate,
       userScripts,
     ]
   }
@@ -387,7 +393,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
+    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasDownloadDelegate, rhs.hasDownloadDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -400,11 +406,12 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: hasNavigationDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasNewWindowDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasPermissionDelegate, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: hasDownloadDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userScripts, hasher: &hasher)
   }
 
   public var description: String {
-    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), userScripts: \(String(describing: userScripts)))"
+    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), hasDownloadDelegate: \(String(describing: hasDownloadDelegate)), userScripts: \(String(describing: userScripts)))"
   }
 }
 
@@ -495,6 +502,57 @@ struct WebResourceErrorMessage: Hashable, CustomStringConvertible {
 
   public var description: String {
     return "WebResourceErrorMessage(errorCode: \(String(describing: errorCode)), message: \(String(describing: message)), isMainFrame: \(String(describing: isMainFrame)), url: \(String(describing: url)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct DownloadRequestMessage: Hashable, CustomStringConvertible {
+  var url: String
+  var suggestedFilename: String? = nil
+  var mimeType: String? = nil
+  /// Size in bytes; null when the server did not say.
+  var contentLength: Int64? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> DownloadRequestMessage? {
+    let url = pigeonVar_list[0] as! String
+    let suggestedFilename: String? = nilOrValue(pigeonVar_list[1])
+    let mimeType: String? = nilOrValue(pigeonVar_list[2])
+    let contentLength: Int64? = nilOrValue(pigeonVar_list[3])
+
+    return DownloadRequestMessage(
+      url: url,
+      suggestedFilename: suggestedFilename,
+      mimeType: mimeType,
+      contentLength: contentLength
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      url,
+      suggestedFilename,
+      mimeType,
+      contentLength,
+    ]
+  }
+  static func == (lhs: DownloadRequestMessage, rhs: DownloadRequestMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.url, rhs.url) && MessagesPigeonInternal.deepEquals(lhs.suggestedFilename, rhs.suggestedFilename) && MessagesPigeonInternal.deepEquals(lhs.mimeType, rhs.mimeType) && MessagesPigeonInternal.deepEquals(lhs.contentLength, rhs.contentLength)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("DownloadRequestMessage")
+    MessagesPigeonInternal.deepHash(value: url, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: suggestedFilename, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: mimeType, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: contentLength, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "DownloadRequestMessage(url: \(String(describing: url)), suggestedFilename: \(String(describing: suggestedFilename)), mimeType: \(String(describing: mimeType)), contentLength: \(String(describing: contentLength)))"
   }
 }
 
@@ -643,8 +701,10 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 137:
       return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
     case 138:
-      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
+      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
     case 139:
+      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
+    case 140:
       return CookieMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -681,11 +741,14 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? WebResourceErrorMessage {
       super.writeByte(137)
       super.writeValue(value.toList())
-    } else if let value = value as? PermissionRequestMessage {
+    } else if let value = value as? DownloadRequestMessage {
       super.writeByte(138)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? PermissionRequestMessage {
       super.writeByte(139)
+      super.writeValue(value.toList())
+    } else if let value = value as? CookieMessage {
+      super.writeByte(140)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1061,6 +1124,8 @@ protocol AdvancedWebViewFlutterApiProtocol {
   @MainActor func onReceivedError(webViewId webViewIdArg: Int64, error errorArg: WebResourceErrorMessage) async throws
   @MainActor func shouldOverrideUrlLoading(webViewId webViewIdArg: Int64, request requestArg: NavigationRequestMessage) async throws -> NavigationDecisionMessage
   @MainActor func onJavaScriptMessage(webViewId webViewIdArg: Int64, channelName channelNameArg: String, message messageArg: String) async throws
+  /// The page started a download. The WebView does not save the file.
+  @MainActor func onDownloadStart(webViewId webViewIdArg: Int64, request requestArg: DownloadRequestMessage) async throws
   /// The page asked for camera, microphone or location access.
   @MainActor func onPermissionRequest(webViewId webViewIdArg: Int64, request requestArg: PermissionRequestMessage) async throws -> PermissionDecisionMessage
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
@@ -1208,6 +1273,27 @@ class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
       let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptMessage\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, channelNameArg, messageArg] as [Any?]) { response in
+        guard let listResponse = response as? [Any?] else {
+          continuation.resume(throwing: createConnectionError(withChannelName: channelName))
+          return
+        }
+        if listResponse.count > 1 {
+          let code: String = listResponse[0] as! String
+          let message: String? = nilOrValue(listResponse[1])
+          let details: String? = nilOrValue(listResponse[2])
+          continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
+        } else {
+          continuation.resume()
+        }
+      }
+    }
+  }
+  /// The page started a download. The WebView does not save the file.
+  @MainActor func onDownloadStart(webViewId webViewIdArg: Int64, request requestArg: DownloadRequestMessage) async throws {
+    return try await withCheckedThrowingContinuation { continuation in
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onDownloadStart\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([webViewIdArg, requestArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
           continuation.resume(throwing: createConnectionError(withChannelName: channelName))
           return

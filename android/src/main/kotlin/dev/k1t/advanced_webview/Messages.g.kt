@@ -383,6 +383,11 @@ data class CreationParamsMessage (
    * denied natively without a round trip to Dart.
    */
   val hasPermissionDelegate: Boolean,
+  /**
+   * When false, downloads are left to the platform default and never
+   * round-trip to Dart.
+   */
+  val hasDownloadDelegate: Boolean,
   /** Scripts injected into every page loaded after creation. */
   val userScripts: List<UserScriptMessage>
 )
@@ -397,8 +402,9 @@ data class CreationParamsMessage (
       val hasNavigationDelegate = pigeonVar_list[5] as Boolean
       val hasNewWindowDelegate = pigeonVar_list[6] as Boolean
       val hasPermissionDelegate = pigeonVar_list[7] as Boolean
-      val userScripts = pigeonVar_list[8] as List<UserScriptMessage>
-      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, userScripts)
+      val hasDownloadDelegate = pigeonVar_list[8] as Boolean
+      val userScripts = pigeonVar_list[9] as List<UserScriptMessage>
+      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, hasDownloadDelegate, userScripts)
     }
   }
   fun toList(): List<Any?> {
@@ -411,6 +417,7 @@ data class CreationParamsMessage (
       hasNavigationDelegate,
       hasNewWindowDelegate,
       hasPermissionDelegate,
+      hasDownloadDelegate,
       userScripts,
     )
   }
@@ -422,7 +429,7 @@ data class CreationParamsMessage (
       return true
     }
     val other = other as CreationParamsMessage
-    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.hasDownloadDelegate, other.hasDownloadDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
   }
 
   override fun hashCode(): Int {
@@ -435,11 +442,12 @@ data class CreationParamsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNavigationDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasNewWindowDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasPermissionDelegate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.hasDownloadDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userScripts)
     return result
   }
   override fun toString(): String {
-    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, userScripts=$userScripts)"
+    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, hasDownloadDelegate=$hasDownloadDelegate, userScripts=$userScripts)"
   }
 }
 
@@ -530,6 +538,56 @@ data class WebResourceErrorMessage (
   }
   override fun toString(): String {
     return "WebResourceErrorMessage(errorCode=$errorCode, message=$message, isMainFrame=$isMainFrame, url=$url)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DownloadRequestMessage (
+  val url: String,
+  val suggestedFilename: String? = null,
+  val mimeType: String? = null,
+  /** Size in bytes; null when the server did not say. */
+  val contentLength: Long? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): DownloadRequestMessage {
+      val url = pigeonVar_list[0] as String
+      val suggestedFilename = pigeonVar_list[1] as String?
+      val mimeType = pigeonVar_list[2] as String?
+      val contentLength = pigeonVar_list[3] as Long?
+      return DownloadRequestMessage(url, suggestedFilename, mimeType, contentLength)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      url,
+      suggestedFilename,
+      mimeType,
+      contentLength,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as DownloadRequestMessage
+    return MessagesPigeonUtils.deepEquals(this.url, other.url) && MessagesPigeonUtils.deepEquals(this.suggestedFilename, other.suggestedFilename) && MessagesPigeonUtils.deepEquals(this.mimeType, other.mimeType) && MessagesPigeonUtils.deepEquals(this.contentLength, other.contentLength)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.url)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.suggestedFilename)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.mimeType)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.contentLength)
+    return result
+  }
+  override fun toString(): String {
+    return "DownloadRequestMessage(url=$url, suggestedFilename=$suggestedFilename, mimeType=$mimeType, contentLength=$contentLength)"
   }
 }
 
@@ -686,10 +744,15 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       138.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PermissionRequestMessage.fromList(it)
+          DownloadRequestMessage.fromList(it)
         }
       }
       139.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PermissionRequestMessage.fromList(it)
+        }
+      }
+      140.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           CookieMessage.fromList(it)
         }
@@ -735,12 +798,16 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(137)
         writeValue(stream, value.toList())
       }
-      is PermissionRequestMessage -> {
+      is DownloadRequestMessage -> {
         stream.write(138)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is PermissionRequestMessage -> {
         stream.write(139)
+        writeValue(stream, value.toList())
+      }
+      is CookieMessage -> {
+        stream.write(140)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1275,6 +1342,26 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
       val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptMessage$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, channelNameArg, messageArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else {
+            continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /** The page started a download. The WebView does not save the file. */
+  suspend fun onDownloadStart(webViewIdArg: Long, requestArg: DownloadRequestMessage)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onDownloadStart$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg, requestArg)) {
         if (it is List<*>) {
           if (it.size > 1) {
             continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))

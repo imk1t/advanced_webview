@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import 'cookie.dart';
+import 'download.dart';
 import 'navigation.dart';
 import 'permission.dart';
 import 'platform/event_dispatcher.dart';
@@ -31,6 +32,7 @@ class AdvancedWebViewController {
     this.onNavigationRequest,
     this.onNewWindow,
     this.onPermissionRequest,
+    this.onDownloadStart,
     @visibleForTesting AdvancedWebViewHostApi? hostApi,
     @visibleForTesting WebViewEventDispatcher? dispatcher,
   }) : webViewId = _nextWebViewId++,
@@ -57,6 +59,7 @@ class AdvancedWebViewController {
         hasNavigationDelegate: onNavigationRequest != null,
         hasNewWindowDelegate: onNewWindow != null,
         hasPermissionDelegate: onPermissionRequest != null,
+        hasDownloadDelegate: onDownloadStart != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
@@ -105,6 +108,19 @@ class AdvancedWebViewController {
   /// temporary WebView that is destroyed right away.
   /// iOS: `WKUIDelegate.webView(_:createWebViewWith:for:windowFeatures:)`.
   final NewWindowCallback? onNewWindow;
+
+  /// Called when the page starts a download: a link to a file the WebView
+  /// cannot show, or a response with `Content-Disposition: attachment`.
+  ///
+  /// The WebView does not save the file; see [DownloadRequest] for how to
+  /// fetch it. When `null`, downloads are left to the platform default, which
+  /// does nothing on Android and shows nothing on iOS.
+  ///
+  /// Android: `WebView.setDownloadListener(DownloadListener)`; the file name is
+  /// guessed with `URLUtil.guessFileName`.
+  /// iOS: `WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)` for
+  /// `WKNavigationResponse`; the navigation is cancelled.
+  final DownloadStartCallback? onDownloadStart;
 
   /// Called when a page asks for camera, microphone or location access.
   ///
@@ -298,6 +314,17 @@ class _EventListener implements WebViewEventListener {
 
   @override
   void onNewWindowRequest(String url) => _controller.onNewWindow?.call(url);
+
+  @override
+  void onDownloadStart(DownloadRequestMessage request) =>
+      _controller.onDownloadStart?.call(
+        DownloadRequest(
+          url: request.url,
+          suggestedFilename: request.suggestedFilename,
+          mimeType: request.mimeType,
+          contentLength: request.contentLength,
+        ),
+      );
 
   @override
   Future<PermissionDecisionMessage> onPermissionRequest(
