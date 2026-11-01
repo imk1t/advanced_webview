@@ -103,8 +103,9 @@ void main() {
     await harness.loadHtml('<html><body></body></html>');
 
     // runJavaScript does not await promises, so report through a channel.
+    // `void` keeps WKWebView from rejecting the Promise as an unsupported result.
     await harness.controller.runJavaScript('''
-      (async () => {
+      void (async () => {
         const total = await window.advancedWebView.callHandler('sum', 1, 2, 3);
         const echoed = await window.advancedWebView.callHandler('echo', 'a', {b: [1]});
         let error = null;

@@ -197,7 +197,10 @@ class WebViewHostApiImplTest {
     @Test
     fun javaScriptHandlersInstallTheBridgeAndShim() {
         mockStatic(WebViewFeature::class.java).use { features ->
-            features.`when`<Boolean> { WebViewFeature.isFeatureSupported(any()) }.thenReturn(true)
+            features.`when`<Boolean> { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) }
+                .thenReturn(true)
+            features.`when`<Boolean> { WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) }
+                .thenReturn(true)
             mockStatic(WebViewCompat::class.java).use { compat ->
                 hostApi.create(params(webViewId = 1, handlers = listOf("sum")))
                 val webView = registry.get(1).webView
