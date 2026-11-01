@@ -12,6 +12,8 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasNewWindowDelegate: Bool
   private let hasPermissionDelegate: Bool
   private let hasDownloadDelegate: Bool
+  private let hasSslErrorDelegate: Bool
+  private let hasHttpAuthDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private let hasJavaScriptHandlers: Bool
   private let handlerObjectName: String
@@ -28,6 +30,8 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.hasNewWindowDelegate = params.hasNewWindowDelegate
     self.hasPermissionDelegate = params.hasPermissionDelegate
     self.hasDownloadDelegate = params.hasDownloadDelegate
+    self.hasSslErrorDelegate = params.hasSslErrorDelegate
+    self.hasHttpAuthDelegate = params.hasHttpAuthDelegate
     self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
     self.handlerObjectName = params.javaScriptHandlerObjectName
 
@@ -299,6 +303,76 @@ extension AdvancedWebView: WKNavigationDelegate {
     withError error: Error
   ) {
     reportError(error, url: webView.url)
+  }
+
+  /// Certificate problems and HTTP authentication. Without a Dart delegate a bad certificate
+  /// is refused (the default) and authentication gets the system default handling.
+  func webView(
+    _ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+  ) {
+    let space = challenge.protectionSpace
+    switch space.authenticationMethod {
+    case NSURLAuthenticationMethodServerTrust:
+      guard hasSslErrorDelegate, let trust = space.serverTrust else {
+        completionHandler(.performDefaultHandling, nil)
+        return
+      }
+      var trustError: CFError?
+      if SecTrustEvaluateWithError(trust, &trustError) {
+        completionHandler(.performDefaultHandling, nil)
+        return
+      }
+      let reason =
+        (trustError as Error?)?.localizedDescription ?? "The certificate is not trusted"
+      let host = space.host
+      let url = webView.url?.absoluteString ?? "https://\(host)/"
+      let error = SslErrorMessage(url: url, host: host, message: reason)
+      let api = flutterApi
+      let id = self.id
+      Task { @MainActor in
+        let decision: SslErrorDecisionMessage
+        do {
+          decision = try await api.onSslError(webViewId: id, error: error)
+        } catch {
+          NSLog("AdvancedWebView: SSL error delegate failed, refusing the load: \(error)")
+          decision = .cancel
+        }
+        if decision == .proceed {
+          completionHandler(.useCredential, URLCredential(trust: trust))
+        } else {
+          completionHandler(.cancelAuthenticationChallenge, nil)
+        }
+      }
+    case NSURLAuthenticationMethodHTTPBasic, NSURLAuthenticationMethodHTTPDigest,
+      NSURLAuthenticationMethodNTLM:
+      guard hasHttpAuthDelegate, !space.isProxy() else {
+        completionHandler(.performDefaultHandling, nil)
+        return
+      }
+      let request = HttpAuthRequestMessage(host: space.host, realm: space.realm)
+      let api = flutterApi
+      let id = self.id
+      Task { @MainActor in
+        let credentials: HttpAuthCredentialsMessage?
+        do {
+          credentials = try await api.onHttpAuthRequest(webViewId: id, request: request)
+        } catch {
+          NSLog("AdvancedWebView: HTTP auth delegate failed, cancelling: \(error)")
+          credentials = nil
+        }
+        if let credentials = credentials {
+          completionHandler(
+            .useCredential,
+            URLCredential(
+              user: credentials.username, password: credentials.password, persistence: .forSession))
+        } else {
+          completionHandler(.cancelAuthenticationChallenge, nil)
+        }
+      }
+    default:
+      completionHandler(.performDefaultHandling, nil)
+    }
   }
 
   /// Attachments and types WebKit cannot show are reported to Dart instead of being loaded.

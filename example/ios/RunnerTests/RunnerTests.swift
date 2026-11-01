@@ -195,6 +195,8 @@ final class RunnerTests: XCTestCase {
     hasNewWindowDelegate: Bool = false,
     hasPermissionDelegate: Bool = false,
     hasDownloadDelegate: Bool = false,
+    hasSslErrorDelegate: Bool = false,
+    hasHttpAuthDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
     return CreationParamsMessage(
@@ -207,6 +209,8 @@ final class RunnerTests: XCTestCase {
       hasNewWindowDelegate: hasNewWindowDelegate,
       hasPermissionDelegate: hasPermissionDelegate,
       hasDownloadDelegate: hasDownloadDelegate,
+      hasSslErrorDelegate: hasSslErrorDelegate,
+      hasHttpAuthDelegate: hasHttpAuthDelegate,
       userScripts: userScripts)
   }
 

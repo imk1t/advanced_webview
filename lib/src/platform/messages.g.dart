@@ -117,6 +117,11 @@ enum NavigationDecisionMessage {
   prevent;
 }
 
+enum SslErrorDecisionMessage {
+  proceed,
+  cancel;
+}
+
 enum PermissionResourceMessage {
   camera,
   microphone,
@@ -272,6 +277,8 @@ class CreationParamsMessage {
     required this.hasNewWindowDelegate,
     required this.hasPermissionDelegate,
     required this.hasDownloadDelegate,
+    required this.hasSslErrorDelegate,
+    required this.hasHttpAuthDelegate,
     required this.userScripts,
   });
 
@@ -305,6 +312,14 @@ class CreationParamsMessage {
   /// round-trip to Dart.
   bool hasDownloadDelegate;
 
+  /// When false, certificate errors are refused natively without a round trip
+  /// to Dart.
+  bool hasSslErrorDelegate;
+
+  /// When false, HTTP authentication challenges get the platform default
+  /// handling without a round trip to Dart.
+  bool hasHttpAuthDelegate;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 
@@ -319,6 +334,8 @@ class CreationParamsMessage {
       hasNewWindowDelegate,
       hasPermissionDelegate,
       hasDownloadDelegate,
+      hasSslErrorDelegate,
+      hasHttpAuthDelegate,
       userScripts,
     ];
   }
@@ -338,7 +355,9 @@ class CreationParamsMessage {
       hasNewWindowDelegate: result[6]! as bool,
       hasPermissionDelegate: result[7]! as bool,
       hasDownloadDelegate: result[8]! as bool,
-      userScripts: (result[9]! as List<Object?>).cast<UserScriptMessage>(),
+      hasSslErrorDelegate: result[9]! as bool,
+      hasHttpAuthDelegate: result[10]! as bool,
+      userScripts: (result[11]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -351,7 +370,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -360,7 +379,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, userScripts: $userScripts)';
   }
 }
 
@@ -471,6 +490,161 @@ class WebResourceErrorMessage {
   @override
   String toString() {
     return 'WebResourceErrorMessage(errorCode: $errorCode, message: $message, isMainFrame: $isMainFrame, url: $url)';
+  }
+}
+
+class SslErrorMessage {
+  SslErrorMessage({
+    required this.url,
+    required this.host,
+    required this.message,
+  });
+
+  String url;
+
+  String host;
+
+  String message;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      url,
+      host,
+      message,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static SslErrorMessage decode(Object result) {
+    result as List<Object?>;
+    return SslErrorMessage(
+      url: result[0]! as String,
+      host: result[1]! as String,
+      message: result[2]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! SslErrorMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(url, other.url) && _deepEquals(host, other.host) && _deepEquals(message, other.message);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'SslErrorMessage(url: $url, host: $host, message: $message)';
+  }
+}
+
+class HttpAuthRequestMessage {
+  HttpAuthRequestMessage({
+    required this.host,
+    this.realm,
+  });
+
+  String host;
+
+  String? realm;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      host,
+      realm,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static HttpAuthRequestMessage decode(Object result) {
+    result as List<Object?>;
+    return HttpAuthRequestMessage(
+      host: result[0]! as String,
+      realm: result[1] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! HttpAuthRequestMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(host, other.host) && _deepEquals(realm, other.realm);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'HttpAuthRequestMessage(host: $host, realm: $realm)';
+  }
+}
+
+class HttpAuthCredentialsMessage {
+  HttpAuthCredentialsMessage({
+    required this.username,
+    required this.password,
+  });
+
+  String username;
+
+  String password;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      username,
+      password,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static HttpAuthCredentialsMessage decode(Object result) {
+    result as List<Object?>;
+    return HttpAuthCredentialsMessage(
+      username: result[0]! as String,
+      password: result[1]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! HttpAuthCredentialsMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(username, other.username) && _deepEquals(password, other.password);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'HttpAuthCredentialsMessage(username: $username, password: $password)';
   }
 }
 
@@ -676,35 +850,47 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is NavigationDecisionMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    }    else if (value is PermissionResourceMessage) {
+    }    else if (value is SslErrorDecisionMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.index);
-    }    else if (value is PermissionDecisionMessage) {
+    }    else if (value is PermissionResourceMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.index);
-    }    else if (value is WebViewSettingsMessage) {
+    }    else if (value is PermissionDecisionMessage) {
       buffer.putUint8(133);
-      writeValue(buffer, value.encode());
-    }    else if (value is UserScriptMessage) {
+      writeValue(buffer, value.index);
+    }    else if (value is WebViewSettingsMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    }    else if (value is CreationParamsMessage) {
+    }    else if (value is UserScriptMessage) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    }    else if (value is NavigationRequestMessage) {
+    }    else if (value is CreationParamsMessage) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    }    else if (value is WebResourceErrorMessage) {
+    }    else if (value is NavigationRequestMessage) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    }    else if (value is DownloadRequestMessage) {
+    }    else if (value is WebResourceErrorMessage) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    }    else if (value is PermissionRequestMessage) {
+    }    else if (value is SslErrorMessage) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is HttpAuthRequestMessage) {
       buffer.putUint8(140);
+      writeValue(buffer, value.encode());
+    }    else if (value is HttpAuthCredentialsMessage) {
+      buffer.putUint8(141);
+      writeValue(buffer, value.encode());
+    }    else if (value is DownloadRequestMessage) {
+      buffer.putUint8(142);
+      writeValue(buffer, value.encode());
+    }    else if (value is PermissionRequestMessage) {
+      buffer.putUint8(143);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(144);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -722,25 +908,34 @@ class _PigeonCodec extends StandardMessageCodec {
         return value == null ? null : NavigationDecisionMessage.values[value];
       case 131:
         final value = readValue(buffer) as int?;
-        return value == null ? null : PermissionResourceMessage.values[value];
+        return value == null ? null : SslErrorDecisionMessage.values[value];
       case 132:
         final value = readValue(buffer) as int?;
-        return value == null ? null : PermissionDecisionMessage.values[value];
+        return value == null ? null : PermissionResourceMessage.values[value];
       case 133:
-        return WebViewSettingsMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : PermissionDecisionMessage.values[value];
       case 134:
-        return UserScriptMessage.decode(readValue(buffer)!);
+        return WebViewSettingsMessage.decode(readValue(buffer)!);
       case 135:
-        return CreationParamsMessage.decode(readValue(buffer)!);
+        return UserScriptMessage.decode(readValue(buffer)!);
       case 136:
-        return NavigationRequestMessage.decode(readValue(buffer)!);
+        return CreationParamsMessage.decode(readValue(buffer)!);
       case 137:
-        return WebResourceErrorMessage.decode(readValue(buffer)!);
+        return NavigationRequestMessage.decode(readValue(buffer)!);
       case 138:
-        return DownloadRequestMessage.decode(readValue(buffer)!);
+        return WebResourceErrorMessage.decode(readValue(buffer)!);
       case 139:
-        return PermissionRequestMessage.decode(readValue(buffer)!);
+        return SslErrorMessage.decode(readValue(buffer)!);
       case 140:
+        return HttpAuthRequestMessage.decode(readValue(buffer)!);
+      case 141:
+        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
+      case 142:
+        return DownloadRequestMessage.decode(readValue(buffer)!);
+      case 143:
+        return PermissionRequestMessage.decode(readValue(buffer)!);
+      case 144:
         return CookieMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1136,6 +1331,12 @@ abstract class AdvancedWebViewFlutterApi {
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
 
+  /// The WebView found a certificate problem. Cancelling refuses the load.
+  Future<SslErrorDecisionMessage> onSslError(int webViewId, SslErrorMessage error);
+
+  /// A server asked for credentials. Null cancels the request.
+  Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(int webViewId, HttpAuthRequestMessage request);
+
   /// The page started a download. The WebView does not save the file.
   void onDownloadStart(int webViewId, DownloadRequestMessage request);
 
@@ -1303,6 +1504,50 @@ abstract class AdvancedWebViewFlutterApi {
           try {
             api.onJavaScriptMessage(arg_webViewId, arg_channelName, arg_message);
             return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onSslError$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final SslErrorMessage arg_error = args[1]! as SslErrorMessage;
+          try {
+            final SslErrorDecisionMessage output = await api.onSslError(arg_webViewId, arg_error);
+            return wrapResponse(result: output);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onHttpAuthRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final HttpAuthRequestMessage arg_request = args[1]! as HttpAuthRequestMessage;
+          try {
+            final HttpAuthCredentialsMessage? output = await api.onHttpAuthRequest(arg_webViewId, arg_request);
+            return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
           }          catch (e) {

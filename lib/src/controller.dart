@@ -9,6 +9,7 @@ import 'navigation.dart';
 import 'permission.dart';
 import 'platform/event_dispatcher.dart';
 import 'platform/messages.g.dart';
+import 'security.dart';
 import 'settings.dart';
 import 'user_script.dart';
 
@@ -33,6 +34,8 @@ class AdvancedWebViewController {
     this.onNewWindow,
     this.onPermissionRequest,
     this.onDownloadStart,
+    this.onSslError,
+    this.onHttpAuthRequest,
     @visibleForTesting AdvancedWebViewHostApi? hostApi,
     @visibleForTesting WebViewEventDispatcher? dispatcher,
   }) : webViewId = _nextWebViewId++,
@@ -60,6 +63,8 @@ class AdvancedWebViewController {
         hasNewWindowDelegate: onNewWindow != null,
         hasPermissionDelegate: onPermissionRequest != null,
         hasDownloadDelegate: onDownloadStart != null,
+        hasSslErrorDelegate: onSslError != null,
+        hasHttpAuthDelegate: onHttpAuthRequest != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
@@ -108,6 +113,33 @@ class AdvancedWebViewController {
   /// temporary WebView that is destroyed right away.
   /// iOS: `WKUIDelegate.webView(_:createWebViewWith:for:windowFeatures:)`.
   final NewWindowCallback? onNewWindow;
+
+  /// Called when the WebView finds a certificate problem (expired, untrusted
+  /// or mismatched certificate) while loading a page or one of its resources.
+  ///
+  /// Return [SslErrorDecision.proceed] to load anyway, which disables TLS
+  /// protection for that load: use it only for a certificate you know, such as
+  /// a development server. Without a callback, and when the callback throws,
+  /// the load is refused on both platforms.
+  ///
+  /// Android: `WebViewClient.onReceivedSslError(WebView, SslErrorHandler, SslError)`.
+  /// iOS: `WKNavigationDelegate.webView(_:didReceive:completionHandler:)` for
+  /// `NSURLAuthenticationMethodServerTrust`, after `SecTrustEvaluateWithError`
+  /// failed.
+  final SslErrorCallback? onSslError;
+
+  /// Called when a server asks for a user name and password (HTTP Basic,
+  /// Digest or NTLM).
+  ///
+  /// Return the credentials, or `null` to cancel. If the server rejects them
+  /// it asks again, so return `null` after a few attempts. Without a callback
+  /// the request is cancelled on Android and gets the system default handling
+  /// on iOS, which also fails the request.
+  ///
+  /// Android: `WebViewClient.onReceivedHttpAuthRequest(WebView, HttpAuthHandler, String, String)`.
+  /// iOS: `WKNavigationDelegate.webView(_:didReceive:completionHandler:)` for
+  /// `NSURLAuthenticationMethodHTTPBasic`, `HTTPDigest` and `NTLM`.
+  final HttpAuthCallback? onHttpAuthRequest;
 
   /// Called when the page starts a download: a link to a file the WebView
   /// cannot show, or a response with `Content-Disposition: attachment`.
@@ -325,6 +357,36 @@ class _EventListener implements WebViewEventListener {
           contentLength: request.contentLength,
         ),
       );
+
+  @override
+  Future<SslErrorDecisionMessage> onSslError(SslErrorMessage error) async {
+    final callback = _controller.onSslError;
+    if (callback == null) return SslErrorDecisionMessage.cancel;
+    final decision = await callback(
+      SslError(url: error.url, host: error.host, message: error.message),
+    );
+    return switch (decision) {
+      SslErrorDecision.proceed => SslErrorDecisionMessage.proceed,
+      SslErrorDecision.cancel => SslErrorDecisionMessage.cancel,
+    };
+  }
+
+  @override
+  Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(
+    HttpAuthRequestMessage request,
+  ) async {
+    final callback = _controller.onHttpAuthRequest;
+    if (callback == null) return null;
+    final credentials = await callback(
+      HttpAuthRequest(host: request.host, realm: request.realm),
+    );
+    return credentials == null
+        ? null
+        : HttpAuthCredentialsMessage(
+            username: credentials.username,
+            password: credentials.password,
+          );
+  }
 
   @override
   Future<PermissionDecisionMessage> onPermissionRequest(

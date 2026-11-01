@@ -67,6 +67,9 @@
       "GeolocationPermissions": "https://developer.android.com/reference/android/webkit/GeolocationPermissions",
       "DownloadListener": "https://developer.android.com/reference/android/webkit/DownloadListener",
       "URLUtil": "https://developer.android.com/reference/android/webkit/URLUtil",
+      "SslErrorHandler": "https://developer.android.com/reference/android/webkit/SslErrorHandler",
+      "SslError": "https://developer.android.com/reference/android/net/http/SslError",
+      "HttpAuthHandler": "https://developer.android.com/reference/android/webkit/HttpAuthHandler",
       "JavaScriptReplyProxy": "https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy",
       "WebSettingsCompat": "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat",
       "WebViewFeature": "https://developer.android.com/reference/androidx/webkit/WebViewFeature"
@@ -83,6 +86,10 @@
       "WKScriptMessageHandler": "https://developer.apple.com/documentation/webkit/wkscriptmessagehandler",
       "WKNavigationResponse": "https://developer.apple.com/documentation/webkit/wknavigationresponse",
       "WKNavigationAction": "https://developer.apple.com/documentation/webkit/wknavigationaction",
+      "SecTrustEvaluateWithError": "https://developer.apple.com/documentation/security/sectrustevaluatewitherror(_:_:)",
+      "URLCredential": "https://developer.apple.com/documentation/foundation/urlcredential",
+      "URLAuthenticationChallenge": "https://developer.apple.com/documentation/foundation/urlauthenticationchallenge",
+      "URLSession": "https://developer.apple.com/documentation/foundation/urlsession",
       "WKSecurityOrigin": "https://developer.apple.com/documentation/webkit/wksecurityorigin",
       "WKMediaCaptureType": "https://developer.apple.com/documentation/webkit/wkmediacapturetype",
       "WKPermissionDecision": "https://developer.apple.com/documentation/webkit/wkpermissiondecision",
@@ -1171,6 +1178,131 @@
       "ios": {
         "status": "supported",
         "apis": ["WKNavigationResponse", "WKNavigationAction"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onSslError",
+      "group": "events",
+      "summary": {
+        "en": "Decides what to do about a certificate problem. Without a callback the load is refused.",
+        "ja": "証明書の問題にどう対処するかを決めます。コールバックがない場合は読み込みを拒否します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewClient.onReceivedSslError(WebView, SslErrorHandler, SslError)",
+          "SslErrorHandler.proceed()",
+          "SslErrorHandler.cancel()"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKNavigationDelegate.webView(_:didReceive:completionHandler:)",
+          "SecTrustEvaluateWithError(_:_:)",
+          "URLCredential(trust:)"
+        ],
+        "note": {
+          "en": "Only called after the system's own trust evaluation failed.",
+          "ja": "システム自身の信頼性評価が失敗した後にだけ呼ばれます。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onHttpAuthRequest",
+      "group": "events",
+      "summary": {
+        "en": "Supplies credentials for HTTP Basic, Digest or NTLM authentication, or cancels with null.",
+        "ja": "HTTP Basic / Digest / NTLM 認証の認証情報を渡します。null を返すとキャンセルします。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewClient.onReceivedHttpAuthRequest(WebView, HttpAuthHandler, String, String)",
+          "HttpAuthHandler.proceed(String, String)",
+          "HttpAuthHandler.cancel()"
+        ],
+        "note": {
+          "en": "Without a callback the request is cancelled.",
+          "ja": "コールバックがない場合はリクエストをキャンセルします。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKNavigationDelegate.webView(_:didReceive:completionHandler:)",
+          "URLCredential(user:password:persistence:)"
+        ],
+        "note": {
+          "en": "Without a callback the system default handling runs, which also fails the request. Proxy authentication is left to the system.",
+          "ja": "コールバックがない場合はシステムの既定処理になり、リクエストは失敗します。プロキシ認証はシステムに任せます。"
+        }
+      }
+    },
+    {
+      "dart": "SslError",
+      "group": "events",
+      "summary": {
+        "en": "The URL, host and description of a certificate problem.",
+        "ja": "証明書の問題の URL、ホスト、説明です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["SslError.getUrl()", "SslError.getPrimaryError()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["SecTrustEvaluateWithError(_:_:)"]
+      }
+    },
+    {
+      "dart": "SslErrorDecision",
+      "group": "events",
+      "summary": {
+        "en": "Whether to proceed despite a certificate problem or cancel the load.",
+        "ja": "証明書の問題があっても続行するか、読み込みをキャンセルするかです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["SslErrorHandler.proceed()", "SslErrorHandler.cancel()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLCredential(trust:)", "URLSession.AuthChallengeDisposition"]
+      }
+    },
+    {
+      "dart": "HttpAuthRequest",
+      "group": "events",
+      "summary": {
+        "en": "The host and realm of an authentication request.",
+        "ja": "認証要求のホストとレルムです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewClient.onReceivedHttpAuthRequest(WebView, HttpAuthHandler, String, String)"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLAuthenticationChallenge.protectionSpace"]
+      }
+    },
+    {
+      "dart": "HttpAuthCredentials",
+      "group": "events",
+      "summary": {
+        "en": "A user name and password for an authentication request.",
+        "ja": "認証要求に対するユーザー名とパスワードです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["HttpAuthHandler.proceed(String, String)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLCredential(user:password:persistence:)"]
       }
     },
     {

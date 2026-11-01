@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.onSslError` and `onHttpAuthRequest` (`SslError`, `SslErrorDecision`,
+  `HttpAuthRequest`, `HttpAuthCredentials`). Certificate errors are still refused unless the callback
+  returns `proceed`; HTTP authentication is cancelled unless the callback returns credentials.
+
 - Add `AdvancedWebViewController.onDownloadStart` and `DownloadRequest`: the WebView reports
   downloads (attachments, files it cannot show, `download` links) instead of saving them, so the
   app decides how to fetch the file. Android uses `WebView.setDownloadListener`; iOS cancels the

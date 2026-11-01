@@ -2,9 +2,12 @@ package dev.k1t.advanced_webview
 
 import android.graphics.Color
 import android.net.Uri
+import android.net.http.SslError
 import android.os.Looper
 import android.webkit.GeolocationPermissions
+import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.widget.FrameLayout
@@ -23,6 +26,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockStatic
+import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
@@ -230,6 +234,76 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun sslErrorsAreRefusedWithoutADelegate() {
+        hostApi.create(params(webViewId = 1, hasSslErrorDelegate = false))
+        val handler = mock(SslErrorHandler::class.java)
+
+        registry.get(1).webView.webViewClient.onReceivedSslError(
+            registry.get(1).webView,
+            handler,
+            mock(SslError::class.java),
+        )
+
+        verify(handler).cancel()
+        verify(handler, never()).proceed()
+    }
+
+    @Test
+    fun sslErrorsAreForwardedToDart() {
+        hostApi.create(params(webViewId = 1, hasSslErrorDelegate = true))
+        val error = mock(SslError::class.java)
+        `when`(error.url).thenReturn("https://expired.test/")
+        `when`(error.primaryError).thenReturn(SslError.SSL_EXPIRED)
+
+        registry.get(1).webView.webViewClient.onReceivedSslError(
+            registry.get(1).webView,
+            mock(SslErrorHandler::class.java),
+            error,
+        )
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(messenger).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onSslError"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun httpAuthIsCancelledWithoutADelegate() {
+        hostApi.create(params(webViewId = 1, hasHttpAuthDelegate = false))
+        val handler = mock(HttpAuthHandler::class.java)
+
+        registry.get(1).webView.webViewClient.onReceivedHttpAuthRequest(
+            registry.get(1).webView,
+            handler,
+            "a.test",
+            "private",
+        )
+
+        verify(handler).cancel()
+    }
+
+    @Test
+    fun httpAuthIsForwardedToDart() {
+        hostApi.create(params(webViewId = 1, hasHttpAuthDelegate = true))
+
+        registry.get(1).webView.webViewClient.onReceivedHttpAuthRequest(
+            registry.get(1).webView,
+            mock(HttpAuthHandler::class.java),
+            "a.test",
+            "private",
+        )
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(messenger).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onHttpAuthRequest"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
     fun downloadsAreOnlyInterceptedWithADelegate() {
         hostApi.create(params(webViewId = 1, hasDownloadDelegate = false))
 
@@ -358,6 +432,8 @@ class WebViewHostApiImplTest {
         hasNewWindowDelegate: Boolean = false,
         hasPermissionDelegate: Boolean = false,
         hasDownloadDelegate: Boolean = false,
+        hasSslErrorDelegate: Boolean = false,
+        hasHttpAuthDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
         webViewId,
@@ -369,6 +445,8 @@ class WebViewHostApiImplTest {
         hasNewWindowDelegate,
         hasPermissionDelegate,
         hasDownloadDelegate,
+        hasSslErrorDelegate,
+        hasHttpAuthDelegate,
         userScripts,
     )
 

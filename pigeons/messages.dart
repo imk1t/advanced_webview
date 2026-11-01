@@ -72,6 +72,8 @@ class CreationParamsMessage {
     required this.hasNewWindowDelegate,
     required this.hasPermissionDelegate,
     required this.hasDownloadDelegate,
+    required this.hasSslErrorDelegate,
+    required this.hasHttpAuthDelegate,
     required this.userScripts,
   });
 
@@ -104,6 +106,14 @@ class CreationParamsMessage {
   /// round-trip to Dart.
   bool hasDownloadDelegate;
 
+  /// When false, certificate errors are refused natively without a round trip
+  /// to Dart.
+  bool hasSslErrorDelegate;
+
+  /// When false, HTTP authentication challenges get the platform default
+  /// handling without a round trip to Dart.
+  bool hasHttpAuthDelegate;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 }
@@ -129,6 +139,34 @@ class WebResourceErrorMessage {
   String message;
   bool isMainFrame;
   String? url;
+}
+
+class SslErrorMessage {
+  SslErrorMessage({
+    required this.url,
+    required this.host,
+    required this.message,
+  });
+
+  String url;
+  String host;
+  String message;
+}
+
+enum SslErrorDecisionMessage { proceed, cancel }
+
+class HttpAuthRequestMessage {
+  HttpAuthRequestMessage({required this.host, this.realm});
+
+  String host;
+  String? realm;
+}
+
+class HttpAuthCredentialsMessage {
+  HttpAuthCredentialsMessage({required this.username, required this.password});
+
+  String username;
+  String password;
 }
 
 class DownloadRequestMessage {
@@ -258,6 +296,17 @@ abstract class AdvancedWebViewFlutterApi {
   );
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
+
+  /// The WebView found a certificate problem. Cancelling refuses the load.
+  @async
+  SslErrorDecisionMessage onSslError(int webViewId, SslErrorMessage error);
+
+  /// A server asked for credentials. Null cancels the request.
+  @async
+  HttpAuthCredentialsMessage? onHttpAuthRequest(
+    int webViewId,
+    HttpAuthRequestMessage request,
+  );
 
   /// The page started a download. The WebView does not save the file.
   void onDownloadStart(int webViewId, DownloadRequestMessage request);

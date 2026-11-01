@@ -29,6 +29,8 @@ void main() {
     NewWindowCallback? onNewWindow,
     PermissionRequestCallback? onPermissionRequest,
     DownloadStartCallback? onDownloadStart,
+    SslErrorCallback? onSslError,
+    HttpAuthCallback? onHttpAuthRequest,
   }) {
     return AdvancedWebViewController(
       hostApi: hostApi,
@@ -43,6 +45,8 @@ void main() {
       onNewWindow: onNewWindow,
       onPermissionRequest: onPermissionRequest,
       onDownloadStart: onDownloadStart,
+      onSslError: onSslError,
+      onHttpAuthRequest: onHttpAuthRequest,
     );
   }
 
@@ -202,6 +206,115 @@ void main() {
 
       await controller.removeAllUserScripts();
       expect(hostApi.userScripts, isEmpty);
+    });
+  });
+
+  group('SSL errors', () {
+    final error = SslErrorMessage(
+      url: 'https://expired.test/',
+      host: 'expired.test',
+      message: 'expired',
+    );
+
+    test('are only delegated when a callback is set', () async {
+      final without = createController();
+      final withCallback = createController(
+        onSslError: (_) => SslErrorDecision.cancel,
+      );
+      await without.ready;
+      await withCallback.ready;
+
+      expect(hostApi.created[without.webViewId]!.hasSslErrorDelegate, false);
+      expect(
+        hostApi.created[withCallback.webViewId]!.hasSslErrorDelegate,
+        true,
+      );
+    });
+
+    test('map the error and the decision', () async {
+      SslError? seen;
+      final controller = createController(
+        onSslError: (e) {
+          seen = e;
+          return SslErrorDecision.proceed;
+        },
+      );
+
+      expect(
+        await dispatcher.onSslError(controller.webViewId, error),
+        SslErrorDecisionMessage.proceed,
+      );
+      expect(seen!.host, 'expired.test');
+      expect(seen!.url, 'https://expired.test/');
+      expect(seen!.message, 'expired');
+    });
+
+    test('are cancelled without a callback or after dispose', () async {
+      final without = createController();
+      final disposed = createController(
+        onSslError: (_) => SslErrorDecision.proceed,
+      );
+      await disposed.dispose();
+
+      expect(
+        await dispatcher.onSslError(without.webViewId, error),
+        SslErrorDecisionMessage.cancel,
+      );
+      expect(
+        await dispatcher.onSslError(disposed.webViewId, error),
+        SslErrorDecisionMessage.cancel,
+      );
+    });
+  });
+
+  group('HTTP auth', () {
+    final request = HttpAuthRequestMessage(host: 'a.test', realm: 'private');
+
+    test('are only delegated when a callback is set', () async {
+      final without = createController();
+      final withCallback = createController(onHttpAuthRequest: (_) => null);
+      await without.ready;
+      await withCallback.ready;
+
+      expect(hostApi.created[without.webViewId]!.hasHttpAuthDelegate, false);
+      expect(
+        hostApi.created[withCallback.webViewId]!.hasHttpAuthDelegate,
+        true,
+      );
+    });
+
+    test('return the credentials from the callback', () async {
+      HttpAuthRequest? seen;
+      final controller = createController(
+        onHttpAuthRequest: (r) async {
+          seen = r;
+          return const HttpAuthCredentials(username: 'u', password: 'p');
+        },
+      );
+
+      final result = await dispatcher.onHttpAuthRequest(
+        controller.webViewId,
+        request,
+      );
+
+      expect(result!.username, 'u');
+      expect(result.password, 'p');
+      expect(seen!.host, 'a.test');
+      expect(seen!.realm, 'private');
+    });
+
+    test('cancel when the callback returns null or is missing', () async {
+      final cancelling = createController(onHttpAuthRequest: (_) => null);
+      final without = createController();
+
+      expect(
+        await dispatcher.onHttpAuthRequest(cancelling.webViewId, request),
+        isNull,
+      );
+      expect(
+        await dispatcher.onHttpAuthRequest(without.webViewId, request),
+        isNull,
+      );
     });
   });
 

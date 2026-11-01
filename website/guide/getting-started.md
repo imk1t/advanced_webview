@@ -40,7 +40,8 @@ A permission declared only in a debug Manifest does not apply to release builds.
 ```
 
 Use HTTPS. If HTTP exceptions are necessary, configure Android Network Security Config and iOS
-ATS for the app's specific use case. The plugin does not bypass transport restrictions or certificate errors.
+ATS for the app's specific use case. The plugin does not bypass transport restrictions or certificate errors unless your app opts in with
+[`onSslError`](./certificates-and-auth).
 See [Controller](./controller#file-uploads) for file-picker Info.plist keys and
 [Settings](./settings#passkeys-webauthn) for passkey domain associations.
 
