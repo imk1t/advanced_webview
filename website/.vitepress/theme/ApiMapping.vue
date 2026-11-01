@@ -42,8 +42,8 @@ const labels = {
 
 const platforms: Platform[] = ['android', 'ios']
 
-// Class names carry the `tw:` prefix. VitePress' own (unlayered) styles beat Tailwind's layered
-// utilities, so the ones that clash with them (table, code) are marked important with `!`.
+// Badge classes carry the `tw:` prefix. Table, cell and code styling lives in layout.css
+// (`.api-map`), because VitePress' own unlayered styles beat Tailwind's layered utilities.
 const badgeBase =
   'tw:inline-block tw:rounded-[10px] tw:px-2 tw:text-xs tw:leading-5 tw:font-semibold'
 const badgeTone: Record<Status, string> = {
@@ -52,9 +52,6 @@ const badgeTone: Record<Status, string> = {
   creationOnly: 'tw:bg-(--vp-c-warning-soft) tw:text-(--vp-c-warning-1)',
   unsupported: 'tw:bg-(--vp-c-danger-soft) tw:text-(--vp-c-danger-1)',
 }
-const summaryClass = 'tw:mt-1 tw:mb-0 tw:text-[13px] tw:leading-normal tw:text-(--vp-c-text-2)'
-const codeClass = 'tw:text-xs! tw:[overflow-wrap:anywhere]'
-const cellClass = 'tw:align-top!'
 
 function refOf(platform: Platform, api: string) {
   const ref = parseRef(api)
@@ -79,8 +76,8 @@ const rows = computed(() =>
 </script>
 
 <template>
-  <div class="tw:my-4 tw:overflow-x-auto">
-    <table class="tw:table! tw:w-full tw:table-fixed">
+  <div class="api-map tw:my-4 tw:overflow-x-auto">
+    <table>
       <thead>
         <tr>
           <th class="tw:w-[30%]">{{ labels[locale].dart }}</th>
@@ -90,26 +87,31 @@ const rows = computed(() =>
       </thead>
       <tbody>
         <tr v-for="row in rows" :id="anchorFor(row.entry.dart)" :key="row.entry.dart">
-          <td :class="cellClass">
-            <code :class="codeClass">{{ row.entry.dart }}</code>
-            <p :class="summaryClass">{{ row.entry.summary[locale] }}</p>
+          <td>
+            <code>{{ row.entry.dart }}</code>
+            <p>{{ row.entry.summary[locale] }}</p>
           </td>
           <td
             v-if="row.entry.dartOnly"
             colspan="2"
-            :class="[cellClass, 'tw:text-[13px] tw:text-(--vp-c-text-2)']"
+            class="api-map-platform tw:text-[13px]! tw:text-(--vp-c-text-3)"
           >
             {{ labels[locale].dartOnly }}
           </td>
           <template v-else>
-            <td v-for="{ platform, side, refs } in row.sides" :key="platform" :class="cellClass">
+            <td
+              v-for="{ platform, side, refs } in row.sides"
+              :key="platform"
+              :data-label="labels[locale][platform]"
+              class="api-map-platform"
+            >
               <template v-if="side">
                 <span :class="[badgeBase, badgeTone[side.status]]">
                   {{ labels[locale].status[side.status] }}
                 </span>
-                <ul v-if="refs.length" class="tw:mt-1.5 tw:mb-0 tw:list-none tw:p-0">
-                  <li v-for="ref in refs" :key="ref.api" class="tw:my-0.5">
-                    <code :class="codeClass"
+                <ul v-if="refs.length">
+                  <li v-for="ref in refs" :key="ref.api">
+                    <code
                       ><a v-if="ref.href" :href="ref.href" target="_blank" rel="noreferrer">{{
                         ref.className
                       }}</a
@@ -118,7 +120,7 @@ const rows = computed(() =>
                     >
                   </li>
                 </ul>
-                <p v-if="side.note" :class="summaryClass">{{ side.note[locale] }}</p>
+                <p v-if="side.note">{{ side.note[locale] }}</p>
               </template>
             </td>
           </template>
