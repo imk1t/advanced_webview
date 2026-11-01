@@ -230,6 +230,35 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun downloadsAreOnlyInterceptedWithADelegate() {
+        hostApi.create(params(webViewId = 1, hasDownloadDelegate = false))
+
+        assertNull(shadowOf(registry.get(1).webView).downloadListener)
+    }
+
+    @Test
+    fun downloadsAreForwardedToDart() {
+        hostApi.create(params(webViewId = 1, hasDownloadDelegate = true))
+        val listener = shadowOf(registry.get(1).webView).downloadListener
+        assertNotNull(listener)
+
+        listener.onDownloadStart(
+            "https://example.com/a.pdf",
+            "ua",
+            "attachment; filename=\"a.pdf\"",
+            "application/pdf",
+            42,
+        )
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(messenger).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onDownloadStart"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
     fun mediaPermissionsAreDeniedWithoutADelegate() {
         hostApi.create(params(webViewId = 1, hasPermissionDelegate = false))
         val request = mock(PermissionRequest::class.java)
@@ -328,6 +357,7 @@ class WebViewHostApiImplTest {
         hasNavigationDelegate: Boolean = false,
         hasNewWindowDelegate: Boolean = false,
         hasPermissionDelegate: Boolean = false,
+        hasDownloadDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
         webViewId,
@@ -338,6 +368,7 @@ class WebViewHostApiImplTest {
         hasNavigationDelegate,
         hasNewWindowDelegate,
         hasPermissionDelegate,
+        hasDownloadDelegate,
         userScripts,
     )
 

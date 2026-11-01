@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.onDownloadStart` and `DownloadRequest`: the WebView reports
+  downloads (attachments, files it cannot show, `download` links) instead of saving them, so the
+  app decides how to fetch the file. Android uses `WebView.setDownloadListener`; iOS cancels the
+  `WKNavigationResponse` / `WKNavigationAction` and reports it.
+
 - Add `AdvancedWebViewController.onPermissionRequest` to decide whether a page may use the camera,
   microphone or location (`PermissionRequest`, `PermissionResource`, `PermissionDecision`).
   Without a callback every request is denied. On Android the plugin also asks for the runtime

@@ -129,6 +129,24 @@ void main() {
     expect(result['error'], contains('boom'));
   });
 
+  testWidgets('downloads are reported instead of saved', (tester) async {
+    final downloads = <DownloadRequest>[];
+    final harness = _Harness(onDownloadStart: downloads.add);
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml(
+      '<html><body><a id="a" href="data:text/plain;base64,aGk=" '
+      'download="hi.txt">get</a></body></html>',
+    );
+    await harness.controller.runJavaScript(
+      'document.getElementById("a").click()',
+    );
+    await _pumpUntil(tester, () => downloads.isNotEmpty);
+
+    expect(downloads.single.url, startsWith('data:text/plain'));
+  });
+
   testWidgets('navigation delegate can prevent a main-frame navigation', (
     tester,
   ) async {
@@ -390,6 +408,7 @@ class _Harness {
     NavigationRequestCallback? onNavigationRequest,
     List<UserScript> userScripts = const [],
     NewWindowCallback? onNewWindow,
+    DownloadStartCallback? onDownloadStart,
   }) {
     controller = AdvancedWebViewController(
       javaScriptChannels: javaScriptChannels,
@@ -397,6 +416,7 @@ class _Harness {
       userScripts: userScripts,
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
+      onDownloadStart: onDownloadStart,
       onPageStarted: startedUrls.add,
       onPageFinished: (url) {
         _pageFinished?.complete();

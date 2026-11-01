@@ -194,6 +194,7 @@ final class RunnerTests: XCTestCase {
     hasNavigationDelegate: Bool = false,
     hasNewWindowDelegate: Bool = false,
     hasPermissionDelegate: Bool = false,
+    hasDownloadDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
     return CreationParamsMessage(
@@ -205,6 +206,7 @@ final class RunnerTests: XCTestCase {
       hasNavigationDelegate: hasNavigationDelegate,
       hasNewWindowDelegate: hasNewWindowDelegate,
       hasPermissionDelegate: hasPermissionDelegate,
+      hasDownloadDelegate: hasDownloadDelegate,
       userScripts: userScripts)
   }
 

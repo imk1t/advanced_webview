@@ -80,6 +80,7 @@ On both platforms, JavaScript can call `window.Bridge.postMessage('hello')`.
 - JavaScript channels (messages from JS to Dart)
 - JavaScript handlers (JS calls Dart and gets a value back)
 - Permission requests from pages (camera, microphone, location)
+- Download notifications (the app decides how to fetch the file)
 - Navigation decisions (main frame)
 - Callbacks: page started / finished, progress, title changed, load errors
 - Settings: JavaScript enabled, User-Agent, media autoplay, inline playback (iOS),

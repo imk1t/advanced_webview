@@ -14,6 +14,7 @@ abstract interface class WebViewEventListener {
   );
   void onJavaScriptMessage(String channelName, String message);
   void onNewWindowRequest(String url);
+  void onDownloadStart(DownloadRequestMessage request);
   Future<PermissionDecisionMessage> onPermissionRequest(
     PermissionRequestMessage request,
   );
@@ -78,6 +79,10 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   @override
   void onNewWindowRequest(int webViewId, String url) =>
       _listeners[webViewId]?.onNewWindowRequest(url);
+
+  @override
+  void onDownloadStart(int webViewId, DownloadRequestMessage request) =>
+      _listeners[webViewId]?.onDownloadStart(request);
 
   @override
   Future<PermissionDecisionMessage> onPermissionRequest(

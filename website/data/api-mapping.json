@@ -65,6 +65,8 @@
       "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler",
       "PermissionRequest": "https://developer.android.com/reference/android/webkit/PermissionRequest",
       "GeolocationPermissions": "https://developer.android.com/reference/android/webkit/GeolocationPermissions",
+      "DownloadListener": "https://developer.android.com/reference/android/webkit/DownloadListener",
+      "URLUtil": "https://developer.android.com/reference/android/webkit/URLUtil",
       "JavaScriptReplyProxy": "https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy",
       "WebSettingsCompat": "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat",
       "WebViewFeature": "https://developer.android.com/reference/androidx/webkit/WebViewFeature"
@@ -79,6 +81,8 @@
       "WKUserContentController": "https://developer.apple.com/documentation/webkit/wkusercontentcontroller",
       "WKUserScript": "https://developer.apple.com/documentation/webkit/wkuserscript",
       "WKScriptMessageHandler": "https://developer.apple.com/documentation/webkit/wkscriptmessagehandler",
+      "WKNavigationResponse": "https://developer.apple.com/documentation/webkit/wknavigationresponse",
+      "WKNavigationAction": "https://developer.apple.com/documentation/webkit/wknavigationaction",
       "WKSecurityOrigin": "https://developer.apple.com/documentation/webkit/wksecurityorigin",
       "WKMediaCaptureType": "https://developer.apple.com/documentation/webkit/wkmediacapturetype",
       "WKPermissionDecision": "https://developer.apple.com/documentation/webkit/wkpermissiondecision",
@@ -1120,6 +1124,53 @@
           "en": "Camera and microphone only. WebKit has no delegate for geolocation, so it asks the user itself and the callback is never called for it.",
           "ja": "カメラとマイクのみです。WebKit には位置情報用のデリゲートがなく、WebKit 自身がユーザーに確認するため、位置情報ではコールバックは呼ばれません。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onDownloadStart",
+      "group": "events",
+      "summary": {
+        "en": "Called when the page starts a download. The WebView does not save the file.",
+        "ja": "ページがダウンロードを始めたときに呼ばれます。WebView はファイルを保存しません。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebView.setDownloadListener(DownloadListener)",
+          "URLUtil.guessFileName(String, String, String)"
+        ],
+        "note": {
+          "en": "The file name is always guessed from the URL and Content-Disposition.",
+          "ja": "ファイル名は常に URL と Content-Disposition から推測します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)",
+          "WKNavigationResponse.canShowMIMEType",
+          "WKNavigationAction.shouldPerformDownload"
+        ],
+        "note": {
+          "en": "Attachments and unshowable types are detected on the response, download links on the action; the navigation is cancelled. The file name can be null for download links.",
+          "ja": "添付ファイルと表示できない種類はレスポンスで、download リンクはアクションで検出し、遷移をキャンセルします。download リンクではファイル名が null になることがあります。"
+        }
+      }
+    },
+    {
+      "dart": "DownloadRequest",
+      "group": "events",
+      "summary": {
+        "en": "The URL, file name, MIME type and size of a download.",
+        "ja": "ダウンロードの URL、ファイル名、MIME タイプ、サイズです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["URLUtil.guessFileName(String, String, String)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKNavigationResponse", "WKNavigationAction"]
       }
     },
     {
