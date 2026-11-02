@@ -315,7 +315,8 @@ class WebViewSettings {
     supportZoom: android.supportZoom,
     transparentBackground: transparentBackground,
     passkeysEnabled: android.passkeysEnabled,
-    allowsBackForwardNavigationGestures: ios.allowsBackForwardNavigationGestures,
+    allowsBackForwardNavigationGestures:
+        ios.allowsBackForwardNavigationGestures,
     inspectable: inspectable,
     textZoom: textZoom,
     cacheMode: CacheModeMessage.values[cacheMode.index],

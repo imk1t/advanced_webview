@@ -237,9 +237,7 @@ void main() {
       expect(
         const WebViewSettings(
           android: AndroidWebViewSettings(passkeysEnabled: true),
-        )
-            .toMessage()
-            .passkeysEnabled,
+        ).toMessage().passkeysEnabled,
         isTrue,
       );
     });
