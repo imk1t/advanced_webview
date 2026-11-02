@@ -160,6 +160,32 @@ void main() {
       );
     });
 
+    test(
+      'findText maps the native result and clearMatches is forwarded',
+      () async {
+        final controller = createController();
+        hostApi.nextFindResult = FindResultMessage(
+          found: true,
+          matchCount: 3,
+          activeMatchIndex: 1,
+        );
+        final result = await controller.findText('abc', forward: false);
+        expect(
+          result,
+          const FindResult(found: true, matchCount: 3, activeMatchIndex: 1),
+        );
+        expect(hostApi.calls, contains('findText(abc, false)'));
+
+        hostApi.nextFindResult = FindResultMessage(found: false);
+        expect(
+          await controller.findText('zzz'),
+          const FindResult(found: false),
+        );
+        await controller.clearMatches();
+        expect(hostApi.calls, contains('clearMatches'));
+      },
+    );
+
     test('takeScreenshot returns the PNG bytes from native', () async {
       final controller = createController();
       final bytes = Uint8List.fromList([0x89, 0x50, 0x4e, 0x47]);

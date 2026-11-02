@@ -18,8 +18,12 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import io.flutter.plugin.common.BinaryMessenger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -180,6 +184,30 @@ class WebViewHostApiImplTest {
         assertFalse(webView.isVerticalScrollBarEnabled)
         assertFalse(webView.isHorizontalScrollBarEnabled)
         assertEquals(View.OVER_SCROLL_NEVER, webView.overScrollMode)
+    }
+
+    @Test
+    fun findCompletesWhenTheWebViewFinishesCounting() = runBlocking(Dispatchers.Unconfined) {
+        hostApi.create(params(webViewId = 1))
+        val view = registry.get(1)
+
+        val search = async(start = CoroutineStart.UNDISPATCHED) { view.find("abc", true) }
+        view.onFindResult(0, 3, false)
+        assertTrue(search.isActive)
+        view.onFindResult(1, 3, true)
+
+        assertEquals(FindResultMessage(found = true, matchCount = 3, activeMatchIndex = 1), search.await())
+
+        val miss = async(start = CoroutineStart.UNDISPATCHED) { view.find("zzz", true) }
+        view.onFindResult(0, 0, true)
+        assertEquals(FindResultMessage(found = false, matchCount = 0, activeMatchIndex = null), miss.await())
+    }
+
+    @Test
+    fun emptyFindQueryClearsAndReportsNoMatch() = runBlocking(Dispatchers.Unconfined) {
+        hostApi.create(params(webViewId = 1))
+
+        assertEquals(FindResultMessage(found = false, matchCount = 0), registry.get(1).find("", true))
     }
 
     @Test

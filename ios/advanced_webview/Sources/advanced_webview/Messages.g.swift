@@ -809,6 +809,53 @@ struct PermissionRequestMessage: Hashable, CustomStringConvertible {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct FindResultMessage: Hashable, CustomStringConvertible {
+  var found: Bool
+  /// Total matches on the page. Null on iOS, which does not report a count.
+  var matchCount: Int64? = nil
+  /// Zero-based index of the highlighted match. Null on iOS.
+  var activeMatchIndex: Int64? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> FindResultMessage? {
+    let found = pigeonVar_list[0] as! Bool
+    let matchCount: Int64? = nilOrValue(pigeonVar_list[1])
+    let activeMatchIndex: Int64? = nilOrValue(pigeonVar_list[2])
+
+    return FindResultMessage(
+      found: found,
+      matchCount: matchCount,
+      activeMatchIndex: activeMatchIndex
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      found,
+      matchCount,
+      activeMatchIndex,
+    ]
+  }
+  static func == (lhs: FindResultMessage, rhs: FindResultMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.found, rhs.found) && MessagesPigeonInternal.deepEquals(lhs.matchCount, rhs.matchCount) && MessagesPigeonInternal.deepEquals(lhs.activeMatchIndex, rhs.activeMatchIndex)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("FindResultMessage")
+    MessagesPigeonInternal.deepHash(value: found, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: matchCount, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: activeMatchIndex, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "FindResultMessage(found: \(String(describing: found)), matchCount: \(String(describing: matchCount)), activeMatchIndex: \(String(describing: activeMatchIndex)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct CookieMessage: Hashable, CustomStringConvertible {
   var name: String
   var value: String
@@ -934,6 +981,8 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 144:
       return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
     case 145:
+      return FindResultMessage.fromList(self.readValue() as! [Any?])
+    case 146:
       return CookieMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -991,8 +1040,11 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? PermissionRequestMessage {
       super.writeByte(144)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? FindResultMessage {
       super.writeByte(145)
+      super.writeValue(value.toList())
+    } else if let value = value as? CookieMessage {
+      super.writeByte(146)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1036,6 +1088,11 @@ protocol AdvancedWebViewHostApi {
   /// Returns a PNG of the visible area, or null when it cannot be captured
   /// (for example when the view has no size yet).
   func takeScreenshot(webViewId: Int64) async throws -> FlutterStandardTypedData?
+  /// Finds `query` in the page and highlights a match. A new query starts at
+  /// the first match; repeating the same query moves to the next or previous.
+  func findText(webViewId: Int64, query: String, forward: Bool) async throws -> FindResultMessage
+  /// Removes the highlights left by `findText`.
+  func clearMatches(webViewId: Int64) throws
   func updateSettings(webViewId: Int64, settings: WebViewSettingsMessage) throws
   func setCookie(webViewId: Int64, cookie: CookieMessage) async throws
   /// Returns the cookies the WebView would send to `url`.
@@ -1275,6 +1332,43 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       takeScreenshotChannel.setMessageHandler(nil)
+    }
+    /// Finds `query` in the page and highlights a match. A new query starts at
+    /// the first match; repeating the same query moves to the next or previous.
+    let findTextChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.findText\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      findTextChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let queryArg = args[1] as! String
+        let forwardArg = args[2] as! Bool
+        Task { @MainActor in
+          do {
+            let result = try await api.findText(webViewId: webViewIdArg, query: queryArg, forward: forwardArg)
+            reply(wrapResult(result))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      findTextChannel.setMessageHandler(nil)
+    }
+    /// Removes the highlights left by `findText`.
+    let clearMatchesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearMatches\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      clearMatchesChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        do {
+          try api.clearMatches(webViewId: webViewIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      clearMatchesChannel.setMessageHandler(nil)
     }
     let updateSettingsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.updateSettings\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

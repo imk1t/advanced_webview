@@ -94,6 +94,25 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     return image.pngData().map { FlutterStandardTypedData(bytes: $0) }
   }
 
+  /// Like Android, repeating the same query moves to the next match. WebKit
+  /// searches from the current selection, so no query state is needed here.
+  @MainActor
+  func find(_ query: String, forward: Bool) async throws -> FindResultMessage {
+    guard !query.isEmpty else {
+      clearMatches()
+      return FindResultMessage(found: false)
+    }
+    let configuration = WKFindConfiguration()
+    configuration.backwards = !forward
+    configuration.wraps = true
+    let result = try await webView.find(query, configuration: configuration)
+    return FindResultMessage(found: result.matchFound)
+  }
+
+  func clearMatches() {
+    webView.evaluateJavaScript("window.getSelection().removeAllRanges()", completionHandler: nil)
+  }
+
   /// Loads a request started by the app. Like Android, it does not consult
   /// the navigation delegate.
   func load(_ request: URLRequest) {

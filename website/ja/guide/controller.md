@@ -33,6 +33,26 @@ final url = await controller.currentUrl();
 final title = await controller.title();
 ```
 
+## スクリーンショット
+
+```dart
+final png = await controller.takeScreenshot(); // Uint8List?（PNG）
+```
+
+ページ全体ではなく、表示されている領域だけを取得します。ビューのサイズが 0 の間は `null` を返します。
+
+## ページ内検索
+
+```dart
+final result = await controller.findText('flutter');
+// result.found。Android では result.matchCount と result.activeMatchIndex も入ります。
+await controller.findText('flutter');                 // 同じ検索語: 次の一致へ
+await controller.findText('flutter', forward: false); // 前の一致へ
+await controller.clearMatches();                      // ハイライトを消す
+```
+
+iOS は一致の有無だけを返すため、`matchCount` と `activeMatchIndex` は `null` になります。
+
 ## コールバック
 
 コンストラクタで渡します。

@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add find-in-page: `AdvancedWebViewController.findText` (returns a `FindResult`) and `clearMatches`.
+  Android uses `WebView.findAllAsync` / `findNext`; iOS uses `WKWebView.find` and reports only
+  whether a match was found (no count).
+
 - Add `AdvancedWebViewController.takeScreenshot`, which returns a PNG of the visible area
   (`WebView.draw` on Android, `WKWebView.takeSnapshot` on iOS).
 

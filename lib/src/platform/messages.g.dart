@@ -827,6 +827,63 @@ class PermissionRequestMessage {
   }
 }
 
+class FindResultMessage {
+  FindResultMessage({
+    required this.found,
+    this.matchCount,
+    this.activeMatchIndex,
+  });
+
+  bool found;
+
+  /// Total matches on the page. Null on iOS, which does not report a count.
+  int? matchCount;
+
+  /// Zero-based index of the highlighted match. Null on iOS.
+  int? activeMatchIndex;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      found,
+      matchCount,
+      activeMatchIndex,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static FindResultMessage decode(Object result) {
+    result as List<Object?>;
+    return FindResultMessage(
+      found: result[0]! as bool,
+      matchCount: result[1] as int?,
+      activeMatchIndex: result[2] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! FindResultMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(found, other.found) && _deepEquals(matchCount, other.matchCount) && _deepEquals(activeMatchIndex, other.activeMatchIndex);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'FindResultMessage(found: $found, matchCount: $matchCount, activeMatchIndex: $activeMatchIndex)';
+  }
+}
+
 class CookieMessage {
   CookieMessage({
     required this.name,
@@ -959,8 +1016,11 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is PermissionRequestMessage) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is FindResultMessage) {
       buffer.putUint8(145);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(146);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1009,6 +1069,8 @@ class _PigeonCodec extends StandardMessageCodec {
       case 144:
         return PermissionRequestMessage.decode(readValue(buffer)!);
       case 145:
+        return FindResultMessage.decode(readValue(buffer)!);
+      case 146:
         return CookieMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1294,6 +1356,46 @@ class AdvancedWebViewHostApi {
     )
     ;
     return pigeonVar_replyValue as Uint8List?;
+  }
+
+  /// Finds `query` in the page and highlights a match. A new query starts at
+  /// the first match; repeating the same query moves to the next or previous.
+  Future<FindResultMessage> findText(int webViewId, String query, bool forward) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.findText$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, query, forward]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return pigeonVar_replyValue! as FindResultMessage;
+  }
+
+  /// Removes the highlights left by `findText`.
+  Future<void> clearMatches(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearMatches$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> updateSettings(int webViewId, WebViewSettingsMessage settings) async {

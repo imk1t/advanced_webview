@@ -864,6 +864,53 @@ data class PermissionRequestMessage (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class FindResultMessage (
+  val found: Boolean,
+  /** Total matches on the page. Null on iOS, which does not report a count. */
+  val matchCount: Long? = null,
+  /** Zero-based index of the highlighted match. Null on iOS. */
+  val activeMatchIndex: Long? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): FindResultMessage {
+      val found = pigeonVar_list[0] as Boolean
+      val matchCount = pigeonVar_list[1] as Long?
+      val activeMatchIndex = pigeonVar_list[2] as Long?
+      return FindResultMessage(found, matchCount, activeMatchIndex)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      found,
+      matchCount,
+      activeMatchIndex,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as FindResultMessage
+    return MessagesPigeonUtils.deepEquals(this.found, other.found) && MessagesPigeonUtils.deepEquals(this.matchCount, other.matchCount) && MessagesPigeonUtils.deepEquals(this.activeMatchIndex, other.activeMatchIndex)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.found)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.matchCount)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.activeMatchIndex)
+    return result
+  }
+  override fun toString(): String {
+    return "FindResultMessage(found=$found, matchCount=$matchCount, activeMatchIndex=$activeMatchIndex)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class CookieMessage (
   val name: String,
   val value: String,
@@ -1009,6 +1056,11 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
+          FindResultMessage.fromList(it)
+        }
+      }
+      146.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
           CookieMessage.fromList(it)
         }
       }
@@ -1081,8 +1133,12 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(144)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is FindResultMessage -> {
         stream.write(145)
+        writeValue(stream, value.toList())
+      }
+      is CookieMessage -> {
+        stream.write(146)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1116,6 +1172,13 @@ interface AdvancedWebViewHostApi {
    * (for example when the view has no size yet).
    */
   suspend fun takeScreenshot(webViewId: Long): ByteArray?
+  /**
+   * Finds `query` in the page and highlights a match. A new query starts at
+   * the first match; repeating the same query moves to the next or previous.
+   */
+  suspend fun findText(webViewId: Long, query: String, forward: Boolean): FindResultMessage
+  /** Removes the highlights left by `findText`. */
+  fun clearMatches(webViewId: Long)
   fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage)
   suspend fun setCookie(webViewId: Long, cookie: CookieMessage)
   /** Returns the cookies the WebView would send to `url`. */
@@ -1384,6 +1447,45 @@ interface AdvancedWebViewHostApi {
               }
               reply.reply(wrapped)
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.findText$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val queryArg = args[1] as String
+            val forwardArg = args[2] as Boolean
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.findText(webViewIdArg, queryArg, forwardArg))
+              } catch (exception: Throwable) {
+                MessagesPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearMatches$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val wrapped: List<Any?> = try {
+              api.clearMatches(webViewIdArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

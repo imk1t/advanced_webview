@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import 'cookie.dart';
 import 'download.dart';
+import 'find.dart';
 import 'navigation.dart';
 import 'permission.dart';
 import 'platform/event_dispatcher.dart';
@@ -217,6 +218,26 @@ class AdvancedWebViewController {
   /// Runs [source] and ignores its result.
   Future<void> runJavaScript(String source) =>
       _call(() => _hostApi.evaluateJavaScript(webViewId, source));
+
+  /// Finds [query] in the page and highlights a match.
+  ///
+  /// A new [query] starts at the first match; calling again with the same
+  /// [query] moves to the next match, or the previous one when [forward] is
+  /// `false`, wrapping around at the ends. An empty [query] clears the
+  /// highlights. Call [clearMatches] when the user closes the search UI.
+  ///
+  /// iOS reports only whether a match was found; [FindResult.matchCount] and
+  /// [FindResult.activeMatchIndex] are `null` there. Needs iOS 16 or later,
+  /// which this package already requires.
+  Future<FindResult> findText(String query, {bool forward = true}) async {
+    final message = await _call(
+      () => _hostApi.findText(webViewId, query, forward),
+    );
+    return FindResult.fromMessage(message);
+  }
+
+  /// Removes the highlights left by [findText].
+  Future<void> clearMatches() => _call(() => _hostApi.clearMatches(webViewId));
 
   /// Captures the visible area of the WebView as a PNG image.
   ///

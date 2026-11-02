@@ -81,6 +81,8 @@
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
       "WKWebsiteDataStore": "https://developer.apple.com/documentation/webkit/wkwebsitedatastore",
       "UIImage": "https://developer.apple.com/documentation/uikit/uiimage",
+      "WKFindResult": "https://developer.apple.com/documentation/webkit/wkfindresult",
+      "WKFindConfiguration": "https://developer.apple.com/documentation/webkit/wkfindconfiguration",
       "WKPreferences": "https://developer.apple.com/documentation/webkit/wkpreferences",
       "WKWebpagePreferences": "https://developer.apple.com/documentation/webkit/wkwebpagepreferences",
       "WKNavigationDelegate": "https://developer.apple.com/documentation/webkit/wknavigationdelegate",
@@ -395,6 +397,50 @@
       "ios": {
         "status": "supported",
         "apis": ["WKWebView.takeSnapshot(configuration:)", "UIImage.pngData()"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.findText",
+      "group": "loading",
+      "summary": {
+        "en": "Finds text in the page and highlights a match; repeating the query moves to the next or previous match.",
+        "ja": "ページ内のテキストを検索してハイライトします。同じクエリを繰り返すと次／前の一致に移動します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebView.findAllAsync(String)",
+          "WebView.findNext(boolean)",
+          "WebView.setFindListener(FindListener)"
+        ]
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["WKWebView.find(_:configuration:)", "WKFindConfiguration"],
+        "note": {
+          "en": "Only reports whether a match was found; matchCount and activeMatchIndex are null.",
+          "ja": "一致の有無のみ返します。matchCount と activeMatchIndex は null です。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.clearMatches",
+      "group": "loading",
+      "summary": {
+        "en": "Removes the highlights left by findText.",
+        "ja": "findText が付けたハイライトを消します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.clearMatches()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:completionHandler:)"],
+        "note": {
+          "en": "Clears the selection with window.getSelection().removeAllRanges().",
+          "ja": "window.getSelection().removeAllRanges() で選択を解除します。"
+        }
       }
     },
     {
@@ -1395,6 +1441,26 @@
         "note": {
           "en": "Attachments and unshowable types are detected on the response, download links on the action; the navigation is cancelled. The file name can be null for download links.",
           "ja": "添付ファイルと表示できない種類はレスポンスで、download リンクはアクションで検出し、遷移をキャンセルします。download リンクではファイル名が null になることがあります。"
+        }
+      }
+    },
+    {
+      "dart": "FindResult",
+      "group": "loading",
+      "summary": {
+        "en": "Whether the query was found, with the match count and active match (Android).",
+        "ja": "検索語が見つかったかどうか。Android では一致数と現在の位置も含みます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.setFindListener(FindListener)"]
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["WKFindResult.matchFound"],
+        "note": {
+          "en": "WebKit does not report a count, so matchCount and activeMatchIndex are null.",
+          "ja": "WebKit は一致数を返さないため、matchCount と activeMatchIndex は null です。"
         }
       }
     },
