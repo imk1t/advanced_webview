@@ -107,6 +107,13 @@ int _deepHash(Object? value) {
 }
 
 
+enum CacheModeMessage {
+  normal,
+  preferCache,
+  cacheOnly,
+  noCache;
+}
+
 enum UserScriptInjectionTimeMessage {
   atDocumentStart,
   atDocumentEnd;
@@ -144,6 +151,7 @@ class WebViewSettingsMessage {
     required this.allowsBackForwardNavigationGestures,
     required this.inspectable,
     required this.textZoom,
+    required this.cacheMode,
     this.minimumFontSize,
     this.userAgent,
   });
@@ -174,6 +182,10 @@ class WebViewSettingsMessage {
   /// the whole page with `WKWebView.pageZoom`.
   int textZoom;
 
+  /// Android: `WebSettings.setCacheMode`. iOS: `URLRequest.cachePolicy` of
+  /// requests started with `loadUrl`.
+  CacheModeMessage cacheMode;
+
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
   int? minimumFontSize;
@@ -191,6 +203,7 @@ class WebViewSettingsMessage {
       allowsBackForwardNavigationGestures,
       inspectable,
       textZoom,
+      cacheMode,
       minimumFontSize,
       userAgent,
     ];
@@ -211,8 +224,9 @@ class WebViewSettingsMessage {
       allowsBackForwardNavigationGestures: result[6]! as bool,
       inspectable: result[7]! as bool,
       textZoom: result[8]! as int,
-      minimumFontSize: result[9] as int?,
-      userAgent: result[10] as String?,
+      cacheMode: result[9]! as CacheModeMessage,
+      minimumFontSize: result[10] as int?,
+      userAgent: result[11] as String?,
     );
   }
 
@@ -225,7 +239,7 @@ class WebViewSettingsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent);
+    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent);
   }
 
   @override
@@ -234,7 +248,7 @@ class WebViewSettingsMessage {
 
   @override
   String toString() {
-    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, minimumFontSize: $minimumFontSize, userAgent: $userAgent)';
+    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, cacheMode: $cacheMode, minimumFontSize: $minimumFontSize, userAgent: $userAgent)';
   }
 }
 
@@ -871,53 +885,56 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is UserScriptInjectionTimeMessage) {
+    }    else if (value is CacheModeMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    }    else if (value is NavigationDecisionMessage) {
+    }    else if (value is UserScriptInjectionTimeMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    }    else if (value is SslErrorDecisionMessage) {
+    }    else if (value is NavigationDecisionMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.index);
-    }    else if (value is PermissionResourceMessage) {
+    }    else if (value is SslErrorDecisionMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.index);
-    }    else if (value is PermissionDecisionMessage) {
+    }    else if (value is PermissionResourceMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.index);
-    }    else if (value is WebViewSettingsMessage) {
+    }    else if (value is PermissionDecisionMessage) {
       buffer.putUint8(134);
-      writeValue(buffer, value.encode());
-    }    else if (value is UserScriptMessage) {
+      writeValue(buffer, value.index);
+    }    else if (value is WebViewSettingsMessage) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    }    else if (value is CreationParamsMessage) {
+    }    else if (value is UserScriptMessage) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    }    else if (value is NavigationRequestMessage) {
+    }    else if (value is CreationParamsMessage) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    }    else if (value is WebResourceErrorMessage) {
+    }    else if (value is NavigationRequestMessage) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    }    else if (value is SslErrorMessage) {
+    }    else if (value is WebResourceErrorMessage) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthRequestMessage) {
+    }    else if (value is SslErrorMessage) {
       buffer.putUint8(140);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthCredentialsMessage) {
+    }    else if (value is HttpAuthRequestMessage) {
       buffer.putUint8(141);
       writeValue(buffer, value.encode());
-    }    else if (value is DownloadRequestMessage) {
+    }    else if (value is HttpAuthCredentialsMessage) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    }    else if (value is PermissionRequestMessage) {
+    }    else if (value is DownloadRequestMessage) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is PermissionRequestMessage) {
       buffer.putUint8(144);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(145);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -929,40 +946,43 @@ class _PigeonCodec extends StandardMessageCodec {
     switch (type) {
       case 129:
         final value = readValue(buffer) as int?;
-        return value == null ? null : UserScriptInjectionTimeMessage.values[value];
+        return value == null ? null : CacheModeMessage.values[value];
       case 130:
         final value = readValue(buffer) as int?;
-        return value == null ? null : NavigationDecisionMessage.values[value];
+        return value == null ? null : UserScriptInjectionTimeMessage.values[value];
       case 131:
         final value = readValue(buffer) as int?;
-        return value == null ? null : SslErrorDecisionMessage.values[value];
+        return value == null ? null : NavigationDecisionMessage.values[value];
       case 132:
         final value = readValue(buffer) as int?;
-        return value == null ? null : PermissionResourceMessage.values[value];
+        return value == null ? null : SslErrorDecisionMessage.values[value];
       case 133:
         final value = readValue(buffer) as int?;
-        return value == null ? null : PermissionDecisionMessage.values[value];
+        return value == null ? null : PermissionResourceMessage.values[value];
       case 134:
-        return WebViewSettingsMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : PermissionDecisionMessage.values[value];
       case 135:
-        return UserScriptMessage.decode(readValue(buffer)!);
+        return WebViewSettingsMessage.decode(readValue(buffer)!);
       case 136:
-        return CreationParamsMessage.decode(readValue(buffer)!);
+        return UserScriptMessage.decode(readValue(buffer)!);
       case 137:
-        return NavigationRequestMessage.decode(readValue(buffer)!);
+        return CreationParamsMessage.decode(readValue(buffer)!);
       case 138:
-        return WebResourceErrorMessage.decode(readValue(buffer)!);
+        return NavigationRequestMessage.decode(readValue(buffer)!);
       case 139:
-        return SslErrorMessage.decode(readValue(buffer)!);
+        return WebResourceErrorMessage.decode(readValue(buffer)!);
       case 140:
-        return HttpAuthRequestMessage.decode(readValue(buffer)!);
+        return SslErrorMessage.decode(readValue(buffer)!);
       case 141:
-        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
+        return HttpAuthRequestMessage.decode(readValue(buffer)!);
       case 142:
-        return DownloadRequestMessage.decode(readValue(buffer)!);
+        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
       case 143:
-        return PermissionRequestMessage.decode(readValue(buffer)!);
+        return DownloadRequestMessage.decode(readValue(buffer)!);
       case 144:
+        return PermissionRequestMessage.decode(readValue(buffer)!);
+      case 145:
         return CookieMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);

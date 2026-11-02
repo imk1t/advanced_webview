@@ -22,6 +22,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   /// URL of the load started by `load(_:)` / `loadHTMLString(_:baseURL:)`
   /// whose policy decision has not arrived yet.
   private var pendingAppInitiatedURL: String?
+  private var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
 
   init(params: CreationParamsMessage, flutterApi: AdvancedWebViewFlutterApi) {
     self.id = params.webViewId
@@ -63,6 +64,13 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
       settings.javaScriptEnabled
     webView.allowsBackForwardNavigationGestures = settings.allowsBackForwardNavigationGestures
     webView.isInspectable = settings.inspectable
+    cachePolicy =
+      switch settings.cacheMode {
+      case .normal: .useProtocolCachePolicy
+      case .preferCache: .returnCacheDataElseLoad
+      case .cacheOnly: .returnCacheDataDontLoad
+      case .noCache: .reloadIgnoringLocalCacheData
+      }
     webView.pageZoom = CGFloat(settings.textZoom) / 100
     webView.configuration.preferences.minimumFontSize =
       settings.minimumFontSize.map { CGFloat($0) } ?? 0
@@ -75,6 +83,8 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   /// Loads a request started by the app. Like Android, it does not consult
   /// the navigation delegate.
   func load(_ request: URLRequest) {
+    var request = request
+    request.cachePolicy = cachePolicy
     pendingAppInitiatedURL = request.url?.absoluteString
     webView.load(request)
   }

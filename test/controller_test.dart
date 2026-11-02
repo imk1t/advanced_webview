@@ -107,6 +107,19 @@ void main() {
       expect(message.allowsBackForwardNavigationGestures, isTrue);
     });
 
+    test('cacheMode is passed to native', () {
+      expect(
+        const WebViewSettings().toMessage().cacheMode,
+        CacheModeMessage.normal,
+      );
+      expect(
+        const WebViewSettings(cacheMode: WebViewCacheMode.noCache)
+            .toMessage()
+            .cacheMode,
+        CacheModeMessage.noCache,
+      );
+    });
+
     test('textZoom and minimumFontSize are passed to native', () {
       final defaults = const WebViewSettings().toMessage();
       expect(defaults.textZoom, 100);

@@ -2,6 +2,22 @@ import 'package:flutter/foundation.dart';
 
 import 'platform/messages.g.dart';
 
+/// How the WebView uses its HTTP cache.
+enum WebViewCacheMode {
+  /// Follows HTTP cache headers (the platform default).
+  normal,
+
+  /// Uses cached content even if it is stale, and loads from the network only
+  /// when nothing is cached.
+  preferCache,
+
+  /// Never touches the network; pages that are not cached fail to load.
+  cacheOnly,
+
+  /// Ignores the cache and always loads from the network.
+  noCache,
+}
+
 /// Per-WebView settings.
 ///
 /// Settings marked "creation only" are applied when the native view is created
@@ -18,6 +34,7 @@ class WebViewSettings {
     this.allowsBackForwardNavigationGestures = false,
     this.inspectable = false,
     this.textZoom = 100,
+    this.cacheMode = WebViewCacheMode.normal,
     this.minimumFontSize,
     this.userAgent,
   }) : assert(textZoom > 0, 'textZoom must be positive'),
@@ -69,6 +86,14 @@ class WebViewSettings {
   /// zoom, so the whole page is scaled (`WKWebView.pageZoom`).
   final int textZoom;
 
+  /// How loads use the HTTP cache.
+  ///
+  /// Android applies it to every load of the WebView
+  /// (`WebSettings.setCacheMode`). iOS applies it as the cache policy of
+  /// requests started by `loadUrl`; links the user follows and subresources
+  /// use the default policy.
+  final WebViewCacheMode cacheMode;
+
   /// Smallest font size the WebView renders: sp on Android
   /// (`WebSettings.setMinimumFontSize`), pt on iOS
   /// (`WKPreferences.minimumFontSize`). `null` uses the platform default.
@@ -87,6 +112,7 @@ class WebViewSettings {
     bool? allowsBackForwardNavigationGestures,
     bool? inspectable,
     int? textZoom,
+    WebViewCacheMode? cacheMode,
     ValueGetter<int?>? minimumFontSize,
     ValueGetter<String?>? userAgent,
   }) {
@@ -106,6 +132,7 @@ class WebViewSettings {
           this.allowsBackForwardNavigationGestures,
       inspectable: inspectable ?? this.inspectable,
       textZoom: textZoom ?? this.textZoom,
+      cacheMode: cacheMode ?? this.cacheMode,
       minimumFontSize: minimumFontSize != null
           ? minimumFontSize()
           : this.minimumFontSize,
@@ -123,6 +150,7 @@ class WebViewSettings {
     allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,
     inspectable: inspectable,
     textZoom: textZoom,
+    cacheMode: CacheModeMessage.values[cacheMode.index],
     minimumFontSize: minimumFontSize,
     userAgent: userAgent,
   );
@@ -141,6 +169,7 @@ class WebViewSettings {
           allowsBackForwardNavigationGestures &&
       other.inspectable == inspectable &&
       other.textZoom == textZoom &&
+      other.cacheMode == cacheMode &&
       other.minimumFontSize == minimumFontSize &&
       other.userAgent == userAgent;
 
@@ -155,6 +184,7 @@ class WebViewSettings {
     allowsBackForwardNavigationGestures,
     inspectable,
     textZoom,
+    cacheMode,
     minimumFontSize,
     userAgent,
   );

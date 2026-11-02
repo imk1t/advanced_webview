@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `WebViewSettings.cacheMode` and `WebViewCacheMode`. Android sets `WebSettings.setCacheMode` for
+  every load; iOS applies the cache policy to requests started with `loadUrl`.
+
 - Add `WebViewSettings.textZoom` (percent; Android scales text only, iOS scales the page with
   `WKWebView.pageZoom`) and `WebViewSettings.minimumFontSize`.
 

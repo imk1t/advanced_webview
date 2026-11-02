@@ -21,6 +21,7 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `allowsBackForwardNavigationGestures` | `false` | 無視 | 対応 |
 | `inspectable` | `false` | 対応（プロセス全体） | 対応 |
 | `textZoom` | `100` | 文字のみ | ページ全体 |
+| `cacheMode` | `normal` | 対応 | `loadUrl` のみ |
 | `minimumFontSize` | `null`（プラットフォーム既定） | 対応 | 対応 |
 | `userAgent` | `null`（プラットフォーム既定） | 対応 | 対応 |
 

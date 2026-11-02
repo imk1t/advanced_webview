@@ -21,6 +21,8 @@ import 'package:pigeon/pigeon.dart';
 // ---------------------------------------------------------------------------
 // Data classes
 // ---------------------------------------------------------------------------
+enum CacheModeMessage { normal, preferCache, cacheOnly, noCache }
+
 class WebViewSettingsMessage {
   WebViewSettingsMessage({
     required this.javaScriptEnabled,
@@ -32,6 +34,7 @@ class WebViewSettingsMessage {
     required this.allowsBackForwardNavigationGestures,
     required this.inspectable,
     required this.textZoom,
+    required this.cacheMode,
     this.minimumFontSize,
     this.userAgent,
   });
@@ -59,6 +62,10 @@ class WebViewSettingsMessage {
   /// Percent, 100 is normal. Android: `WebSettings.setTextZoom`. iOS: scales
   /// the whole page with `WKWebView.pageZoom`.
   int textZoom;
+
+  /// Android: `WebSettings.setCacheMode`. iOS: `URLRequest.cachePolicy` of
+  /// requests started with `loadUrl`.
+  CacheModeMessage cacheMode;
 
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.

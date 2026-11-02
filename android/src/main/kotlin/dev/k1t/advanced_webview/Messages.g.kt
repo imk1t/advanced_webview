@@ -201,6 +201,19 @@ class FlutterError (
   val details: Any? = null
 ) : RuntimeException()
 
+enum class CacheModeMessage(val raw: Int) {
+  NORMAL(0),
+  PREFER_CACHE(1),
+  CACHE_ONLY(2),
+  NO_CACHE(3);
+
+  companion object {
+    fun ofRaw(raw: Int): CacheModeMessage? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class UserScriptInjectionTimeMessage(val raw: Int) {
   AT_DOCUMENT_START(0),
   AT_DOCUMENT_END(1);
@@ -281,6 +294,11 @@ data class WebViewSettingsMessage (
    */
   val textZoom: Long,
   /**
+   * Android: `WebSettings.setCacheMode`. iOS: `URLRequest.cachePolicy` of
+   * requests started with `loadUrl`.
+   */
+  val cacheMode: CacheModeMessage,
+  /**
    * Android: `WebSettings.setMinimumFontSize` (sp). iOS:
    * `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
    */
@@ -299,9 +317,10 @@ data class WebViewSettingsMessage (
       val allowsBackForwardNavigationGestures = pigeonVar_list[6] as Boolean
       val inspectable = pigeonVar_list[7] as Boolean
       val textZoom = pigeonVar_list[8] as Long
-      val minimumFontSize = pigeonVar_list[9] as Long?
-      val userAgent = pigeonVar_list[10] as String?
-      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, transparentBackground, passkeysEnabled, allowsBackForwardNavigationGestures, inspectable, textZoom, minimumFontSize, userAgent)
+      val cacheMode = pigeonVar_list[9] as CacheModeMessage
+      val minimumFontSize = pigeonVar_list[10] as Long?
+      val userAgent = pigeonVar_list[11] as String?
+      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, transparentBackground, passkeysEnabled, allowsBackForwardNavigationGestures, inspectable, textZoom, cacheMode, minimumFontSize, userAgent)
     }
   }
   fun toList(): List<Any?> {
@@ -315,6 +334,7 @@ data class WebViewSettingsMessage (
       allowsBackForwardNavigationGestures,
       inspectable,
       textZoom,
+      cacheMode,
       minimumFontSize,
       userAgent,
     )
@@ -327,7 +347,7 @@ data class WebViewSettingsMessage (
       return true
     }
     val other = other as WebViewSettingsMessage
-    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && MessagesPigeonUtils.deepEquals(this.inspectable, other.inspectable) && MessagesPigeonUtils.deepEquals(this.textZoom, other.textZoom) && MessagesPigeonUtils.deepEquals(this.minimumFontSize, other.minimumFontSize) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent)
+    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && MessagesPigeonUtils.deepEquals(this.inspectable, other.inspectable) && MessagesPigeonUtils.deepEquals(this.textZoom, other.textZoom) && MessagesPigeonUtils.deepEquals(this.cacheMode, other.cacheMode) && MessagesPigeonUtils.deepEquals(this.minimumFontSize, other.minimumFontSize) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent)
   }
 
   override fun hashCode(): Int {
@@ -341,12 +361,13 @@ data class WebViewSettingsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.allowsBackForwardNavigationGestures)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.inspectable)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.textZoom)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.cacheMode)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.minimumFontSize)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userAgent)
     return result
   }
   override fun toString(): String {
-    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, allowsBackForwardNavigationGestures=$allowsBackForwardNavigationGestures, inspectable=$inspectable, textZoom=$textZoom, minimumFontSize=$minimumFontSize, userAgent=$userAgent)"
+    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, allowsBackForwardNavigationGestures=$allowsBackForwardNavigationGestures, inspectable=$inspectable, textZoom=$textZoom, cacheMode=$cacheMode, minimumFontSize=$minimumFontSize, userAgent=$userAgent)"
   }
 }
 
@@ -882,80 +903,85 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
     return when (type) {
       129.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          UserScriptInjectionTimeMessage.ofRaw(it.toInt())
+          CacheModeMessage.ofRaw(it.toInt())
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          NavigationDecisionMessage.ofRaw(it.toInt())
+          UserScriptInjectionTimeMessage.ofRaw(it.toInt())
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          SslErrorDecisionMessage.ofRaw(it.toInt())
+          NavigationDecisionMessage.ofRaw(it.toInt())
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PermissionResourceMessage.ofRaw(it.toInt())
+          SslErrorDecisionMessage.ofRaw(it.toInt())
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PermissionDecisionMessage.ofRaw(it.toInt())
+          PermissionResourceMessage.ofRaw(it.toInt())
         }
       }
       134.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          WebViewSettingsMessage.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          PermissionDecisionMessage.ofRaw(it.toInt())
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UserScriptMessage.fromList(it)
+          WebViewSettingsMessage.fromList(it)
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CreationParamsMessage.fromList(it)
+          UserScriptMessage.fromList(it)
         }
       }
       137.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          NavigationRequestMessage.fromList(it)
+          CreationParamsMessage.fromList(it)
         }
       }
       138.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          WebResourceErrorMessage.fromList(it)
+          NavigationRequestMessage.fromList(it)
         }
       }
       139.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SslErrorMessage.fromList(it)
+          WebResourceErrorMessage.fromList(it)
         }
       }
       140.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthRequestMessage.fromList(it)
+          SslErrorMessage.fromList(it)
         }
       }
       141.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthCredentialsMessage.fromList(it)
+          HttpAuthRequestMessage.fromList(it)
         }
       }
       142.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DownloadRequestMessage.fromList(it)
+          HttpAuthCredentialsMessage.fromList(it)
         }
       }
       143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PermissionRequestMessage.fromList(it)
+          DownloadRequestMessage.fromList(it)
         }
       }
       144.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PermissionRequestMessage.fromList(it)
+        }
+      }
+      145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           CookieMessage.fromList(it)
         }
@@ -965,68 +991,72 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
   }
   override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     when (value) {
-      is UserScriptInjectionTimeMessage -> {
+      is CacheModeMessage -> {
         stream.write(129)
         writeValue(stream, value.raw.toLong())
       }
-      is NavigationDecisionMessage -> {
+      is UserScriptInjectionTimeMessage -> {
         stream.write(130)
         writeValue(stream, value.raw.toLong())
       }
-      is SslErrorDecisionMessage -> {
+      is NavigationDecisionMessage -> {
         stream.write(131)
         writeValue(stream, value.raw.toLong())
       }
-      is PermissionResourceMessage -> {
+      is SslErrorDecisionMessage -> {
         stream.write(132)
         writeValue(stream, value.raw.toLong())
       }
-      is PermissionDecisionMessage -> {
+      is PermissionResourceMessage -> {
         stream.write(133)
         writeValue(stream, value.raw.toLong())
       }
-      is WebViewSettingsMessage -> {
+      is PermissionDecisionMessage -> {
         stream.write(134)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is UserScriptMessage -> {
+      is WebViewSettingsMessage -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is CreationParamsMessage -> {
+      is UserScriptMessage -> {
         stream.write(136)
         writeValue(stream, value.toList())
       }
-      is NavigationRequestMessage -> {
+      is CreationParamsMessage -> {
         stream.write(137)
         writeValue(stream, value.toList())
       }
-      is WebResourceErrorMessage -> {
+      is NavigationRequestMessage -> {
         stream.write(138)
         writeValue(stream, value.toList())
       }
-      is SslErrorMessage -> {
+      is WebResourceErrorMessage -> {
         stream.write(139)
         writeValue(stream, value.toList())
       }
-      is HttpAuthRequestMessage -> {
+      is SslErrorMessage -> {
         stream.write(140)
         writeValue(stream, value.toList())
       }
-      is HttpAuthCredentialsMessage -> {
+      is HttpAuthRequestMessage -> {
         stream.write(141)
         writeValue(stream, value.toList())
       }
-      is DownloadRequestMessage -> {
+      is HttpAuthCredentialsMessage -> {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is PermissionRequestMessage -> {
+      is DownloadRequestMessage -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is PermissionRequestMessage -> {
         stream.write(144)
+        writeValue(stream, value.toList())
+      }
+      is CookieMessage -> {
+        stream.write(145)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

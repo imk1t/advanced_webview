@@ -251,6 +251,7 @@ final class RunnerTests: XCTestCase {
     allowsBackForwardNavigationGestures: Bool = false,
     inspectable: Bool = false,
     textZoom: Int = 100,
+    cacheMode: CacheModeMessage = .normal,
     minimumFontSize: Int? = nil,
     userAgent: String? = nil
   ) -> WebViewSettingsMessage {
@@ -264,6 +265,7 @@ final class RunnerTests: XCTestCase {
       allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,
       inspectable: inspectable,
       textZoom: Int64(textZoom),
+      cacheMode: cacheMode,
       minimumFontSize: minimumFontSize.map { Int64($0) },
       userAgent: userAgent)
   }
