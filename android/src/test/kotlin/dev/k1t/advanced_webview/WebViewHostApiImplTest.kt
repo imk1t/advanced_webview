@@ -163,6 +163,31 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun securitySettingsAreSafeByDefaultAndApplyOnUpdate() {
+        hostApi.create(params(webViewId = 1))
+        val nativeSettings = registry.get(1).webView.settings
+        assertTrue(nativeSettings.domStorageEnabled)
+        assertFalse(nativeSettings.allowFileAccess)
+        assertFalse(nativeSettings.allowContentAccess)
+        assertEquals(WebSettings.MIXED_CONTENT_NEVER_ALLOW, nativeSettings.mixedContentMode)
+
+        hostApi.updateSettings(
+            1,
+            settings(
+                domStorageEnabled = false,
+                allowFileAccess = true,
+                allowContentAccess = true,
+                mixedContentMode = MixedContentModeMessage.COMPATIBILITY,
+            ),
+        )
+
+        assertFalse(nativeSettings.domStorageEnabled)
+        assertTrue(nativeSettings.allowFileAccess)
+        assertTrue(nativeSettings.allowContentAccess)
+        assertEquals(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE, nativeSettings.mixedContentMode)
+    }
+
+    @Test
     fun windowAndScrollSettingsAreAppliedAtCreationAndOnUpdate() {
         hostApi.create(params(webViewId = 1, settings = settings()))
         val webView = registry.get(1).webView
@@ -611,6 +636,10 @@ class WebViewHostApiImplTest {
         scrollbarsVisible: Boolean = true,
         overScrollEnabled: Boolean = true,
         pullToRefreshEnabled: Boolean = false,
+        domStorageEnabled: Boolean = true,
+        allowFileAccess: Boolean = false,
+        allowContentAccess: Boolean = false,
+        mixedContentMode: MixedContentModeMessage = MixedContentModeMessage.NEVER_ALLOW,
         minimumFontSize: Long? = null,
     ) = WebViewSettingsMessage(
         javaScriptEnabled = javaScriptEnabled,
@@ -628,6 +657,10 @@ class WebViewHostApiImplTest {
         scrollbarsVisible = scrollbarsVisible,
         overScrollEnabled = overScrollEnabled,
         pullToRefreshEnabled = pullToRefreshEnabled,
+        domStorageEnabled = domStorageEnabled,
+        allowFileAccess = allowFileAccess,
+        allowContentAccess = allowContentAccess,
+        mixedContentMode = mixedContentMode,
         minimumFontSize = minimumFontSize,
         userAgent = userAgent,
     )

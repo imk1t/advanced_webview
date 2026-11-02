@@ -195,6 +195,12 @@ enum CacheModeMessage: Int, CaseIterable {
   case noCache = 3
 }
 
+enum MixedContentModeMessage: Int, CaseIterable {
+  case neverAllow = 0
+  case compatibility = 1
+  case alwaysAllow = 2
+}
+
 enum UserScriptInjectionTimeMessage: Int, CaseIterable {
   case atDocumentStart = 0
   case atDocumentEnd = 1
@@ -256,6 +262,14 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   /// Android: `SwipeRefreshLayout`. iOS: `UIRefreshControl`. A pull reloads the
   /// page.
   var pullToRefreshEnabled: Bool
+  /// Android: `WebSettings.setDomStorageEnabled`. iOS has no switch.
+  var domStorageEnabled: Bool
+  /// Android: `WebSettings.setAllowFileAccess`. iOS has no equivalent.
+  var allowFileAccess: Bool
+  /// Android: `WebSettings.setAllowContentAccess`. iOS has no equivalent.
+  var allowContentAccess: Bool
+  /// Android: `WebSettings.setMixedContentMode`. iOS has no equivalent.
+  var mixedContentMode: MixedContentModeMessage
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
   var minimumFontSize: Int64? = nil
@@ -279,8 +293,12 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     let scrollbarsVisible = pigeonVar_list[12] as! Bool
     let overScrollEnabled = pigeonVar_list[13] as! Bool
     let pullToRefreshEnabled = pigeonVar_list[14] as! Bool
-    let minimumFontSize: Int64? = nilOrValue(pigeonVar_list[15])
-    let userAgent: String? = nilOrValue(pigeonVar_list[16])
+    let domStorageEnabled = pigeonVar_list[15] as! Bool
+    let allowFileAccess = pigeonVar_list[16] as! Bool
+    let allowContentAccess = pigeonVar_list[17] as! Bool
+    let mixedContentMode = pigeonVar_list[18] as! MixedContentModeMessage
+    let minimumFontSize: Int64? = nilOrValue(pigeonVar_list[19])
+    let userAgent: String? = nilOrValue(pigeonVar_list[20])
 
     return WebViewSettingsMessage(
       javaScriptEnabled: javaScriptEnabled,
@@ -298,6 +316,10 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       scrollbarsVisible: scrollbarsVisible,
       overScrollEnabled: overScrollEnabled,
       pullToRefreshEnabled: pullToRefreshEnabled,
+      domStorageEnabled: domStorageEnabled,
+      allowFileAccess: allowFileAccess,
+      allowContentAccess: allowContentAccess,
+      mixedContentMode: mixedContentMode,
       minimumFontSize: minimumFontSize,
       userAgent: userAgent
     )
@@ -319,6 +341,10 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       scrollbarsVisible,
       overScrollEnabled,
       pullToRefreshEnabled,
+      domStorageEnabled,
+      allowFileAccess,
+      allowContentAccess,
+      mixedContentMode,
       minimumFontSize,
       userAgent,
     ]
@@ -327,7 +353,7 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.cacheMode, rhs.cacheMode) && MessagesPigeonInternal.deepEquals(lhs.incognito, rhs.incognito) && MessagesPigeonInternal.deepEquals(lhs.javaScriptCanOpenWindowsAutomatically, rhs.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonInternal.deepEquals(lhs.scrollbarsVisible, rhs.scrollbarsVisible) && MessagesPigeonInternal.deepEquals(lhs.overScrollEnabled, rhs.overScrollEnabled) && MessagesPigeonInternal.deepEquals(lhs.pullToRefreshEnabled, rhs.pullToRefreshEnabled) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent)
+    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.cacheMode, rhs.cacheMode) && MessagesPigeonInternal.deepEquals(lhs.incognito, rhs.incognito) && MessagesPigeonInternal.deepEquals(lhs.javaScriptCanOpenWindowsAutomatically, rhs.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonInternal.deepEquals(lhs.scrollbarsVisible, rhs.scrollbarsVisible) && MessagesPigeonInternal.deepEquals(lhs.overScrollEnabled, rhs.overScrollEnabled) && MessagesPigeonInternal.deepEquals(lhs.pullToRefreshEnabled, rhs.pullToRefreshEnabled) && MessagesPigeonInternal.deepEquals(lhs.domStorageEnabled, rhs.domStorageEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowFileAccess, rhs.allowFileAccess) && MessagesPigeonInternal.deepEquals(lhs.allowContentAccess, rhs.allowContentAccess) && MessagesPigeonInternal.deepEquals(lhs.mixedContentMode, rhs.mixedContentMode) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -347,12 +373,16 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: scrollbarsVisible, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: overScrollEnabled, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: pullToRefreshEnabled, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: domStorageEnabled, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: allowFileAccess, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: allowContentAccess, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: mixedContentMode, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: minimumFontSize, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userAgent, hasher: &hasher)
   }
 
   public var description: String {
-    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), cacheMode: \(String(describing: cacheMode)), incognito: \(String(describing: incognito)), javaScriptCanOpenWindowsAutomatically: \(String(describing: javaScriptCanOpenWindowsAutomatically)), scrollbarsVisible: \(String(describing: scrollbarsVisible)), overScrollEnabled: \(String(describing: overScrollEnabled)), pullToRefreshEnabled: \(String(describing: pullToRefreshEnabled)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)))"
+    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), cacheMode: \(String(describing: cacheMode)), incognito: \(String(describing: incognito)), javaScriptCanOpenWindowsAutomatically: \(String(describing: javaScriptCanOpenWindowsAutomatically)), scrollbarsVisible: \(String(describing: scrollbarsVisible)), overScrollEnabled: \(String(describing: overScrollEnabled)), pullToRefreshEnabled: \(String(describing: pullToRefreshEnabled)), domStorageEnabled: \(String(describing: domStorageEnabled)), allowFileAccess: \(String(describing: allowFileAccess)), allowContentAccess: \(String(describing: allowContentAccess)), mixedContentMode: \(String(describing: mixedContentMode)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)))"
   }
 }
 
@@ -994,58 +1024,64 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 130:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return UserScriptInjectionTimeMessage(rawValue: enumResultAsInt)
+        return MixedContentModeMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 131:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return NavigationDecisionMessage(rawValue: enumResultAsInt)
+        return UserScriptInjectionTimeMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 132:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return SslErrorDecisionMessage(rawValue: enumResultAsInt)
+        return NavigationDecisionMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 133:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return PermissionResourceMessage(rawValue: enumResultAsInt)
+        return SslErrorDecisionMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 134:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return PermissionDecisionMessage(rawValue: enumResultAsInt)
+        return PermissionResourceMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 135:
-      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return PermissionDecisionMessage(rawValue: enumResultAsInt)
+      }
+      return nil
     case 136:
-      return UserScriptMessage.fromList(self.readValue() as! [Any?])
+      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
     case 137:
-      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
+      return UserScriptMessage.fromList(self.readValue() as! [Any?])
     case 138:
-      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
+      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
     case 139:
-      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
     case 140:
-      return SslErrorMessage.fromList(self.readValue() as! [Any?])
+      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
     case 141:
-      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
+      return SslErrorMessage.fromList(self.readValue() as! [Any?])
     case 142:
-      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
     case 143:
-      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
     case 144:
-      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
+      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
     case 145:
-      return FindResultMessage.fromList(self.readValue() as! [Any?])
+      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
     case 146:
-      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+      return FindResultMessage.fromList(self.readValue() as! [Any?])
     case 147:
+      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+    case 148:
       return CookieMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1058,59 +1094,62 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     if let value = value as? CacheModeMessage {
       super.writeByte(129)
       super.writeValue(value.rawValue)
-    } else if let value = value as? UserScriptInjectionTimeMessage {
+    } else if let value = value as? MixedContentModeMessage {
       super.writeByte(130)
       super.writeValue(value.rawValue)
-    } else if let value = value as? NavigationDecisionMessage {
+    } else if let value = value as? UserScriptInjectionTimeMessage {
       super.writeByte(131)
       super.writeValue(value.rawValue)
-    } else if let value = value as? SslErrorDecisionMessage {
+    } else if let value = value as? NavigationDecisionMessage {
       super.writeByte(132)
       super.writeValue(value.rawValue)
-    } else if let value = value as? PermissionResourceMessage {
+    } else if let value = value as? SslErrorDecisionMessage {
       super.writeByte(133)
       super.writeValue(value.rawValue)
-    } else if let value = value as? PermissionDecisionMessage {
+    } else if let value = value as? PermissionResourceMessage {
       super.writeByte(134)
       super.writeValue(value.rawValue)
-    } else if let value = value as? WebViewSettingsMessage {
+    } else if let value = value as? PermissionDecisionMessage {
       super.writeByte(135)
-      super.writeValue(value.toList())
-    } else if let value = value as? UserScriptMessage {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? WebViewSettingsMessage {
       super.writeByte(136)
       super.writeValue(value.toList())
-    } else if let value = value as? CreationParamsMessage {
+    } else if let value = value as? UserScriptMessage {
       super.writeByte(137)
       super.writeValue(value.toList())
-    } else if let value = value as? NavigationRequestMessage {
+    } else if let value = value as? CreationParamsMessage {
       super.writeByte(138)
       super.writeValue(value.toList())
-    } else if let value = value as? WebResourceErrorMessage {
+    } else if let value = value as? NavigationRequestMessage {
       super.writeByte(139)
       super.writeValue(value.toList())
-    } else if let value = value as? SslErrorMessage {
+    } else if let value = value as? WebResourceErrorMessage {
       super.writeByte(140)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthRequestMessage {
+    } else if let value = value as? SslErrorMessage {
       super.writeByte(141)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthCredentialsMessage {
+    } else if let value = value as? HttpAuthRequestMessage {
       super.writeByte(142)
       super.writeValue(value.toList())
-    } else if let value = value as? DownloadRequestMessage {
+    } else if let value = value as? HttpAuthCredentialsMessage {
       super.writeByte(143)
       super.writeValue(value.toList())
-    } else if let value = value as? PermissionRequestMessage {
+    } else if let value = value as? DownloadRequestMessage {
       super.writeByte(144)
       super.writeValue(value.toList())
-    } else if let value = value as? FindResultMessage {
+    } else if let value = value as? PermissionRequestMessage {
       super.writeByte(145)
       super.writeValue(value.toList())
-    } else if let value = value as? ScrollPositionMessage {
+    } else if let value = value as? FindResultMessage {
       super.writeByte(146)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? ScrollPositionMessage {
       super.writeByte(147)
+      super.writeValue(value.toList())
+    } else if let value = value as? CookieMessage {
+      super.writeByte(148)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)

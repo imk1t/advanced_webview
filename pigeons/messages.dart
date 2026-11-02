@@ -23,6 +23,8 @@ import 'package:pigeon/pigeon.dart';
 // ---------------------------------------------------------------------------
 enum CacheModeMessage { normal, preferCache, cacheOnly, noCache }
 
+enum MixedContentModeMessage { neverAllow, compatibility, alwaysAllow }
+
 class WebViewSettingsMessage {
   WebViewSettingsMessage({
     required this.javaScriptEnabled,
@@ -40,6 +42,10 @@ class WebViewSettingsMessage {
     required this.scrollbarsVisible,
     required this.overScrollEnabled,
     required this.pullToRefreshEnabled,
+    required this.domStorageEnabled,
+    required this.allowFileAccess,
+    required this.allowContentAccess,
+    required this.mixedContentMode,
     this.minimumFontSize,
     this.userAgent,
   });
@@ -89,6 +95,18 @@ class WebViewSettingsMessage {
   /// Android: `SwipeRefreshLayout`. iOS: `UIRefreshControl`. A pull reloads the
   /// page.
   bool pullToRefreshEnabled;
+
+  /// Android: `WebSettings.setDomStorageEnabled`. iOS has no switch.
+  bool domStorageEnabled;
+
+  /// Android: `WebSettings.setAllowFileAccess`. iOS has no equivalent.
+  bool allowFileAccess;
+
+  /// Android: `WebSettings.setAllowContentAccess`. iOS has no equivalent.
+  bool allowContentAccess;
+
+  /// Android: `WebSettings.setMixedContentMode`. iOS has no equivalent.
+  MixedContentModeMessage mixedContentMode;
 
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.

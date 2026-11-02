@@ -90,7 +90,6 @@ class AdvancedWebView(
     private var pendingFind: CancellableContinuation<FindResultMessage>? = null
 
     init {
-        webView.settings.domStorageEnabled = true
         // Without a delegate, window.open and target=_blank load in this WebView.
         webView.settings.setSupportMultipleWindows(hasNewWindowDelegate)
         applySettings(params.settings)
@@ -165,6 +164,14 @@ class AdvancedWebView(
                 CacheModeMessage.PREFER_CACHE -> WebSettings.LOAD_CACHE_ELSE_NETWORK
                 CacheModeMessage.CACHE_ONLY -> WebSettings.LOAD_CACHE_ONLY
                 CacheModeMessage.NO_CACHE -> WebSettings.LOAD_NO_CACHE
+            }
+            domStorageEnabled = settings.domStorageEnabled
+            allowFileAccess = settings.allowFileAccess
+            allowContentAccess = settings.allowContentAccess
+            mixedContentMode = when (settings.mixedContentMode) {
+                MixedContentModeMessage.NEVER_ALLOW -> WebSettings.MIXED_CONTENT_NEVER_ALLOW
+                MixedContentModeMessage.COMPATIBILITY -> WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                MixedContentModeMessage.ALWAYS_ALLOW -> WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             }
             minimumFontSize = settings.minimumFontSize?.toInt() ?: DEFAULT_MINIMUM_FONT_SIZE
             userAgentString = settings.userAgent ?: WebSettings.getDefaultUserAgent(webView.context)

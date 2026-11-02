@@ -27,6 +27,10 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `scrollbarsVisible` | `true` | 対応 | 対応 |
 | `overScrollEnabled` | `true` | 対応 | 対応 |
 | `pullToRefreshEnabled` | `false` | 対応 | 対応（`overScrollEnabled` が必要） |
+| `domStorageEnabled` | `true` | 対応 | 無視（常に有効） |
+| `allowFileAccess` | `false` | 対応 | 無視 |
+| `allowContentAccess` | `false` | 対応 | 無視 |
+| `mixedContentMode` | `neverAllow` | 対応 | 無視（WebKit が遮断） |
 | `minimumFontSize` | `null`（プラットフォーム既定） | 対応 | 対応 |
 | `userAgent` | `null`（プラットフォーム既定） | 対応 | 対応 |
 
