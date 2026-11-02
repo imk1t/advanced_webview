@@ -61,6 +61,8 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   func apply(settings: WebViewSettingsMessage) {
     webView.configuration.defaultWebpagePreferences.allowsContentJavaScript =
       settings.javaScriptEnabled
+    webView.allowsBackForwardNavigationGestures = settings.allowsBackForwardNavigationGestures
+    webView.isInspectable = settings.inspectable
     webView.customUserAgent = settings.userAgent
     webView.isOpaque = !settings.transparentBackground
     webView.backgroundColor = settings.transparentBackground ? .clear : .white

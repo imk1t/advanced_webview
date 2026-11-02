@@ -456,6 +456,7 @@ class WebViewHostApiImplTest {
         transparentBackground: Boolean = false,
         userAgent: String? = null,
         passkeysEnabled: Boolean = false,
+        inspectable: Boolean = false,
     ) = WebViewSettingsMessage(
         javaScriptEnabled = javaScriptEnabled,
         mediaPlaybackRequiresUserGesture = true,
@@ -463,6 +464,8 @@ class WebViewHostApiImplTest {
         supportZoom = supportZoom,
         transparentBackground = transparentBackground,
         passkeysEnabled = passkeysEnabled,
+        allowsBackForwardNavigationGestures = false,
+        inspectable = inspectable,
         userAgent = userAgent,
     )
 }

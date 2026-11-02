@@ -15,6 +15,8 @@ class WebViewSettings {
     this.supportZoom = true,
     this.transparentBackground = false,
     this.passkeysEnabled = false,
+    this.allowsBackForwardNavigationGestures = false,
+    this.inspectable = false,
     this.userAgent,
   });
 
@@ -41,6 +43,20 @@ class WebViewSettings {
   /// Asset Links on Android, `apple-app-site-association` on iOS).
   final bool passkeysEnabled;
 
+  /// Lets the user swipe from the screen edge to go back and forward.
+  ///
+  /// iOS only (`allowsBackForwardNavigationGestures`). Android has no
+  /// equivalent in the WebView, so the setting is ignored there.
+  final bool allowsBackForwardNavigationGestures;
+
+  /// Allows the page to be inspected with Safari Web Inspector (iOS) or
+  /// `chrome://inspect` (Android).
+  ///
+  /// On Android this is process-wide: it calls
+  /// `WebView.setWebContentsDebuggingEnabled`, which applies to every WebView
+  /// in the app, so the latest value set by any controller wins.
+  final bool inspectable;
+
   /// `null` uses the platform default user agent.
   final String? userAgent;
 
@@ -51,6 +67,8 @@ class WebViewSettings {
     bool? supportZoom,
     bool? transparentBackground,
     bool? passkeysEnabled,
+    bool? allowsBackForwardNavigationGestures,
+    bool? inspectable,
     ValueGetter<String?>? userAgent,
   }) {
     return WebViewSettings(
@@ -64,6 +82,10 @@ class WebViewSettings {
       transparentBackground:
           transparentBackground ?? this.transparentBackground,
       passkeysEnabled: passkeysEnabled ?? this.passkeysEnabled,
+      allowsBackForwardNavigationGestures:
+          allowsBackForwardNavigationGestures ??
+          this.allowsBackForwardNavigationGestures,
+      inspectable: inspectable ?? this.inspectable,
       userAgent: userAgent != null ? userAgent() : this.userAgent,
     );
   }
@@ -75,6 +97,8 @@ class WebViewSettings {
     supportZoom: supportZoom,
     transparentBackground: transparentBackground,
     passkeysEnabled: passkeysEnabled,
+    allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,
+    inspectable: inspectable,
     userAgent: userAgent,
   );
 
@@ -88,6 +112,9 @@ class WebViewSettings {
       other.supportZoom == supportZoom &&
       other.transparentBackground == transparentBackground &&
       other.passkeysEnabled == passkeysEnabled &&
+      other.allowsBackForwardNavigationGestures ==
+          allowsBackForwardNavigationGestures &&
+      other.inspectable == inspectable &&
       other.userAgent == userAgent;
 
   @override
@@ -98,6 +125,8 @@ class WebViewSettings {
     supportZoom,
     transparentBackground,
     passkeysEnabled,
+    allowsBackForwardNavigationGestures,
+    inspectable,
     userAgent,
   );
 }

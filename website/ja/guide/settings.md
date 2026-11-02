@@ -18,6 +18,8 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `supportZoom` | `true` | 対応 | 無視 |
 | `transparentBackground` | `false` | 対応 | 対応 |
 | `passkeysEnabled` | `false` | 対応 | 無視（下記参照） |
+| `allowsBackForwardNavigationGestures` | `false` | 無視 | 対応 |
+| `inspectable` | `false` | 対応（プロセス全体） | 対応 |
 | `userAgent` | `null`（プラットフォーム既定） | 対応 | 対応 |
 
 「生成時のみ」の設定はネイティブビューの生成時に適用され、そのプラットフォームでは `updateSettings` で変更しても無視されます。

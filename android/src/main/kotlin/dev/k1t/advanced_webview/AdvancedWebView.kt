@@ -124,6 +124,7 @@ class AdvancedWebView(
                 },
             )
         }
+        WebView.setWebContentsDebuggingEnabled(settings.inspectable)
         webView.setBackgroundColor(if (settings.transparentBackground) Color.TRANSPARENT else Color.WHITE)
     }
 
