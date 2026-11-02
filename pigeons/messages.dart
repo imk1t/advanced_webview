@@ -124,6 +124,7 @@ class CreationParamsMessage {
     required this.hasSslErrorDelegate,
     required this.hasHttpAuthDelegate,
     required this.hasScrollDelegate,
+    required this.hasLongPressDelegate,
     required this.userScripts,
   });
 
@@ -166,6 +167,9 @@ class CreationParamsMessage {
 
   /// When false, scroll changes are never reported to Dart.
   bool hasScrollDelegate;
+
+  /// When false, long presses are never reported to Dart.
+  bool hasLongPressDelegate;
 
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
@@ -400,6 +404,10 @@ abstract class AdvancedWebViewFlutterApi {
 
   /// Only sent when the controller was created with `hasScrollDelegate`.
   void onScrollChanged(int webViewId, double x, double y);
+
+  /// A long press at `x`, `y` (logical pixels, relative to the WebView).
+  /// Only sent when the controller was created with `hasLongPressDelegate`.
+  void onLongPress(int webViewId, double x, double y);
 
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 

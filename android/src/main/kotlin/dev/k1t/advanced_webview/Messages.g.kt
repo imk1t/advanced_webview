@@ -495,6 +495,8 @@ data class CreationParamsMessage (
   val hasHttpAuthDelegate: Boolean,
   /** When false, scroll changes are never reported to Dart. */
   val hasScrollDelegate: Boolean,
+  /** When false, long presses are never reported to Dart. */
+  val hasLongPressDelegate: Boolean,
   /** Scripts injected into every page loaded after creation. */
   val userScripts: List<UserScriptMessage>
 )
@@ -513,8 +515,9 @@ data class CreationParamsMessage (
       val hasSslErrorDelegate = pigeonVar_list[9] as Boolean
       val hasHttpAuthDelegate = pigeonVar_list[10] as Boolean
       val hasScrollDelegate = pigeonVar_list[11] as Boolean
-      val userScripts = pigeonVar_list[12] as List<UserScriptMessage>
-      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, hasDownloadDelegate, hasSslErrorDelegate, hasHttpAuthDelegate, hasScrollDelegate, userScripts)
+      val hasLongPressDelegate = pigeonVar_list[12] as Boolean
+      val userScripts = pigeonVar_list[13] as List<UserScriptMessage>
+      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, hasDownloadDelegate, hasSslErrorDelegate, hasHttpAuthDelegate, hasScrollDelegate, hasLongPressDelegate, userScripts)
     }
   }
   fun toList(): List<Any?> {
@@ -531,6 +534,7 @@ data class CreationParamsMessage (
       hasSslErrorDelegate,
       hasHttpAuthDelegate,
       hasScrollDelegate,
+      hasLongPressDelegate,
       userScripts,
     )
   }
@@ -542,7 +546,7 @@ data class CreationParamsMessage (
       return true
     }
     val other = other as CreationParamsMessage
-    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.hasDownloadDelegate, other.hasDownloadDelegate) && MessagesPigeonUtils.deepEquals(this.hasSslErrorDelegate, other.hasSslErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpAuthDelegate, other.hasHttpAuthDelegate) && MessagesPigeonUtils.deepEquals(this.hasScrollDelegate, other.hasScrollDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.hasDownloadDelegate, other.hasDownloadDelegate) && MessagesPigeonUtils.deepEquals(this.hasSslErrorDelegate, other.hasSslErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpAuthDelegate, other.hasHttpAuthDelegate) && MessagesPigeonUtils.deepEquals(this.hasScrollDelegate, other.hasScrollDelegate) && MessagesPigeonUtils.deepEquals(this.hasLongPressDelegate, other.hasLongPressDelegate) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
   }
 
   override fun hashCode(): Int {
@@ -559,11 +563,12 @@ data class CreationParamsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasSslErrorDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasHttpAuthDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasScrollDelegate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.hasLongPressDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userScripts)
     return result
   }
   override fun toString(): String {
-    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, hasDownloadDelegate=$hasDownloadDelegate, hasSslErrorDelegate=$hasSslErrorDelegate, hasHttpAuthDelegate=$hasHttpAuthDelegate, hasScrollDelegate=$hasScrollDelegate, userScripts=$userScripts)"
+    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, hasDownloadDelegate=$hasDownloadDelegate, hasSslErrorDelegate=$hasSslErrorDelegate, hasHttpAuthDelegate=$hasHttpAuthDelegate, hasScrollDelegate=$hasScrollDelegate, hasLongPressDelegate=$hasLongPressDelegate, userScripts=$userScripts)"
   }
 }
 
@@ -1894,6 +1899,29 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
       val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onScrollChanged$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg, xArg, yArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else {
+            continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /**
+   * A long press at `x`, `y` (logical pixels, relative to the WebView).
+   * Only sent when the controller was created with `hasLongPressDelegate`.
+   */
+  suspend fun onLongPress(webViewIdArg: Long, xArg: Double, yArg: Double)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onLongPress$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, xArg, yArg)) {
         if (it is List<*>) {

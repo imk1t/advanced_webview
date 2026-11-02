@@ -75,6 +75,21 @@ await controller.printPage(jobName: 'Invoice');
 表示された時点で戻ります。WebView が `AdvancedWebView` として画面に表示されている必要があり、
 そうでない場合は `PlatformException`（コード `not-attached`）が投げられます。
 
+## 長押しとヒットテスト
+
+```dart
+AdvancedWebViewController(
+  onLongPress: (position) async {
+    final hit = await controller.hitTest(position);
+    // hit.type: none / link / image / imageLink。hit.linkUrl / hit.imageUrl
+  },
+);
+```
+
+`onLongPress` は WebView 内のタッチ位置を論理ピクセルで通知します。プラットフォーム標準の長押し動作
+（テキスト選択やリンクメニュー）もそのまま動きます。`hitTest` は `document.elementFromPoint` で位置を調べるため、
+メインフレームのみが対象で、両プラットフォームで同じ結果になります。独自のコンテキストメニューを作るときに使います。
+
 ## ページ内検索
 
 ```dart

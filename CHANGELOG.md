@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.onLongPress` (touch position in logical pixels) and `hitTest`, which
+  reports the link and/or image under a point (`WebViewHitTestResult`). Together they let apps build a
+  custom context menu. `hitTest` uses `document.elementFromPoint`, so it is main-frame only and
+  identical on both platforms; the platform's own long-press behaviour is not suppressed.
+
 - Add `AdvancedWebViewController.printPage`, which opens the system print dialog for the current page
   (`PrintManager` on Android, `UIPrintInteractionController` on iOS).
 

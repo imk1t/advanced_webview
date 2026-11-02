@@ -424,6 +424,29 @@ void main() {
     expect(miss.found, isFalse);
   });
 
+  testWidgets('hitTest finds the link and image under a point', (tester) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+    await harness.show(tester);
+    await harness.loadHtml(
+      '<html><body style="margin:0">'
+      '<a href="https://example.com/target" style="display:block;height:50px">link</a>'
+      '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" '
+      'style="display:block;width:50px;height:50px">'
+      '</body></html>',
+    );
+
+    final link = await harness.controller.hitTest(const Offset(10, 10));
+    final image = await harness.controller.hitTest(const Offset(10, 70));
+    final none = await harness.controller.hitTest(const Offset(10, 400));
+
+    expect(link.type, WebViewHitTestType.link);
+    expect(link.linkUrl, 'https://example.com/target');
+    expect(image.type, WebViewHitTestType.image);
+    expect(image.imageUrl, startsWith('data:image/gif'));
+    expect(none.type, WebViewHitTestType.none);
+  });
+
   testWidgets('saveState from one WebView is accepted by another', (
     tester,
   ) async {

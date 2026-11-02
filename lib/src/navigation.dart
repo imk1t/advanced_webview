@@ -37,6 +37,7 @@ class WebResourceError {
 typedef PageEventCallback = void Function(String url);
 typedef ProgressCallback = void Function(int progress);
 typedef TitleChangedCallback = void Function(String? title);
+typedef LongPressCallback = void Function(Offset offset);
 typedef ScrollChangedCallback = void Function(Offset offset);
 typedef WebResourceErrorCallback = void Function(WebResourceError error);
 typedef NavigationRequestCallback = FutureOr<NavigationDecision> Function(

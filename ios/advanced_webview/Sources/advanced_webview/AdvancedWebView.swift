@@ -54,6 +54,13 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     params.userScripts.forEach(addUserScript)
     if hasJavaScriptHandlers { installHandlerBridge() }
     observeProperties()
+    if params.hasLongPressDelegate {
+      let recognizer = UILongPressGestureRecognizer(
+        target: self, action: #selector(handleLongPress(_:)))
+      recognizer.delegate = self
+      recognizer.cancelsTouchesInView = false
+      webView.addGestureRecognizer(recognizer)
+    }
     if params.hasScrollDelegate {
       observations.append(
         webView.scrollView.observe(\.contentOffset, options: [.new]) { [weak self] scrollView, _ in
@@ -368,6 +375,14 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
         self?.send { api, id in try await api.onTitleChanged(webViewId: id, title: title) }
       },
     ]
+  }
+
+  @objc private func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
+    guard recognizer.state == .began else { return }
+    let point = recognizer.location(in: webView)
+    send { api, id in
+      try await api.onLongPress(webViewId: id, x: Double(point.x), y: Double(point.y))
+    }
   }
 
   /// Fire-and-forget call into Dart. Failures are logged, never thrown.
@@ -699,5 +714,15 @@ private final class WeakReplyScriptMessageHandler: NSObject, WKScriptMessageHand
     }
     target.userContentController(
       userContentController, didReceive: message, replyHandler: replyHandler)
+  }
+}
+
+extension AdvancedWebView: UIGestureRecognizerDelegate {
+  /// Let WKWebView's own long-press handling (link preview, text selection) keep working.
+  func gestureRecognizer(
+    _ gestureRecognizer: UIGestureRecognizer,
+    shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer
+  ) -> Bool {
+    return true
   }
 }

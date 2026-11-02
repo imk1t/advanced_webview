@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'cookie.dart';
 import 'download.dart';
 import 'find.dart';
+import 'hit_test.dart';
 import 'navigation.dart';
 import 'permission.dart';
 import 'platform/event_dispatcher.dart';
@@ -32,6 +33,7 @@ class AdvancedWebViewController {
     this.onProgress,
     this.onTitleChanged,
     this.onScrollChanged,
+    this.onLongPress,
     this.onWebResourceError,
     this.onNavigationRequest,
     this.onNewWindow,
@@ -69,6 +71,7 @@ class AdvancedWebViewController {
         hasSslErrorDelegate: onSslError != null,
         hasHttpAuthDelegate: onHttpAuthRequest != null,
         hasScrollDelegate: onScrollChanged != null,
+        hasLongPressDelegate: onLongPress != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
@@ -100,6 +103,14 @@ class AdvancedWebViewController {
   /// construction: leaving it `null` keeps scroll events off the platform
   /// channel.
   final ScrollChangedCallback? onScrollChanged;
+
+  /// Called when the user long-presses the page, with the touch position in
+  /// logical pixels relative to the WebView. Pass it to [hitTest] to find out
+  /// whether a link or image was pressed, for example to show a custom menu.
+  ///
+  /// The platform's own long-press behaviour (text selection, system link
+  /// menu) still happens. Only set at construction.
+  final LongPressCallback? onLongPress;
   final WebResourceErrorCallback? onWebResourceError;
 
   /// Called for main-frame navigations started by the page (links, forms,
@@ -286,6 +297,18 @@ class AdvancedWebViewController {
   Future<void> printPage({String? jobName}) =>
       _call(() => _hostApi.printPage(webViewId, jobName));
 
+  /// Reports what is at [position] (logical pixels, relative to the WebView,
+  /// as given to [onLongPress]): a link, an image, both, or neither.
+  ///
+  /// Implemented with `document.elementFromPoint`, so it only sees the main
+  /// frame and behaves the same on Android and iOS.
+  Future<WebViewHitTestResult> hitTest(Offset position) async {
+    final result = await runJavaScriptReturningResult(
+      hitTestScript(position.dx, position.dy),
+    );
+    return WebViewHitTestResult.fromJson(result);
+  }
+
   /// Captures the visible area of the WebView as a PNG image.
   ///
   /// Returns `null` when nothing can be captured, for example while the view
@@ -393,6 +416,10 @@ class _EventListener implements WebViewEventListener {
   @override
   void onScrollChanged(double x, double y) =>
       _controller.onScrollChanged?.call(Offset(x, y));
+
+  @override
+  void onLongPress(double x, double y) =>
+      _controller.onLongPress?.call(Offset(x, y));
 
   @override
   void onReceivedError(WebResourceErrorMessage error) =>
