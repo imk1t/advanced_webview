@@ -112,6 +112,8 @@ class AdvancedWebView(
             setSupportZoom(settings.supportZoom)
             builtInZoomControls = settings.supportZoom
             displayZoomControls = false
+            textZoom = settings.textZoom.toInt()
+            minimumFontSize = settings.minimumFontSize?.toInt() ?: DEFAULT_MINIMUM_FONT_SIZE
             userAgentString = settings.userAgent ?: WebSettings.getDefaultUserAgent(webView.context)
         }
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
@@ -498,6 +500,9 @@ class AdvancedWebView(
 
     companion object {
         private const val TAG = "AdvancedWebView"
+
+        // WebSettings.getMinimumFontSize() default.
+        private const val DEFAULT_MINIMUM_FONT_SIZE = 8
         private const val BRIDGE_NAME = "advancedWebViewBridge"
 
         // Same contract as the iOS shim: callHandler(name, ...args) returns a promise.

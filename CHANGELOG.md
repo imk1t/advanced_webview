@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `WebViewSettings.textZoom` (percent; Android scales text only, iOS scales the page with
+  `WKWebView.pageZoom`) and `WebViewSettings.minimumFontSize`.
+
 - Add `WebViewSettings.allowsBackForwardNavigationGestures` (iOS only, swipe to go back/forward) and
   `WebViewSettings.inspectable` (Safari Web Inspector on iOS; `WebView.setWebContentsDebuggingEnabled`
   on Android, which is process-wide).

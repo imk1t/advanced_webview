@@ -275,6 +275,16 @@ data class WebViewSettingsMessage (
    * iOS: `WKWebView.isInspectable`.
    */
   val inspectable: Boolean,
+  /**
+   * Percent, 100 is normal. Android: `WebSettings.setTextZoom`. iOS: scales
+   * the whole page with `WKWebView.pageZoom`.
+   */
+  val textZoom: Long,
+  /**
+   * Android: `WebSettings.setMinimumFontSize` (sp). iOS:
+   * `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
+   */
+  val minimumFontSize: Long? = null,
   val userAgent: String? = null
 )
  {
@@ -288,8 +298,10 @@ data class WebViewSettingsMessage (
       val passkeysEnabled = pigeonVar_list[5] as Boolean
       val allowsBackForwardNavigationGestures = pigeonVar_list[6] as Boolean
       val inspectable = pigeonVar_list[7] as Boolean
-      val userAgent = pigeonVar_list[8] as String?
-      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, transparentBackground, passkeysEnabled, allowsBackForwardNavigationGestures, inspectable, userAgent)
+      val textZoom = pigeonVar_list[8] as Long
+      val minimumFontSize = pigeonVar_list[9] as Long?
+      val userAgent = pigeonVar_list[10] as String?
+      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, transparentBackground, passkeysEnabled, allowsBackForwardNavigationGestures, inspectable, textZoom, minimumFontSize, userAgent)
     }
   }
   fun toList(): List<Any?> {
@@ -302,6 +314,8 @@ data class WebViewSettingsMessage (
       passkeysEnabled,
       allowsBackForwardNavigationGestures,
       inspectable,
+      textZoom,
+      minimumFontSize,
       userAgent,
     )
   }
@@ -313,7 +327,7 @@ data class WebViewSettingsMessage (
       return true
     }
     val other = other as WebViewSettingsMessage
-    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && MessagesPigeonUtils.deepEquals(this.inspectable, other.inspectable) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent)
+    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && MessagesPigeonUtils.deepEquals(this.inspectable, other.inspectable) && MessagesPigeonUtils.deepEquals(this.textZoom, other.textZoom) && MessagesPigeonUtils.deepEquals(this.minimumFontSize, other.minimumFontSize) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent)
   }
 
   override fun hashCode(): Int {
@@ -326,11 +340,13 @@ data class WebViewSettingsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.passkeysEnabled)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.allowsBackForwardNavigationGestures)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.inspectable)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.textZoom)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.minimumFontSize)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userAgent)
     return result
   }
   override fun toString(): String {
-    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, allowsBackForwardNavigationGestures=$allowsBackForwardNavigationGestures, inspectable=$inspectable, userAgent=$userAgent)"
+    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, allowsBackForwardNavigationGestures=$allowsBackForwardNavigationGestures, inspectable=$inspectable, textZoom=$textZoom, minimumFontSize=$minimumFontSize, userAgent=$userAgent)"
   }
 }
 

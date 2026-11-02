@@ -954,6 +954,50 @@
       }
     },
     {
+      "dart": "WebViewSettings.textZoom",
+      "group": "settings",
+      "summary": {
+        "en": "Text size as a percentage (100 is normal).",
+        "ja": "文字サイズをパーセントで指定します（100 が標準）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setTextZoom(int)"]
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["WKWebView.pageZoom"],
+        "note": {
+          "en": "iOS has no text-only zoom, so the whole page is scaled.",
+          "ja": "iOS には文字のみのズームがないため、ページ全体が拡大縮小されます。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewSettings.minimumFontSize",
+      "group": "settings",
+      "summary": {
+        "en": "Smallest font size the WebView renders. null uses the platform default.",
+        "ja": "WebView が表示する最小のフォントサイズ。null ならプラットフォームの既定値です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setMinimumFontSize(int)"],
+        "note": {
+          "en": "null restores the Android default of 8.",
+          "ja": "null なら Android の既定値 8 に戻します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKPreferences.minimumFontSize"],
+        "note": {
+          "en": "null restores the default of 0.",
+          "ja": "null なら既定値 0 に戻します。"
+        }
+      }
+    },
+    {
       "dart": "WebViewSettings.userAgent",
       "group": "settings",
       "summary": {

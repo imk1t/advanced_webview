@@ -31,6 +31,8 @@ class WebViewSettingsMessage {
     required this.passkeysEnabled,
     required this.allowsBackForwardNavigationGestures,
     required this.inspectable,
+    required this.textZoom,
+    this.minimumFontSize,
     this.userAgent,
   });
 
@@ -53,6 +55,14 @@ class WebViewSettingsMessage {
   /// Android: process-wide `WebView.setWebContentsDebuggingEnabled`.
   /// iOS: `WKWebView.isInspectable`.
   bool inspectable;
+
+  /// Percent, 100 is normal. Android: `WebSettings.setTextZoom`. iOS: scales
+  /// the whole page with `WKWebView.pageZoom`.
+  int textZoom;
+
+  /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
+  /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
+  int? minimumFontSize;
   String? userAgent;
 }
 
