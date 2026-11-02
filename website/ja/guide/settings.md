@@ -36,6 +36,14 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 
 「生成時のみ」の設定はネイティブビューの生成時に適用され、そのプラットフォームでは `updateSettings` で変更しても無視されます。
 
+## Android のセキュリティ設定
+
+`allowFileAccess`・`allowContentAccess`・`mixedContentMode` の既定値は制限的な側です。ページはローカルファイルや
+`content://` プロバイダーを読めず、HTTPS ページ上の HTTP コンテンツは遮断されます。緩めるのは自分が管理する
+コンテンツに限ってください。`mixedContentMode: alwaysAllow` はネットワーク上の攻撃者に安全なページを改ざんされる
+恐れがあります。iOS には同等の設定がありません（WebKit が混在コンテンツを遮断し、ファイルアクセスの切り替えもありません）。
+`domStorageEnabled` は従来どおり既定で有効です。
+
 ## パスキー（WebAuthn） {#passkeys-webauthn}
 
 パスキーは、ドメインがアプリと関連付けられたサイトでのみ使えます。
