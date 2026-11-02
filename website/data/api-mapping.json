@@ -975,6 +975,27 @@
       }
     },
     {
+      "dart": "WebViewCacheMode",
+      "group": "settings",
+      "summary": {
+        "en": "The values accepted by WebViewSettings.cacheMode.",
+        "ja": "WebViewSettings.cacheMode に指定できる値です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebSettings.LOAD_DEFAULT",
+          "WebSettings.LOAD_CACHE_ELSE_NETWORK",
+          "WebSettings.LOAD_CACHE_ONLY",
+          "WebSettings.LOAD_NO_CACHE"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLRequest.CachePolicy"]
+      }
+    },
+    {
       "dart": "WebViewSettings.cacheMode",
       "group": "settings",
       "summary": {
