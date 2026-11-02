@@ -211,11 +211,12 @@ class WebViewHostApiImplTest {
     }
 
     @Test
-    fun saveStateIsNullWithoutHistoryAndRestoreRejectsGarbage() {
+    fun saveStateReturnsMarshalledBytes() {
+        // Robolectric cannot unmarshall parcels or restore a WebView, so restoring is covered by the
+        // integration test.
         hostApi.create(params(webViewId = 1))
 
-        assertNull(hostApi.saveState(1))
-        assertFalse(hostApi.restoreState(1, byteArrayOf(1, 2, 3)))
+        assertNotNull(hostApi.saveState(1))
     }
 
     @Test
