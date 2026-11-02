@@ -77,6 +77,7 @@
     "ios": {
       "WKWebView": "https://developer.apple.com/documentation/webkit/wkwebview",
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
+      "WKPreferences": "https://developer.apple.com/documentation/webkit/wkpreferences",
       "WKWebpagePreferences": "https://developer.apple.com/documentation/webkit/wkwebpagepreferences",
       "WKNavigationDelegate": "https://developer.apple.com/documentation/webkit/wknavigationdelegate",
       "WKNavigationAction": "https://developer.apple.com/documentation/webkit/wknavigationaction",
