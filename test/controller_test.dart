@@ -161,6 +161,7 @@ void main() {
     });
 
     test('takeScreenshot returns the PNG bytes from native', () async {
+      final controller = createController();
       final bytes = Uint8List.fromList([0x89, 0x50, 0x4e, 0x47]);
       hostApi.nextScreenshot = bytes;
       expect(await controller.takeScreenshot(), bytes);
