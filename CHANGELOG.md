@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.5.0 - 2026-11-02
+
 - **Breaking:** platform-specific settings moved out of `WebViewSettings` into two new classes,
   passed as `WebViewSettings.android` and `WebViewSettings.ios`. The other platform ignores them.
   Defaults are unchanged.
