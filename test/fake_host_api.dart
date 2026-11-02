@@ -62,6 +62,10 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     return nextJavaScriptResult;
   }
 
+  @override
+  Future<void> printPage(int webViewId, String? jobName) async =>
+      calls.add('printPage($jobName)');
+
   Uint8List? nextState;
   bool nextRestoreResult = true;
 

@@ -128,6 +128,20 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     return true
   }
 
+  /// Opens the system print dialog; needs the WebView to be in a window.
+  func printPage(jobName: String?) throws {
+    guard webView.window != nil else {
+      throw PigeonError(code: "not-attached", message: "The WebView is not shown", details: nil)
+    }
+    let info = UIPrintInfo.printInfo()
+    info.outputType = .general
+    info.jobName = jobName ?? webView.title ?? "Document"
+    let controller = UIPrintInteractionController.shared
+    controller.printInfo = info
+    controller.printFormatter = webView.viewPrintFormatter()
+    controller.present(animated: true, completionHandler: nil)
+  }
+
   /// Scroll offsets are logical pixels (points), like Flutter and Android.
   func scrollTo(x: Double, y: Double) {
     webView.scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)

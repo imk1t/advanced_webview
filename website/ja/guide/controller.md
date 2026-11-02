@@ -65,6 +65,16 @@ final restored = await controller.restoreState(state!); // false: 読めない�
 `WKWebView.interactionState` をアーカイブしたもの）。同じプラットフォームでのみ復元し、
 `restoreState` が `false` を返したら破棄してください。まだ履歴がなければ `saveState` は `null` を返します。
 
+## 印刷
+
+```dart
+await controller.printPage(jobName: 'Invoice');
+```
+
+システムの印刷ダイアログ（Android は `PrintManager`、iOS は `UIPrintInteractionController`）を開き、
+表示された時点で戻ります。WebView が `AdvancedWebView` として画面に表示されている必要があり、
+そうでない場合は `PlatformException`（コード `not-attached`）が投げられます。
+
 ## ページ内検索
 
 ```dart

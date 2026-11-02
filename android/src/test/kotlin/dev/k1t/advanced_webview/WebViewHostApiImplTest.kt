@@ -211,6 +211,15 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun printPageFailsWithoutAnActivity() {
+        hostApi.create(params(webViewId = 1))
+
+        val error = assertFailsWith<FlutterError> { hostApi.printPage(1, null) }
+
+        assertEquals("not-attached", error.code)
+    }
+
+    @Test
     fun saveStateReturnsMarshalledBytes() {
         // Robolectric cannot unmarshall parcels or restore a WebView, so restoring is covered by the
         // integration test.

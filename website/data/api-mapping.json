@@ -55,6 +55,7 @@
       "WebView": "https://developer.android.com/reference/android/webkit/WebView",
       "SwipeRefreshLayout": "https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout",
       "Bitmap": "https://developer.android.com/reference/android/graphics/Bitmap",
+      "PrintManager": "https://developer.android.com/reference/android/print/PrintManager",
       "Bundle": "https://developer.android.com/reference/android/os/Bundle",
       "Parcel": "https://developer.android.com/reference/android/os/Parcel",
       "View": "https://developer.android.com/reference/android/view/View",
@@ -84,6 +85,7 @@
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
       "WKWebsiteDataStore": "https://developer.apple.com/documentation/webkit/wkwebsitedatastore",
       "UIImage": "https://developer.apple.com/documentation/uikit/uiimage",
+      "UIPrintInteractionController": "https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller",
       "NSKeyedArchiver": "https://developer.apple.com/documentation/foundation/nskeyedarchiver",
       "NSKeyedUnarchiver": "https://developer.apple.com/documentation/foundation/nskeyedunarchiver",
       "WKFindResult": "https://developer.apple.com/documentation/webkit/wkfindresult",
@@ -447,6 +449,32 @@
           "en": "Clears the selection with window.getSelection().removeAllRanges().",
           "ja": "window.getSelection().removeAllRanges() で選択を解除します。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.printPage",
+      "group": "loading",
+      "summary": {
+        "en": "Opens the system print dialog for the current page.",
+        "ja": "現在のページのシステム印刷ダイアログを開きます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebView.createPrintDocumentAdapter(String)",
+          "PrintManager.print(String, PrintDocumentAdapter, PrintAttributes)"
+        ],
+        "note": {
+          "en": "Needs the Activity the platform view is shown in.",
+          "ja": "プラットフォームビューが表示されている Activity が必要です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "UIPrintInteractionController.present(animated:completionHandler:)",
+          "WKWebView.viewPrintFormatter()"
+        ]
       }
     },
     {

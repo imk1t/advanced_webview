@@ -66,6 +66,8 @@ class WebViewHostApiImpl(
 
     override fun restoreState(webViewId: Long, state: ByteArray): Boolean = registry.get(webViewId).restoreState(state)
 
+    override fun printPage(webViewId: Long, jobName: String?) = registry.get(webViewId).printPage(jobName)
+
     override fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage) =
         registry.get(webViewId).applySettings(settings)
 

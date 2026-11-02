@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.printPage`, which opens the system print dialog for the current page
+  (`PrintManager` on Android, `UIPrintInteractionController` on iOS).
+
 - Add `AdvancedWebViewController.saveState` and `restoreState`, which snapshot and restore the
   back/forward history and scroll position as opaque bytes (`WebView.saveState` on Android,
   `WKWebView.interactionState` on iOS). Snapshots only work on the platform that created them.

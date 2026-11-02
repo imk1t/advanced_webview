@@ -66,6 +66,16 @@ The bytes are opaque and platform specific (a marshalled `Bundle` on Android, th
 `WKWebView.interactionState` on iOS). Restore them only on the same platform, and discard them when
 `restoreState` returns `false`. `saveState` returns `null` when there is no history yet.
 
+## Printing
+
+```dart
+await controller.printPage(jobName: 'Invoice');
+```
+
+Opens the system print dialog (`PrintManager` on Android, `UIPrintInteractionController` on iOS) and
+returns once it is presented. The WebView has to be shown in an `AdvancedWebView`; otherwise the call
+throws a `PlatformException` with code `not-attached`.
+
 ## Find in page
 
 ```dart
