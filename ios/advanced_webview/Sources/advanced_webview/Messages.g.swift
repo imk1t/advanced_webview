@@ -1158,6 +1158,11 @@ protocol AdvancedWebViewHostApi {
   /// Scrolls the page by `dx`, `dy` (logical pixels) without animation.
   func scrollBy(webViewId: Int64, dx: Double, dy: Double) throws
   func getScrollPosition(webViewId: Int64) throws -> ScrollPositionMessage
+  /// Opaque snapshot of the back/forward list and scroll position, or null
+  /// when there is nothing to save. Only valid on the same platform.
+  func saveState(webViewId: Int64) throws -> FlutterStandardTypedData?
+  /// Restores a snapshot from `saveState`. Returns false when it cannot be read.
+  func restoreState(webViewId: Int64, state: FlutterStandardTypedData) throws -> Bool
   func updateSettings(webViewId: Int64, settings: WebViewSettingsMessage) throws
   func setCookie(webViewId: Int64, cookie: CookieMessage) async throws
   /// Returns the cookies the WebView would send to `url`.
@@ -1485,6 +1490,40 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       getScrollPositionChannel.setMessageHandler(nil)
+    }
+    /// Opaque snapshot of the back/forward list and scroll position, or null
+    /// when there is nothing to save. Only valid on the same platform.
+    let saveStateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.saveState\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      saveStateChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        do {
+          let result = try api.saveState(webViewId: webViewIdArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      saveStateChannel.setMessageHandler(nil)
+    }
+    /// Restores a snapshot from `saveState`. Returns false when it cannot be read.
+    let restoreStateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.restoreState\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      restoreStateChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let stateArg = args[1] as! FlutterStandardTypedData
+        do {
+          let result = try api.restoreState(webViewId: webViewIdArg, state: stateArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      restoreStateChannel.setMessageHandler(nil)
     }
     let updateSettingsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.updateSettings\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

@@ -263,6 +263,19 @@ class AdvancedWebViewController {
     return Offset(position.x, position.y);
   }
 
+  /// Saves the back/forward history and scroll position as opaque bytes, or
+  /// `null` when there is nothing to save (for example before the first load).
+  ///
+  /// The format is platform specific and not stable across OS or app versions:
+  /// only pass it to [restoreState] on the same platform, and discard it when
+  /// that returns `false`.
+  Future<Uint8List?> saveState() => _call(() => _hostApi.saveState(webViewId));
+
+  /// Restores bytes returned by [saveState]. Returns `false` when the
+  /// platform cannot read them; the WebView is then left unchanged.
+  Future<bool> restoreState(Uint8List state) =>
+      _call(() => _hostApi.restoreState(webViewId, state));
+
   /// Captures the visible area of the WebView as a PNG image.
   ///
   /// Returns `null` when nothing can be captured, for example while the view

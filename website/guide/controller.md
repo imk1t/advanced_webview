@@ -54,6 +54,18 @@ Offsets are logical pixels on both platforms. To follow the scroll position, pas
 `onScrollChanged: (offset) {}` to the constructor. It fires for every scroll step, so keep it cheap;
 when it is not set, no scroll events cross the platform channel.
 
+## Saving and restoring state
+
+```dart
+final state = await controller.saveState();     // Uint8List? (history + scroll position)
+// ... later, for example after an app restart, on a new controller:
+final restored = await controller.restoreState(state!); // false: unreadable, load normally
+```
+
+The bytes are opaque and platform specific (a marshalled `Bundle` on Android, the archived
+`WKWebView.interactionState` on iOS). Restore them only on the same platform, and discard them when
+`restoreState` returns `false`. `saveState` returns `null` when there is no history yet.
+
 ## Find in page
 
 ```dart

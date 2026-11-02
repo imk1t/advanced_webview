@@ -355,6 +355,13 @@ abstract class AdvancedWebViewHostApi {
 
   ScrollPositionMessage getScrollPosition(int webViewId);
 
+  /// Opaque snapshot of the back/forward list and scroll position, or null
+  /// when there is nothing to save. Only valid on the same platform.
+  Uint8List? saveState(int webViewId);
+
+  /// Restores a snapshot from `saveState`. Returns false when it cannot be read.
+  bool restoreState(int webViewId, Uint8List state);
+
   void updateSettings(int webViewId, WebViewSettingsMessage settings);
 
   @async

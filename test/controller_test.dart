@@ -253,6 +253,19 @@ void main() {
     });
   });
 
+  group('state', () {
+    test('saveState and restoreState use the host API', () async {
+      final controller = createController();
+      expect(await controller.saveState(), isNull);
+      hostApi.nextState = Uint8List.fromList([1, 2, 3]);
+      expect(await controller.saveState(), [1, 2, 3]);
+      expect(await controller.restoreState(Uint8List(2)), isTrue);
+      hostApi.nextRestoreResult = false;
+      expect(await controller.restoreState(Uint8List(2)), isFalse);
+      expect(hostApi.calls, contains('restoreState(2)'));
+    });
+  });
+
   group('scrolling', () {
     test('scrollTo, scrollBy and scrollPosition use the host API', () async {
       final controller = createController();

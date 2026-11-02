@@ -424,6 +424,24 @@ void main() {
     expect(miss.found, isFalse);
   });
 
+  testWidgets('saveState from one WebView is accepted by another', (
+    tester,
+  ) async {
+    final source = _Harness();
+    addTearDown(source.dispose);
+    await source.show(tester);
+    await source.loadHtml('<html><body><p>saved</p></body></html>');
+
+    final state = await source.controller.saveState();
+
+    expect(state, isNotNull);
+    expect(state, isNotEmpty);
+    final target = _Harness();
+    addTearDown(target.dispose);
+    await target.show(tester);
+    expect(await target.controller.restoreState(state!), isTrue);
+  });
+
   testWidgets('the WebView outlives its widget', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);

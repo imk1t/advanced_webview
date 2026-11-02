@@ -55,6 +55,8 @@
       "WebView": "https://developer.android.com/reference/android/webkit/WebView",
       "SwipeRefreshLayout": "https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout",
       "Bitmap": "https://developer.android.com/reference/android/graphics/Bitmap",
+      "Bundle": "https://developer.android.com/reference/android/os/Bundle",
+      "Parcel": "https://developer.android.com/reference/android/os/Parcel",
       "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
@@ -82,6 +84,8 @@
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
       "WKWebsiteDataStore": "https://developer.apple.com/documentation/webkit/wkwebsitedatastore",
       "UIImage": "https://developer.apple.com/documentation/uikit/uiimage",
+      "NSKeyedArchiver": "https://developer.apple.com/documentation/foundation/nskeyedarchiver",
+      "NSKeyedUnarchiver": "https://developer.apple.com/documentation/foundation/nskeyedunarchiver",
       "WKFindResult": "https://developer.apple.com/documentation/webkit/wkfindresult",
       "WKFindConfiguration": "https://developer.apple.com/documentation/webkit/wkfindconfiguration",
       "UIRefreshControl": "https://developer.apple.com/documentation/uikit/uirefreshcontrol",
@@ -443,6 +447,38 @@
           "en": "Clears the selection with window.getSelection().removeAllRanges().",
           "ja": "window.getSelection().removeAllRanges() で選択を解除します。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.saveState",
+      "group": "loading",
+      "summary": {
+        "en": "Saves the back/forward history and scroll position as opaque bytes.",
+        "ja": "戻る/進む履歴とスクロール位置を、中身が不透明なバイト列として保存します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.saveState(Bundle)", "Parcel.marshall()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.interactionState", "NSKeyedArchiver"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.restoreState",
+      "group": "loading",
+      "summary": {
+        "en": "Restores bytes from saveState; returns false when they cannot be read.",
+        "ja": "saveState のバイト列を復元します。読めない場合は false を返します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.restoreState(Bundle)", "Parcel.unmarshall(byte[], int, int)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.interactionState", "NSKeyedUnarchiver"]
       }
     },
     {

@@ -9,7 +9,9 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.net.Uri
 import android.net.http.SslError
+import android.os.Bundle
 import android.os.Message
+import android.os.Parcel
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
@@ -160,6 +162,34 @@ class AdvancedWebView(
         container.isEnabled = settings.pullToRefreshEnabled
         if (!settings.pullToRefreshEnabled) container.isRefreshing = false
         webView.setBackgroundColor(if (settings.transparentBackground) Color.TRANSPARENT else Color.WHITE)
+    }
+
+    /** Back/forward list and scroll position as a marshalled [Bundle], or null while the list is empty. */
+    fun saveState(): ByteArray? {
+        val bundle = Bundle()
+        if (webView.saveState(bundle) == null) return null
+        val parcel = Parcel.obtain()
+        return try {
+            parcel.writeBundle(bundle)
+            parcel.marshall()
+        } finally {
+            parcel.recycle()
+        }
+    }
+
+    fun restoreState(state: ByteArray): Boolean {
+        val parcel = Parcel.obtain()
+        return try {
+            parcel.unmarshall(state, 0, state.size)
+            parcel.setDataPosition(0)
+            val bundle = parcel.readBundle(AdvancedWebView::class.java.classLoader)
+            bundle != null && webView.restoreState(bundle) != null
+        } catch (e: RuntimeException) {
+            // A snapshot from another version can fail to parse.
+            false
+        } finally {
+            parcel.recycle()
+        }
     }
 
     private val density: Double get() = webView.resources.displayMetrics.density.toDouble()

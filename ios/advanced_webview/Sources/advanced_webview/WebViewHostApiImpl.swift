@@ -94,6 +94,14 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     return try registry.get(webViewId).scrollPosition()
   }
 
+  func saveState(webViewId: Int64) throws -> FlutterStandardTypedData? {
+    return try registry.get(webViewId).saveState()
+  }
+
+  func restoreState(webViewId: Int64, state: FlutterStandardTypedData) throws -> Bool {
+    return try registry.get(webViewId).restoreState(state)
+  }
+
   func getTitle(webViewId: Int64) throws -> String? {
     return try registry.get(webViewId).webView.title
   }

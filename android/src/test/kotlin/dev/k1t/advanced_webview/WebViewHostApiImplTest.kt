@@ -211,6 +211,14 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun saveStateIsNullWithoutHistoryAndRestoreRejectsGarbage() {
+        hostApi.create(params(webViewId = 1))
+
+        assertNull(hostApi.saveState(1))
+        assertFalse(hostApi.restoreState(1, byteArrayOf(1, 2, 3)))
+    }
+
+    @Test
     fun scrollToByAndPositionUseLogicalPixels() {
         hostApi.create(params(webViewId = 1))
         val webView = registry.get(1).webView

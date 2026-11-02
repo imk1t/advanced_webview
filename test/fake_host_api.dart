@@ -62,6 +62,21 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     return nextJavaScriptResult;
   }
 
+  Uint8List? nextState;
+  bool nextRestoreResult = true;
+
+  @override
+  Future<Uint8List?> saveState(int webViewId) async {
+    calls.add('saveState');
+    return nextState;
+  }
+
+  @override
+  Future<bool> restoreState(int webViewId, Uint8List state) async {
+    calls.add('restoreState(${state.length})');
+    return nextRestoreResult;
+  }
+
   ScrollPositionMessage nextScrollPosition = ScrollPositionMessage(x: 0, y: 0);
 
   @override
