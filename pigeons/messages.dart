@@ -362,6 +362,10 @@ abstract class AdvancedWebViewHostApi {
   /// Restores a snapshot from `saveState`. Returns false when it cannot be read.
   bool restoreState(int webViewId, Uint8List state);
 
+  /// Opens the system print dialog for the current page. Fails with
+  /// `not-attached` when the WebView is not shown in a window.
+  void printPage(int webViewId, String? jobName);
+
   void updateSettings(int webViewId, WebViewSettingsMessage settings);
 
   @async

@@ -253,6 +253,18 @@ void main() {
     });
   });
 
+  group('printing', () {
+    test('printPage forwards the job name', () async {
+      final controller = createController();
+      await controller.printPage();
+      await controller.printPage(jobName: 'Invoice');
+      expect(
+        hostApi.calls,
+        containsAllInOrder(['printPage(null)', 'printPage(Invoice)']),
+      );
+    });
+  });
+
   group('state', () {
     test('saveState and restoreState use the host API', () async {
       final controller = createController();

@@ -217,6 +217,17 @@ final class RunnerTests: XCTestCase {
   }
 
   @MainActor
+  func testPrintPageFailsWhenTheWebViewIsNotInAWindow() throws {
+    let (hostApi, _, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    defer { hostApi.disposeAll() }
+
+    XCTAssertThrowsError(try hostApi.printPage(webViewId: 1, jobName: nil)) { error in
+      XCTAssertEqual((error as? PigeonError)?.code, "not-attached")
+    }
+  }
+
+  @MainActor
   func testRestoreStateRejectsGarbage() throws {
     let (hostApi, _, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))

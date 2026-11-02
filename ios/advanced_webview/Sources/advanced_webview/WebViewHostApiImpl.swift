@@ -102,6 +102,10 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     return try registry.get(webViewId).restoreState(state)
   }
 
+  func printPage(webViewId: Int64, jobName: String?) throws {
+    try registry.get(webViewId).printPage(jobName: jobName)
+  }
+
   func getTitle(webViewId: Int64) throws -> String? {
     return try registry.get(webViewId).webView.title
   }

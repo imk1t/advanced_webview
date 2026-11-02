@@ -1256,6 +1256,11 @@ interface AdvancedWebViewHostApi {
   fun saveState(webViewId: Long): ByteArray?
   /** Restores a snapshot from `saveState`. Returns false when it cannot be read. */
   fun restoreState(webViewId: Long, state: ByteArray): Boolean
+  /**
+   * Opens the system print dialog for the current page. Fails with
+   * `not-attached` when the WebView is not shown in a window.
+   */
+  fun printPage(webViewId: Long, jobName: String?)
   fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage)
   suspend fun setCookie(webViewId: Long, cookie: CookieMessage)
   /** Returns the cookies the WebView would send to `url`. */
@@ -1651,6 +1656,25 @@ interface AdvancedWebViewHostApi {
             val stateArg = args[1] as ByteArray
             val wrapped: List<Any?> = try {
               listOf(api.restoreState(webViewIdArg, stateArg))
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.printPage$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val jobNameArg = args[1] as String?
+            val wrapped: List<Any?> = try {
+              api.printPage(webViewIdArg, jobNameArg)
+              listOf(null)
             } catch (exception: Throwable) {
               MessagesPigeonUtils.wrapError(exception)
             }

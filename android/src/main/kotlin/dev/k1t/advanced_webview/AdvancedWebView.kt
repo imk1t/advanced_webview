@@ -2,7 +2,9 @@ package dev.k1t.advanced_webview
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.MutableContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -12,6 +14,8 @@ import android.net.http.SslError
 import android.os.Bundle
 import android.os.Message
 import android.os.Parcel
+import android.print.PrintAttributes
+import android.print.PrintManager
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
@@ -190,6 +194,16 @@ class AdvancedWebView(
         } finally {
             parcel.recycle()
         }
+    }
+
+    /** Opens the system print dialog; needs the Activity the platform view is shown in. */
+    fun printPage(jobName: String?) {
+        var current: Context? = webView.context
+        while (current is ContextWrapper && current !is Activity) current = current.baseContext
+        val activity = current as? Activity ?: throw FlutterError("not-attached", "The WebView is not shown", null)
+        val name = jobName ?: webView.title ?: "Document"
+        val printManager = activity.getSystemService(Context.PRINT_SERVICE) as PrintManager
+        printManager.print(name, webView.createPrintDocumentAdapter(name), PrintAttributes.Builder().build())
     }
 
     private val density: Double get() = webView.resources.displayMetrics.density.toDouble()

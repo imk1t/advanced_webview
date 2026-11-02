@@ -1163,6 +1163,9 @@ protocol AdvancedWebViewHostApi {
   func saveState(webViewId: Int64) throws -> FlutterStandardTypedData?
   /// Restores a snapshot from `saveState`. Returns false when it cannot be read.
   func restoreState(webViewId: Int64, state: FlutterStandardTypedData) throws -> Bool
+  /// Opens the system print dialog for the current page. Fails with
+  /// `not-attached` when the WebView is not shown in a window.
+  func printPage(webViewId: Int64, jobName: String?) throws
   func updateSettings(webViewId: Int64, settings: WebViewSettingsMessage) throws
   func setCookie(webViewId: Int64, cookie: CookieMessage) async throws
   /// Returns the cookies the WebView would send to `url`.
@@ -1524,6 +1527,24 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       restoreStateChannel.setMessageHandler(nil)
+    }
+    /// Opens the system print dialog for the current page. Fails with
+    /// `not-attached` when the WebView is not shown in a window.
+    let printPageChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.printPage\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      printPageChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let jobNameArg: String? = nilOrValue(args[1])
+        do {
+          try api.printPage(webViewId: webViewIdArg, jobName: jobNameArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      printPageChannel.setMessageHandler(nil)
     }
     let updateSettingsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.updateSettings\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
