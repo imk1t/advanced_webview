@@ -22,6 +22,9 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `inspectable` | `false` | 対応（プロセス全体） | 対応 |
 | `textZoom` | `100` | 文字のみ | ページ全体 |
 | `cacheMode` | `normal` | 対応 | `loadUrl` のみ |
+| `javaScriptCanOpenWindowsAutomatically` | `true` | 対応 | 対応 |
+| `scrollbarsVisible` | `true` | 対応 | 対応 |
+| `overScrollEnabled` | `true` | 対応 | 対応 |
 | `minimumFontSize` | `null`（プラットフォーム既定） | 対応 | 対応 |
 | `userAgent` | `null`（プラットフォーム既定） | 対応 | 対応 |
 

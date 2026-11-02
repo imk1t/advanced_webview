@@ -107,6 +107,21 @@ void main() {
       expect(message.allowsBackForwardNavigationGestures, isTrue);
     });
 
+    test('window and scroll settings are passed to native', () {
+      final defaults = const WebViewSettings().toMessage();
+      expect(defaults.javaScriptCanOpenWindowsAutomatically, isTrue);
+      expect(defaults.scrollbarsVisible, isTrue);
+      expect(defaults.overScrollEnabled, isTrue);
+      final message = const WebViewSettings(
+        javaScriptCanOpenWindowsAutomatically: false,
+        scrollbarsVisible: false,
+        overScrollEnabled: false,
+      ).toMessage();
+      expect(message.javaScriptCanOpenWindowsAutomatically, isFalse);
+      expect(message.scrollbarsVisible, isFalse);
+      expect(message.overScrollEnabled, isFalse);
+    });
+
     test('cacheMode is passed to native', () {
       expect(
         const WebViewSettings().toMessage().cacheMode,

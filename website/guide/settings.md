@@ -23,6 +23,9 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `inspectable` | `false` | Yes (process-wide) | Yes |
 | `textZoom` | `100` | Text only | Whole page |
 | `cacheMode` | `normal` | Yes | `loadUrl` only |
+| `javaScriptCanOpenWindowsAutomatically` | `true` | Yes | Yes |
+| `scrollbarsVisible` | `true` | Yes | Yes |
+| `overScrollEnabled` | `true` | Yes | Yes |
 | `minimumFontSize` | `null` (platform default) | Yes | Yes |
 | `userAgent` | `null` (platform default) | Yes | Yes |
 

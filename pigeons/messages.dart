@@ -35,6 +35,9 @@ class WebViewSettingsMessage {
     required this.inspectable,
     required this.textZoom,
     required this.cacheMode,
+    required this.javaScriptCanOpenWindowsAutomatically,
+    required this.scrollbarsVisible,
+    required this.overScrollEnabled,
     this.minimumFontSize,
     this.userAgent,
   });
@@ -66,6 +69,16 @@ class WebViewSettingsMessage {
   /// Android: `WebSettings.setCacheMode`. iOS: `URLRequest.cachePolicy` of
   /// requests started with `loadUrl`.
   CacheModeMessage cacheMode;
+
+  /// Android: `WebSettings.setJavaScriptCanOpenWindowsAutomatically`. iOS:
+  /// `WKPreferences.javaScriptCanOpenWindowsAutomatically`.
+  bool javaScriptCanOpenWindowsAutomatically;
+
+  /// Android: vertical and horizontal scroll bars. iOS: scroll indicators.
+  bool scrollbarsVisible;
+
+  /// Android: `View.setOverScrollMode`. iOS: `UIScrollView.bounces`.
+  bool overScrollEnabled;
 
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.

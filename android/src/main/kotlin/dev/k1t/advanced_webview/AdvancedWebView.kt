@@ -71,7 +71,6 @@ class AdvancedWebView(
         webView.settings.domStorageEnabled = true
         // Without a delegate, window.open and target=_blank load in this WebView.
         webView.settings.setSupportMultipleWindows(hasNewWindowDelegate)
-        webView.settings.javaScriptCanOpenWindowsAutomatically = true
         applySettings(params.settings)
         webView.webViewClient = Client()
         webView.webChromeClient = ChromeClient()
@@ -112,6 +111,7 @@ class AdvancedWebView(
             setSupportZoom(settings.supportZoom)
             builtInZoomControls = settings.supportZoom
             displayZoomControls = false
+            javaScriptCanOpenWindowsAutomatically = settings.javaScriptCanOpenWindowsAutomatically
             textZoom = settings.textZoom.toInt()
             cacheMode = when (settings.cacheMode) {
                 CacheModeMessage.NORMAL -> WebSettings.LOAD_DEFAULT
@@ -132,6 +132,10 @@ class AdvancedWebView(
                 },
             )
         }
+        webView.setVerticalScrollBarEnabled(settings.scrollbarsVisible)
+        webView.setHorizontalScrollBarEnabled(settings.scrollbarsVisible)
+        webView.overScrollMode =
+            if (settings.overScrollEnabled) View.OVER_SCROLL_IF_CONTENT_SCROLLS else View.OVER_SCROLL_NEVER
         WebView.setWebContentsDebuggingEnabled(settings.inspectable)
         webView.setBackgroundColor(if (settings.transparentBackground) Color.TRANSPARENT else Color.WHITE)
     }

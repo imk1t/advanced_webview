@@ -41,8 +41,6 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     configuration.allowsInlineMediaPlayback = params.settings.allowsInlineMediaPlayback
     configuration.mediaTypesRequiringUserActionForPlayback =
       params.settings.mediaPlaybackRequiresUserGesture ? .all : []
-    // Same as Android: let scripts call window.open without a user gesture.
-    configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
     self.webView = WKWebView(frame: .zero, configuration: configuration)
     super.init()
 
@@ -71,6 +69,11 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
       case .cacheOnly: .returnCacheDataDontLoad
       case .noCache: .reloadIgnoringLocalCacheData
       }
+    webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically =
+      settings.javaScriptCanOpenWindowsAutomatically
+    webView.scrollView.showsVerticalScrollIndicator = settings.scrollbarsVisible
+    webView.scrollView.showsHorizontalScrollIndicator = settings.scrollbarsVisible
+    webView.scrollView.bounces = settings.overScrollEnabled
     webView.pageZoom = CGFloat(settings.textZoom) / 100
     webView.configuration.preferences.minimumFontSize =
       settings.minimumFontSize.map { CGFloat($0) } ?? 0

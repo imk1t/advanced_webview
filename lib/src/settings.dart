@@ -35,6 +35,9 @@ class WebViewSettings {
     this.inspectable = false,
     this.textZoom = 100,
     this.cacheMode = WebViewCacheMode.normal,
+    this.javaScriptCanOpenWindowsAutomatically = true,
+    this.scrollbarsVisible = true,
+    this.overScrollEnabled = true,
     this.minimumFontSize,
     this.userAgent,
   }) : assert(textZoom > 0, 'textZoom must be positive'),
@@ -94,6 +97,17 @@ class WebViewSettings {
   /// use the default policy.
   final WebViewCacheMode cacheMode;
 
+  /// Lets scripts call `window.open` without a user gesture. When `false`,
+  /// `window.open` only works in response to a tap or click.
+  final bool javaScriptCanOpenWindowsAutomatically;
+
+  /// Shows scroll bars (Android) or scroll indicators (iOS) while scrolling.
+  final bool scrollbarsVisible;
+
+  /// Allows scrolling past the content edge: the stretch / glow effect on
+  /// Android and the bounce on iOS.
+  final bool overScrollEnabled;
+
   /// Smallest font size the WebView renders: sp on Android
   /// (`WebSettings.setMinimumFontSize`), pt on iOS
   /// (`WKPreferences.minimumFontSize`). `null` uses the platform default.
@@ -113,6 +127,9 @@ class WebViewSettings {
     bool? inspectable,
     int? textZoom,
     WebViewCacheMode? cacheMode,
+    bool? javaScriptCanOpenWindowsAutomatically,
+    bool? scrollbarsVisible,
+    bool? overScrollEnabled,
     ValueGetter<int?>? minimumFontSize,
     ValueGetter<String?>? userAgent,
   }) {
@@ -133,6 +150,11 @@ class WebViewSettings {
       inspectable: inspectable ?? this.inspectable,
       textZoom: textZoom ?? this.textZoom,
       cacheMode: cacheMode ?? this.cacheMode,
+      javaScriptCanOpenWindowsAutomatically:
+          javaScriptCanOpenWindowsAutomatically ??
+          this.javaScriptCanOpenWindowsAutomatically,
+      scrollbarsVisible: scrollbarsVisible ?? this.scrollbarsVisible,
+      overScrollEnabled: overScrollEnabled ?? this.overScrollEnabled,
       minimumFontSize: minimumFontSize != null
           ? minimumFontSize()
           : this.minimumFontSize,
@@ -151,6 +173,10 @@ class WebViewSettings {
     inspectable: inspectable,
     textZoom: textZoom,
     cacheMode: CacheModeMessage.values[cacheMode.index],
+    javaScriptCanOpenWindowsAutomatically:
+        javaScriptCanOpenWindowsAutomatically,
+    scrollbarsVisible: scrollbarsVisible,
+    overScrollEnabled: overScrollEnabled,
     minimumFontSize: minimumFontSize,
     userAgent: userAgent,
   );
@@ -170,6 +196,10 @@ class WebViewSettings {
       other.inspectable == inspectable &&
       other.textZoom == textZoom &&
       other.cacheMode == cacheMode &&
+      other.javaScriptCanOpenWindowsAutomatically ==
+          javaScriptCanOpenWindowsAutomatically &&
+      other.scrollbarsVisible == scrollbarsVisible &&
+      other.overScrollEnabled == overScrollEnabled &&
       other.minimumFontSize == minimumFontSize &&
       other.userAgent == userAgent;
 
@@ -185,6 +215,9 @@ class WebViewSettings {
     inspectable,
     textZoom,
     cacheMode,
+    javaScriptCanOpenWindowsAutomatically,
+    scrollbarsVisible,
+    overScrollEnabled,
     minimumFontSize,
     userAgent,
   );

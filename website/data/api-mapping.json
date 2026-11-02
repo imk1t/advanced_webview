@@ -53,6 +53,7 @@
   "classes": {
     "android": {
       "WebView": "https://developer.android.com/reference/android/webkit/WebView",
+      "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
       "WebChromeClient": "https://developer.android.com/reference/android/webkit/WebChromeClient",
@@ -1019,6 +1020,60 @@
           "en": "Applied to requests started with loadUrl; link taps and subresources use the default policy.",
           "ja": "loadUrl で開始したリクエストに適用されます。リンクのタップやサブリソースは既定のポリシーです。"
         }
+      }
+    },
+    {
+      "dart": "WebViewSettings.javaScriptCanOpenWindowsAutomatically",
+      "group": "settings",
+      "summary": {
+        "en": "Lets scripts call window.open without a user gesture.",
+        "ja": "ユーザー操作なしでスクリプトから window.open を呼べるようにします。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setJavaScriptCanOpenWindowsAutomatically(boolean)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKPreferences.javaScriptCanOpenWindowsAutomatically"]
+      }
+    },
+    {
+      "dart": "WebViewSettings.scrollbarsVisible",
+      "group": "settings",
+      "summary": {
+        "en": "Shows scroll bars (Android) or scroll indicators (iOS).",
+        "ja": "スクロールバー（Android）／スクロールインジケータ（iOS）を表示します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "View.setVerticalScrollBarEnabled(boolean)",
+          "View.setHorizontalScrollBarEnabled(boolean)"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "UIScrollView.showsVerticalScrollIndicator",
+          "UIScrollView.showsHorizontalScrollIndicator"
+        ]
+      }
+    },
+    {
+      "dart": "WebViewSettings.overScrollEnabled",
+      "group": "settings",
+      "summary": {
+        "en": "Allows scrolling past the content edge (stretch on Android, bounce on iOS).",
+        "ja": "コンテンツの端を越えたスクロールを許可します（Android はストレッチ、iOS はバウンス）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.setOverScrollMode(int)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.bounces"]
       }
     },
     {
