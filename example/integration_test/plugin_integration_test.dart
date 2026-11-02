@@ -388,6 +388,19 @@ void main() {
 
     await harness.show(tester);
     await harness.loadHtml('<html><body><h1>shot</h1></body></html>');
+    // The platform view gets its size asynchronously; wait until it has one.
+    final deadline = DateTime.now().add(_timeout);
+    while (await harness.controller.runJavaScriptReturningResult(
+          'window.innerWidth',
+        ) ==
+        0) {
+      expect(
+        DateTime.now().isBefore(deadline),
+        isTrue,
+        reason: 'view has no size',
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
     final png = await harness.controller.takeScreenshot();
 
     expect(png, isNotNull);
