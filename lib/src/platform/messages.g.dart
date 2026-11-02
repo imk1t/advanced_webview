@@ -354,6 +354,7 @@ class CreationParamsMessage {
     required this.hasSslErrorDelegate,
     required this.hasHttpAuthDelegate,
     required this.hasScrollDelegate,
+    required this.hasLongPressDelegate,
     required this.userScripts,
   });
 
@@ -398,6 +399,9 @@ class CreationParamsMessage {
   /// When false, scroll changes are never reported to Dart.
   bool hasScrollDelegate;
 
+  /// When false, long presses are never reported to Dart.
+  bool hasLongPressDelegate;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 
@@ -415,6 +419,7 @@ class CreationParamsMessage {
       hasSslErrorDelegate,
       hasHttpAuthDelegate,
       hasScrollDelegate,
+      hasLongPressDelegate,
       userScripts,
     ];
   }
@@ -437,7 +442,8 @@ class CreationParamsMessage {
       hasSslErrorDelegate: result[9]! as bool,
       hasHttpAuthDelegate: result[10]! as bool,
       hasScrollDelegate: result[11]! as bool,
-      userScripts: (result[12]! as List<Object?>).cast<UserScriptMessage>(),
+      hasLongPressDelegate: result[12]! as bool,
+      userScripts: (result[13]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -450,7 +456,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -459,7 +465,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, userScripts: $userScripts)';
   }
 }
 
@@ -1712,6 +1718,10 @@ abstract class AdvancedWebViewFlutterApi {
   /// Only sent when the controller was created with `hasScrollDelegate`.
   void onScrollChanged(int webViewId, double x, double y);
 
+  /// A long press at `x`, `y` (logical pixels, relative to the WebView).
+  /// Only sent when the controller was created with `hasLongPressDelegate`.
+  void onLongPress(int webViewId, double x, double y);
+
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 
   Future<NavigationDecisionMessage> shouldOverrideUrlLoading(int webViewId, NavigationRequestMessage request);
@@ -1846,6 +1856,29 @@ abstract class AdvancedWebViewFlutterApi {
           final double arg_y = args[2]! as double;
           try {
             api.onScrollChanged(arg_webViewId, arg_x, arg_y);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onLongPress$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final double arg_x = args[1]! as double;
+          final double arg_y = args[2]! as double;
+          try {
+            api.onLongPress(arg_webViewId, arg_x, arg_y);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

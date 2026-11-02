@@ -343,6 +343,7 @@ final class RunnerTests: XCTestCase {
     hasSslErrorDelegate: Bool = false,
     hasHttpAuthDelegate: Bool = false,
     hasScrollDelegate: Bool = false,
+    hasLongPressDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
     return CreationParamsMessage(
@@ -358,6 +359,7 @@ final class RunnerTests: XCTestCase {
       hasSslErrorDelegate: hasSslErrorDelegate,
       hasHttpAuthDelegate: hasHttpAuthDelegate,
       hasScrollDelegate: hasScrollDelegate,
+      hasLongPressDelegate: hasLongPressDelegate,
       userScripts: userScripts)
   }
 

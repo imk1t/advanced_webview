@@ -76,6 +76,22 @@ Opens the system print dialog (`PrintManager` on Android, `UIPrintInteractionCon
 returns once it is presented. The WebView has to be shown in an `AdvancedWebView`; otherwise the call
 throws a `PlatformException` with code `not-attached`.
 
+## Long press and hit testing
+
+```dart
+AdvancedWebViewController(
+  onLongPress: (position) async {
+    final hit = await controller.hitTest(position);
+    // hit.type: none, link, image or imageLink; hit.linkUrl / hit.imageUrl
+  },
+);
+```
+
+`onLongPress` reports the touch position in logical pixels relative to the WebView, and the platform's own
+long-press behaviour (text selection, link menu) still happens. `hitTest` looks the position up with
+`document.elementFromPoint`, so it only sees the main frame and works the same on both platforms. Use it
+to build a custom context menu.
+
 ## Find in page
 
 ```dart

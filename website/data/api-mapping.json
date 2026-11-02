@@ -85,6 +85,7 @@
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
       "WKWebsiteDataStore": "https://developer.apple.com/documentation/webkit/wkwebsitedatastore",
       "UIImage": "https://developer.apple.com/documentation/uikit/uiimage",
+      "UILongPressGestureRecognizer": "https://developer.apple.com/documentation/uikit/uilongpressgesturerecognizer",
       "UIPrintInteractionController": "https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller",
       "NSKeyedArchiver": "https://developer.apple.com/documentation/foundation/nskeyedarchiver",
       "NSKeyedUnarchiver": "https://developer.apple.com/documentation/foundation/nskeyedunarchiver",
@@ -452,6 +453,54 @@
       }
     },
     {
+      "dart": "AdvancedWebViewController.hitTest",
+      "group": "javascript",
+      "summary": {
+        "en": "Reports the link and image at a point, using document.elementFromPoint.",
+        "ja": "指定位置のリンクと画像を document.elementFromPoint で調べます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.evaluateJavascript(String, ValueCallback)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:)"]
+      }
+    },
+    {
+      "dart": "WebViewHitTestResult",
+      "group": "javascript",
+      "summary": {
+        "en": "The link and image URLs found by hitTest.",
+        "ja": "hitTest が見つけたリンクと画像の URL です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.evaluateJavascript(String, ValueCallback)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:)"]
+      }
+    },
+    {
+      "dart": "WebViewHitTestType",
+      "group": "javascript",
+      "summary": {
+        "en": "Whether hitTest found a link, an image, both or neither.",
+        "ja": "hitTest がリンク・画像・両方・どちらでもないのどれを見つけたかを表します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.evaluateJavascript(String, ValueCallback)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:)"]
+      }
+    },
+    {
       "dart": "AdvancedWebViewController.printPage",
       "group": "loading",
       "summary": {
@@ -747,6 +796,25 @@
           "en": "Observed with KVO.",
           "ja": "KVO で監視します。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onLongPress",
+      "group": "events",
+      "summary": {
+        "en": "The user long-pressed the page; reports the touch position in logical pixels.",
+        "ja": "ユーザーがページを長押ししました。タッチ位置を論理ピクセルで通知します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "View.setOnLongClickListener(OnLongClickListener)",
+          "View.setOnTouchListener(OnTouchListener)"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UILongPressGestureRecognizer"]
       }
     },
     {

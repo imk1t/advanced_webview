@@ -578,6 +578,7 @@ class WebViewHostApiImplTest {
         hasSslErrorDelegate: Boolean = false,
         hasHttpAuthDelegate: Boolean = false,
         hasScrollDelegate: Boolean = false,
+        hasLongPressDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
         webViewId,
@@ -592,6 +593,7 @@ class WebViewHostApiImplTest {
         hasSslErrorDelegate,
         hasHttpAuthDelegate,
         hasScrollDelegate,
+        hasLongPressDelegate,
         userScripts,
     )
 

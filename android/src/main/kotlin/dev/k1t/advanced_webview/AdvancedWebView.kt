@@ -16,6 +16,7 @@ import android.os.Message
 import android.os.Parcel
 import android.print.PrintAttributes
 import android.print.PrintManager
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
@@ -98,12 +99,32 @@ class AdvancedWebView(
         params.javaScriptChannelNames.forEach(::addJavaScriptChannel)
         params.userScripts.forEach(::addUserScript)
         if (params.hasDownloadDelegate) webView.setDownloadListener(::onDownload)
+        if (params.hasLongPressDelegate) installLongPress()
         if (params.hasScrollDelegate) {
             webView.setOnScrollChangeListener { _, x, y, _, _ ->
                 send { flutterApi.onScrollChanged(id, x / density, y / density) }
             }
         }
         if (params.javaScriptHandlerNames.isNotEmpty()) installHandlerBridge(params.javaScriptHandlerObjectName)
+    }
+
+    // The long-click callback has no position, so remember where the last touch went down.
+    @SuppressLint("ClickableViewAccessibility")
+    private fun installLongPress() {
+        var downX = 0f
+        var downY = 0f
+        webView.setOnTouchListener { _, event ->
+            if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                downX = event.x
+                downY = event.y
+            }
+            false
+        }
+        // Returning false keeps the platform behaviour (text selection, context menu).
+        webView.setOnLongClickListener {
+            send { flutterApi.onLongPress(id, downX / density, downY / density) }
+            false
+        }
     }
 
     private fun onDownload(

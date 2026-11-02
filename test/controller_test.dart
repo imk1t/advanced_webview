@@ -26,6 +26,7 @@ void main() {
     List<UserScript> userScripts = const [],
     PageEventCallback? onPageFinished,
     ScrollChangedCallback? onScrollChanged,
+    LongPressCallback? onLongPress,
     WebResourceErrorCallback? onWebResourceError,
     NavigationRequestCallback? onNavigationRequest,
     NewWindowCallback? onNewWindow,
@@ -43,6 +44,7 @@ void main() {
       userScripts: userScripts,
       onPageFinished: onPageFinished,
       onScrollChanged: onScrollChanged,
+      onLongPress: onLongPress,
       onWebResourceError: onWebResourceError,
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
@@ -275,6 +277,52 @@ void main() {
       hostApi.nextRestoreResult = false;
       expect(await controller.restoreState(Uint8List(2)), isFalse);
       expect(hostApi.calls, contains('restoreState(2)'));
+    });
+  });
+
+  group('hit testing', () {
+    test('onLongPress is routed and flagged at creation', () {
+      final without = createController();
+      expect(hostApi.created[without.webViewId]!.hasLongPressDelegate, isFalse);
+
+      final offsets = <Offset>[];
+      final controller = createController(onLongPress: offsets.add);
+      expect(hostApi.created[controller.webViewId]!.hasLongPressDelegate, true);
+      dispatcher.onLongPress(controller.webViewId, 3, 4);
+      expect(offsets, [const Offset(3, 4)]);
+    });
+
+    test('hitTest maps the script result to a type', () async {
+      final controller = createController();
+      hostApi.nextJavaScriptResult =
+          '{"link":"https://a.dev/","image":"https://a.dev/i.png"}';
+      final both = await controller.hitTest(const Offset(1, 2));
+      expect(both.type, WebViewHitTestType.imageLink);
+      expect(both.linkUrl, 'https://a.dev/');
+      expect(both.imageUrl, 'https://a.dev/i.png');
+      expect(hostApi.calls.last, contains('elementFromPoint(x, y)'));
+      expect(hostApi.calls.last, contains('})(1.0, 2.0)'));
+
+      hostApi.nextJavaScriptResult = '{"link":"https://a.dev/","image":null}';
+      expect(
+        (await controller.hitTest(Offset.zero)).type,
+        WebViewHitTestType.link,
+      );
+      hostApi.nextJavaScriptResult = '{"link":null,"image":"https://a.dev/i"}';
+      expect(
+        (await controller.hitTest(Offset.zero)).type,
+        WebViewHitTestType.image,
+      );
+      hostApi.nextJavaScriptResult = '{"link":null,"image":null}';
+      expect(
+        (await controller.hitTest(Offset.zero)).type,
+        WebViewHitTestType.none,
+      );
+      hostApi.nextJavaScriptResult = null;
+      expect(
+        (await controller.hitTest(Offset.zero)).type,
+        WebViewHitTestType.none,
+      );
     });
   });
 
