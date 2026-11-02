@@ -107,6 +107,22 @@ void main() {
       expect(message.allowsBackForwardNavigationGestures, isTrue);
     });
 
+    test('textZoom and minimumFontSize are passed to native', () {
+      final defaults = const WebViewSettings().toMessage();
+      expect(defaults.textZoom, 100);
+      expect(defaults.minimumFontSize, isNull);
+      final message = const WebViewSettings(
+        textZoom: 150,
+        minimumFontSize: 12,
+      ).toMessage();
+      expect(message.textZoom, 150);
+      expect(message.minimumFontSize, 12);
+      expect(
+        () => WebViewSettings(textZoom: 0),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
     test('passkeysEnabled is passed to the native settings', () {
       expect(const WebViewSettings().toMessage().passkeysEnabled, isFalse);
       expect(

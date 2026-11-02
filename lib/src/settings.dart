@@ -17,8 +17,14 @@ class WebViewSettings {
     this.passkeysEnabled = false,
     this.allowsBackForwardNavigationGestures = false,
     this.inspectable = false,
+    this.textZoom = 100,
+    this.minimumFontSize,
     this.userAgent,
-  });
+  }) : assert(textZoom > 0, 'textZoom must be positive'),
+       assert(
+         minimumFontSize == null || minimumFontSize >= 0,
+         'minimumFontSize must not be negative',
+       );
 
   final bool javaScriptEnabled;
 
@@ -57,6 +63,17 @@ class WebViewSettings {
   /// in the app, so the latest value set by any controller wins.
   final bool inspectable;
 
+  /// Text size as a percentage; 100 is the page's own size. Must be positive.
+  ///
+  /// Android scales text only (`WebSettings.setTextZoom`). iOS has no text-only
+  /// zoom, so the whole page is scaled (`WKWebView.pageZoom`).
+  final int textZoom;
+
+  /// Smallest font size the WebView renders: sp on Android
+  /// (`WebSettings.setMinimumFontSize`), pt on iOS
+  /// (`WKPreferences.minimumFontSize`). `null` uses the platform default.
+  final int? minimumFontSize;
+
   /// `null` uses the platform default user agent.
   final String? userAgent;
 
@@ -69,6 +86,8 @@ class WebViewSettings {
     bool? passkeysEnabled,
     bool? allowsBackForwardNavigationGestures,
     bool? inspectable,
+    int? textZoom,
+    ValueGetter<int?>? minimumFontSize,
     ValueGetter<String?>? userAgent,
   }) {
     return WebViewSettings(
@@ -86,6 +105,10 @@ class WebViewSettings {
           allowsBackForwardNavigationGestures ??
           this.allowsBackForwardNavigationGestures,
       inspectable: inspectable ?? this.inspectable,
+      textZoom: textZoom ?? this.textZoom,
+      minimumFontSize: minimumFontSize != null
+          ? minimumFontSize()
+          : this.minimumFontSize,
       userAgent: userAgent != null ? userAgent() : this.userAgent,
     );
   }
@@ -99,6 +122,8 @@ class WebViewSettings {
     passkeysEnabled: passkeysEnabled,
     allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,
     inspectable: inspectable,
+    textZoom: textZoom,
+    minimumFontSize: minimumFontSize,
     userAgent: userAgent,
   );
 
@@ -115,6 +140,8 @@ class WebViewSettings {
       other.allowsBackForwardNavigationGestures ==
           allowsBackForwardNavigationGestures &&
       other.inspectable == inspectable &&
+      other.textZoom == textZoom &&
+      other.minimumFontSize == minimumFontSize &&
       other.userAgent == userAgent;
 
   @override
@@ -127,6 +154,8 @@ class WebViewSettings {
     passkeysEnabled,
     allowsBackForwardNavigationGestures,
     inspectable,
+    textZoom,
+    minimumFontSize,
     userAgent,
   );
 }

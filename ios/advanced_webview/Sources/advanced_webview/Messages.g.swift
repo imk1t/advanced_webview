@@ -230,6 +230,12 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   /// Android: process-wide `WebView.setWebContentsDebuggingEnabled`.
   /// iOS: `WKWebView.isInspectable`.
   var inspectable: Bool
+  /// Percent, 100 is normal. Android: `WebSettings.setTextZoom`. iOS: scales
+  /// the whole page with `WKWebView.pageZoom`.
+  var textZoom: Int64
+  /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
+  /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
+  var minimumFontSize: Int64? = nil
   var userAgent: String? = nil
 
 
@@ -243,7 +249,9 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     let passkeysEnabled = pigeonVar_list[5] as! Bool
     let allowsBackForwardNavigationGestures = pigeonVar_list[6] as! Bool
     let inspectable = pigeonVar_list[7] as! Bool
-    let userAgent: String? = nilOrValue(pigeonVar_list[8])
+    let textZoom = pigeonVar_list[8] as! Int64
+    let minimumFontSize: Int64? = nilOrValue(pigeonVar_list[9])
+    let userAgent: String? = nilOrValue(pigeonVar_list[10])
 
     return WebViewSettingsMessage(
       javaScriptEnabled: javaScriptEnabled,
@@ -254,6 +262,8 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       passkeysEnabled: passkeysEnabled,
       allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,
       inspectable: inspectable,
+      textZoom: textZoom,
+      minimumFontSize: minimumFontSize,
       userAgent: userAgent
     )
   }
@@ -267,6 +277,8 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       passkeysEnabled,
       allowsBackForwardNavigationGestures,
       inspectable,
+      textZoom,
+      minimumFontSize,
       userAgent,
     ]
   }
@@ -274,7 +286,7 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent)
+    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -287,11 +299,13 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: passkeysEnabled, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: allowsBackForwardNavigationGestures, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: inspectable, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: textZoom, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: minimumFontSize, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userAgent, hasher: &hasher)
   }
 
   public var description: String {
-    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), userAgent: \(String(describing: userAgent)))"
+    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)))"
   }
 }
 

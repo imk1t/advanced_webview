@@ -146,6 +146,19 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun textZoomAndMinimumFontSizeAreApplied() {
+        hostApi.create(params(webViewId = 1, settings = settings(textZoom = 150, minimumFontSize = 14)))
+        val nativeSettings = registry.get(1).webView.settings
+        assertEquals(150, nativeSettings.textZoom)
+        assertEquals(14, nativeSettings.minimumFontSize)
+
+        hostApi.updateSettings(1, settings())
+
+        assertEquals(100, nativeSettings.textZoom)
+        assertEquals(8, nativeSettings.minimumFontSize)
+    }
+
+    @Test
     fun passkeysCanBeEnabledAndDisabledOnTheSameWebView() {
         mockStatic(WebViewFeature::class.java).use { features ->
             features.`when`<Boolean> { WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION) }
@@ -457,6 +470,8 @@ class WebViewHostApiImplTest {
         userAgent: String? = null,
         passkeysEnabled: Boolean = false,
         inspectable: Boolean = false,
+        textZoom: Long = 100,
+        minimumFontSize: Long? = null,
     ) = WebViewSettingsMessage(
         javaScriptEnabled = javaScriptEnabled,
         mediaPlaybackRequiresUserGesture = true,
@@ -466,6 +481,8 @@ class WebViewHostApiImplTest {
         passkeysEnabled = passkeysEnabled,
         allowsBackForwardNavigationGestures = false,
         inspectable = inspectable,
+        textZoom = textZoom,
+        minimumFontSize = minimumFontSize,
         userAgent = userAgent,
     )
 }

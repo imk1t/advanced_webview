@@ -63,6 +63,9 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
       settings.javaScriptEnabled
     webView.allowsBackForwardNavigationGestures = settings.allowsBackForwardNavigationGestures
     webView.isInspectable = settings.inspectable
+    webView.pageZoom = CGFloat(settings.textZoom) / 100
+    webView.configuration.preferences.minimumFontSize =
+      settings.minimumFontSize.map { CGFloat($0) } ?? 0
     webView.customUserAgent = settings.userAgent
     webView.isOpaque = !settings.transparentBackground
     webView.backgroundColor = settings.transparentBackground ? .clear : .white

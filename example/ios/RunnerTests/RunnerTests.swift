@@ -88,6 +88,20 @@ final class RunnerTests: XCTestCase {
     XCTAssertTrue(webView.isInspectable)
   }
 
+  func testTextZoomAndMinimumFontSizeAreApplied() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(
+      params: params(webViewId: 1, settings: settings(textZoom: 150, minimumFontSize: 14)))
+    let webView = try registry.get(1).webView
+    XCTAssertEqual(webView.pageZoom, 1.5, accuracy: 0.001)
+    XCTAssertEqual(webView.configuration.preferences.minimumFontSize, 14)
+
+    try hostApi.updateSettings(webViewId: 1, settings: settings())
+
+    XCTAssertEqual(webView.pageZoom, 1.0, accuracy: 0.001)
+    XCTAssertEqual(webView.configuration.preferences.minimumFontSize, 0)
+  }
+
   func testCreationOnlySettingsConfigureTheWebView() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(
@@ -236,6 +250,8 @@ final class RunnerTests: XCTestCase {
     transparentBackground: Bool = false,
     allowsBackForwardNavigationGestures: Bool = false,
     inspectable: Bool = false,
+    textZoom: Int = 100,
+    minimumFontSize: Int? = nil,
     userAgent: String? = nil
   ) -> WebViewSettingsMessage {
     return WebViewSettingsMessage(
@@ -247,6 +263,8 @@ final class RunnerTests: XCTestCase {
       passkeysEnabled: false,
       allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,
       inspectable: inspectable,
+      textZoom: Int64(textZoom),
+      minimumFontSize: minimumFontSize.map { Int64($0) },
       userAgent: userAgent)
   }
 }

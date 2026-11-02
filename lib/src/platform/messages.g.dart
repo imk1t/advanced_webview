@@ -143,6 +143,8 @@ class WebViewSettingsMessage {
     required this.passkeysEnabled,
     required this.allowsBackForwardNavigationGestures,
     required this.inspectable,
+    required this.textZoom,
+    this.minimumFontSize,
     this.userAgent,
   });
 
@@ -168,6 +170,14 @@ class WebViewSettingsMessage {
   /// iOS: `WKWebView.isInspectable`.
   bool inspectable;
 
+  /// Percent, 100 is normal. Android: `WebSettings.setTextZoom`. iOS: scales
+  /// the whole page with `WKWebView.pageZoom`.
+  int textZoom;
+
+  /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
+  /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
+  int? minimumFontSize;
+
   String? userAgent;
 
   List<Object?> _toList() {
@@ -180,6 +190,8 @@ class WebViewSettingsMessage {
       passkeysEnabled,
       allowsBackForwardNavigationGestures,
       inspectable,
+      textZoom,
+      minimumFontSize,
       userAgent,
     ];
   }
@@ -198,7 +210,9 @@ class WebViewSettingsMessage {
       passkeysEnabled: result[5]! as bool,
       allowsBackForwardNavigationGestures: result[6]! as bool,
       inspectable: result[7]! as bool,
-      userAgent: result[8] as String?,
+      textZoom: result[8]! as int,
+      minimumFontSize: result[9] as int?,
+      userAgent: result[10] as String?,
     );
   }
 
@@ -211,7 +225,7 @@ class WebViewSettingsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(userAgent, other.userAgent);
+    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent);
   }
 
   @override
@@ -220,7 +234,7 @@ class WebViewSettingsMessage {
 
   @override
   String toString() {
-    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, userAgent: $userAgent)';
+    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, minimumFontSize: $minimumFontSize, userAgent: $userAgent)';
   }
 }
 
