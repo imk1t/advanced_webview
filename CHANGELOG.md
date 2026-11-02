@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.4.0 - 2026-11-02
+
 - Add the Android settings `WebViewSettings.domStorageEnabled` (default `true`, as before),
   `allowFileAccess`, `allowContentAccess` and `mixedContentMode` (`WebViewMixedContentMode`). iOS
   ignores them. **Behaviour change:** `allowFileAccess` and `allowContentAccess` now default to
