@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.3.0 - 2026-11-02
+
 - Add `WebViewSettings.pullToRefreshEnabled`: pulling down from the top reloads the page with the
   platform's refresh indicator (`SwipeRefreshLayout` on Android, `UIRefreshControl` on iOS).
   On Android the platform view is now a `SwipeRefreshLayout` that contains the WebView.
