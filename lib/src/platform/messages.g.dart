@@ -141,6 +141,8 @@ class WebViewSettingsMessage {
     required this.supportZoom,
     required this.transparentBackground,
     required this.passkeysEnabled,
+    required this.allowsBackForwardNavigationGestures,
+    required this.inspectable,
     this.userAgent,
   });
 
@@ -159,6 +161,13 @@ class WebViewSettingsMessage {
   /// Android only. Ignored on iOS, where WebAuthn is governed by entitlements.
   bool passkeysEnabled;
 
+  /// iOS only. Ignored on Android.
+  bool allowsBackForwardNavigationGestures;
+
+  /// Android: process-wide `WebView.setWebContentsDebuggingEnabled`.
+  /// iOS: `WKWebView.isInspectable`.
+  bool inspectable;
+
   String? userAgent;
 
   List<Object?> _toList() {
@@ -169,6 +178,8 @@ class WebViewSettingsMessage {
       supportZoom,
       transparentBackground,
       passkeysEnabled,
+      allowsBackForwardNavigationGestures,
+      inspectable,
       userAgent,
     ];
   }
@@ -185,7 +196,9 @@ class WebViewSettingsMessage {
       supportZoom: result[3]! as bool,
       transparentBackground: result[4]! as bool,
       passkeysEnabled: result[5]! as bool,
-      userAgent: result[6] as String?,
+      allowsBackForwardNavigationGestures: result[6]! as bool,
+      inspectable: result[7]! as bool,
+      userAgent: result[8] as String?,
     );
   }
 
@@ -198,7 +211,7 @@ class WebViewSettingsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(userAgent, other.userAgent);
+    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(userAgent, other.userAgent);
   }
 
   @override
@@ -207,7 +220,7 @@ class WebViewSettingsMessage {
 
   @override
   String toString() {
-    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, userAgent: $userAgent)';
+    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, userAgent: $userAgent)';
   }
 }
 

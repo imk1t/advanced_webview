@@ -225,6 +225,11 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   var transparentBackground: Bool
   /// Android only. Ignored on iOS, where WebAuthn is governed by entitlements.
   var passkeysEnabled: Bool
+  /// iOS only. Ignored on Android.
+  var allowsBackForwardNavigationGestures: Bool
+  /// Android: process-wide `WebView.setWebContentsDebuggingEnabled`.
+  /// iOS: `WKWebView.isInspectable`.
+  var inspectable: Bool
   var userAgent: String? = nil
 
 
@@ -236,7 +241,9 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     let supportZoom = pigeonVar_list[3] as! Bool
     let transparentBackground = pigeonVar_list[4] as! Bool
     let passkeysEnabled = pigeonVar_list[5] as! Bool
-    let userAgent: String? = nilOrValue(pigeonVar_list[6])
+    let allowsBackForwardNavigationGestures = pigeonVar_list[6] as! Bool
+    let inspectable = pigeonVar_list[7] as! Bool
+    let userAgent: String? = nilOrValue(pigeonVar_list[8])
 
     return WebViewSettingsMessage(
       javaScriptEnabled: javaScriptEnabled,
@@ -245,6 +252,8 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       supportZoom: supportZoom,
       transparentBackground: transparentBackground,
       passkeysEnabled: passkeysEnabled,
+      allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,
+      inspectable: inspectable,
       userAgent: userAgent
     )
   }
@@ -256,6 +265,8 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       supportZoom,
       transparentBackground,
       passkeysEnabled,
+      allowsBackForwardNavigationGestures,
+      inspectable,
       userAgent,
     ]
   }
@@ -263,7 +274,7 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent)
+    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -274,11 +285,13 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: supportZoom, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: transparentBackground, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: passkeysEnabled, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: allowsBackForwardNavigationGestures, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: inspectable, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userAgent, hasher: &hasher)
   }
 
   public var description: String {
-    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), userAgent: \(String(describing: userAgent)))"
+    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), userAgent: \(String(describing: userAgent)))"
   }
 }
 

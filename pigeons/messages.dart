@@ -29,6 +29,8 @@ class WebViewSettingsMessage {
     required this.supportZoom,
     required this.transparentBackground,
     required this.passkeysEnabled,
+    required this.allowsBackForwardNavigationGestures,
+    required this.inspectable,
     this.userAgent,
   });
 
@@ -44,6 +46,13 @@ class WebViewSettingsMessage {
 
   /// Android only. Ignored on iOS, where WebAuthn is governed by entitlements.
   bool passkeysEnabled;
+
+  /// iOS only. Ignored on Android.
+  bool allowsBackForwardNavigationGestures;
+
+  /// Android: process-wide `WebView.setWebContentsDebuggingEnabled`.
+  /// iOS: `WKWebView.isInspectable`.
+  bool inspectable;
   String? userAgent;
 }
 

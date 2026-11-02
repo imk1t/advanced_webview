@@ -19,6 +19,8 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `supportZoom` | `true` | Yes | Ignored |
 | `transparentBackground` | `false` | Yes | Yes |
 | `passkeysEnabled` | `false` | Yes | Ignored (see below) |
+| `allowsBackForwardNavigationGestures` | `false` | Ignored | Yes |
+| `inspectable` | `false` | Yes (process-wide) | Yes |
 | `userAgent` | `null` (platform default) | Yes | Yes |
 
 "Creation only" settings are applied when the native view is created and ignored by

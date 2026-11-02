@@ -73,6 +73,21 @@ final class RunnerTests: XCTestCase {
     XCTAssertFalse(webView.isOpaque)
   }
 
+  func testNavigationGesturesAndInspectableAreApplied() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, settings: settings()))
+    let webView = try registry.get(1).webView
+    XCTAssertFalse(webView.allowsBackForwardNavigationGestures)
+    XCTAssertFalse(webView.isInspectable)
+
+    try hostApi.updateSettings(
+      webViewId: 1,
+      settings: settings(allowsBackForwardNavigationGestures: true, inspectable: true))
+
+    XCTAssertTrue(webView.allowsBackForwardNavigationGestures)
+    XCTAssertTrue(webView.isInspectable)
+  }
+
   func testCreationOnlySettingsConfigureTheWebView() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(
@@ -219,6 +234,8 @@ final class RunnerTests: XCTestCase {
     mediaPlaybackRequiresUserGesture: Bool = true,
     allowsInlineMediaPlayback: Bool = false,
     transparentBackground: Bool = false,
+    allowsBackForwardNavigationGestures: Bool = false,
+    inspectable: Bool = false,
     userAgent: String? = nil
   ) -> WebViewSettingsMessage {
     return WebViewSettingsMessage(
@@ -228,6 +245,8 @@ final class RunnerTests: XCTestCase {
       supportZoom: true,
       transparentBackground: transparentBackground,
       passkeysEnabled: false,
+      allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,
+      inspectable: inspectable,
       userAgent: userAgent)
   }
 }

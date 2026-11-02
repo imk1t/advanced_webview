@@ -95,6 +95,18 @@ void main() {
       expect(await controller.runJavaScriptReturningResult('x'), isNull);
     });
 
+    test('inspectable and back/forward gestures are passed to native', () {
+      final defaults = const WebViewSettings().toMessage();
+      expect(defaults.inspectable, isFalse);
+      expect(defaults.allowsBackForwardNavigationGestures, isFalse);
+      final message = const WebViewSettings(
+        inspectable: true,
+        allowsBackForwardNavigationGestures: true,
+      ).toMessage();
+      expect(message.inspectable, isTrue);
+      expect(message.allowsBackForwardNavigationGestures, isTrue);
+    });
+
     test('passkeysEnabled is passed to the native settings', () {
       expect(const WebViewSettings().toMessage().passkeysEnabled, isFalse);
       expect(

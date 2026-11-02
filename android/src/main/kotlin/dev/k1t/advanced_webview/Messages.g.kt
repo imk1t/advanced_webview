@@ -268,6 +268,13 @@ data class WebViewSettingsMessage (
   val transparentBackground: Boolean,
   /** Android only. Ignored on iOS, where WebAuthn is governed by entitlements. */
   val passkeysEnabled: Boolean,
+  /** iOS only. Ignored on Android. */
+  val allowsBackForwardNavigationGestures: Boolean,
+  /**
+   * Android: process-wide `WebView.setWebContentsDebuggingEnabled`.
+   * iOS: `WKWebView.isInspectable`.
+   */
+  val inspectable: Boolean,
   val userAgent: String? = null
 )
  {
@@ -279,8 +286,10 @@ data class WebViewSettingsMessage (
       val supportZoom = pigeonVar_list[3] as Boolean
       val transparentBackground = pigeonVar_list[4] as Boolean
       val passkeysEnabled = pigeonVar_list[5] as Boolean
-      val userAgent = pigeonVar_list[6] as String?
-      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, transparentBackground, passkeysEnabled, userAgent)
+      val allowsBackForwardNavigationGestures = pigeonVar_list[6] as Boolean
+      val inspectable = pigeonVar_list[7] as Boolean
+      val userAgent = pigeonVar_list[8] as String?
+      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, transparentBackground, passkeysEnabled, allowsBackForwardNavigationGestures, inspectable, userAgent)
     }
   }
   fun toList(): List<Any?> {
@@ -291,6 +300,8 @@ data class WebViewSettingsMessage (
       supportZoom,
       transparentBackground,
       passkeysEnabled,
+      allowsBackForwardNavigationGestures,
+      inspectable,
       userAgent,
     )
   }
@@ -302,7 +313,7 @@ data class WebViewSettingsMessage (
       return true
     }
     val other = other as WebViewSettingsMessage
-    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent)
+    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && MessagesPigeonUtils.deepEquals(this.inspectable, other.inspectable) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent)
   }
 
   override fun hashCode(): Int {
@@ -313,11 +324,13 @@ data class WebViewSettingsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.supportZoom)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.transparentBackground)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.passkeysEnabled)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.allowsBackForwardNavigationGestures)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.inspectable)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userAgent)
     return result
   }
   override fun toString(): String {
-    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, userAgent=$userAgent)"
+    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, allowsBackForwardNavigationGestures=$allowsBackForwardNavigationGestures, inspectable=$inspectable, userAgent=$userAgent)"
   }
 }
 

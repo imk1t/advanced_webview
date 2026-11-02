@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `WebViewSettings.allowsBackForwardNavigationGestures` (iOS only, swipe to go back/forward) and
+  `WebViewSettings.inspectable` (Safari Web Inspector on iOS; `WebView.setWebContentsDebuggingEnabled`
+  on Android, which is process-wide).
+
 ## 0.2.0 - 2026-11-01
 
 - Add `AdvancedWebViewController.onSslError` and `onHttpAuthRequest` (`SslError`, `SslErrorDecision`,

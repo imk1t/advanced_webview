@@ -914,6 +914,46 @@
       }
     },
     {
+      "dart": "WebViewSettings.allowsBackForwardNavigationGestures",
+      "group": "settings",
+      "summary": {
+        "en": "Lets the user swipe from the screen edge to go back and forward (iOS).",
+        "ja": "画面端からのスワイプで戻る・進むを可能にします（iOS）。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "WebView has no edge-swipe navigation; handle the system back gesture in the app.",
+          "ja": "WebView には画面端スワイプのナビゲーションがありません。システムの戻る操作はアプリ側で処理してください。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.allowsBackForwardNavigationGestures"]
+      }
+    },
+    {
+      "dart": "WebViewSettings.inspectable",
+      "group": "settings",
+      "summary": {
+        "en": "Allows the page to be inspected with Safari Web Inspector or chrome://inspect.",
+        "ja": "Safari Web Inspector または chrome://inspect でページを調査できるようにします。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.setWebContentsDebuggingEnabled(boolean)"],
+        "note": {
+          "en": "Process-wide: it applies to every WebView in the app, and the latest value set wins.",
+          "ja": "プロセス全体に効きます。アプリ内のすべての WebView が対象で、最後に設定した値が有効になります。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.isInspectable"]
+      }
+    },
+    {
       "dart": "WebViewSettings.userAgent",
       "group": "settings",
       "summary": {
