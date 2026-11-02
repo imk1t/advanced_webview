@@ -113,6 +113,12 @@ class AdvancedWebView(
             builtInZoomControls = settings.supportZoom
             displayZoomControls = false
             textZoom = settings.textZoom.toInt()
+            cacheMode = when (settings.cacheMode) {
+                CacheModeMessage.NORMAL -> WebSettings.LOAD_DEFAULT
+                CacheModeMessage.PREFER_CACHE -> WebSettings.LOAD_CACHE_ELSE_NETWORK
+                CacheModeMessage.CACHE_ONLY -> WebSettings.LOAD_CACHE_ONLY
+                CacheModeMessage.NO_CACHE -> WebSettings.LOAD_NO_CACHE
+            }
             minimumFontSize = settings.minimumFontSize?.toInt() ?: DEFAULT_MINIMUM_FONT_SIZE
             userAgentString = settings.userAgent ?: WebSettings.getDefaultUserAgent(webView.context)
         }

@@ -22,6 +22,7 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `allowsBackForwardNavigationGestures` | `false` | Ignored | Yes |
 | `inspectable` | `false` | Yes (process-wide) | Yes |
 | `textZoom` | `100` | Text only | Whole page |
+| `cacheMode` | `normal` | Yes | `loadUrl` only |
 | `minimumFontSize` | `null` (platform default) | Yes | Yes |
 | `userAgent` | `null` (platform default) | Yes | Yes |
 

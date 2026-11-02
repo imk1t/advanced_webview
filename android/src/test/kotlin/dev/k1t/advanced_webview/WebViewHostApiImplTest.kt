@@ -9,6 +9,7 @@ import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.webkit.WebSettingsCompat
@@ -143,6 +144,17 @@ class WebViewHostApiImplTest {
         assertFalse(webView.settings.supportZoom())
         assertEquals("ua-2", webView.settings.userAgentString)
         assertEquals(Color.TRANSPARENT, shadowOf(webView).backgroundColor)
+    }
+
+    @Test
+    fun cacheModeIsAppliedAtCreationAndOnUpdate() {
+        hostApi.create(params(webViewId = 1, settings = settings(cacheMode = CacheModeMessage.CACHE_ONLY)))
+        val nativeSettings = registry.get(1).webView.settings
+        assertEquals(WebSettings.LOAD_CACHE_ONLY, nativeSettings.cacheMode)
+
+        hostApi.updateSettings(1, settings(cacheMode = CacheModeMessage.NO_CACHE))
+
+        assertEquals(WebSettings.LOAD_NO_CACHE, nativeSettings.cacheMode)
     }
 
     @Test
@@ -471,6 +483,7 @@ class WebViewHostApiImplTest {
         passkeysEnabled: Boolean = false,
         inspectable: Boolean = false,
         textZoom: Long = 100,
+        cacheMode: CacheModeMessage = CacheModeMessage.NORMAL,
         minimumFontSize: Long? = null,
     ) = WebViewSettingsMessage(
         javaScriptEnabled = javaScriptEnabled,
@@ -482,6 +495,7 @@ class WebViewHostApiImplTest {
         allowsBackForwardNavigationGestures = false,
         inspectable = inspectable,
         textZoom = textZoom,
+        cacheMode = cacheMode,
         minimumFontSize = minimumFontSize,
         userAgent = userAgent,
     )

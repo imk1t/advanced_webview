@@ -975,6 +975,32 @@
       }
     },
     {
+      "dart": "WebViewSettings.cacheMode",
+      "group": "settings",
+      "summary": {
+        "en": "How loads use the HTTP cache: normal, preferCache, cacheOnly or noCache.",
+        "ja": "読み込み時の HTTP キャッシュの使い方（normal / preferCache / cacheOnly / noCache）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebSettings.setCacheMode(int)",
+          "WebSettings.LOAD_DEFAULT",
+          "WebSettings.LOAD_CACHE_ELSE_NETWORK",
+          "WebSettings.LOAD_CACHE_ONLY",
+          "WebSettings.LOAD_NO_CACHE"
+        ]
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["URLRequest.cachePolicy"],
+        "note": {
+          "en": "Applied to requests started with loadUrl; link taps and subresources use the default policy.",
+          "ja": "loadUrl で開始したリクエストに適用されます。リンクのタップやサブリソースは既定のポリシーです。"
+        }
+      }
+    },
+    {
       "dart": "WebViewSettings.minimumFontSize",
       "group": "settings",
       "summary": {
