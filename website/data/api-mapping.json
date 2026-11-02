@@ -1051,6 +1051,46 @@
       }
     },
     {
+      "dart": "WebViewSettings.android",
+      "group": "settings",
+      "summary": {
+        "en": "Android-only settings (AndroidWebViewSettings); iOS ignores them.",
+        "ja": "Android 専用の設定（AndroidWebViewSettings）です。iOS では無視されます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Not applicable on iOS.",
+          "ja": "iOS には該当しません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewSettings.ios",
+      "group": "settings",
+      "summary": {
+        "en": "iOS-only settings (IOSWebViewSettings); Android ignores them.",
+        "ja": "iOS 専用の設定（IOSWebViewSettings）です。Android では無視されます。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Not applicable on Android.",
+          "ja": "Android には該当しません。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebViewConfiguration"]
+      }
+    },
+    {
       "dart": "WebViewSettings.javaScriptEnabled",
       "group": "settings",
       "summary": {
@@ -1087,7 +1127,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.allowsInlineMediaPlayback",
+      "dart": "IOSWebViewSettings.allowsInlineMediaPlayback",
       "group": "settings",
       "summary": {
         "en": "Plays video inline instead of full screen.",
@@ -1111,7 +1151,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.supportZoom",
+      "dart": "AndroidWebViewSettings.supportZoom",
       "group": "settings",
       "summary": {
         "en": "Allows pinch-to-zoom.",
@@ -1155,7 +1195,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.passkeysEnabled",
+      "dart": "AndroidWebViewSettings.passkeysEnabled",
       "group": "settings",
       "summary": {
         "en": "Enables WebAuthn / passkeys for web content (Android).",
@@ -1183,7 +1223,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.allowsBackForwardNavigationGestures",
+      "dart": "IOSWebViewSettings.allowsBackForwardNavigationGestures",
       "group": "settings",
       "summary": {
         "en": "Lets the user swipe from the screen edge to go back and forward (iOS).",
@@ -1264,7 +1304,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.domStorageEnabled",
+      "dart": "AndroidWebViewSettings.domStorageEnabled",
       "group": "settings",
       "summary": {
         "en": "Lets pages use localStorage and sessionStorage (Android).",
@@ -1284,7 +1324,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.allowFileAccess",
+      "dart": "AndroidWebViewSettings.allowFileAccess",
       "group": "settings",
       "summary": {
         "en": "Lets the WebView reach file:// URLs (Android, off by default).",
@@ -1304,7 +1344,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.allowContentAccess",
+      "dart": "AndroidWebViewSettings.allowContentAccess",
       "group": "settings",
       "summary": {
         "en": "Lets the WebView load content:// URLs (Android, off by default).",
@@ -1324,7 +1364,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.mixedContentMode",
+      "dart": "AndroidWebViewSettings.mixedContentMode",
       "group": "settings",
       "summary": {
         "en": "Controls HTTP content on HTTPS pages (Android, blocked by default).",
@@ -1368,7 +1408,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.incognito",
+      "dart": "IOSWebViewSettings.incognito",
       "group": "settings",
       "summary": {
         "en": "Keeps cookies, cache and storage in memory only (iOS).",

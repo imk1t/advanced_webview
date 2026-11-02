@@ -10,35 +10,60 @@ final controller = AdvancedWebViewController(
 await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false));
 ```
 
+片方の OS にしかないオプションは `AndroidWebViewSettings` と `IOSWebViewSettings` にあり、`android:` と
+`ios:` で渡します。もう一方の OS では無視されるので、同じ `WebViewSettings` を両方で使えます。
+
+```dart
+const WebViewSettings(
+  android: AndroidWebViewSettings(passkeysEnabled: true),
+  ios: IOSWebViewSettings(allowsInlineMediaPlayback: true),
+);
+```
+
+
 | 設定 | 既定値 | Android | iOS |
 | --- | --- | --- | --- |
 | `javaScriptEnabled` | `true` | 対応 | 対応 |
 | `mediaPlaybackRequiresUserGesture` | `true` | 対応 | 生成時のみ |
-| `allowsInlineMediaPlayback` | `false` | 無視 | 生成時のみ |
-| `supportZoom` | `true` | 対応 | 無視 |
 | `transparentBackground` | `false` | 対応 | 対応 |
-| `passkeysEnabled` | `false` | 対応 | 無視（下記参照） |
-| `allowsBackForwardNavigationGestures` | `false` | 無視 | 対応 |
 | `inspectable` | `false` | 対応（プロセス全体） | 対応 |
 | `textZoom` | `100` | 文字のみ | ページ全体 |
-| `incognito` | `false` | 無視 | 生成時のみ |
 | `cacheMode` | `normal` | 対応 | `loadUrl` のみ |
 | `javaScriptCanOpenWindowsAutomatically` | `true` | 対応 | 対応 |
 | `scrollbarsVisible` | `true` | 対応 | 対応 |
 | `overScrollEnabled` | `true` | 対応 | 対応 |
 | `pullToRefreshEnabled` | `false` | 対応 | 対応（`overScrollEnabled` が必要） |
+| `minimumFontSize` | `null`（プラットフォーム既定） | 対応 | 対応 |
+| `userAgent` | `null`（プラットフォーム既定） | 対応 | 対応 |
+
+## Android 専用の設定
+
+`WebViewSettings.android` に渡します。iOS ではすべて無視されます。
+
+| 設定 | 既定値 | Android | iOS |
+| --- | --- | --- | --- |
+| `supportZoom` | `true` | 対応 | 無視 |
+| `passkeysEnabled` | `false` | 対応 | 無視（下記参照） |
 | `domStorageEnabled` | `true` | 対応 | 無視（常に有効） |
 | `allowFileAccess` | `false` | 対応 | 無視 |
 | `allowContentAccess` | `false` | 対応 | 無視 |
 | `mixedContentMode` | `neverAllow` | 対応 | 無視（WebKit が遮断） |
-| `minimumFontSize` | `null`（プラットフォーム既定） | 対応 | 対応 |
-| `userAgent` | `null`（プラットフォーム既定） | 対応 | 対応 |
+
+## iOS 専用の設定
+
+`WebViewSettings.ios` に渡します。Android ではすべて無視されます。
+
+| 設定 | 既定値 | Android | iOS |
+| --- | --- | --- | --- |
+| `allowsInlineMediaPlayback` | `false` | 無視 | 生成時のみ |
+| `allowsBackForwardNavigationGestures` | `false` | 無視 | 対応 |
+| `incognito` | `false` | 無視 | 生成時のみ |
 
 「生成時のみ」の設定はネイティブビューの生成時に適用され、そのプラットフォームでは `updateSettings` で変更しても無視されます。
 
 ## Android のセキュリティ設定
 
-`allowFileAccess`・`allowContentAccess`・`mixedContentMode` の既定値は制限的な側です。ページはローカルファイルや
+`AndroidWebViewSettings` の `allowFileAccess`・`allowContentAccess`・`mixedContentMode` の既定値は制限的な側です。ページはローカルファイルや
 `content://` プロバイダーを読めず、HTTPS ページ上の HTTP コンテンツは遮断されます。緩めるのは自分が管理する
 コンテンツに限ってください。`mixedContentMode: alwaysAllow` はネットワーク上の攻撃者に安全なページを改ざんされる
 恐れがあります。iOS には同等の設定がありません（WebKit が混在コンテンツを遮断し、ファイルアクセスの切り替えもありません）。

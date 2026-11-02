@@ -106,7 +106,7 @@ void main() {
       expect(defaults.allowsBackForwardNavigationGestures, isFalse);
       final message = const WebViewSettings(
         inspectable: true,
-        allowsBackForwardNavigationGestures: true,
+        ios: IOSWebViewSettings(allowsBackForwardNavigationGestures: true),
       ).toMessage();
       expect(message.inspectable, isTrue);
       expect(message.allowsBackForwardNavigationGestures, isTrue);
@@ -130,7 +130,9 @@ void main() {
     test('incognito is passed to native', () {
       expect(const WebViewSettings().toMessage().incognito, isFalse);
       expect(
-        const WebViewSettings(incognito: true).toMessage().incognito,
+        const WebViewSettings(ios: IOSWebViewSettings(incognito: true))
+            .toMessage()
+            .incognito,
         isTrue,
       );
     });
@@ -152,10 +154,12 @@ void main() {
       expect(defaults.allowContentAccess, isFalse);
       expect(defaults.mixedContentMode, MixedContentModeMessage.neverAllow);
       final message = const WebViewSettings(
-        domStorageEnabled: false,
-        allowFileAccess: true,
-        allowContentAccess: true,
-        mixedContentMode: WebViewMixedContentMode.compatibility,
+        android: AndroidWebViewSettings(
+          domStorageEnabled: false,
+          allowFileAccess: true,
+          allowContentAccess: true,
+          mixedContentMode: WebViewMixedContentMode.compatibility,
+        ),
       ).toMessage();
       expect(message.domStorageEnabled, isFalse);
       expect(message.allowFileAccess, isTrue);
@@ -231,11 +235,31 @@ void main() {
     test('passkeysEnabled is passed to the native settings', () {
       expect(const WebViewSettings().toMessage().passkeysEnabled, isFalse);
       expect(
-        const WebViewSettings(passkeysEnabled: true)
+        const WebViewSettings(
+          android: AndroidWebViewSettings(passkeysEnabled: true),
+        )
             .toMessage()
             .passkeysEnabled,
         isTrue,
       );
+    });
+
+    test('platform settings default, compare and copy', () {
+      expect(const WebViewSettings(), const WebViewSettings());
+      const custom = WebViewSettings(
+        android: AndroidWebViewSettings(supportZoom: false),
+        ios: IOSWebViewSettings(allowsInlineMediaPlayback: true),
+      );
+      expect(custom, isNot(const WebViewSettings()));
+      expect(custom.hashCode, isNot(const WebViewSettings().hashCode));
+      final message = custom.toMessage();
+      expect(message.supportZoom, isFalse);
+      expect(message.allowsInlineMediaPlayback, isTrue);
+      final copy = custom.copyWith(
+        android: custom.android.copyWith(supportZoom: true),
+      );
+      expect(copy.android.supportZoom, isTrue);
+      expect(copy.ios, custom.ios);
     });
 
     test('updateSettings stores the new settings', () async {
