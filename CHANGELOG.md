@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.5.0 - 2026-11-02
+
 - Add `AdvancedWebViewController.onConsoleMessage`, which reports the page's `console.debug`, `log`,
   `info`, `warn` and `error` calls as `WebViewConsoleMessage` (level, text, and on Android the source
   URL and line number). Android uses `WebChromeClient.onConsoleMessage`; iOS wraps the `console`
