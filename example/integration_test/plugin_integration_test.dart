@@ -388,19 +388,7 @@ void main() {
 
     await harness.show(tester);
     await harness.loadHtml('<html><body><h1>shot</h1></body></html>');
-    // The platform view gets its size asynchronously; wait until it has one.
-    final deadline = DateTime.now().add(_timeout);
-    while (await harness.controller.runJavaScriptReturningResult(
-          'window.innerWidth',
-        ) ==
-        0) {
-      expect(
-        DateTime.now().isBefore(deadline),
-        isTrue,
-        reason: 'view has no size',
-      );
-      await tester.pump(const Duration(milliseconds: 100));
-    }
+    await harness.waitForSize(tester);
     final png = await harness.controller.takeScreenshot();
 
     expect(png, isNotNull);
@@ -435,6 +423,8 @@ void main() {
       'style="display:block;width:50px;height:50px">'
       '</body></html>',
     );
+
+    await harness.waitForSize(tester);
 
     final link = await harness.controller.hitTest(const Offset(10, 10));
     final image = await harness.controller.hitTest(const Offset(10, 70));
@@ -531,7 +521,28 @@ class _Harness {
     await finished.future.timeout(_timeout);
   }
 
+  /// The platform view gets its size asynchronously; wait until the page has a viewport.
+  Future<void> waitForSize(WidgetTester tester) => _pumpUntilAsync(
+    tester,
+    () async =>
+        await controller.runJavaScriptReturningResult('window.innerWidth') != 0,
+  );
+
   Future<void> dispose() => controller.dispose();
+}
+
+/// Like [_pumpUntil] for a condition that has to be awaited.
+Future<void> _pumpUntilAsync(
+  WidgetTester tester,
+  Future<bool> Function() condition,
+) async {
+  final deadline = DateTime.now().add(_timeout);
+  while (!await condition()) {
+    if (DateTime.now().isAfter(deadline)) {
+      fail('Condition not met within $_timeout');
+    }
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 }
 
 /// Pumps frames until [condition] holds, failing after [_timeout].
