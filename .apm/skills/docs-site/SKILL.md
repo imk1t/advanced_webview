@@ -20,14 +20,19 @@ first; it takes precedence over this skill. Do not add Web, macOS, Windows or Li
    current API (class names `AdvancedWebView`, `AdvancedWebViewController`) and note any
    Android/iOS difference explicitly.
 3. **Edit the matching Japanese page** in `website/ja/guide/` in the same change. Translate
-   prose only; keep code, identifiers and headings' anchors structurally identical. If a
+   prose only; keep code, identifiers and headings' anchors structurally identical. Japanese
+   headings differ from the English ones (for example `## パスキー（WebAuthn） {#passkeys-webauthn}`),
+   so locate the insertion point by grepping `^## ` in the Japanese file instead of assuming the
+   English heading text. If a
    page exists in only one language, add the other.
 4. **Update the API mapping.** `website/data/api-mapping.json` is the single source for the
    "Platform API mapping" pages (`website/guide/api-mapping.md`, `website/ja/guide/api-mapping.md`):
    one entry per public Dart member with the Android and iOS APIs it uses, a status
    (`supported`, `partial`, `creationOnly`, `unsupported`) and an `en`/`ja` summary. For every
    added, renamed or removed public member, or changed native call, edit the entry (cite
-   only native APIs the Kotlin/Swift sources really use). A new group needs a section in
+   only native APIs the Kotlin/Swift sources really use). Every native class an entry cites
+   must also be listed in `classes` with its documentation URL, and every new public Dart type
+   (result classes, enums) needs its own entry, not just its members. A new group needs a section in
    both pages. Run `cd website && bun run check:mapping`; it fails on any drift from `lib/` and
    the native sources.
 5. **New page?** Add it to both sidebars in `website/.vitepress/config.mts` (`root` and

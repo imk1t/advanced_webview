@@ -56,7 +56,9 @@ not exported.
 
 - Reference identifiers with `[Name]` (resolved by dartdoc): `[AdvancedWebViewController.loadUrl]`,
   `[WebViewSettings.javaScriptEnabled]`. Use backticks only for things dartdoc cannot
-  resolve (JS, native types, literals).
+  resolve (JS, native types, literals) and for types that `lib/` does not import, such as
+  `PlatformException`: `dart doc` flags `[PlatformException]` as an unresolved reference and
+  CI fails on it.
 - Document `window.<name>.postMessage(String)`, main-frame-only navigation decisions and
   JSON decoding (`undefined` -> `null`) wherever they apply (AGENTS.md rule 6).
 - Don't restate the signature ("The url parameter"); say what the value means and its
@@ -73,6 +75,7 @@ not exported.
 Run from the repo root, through the mise-pinned toolchain (`mise exec -- <cmd>` if mise is not activated):
 
 ```sh
+# Never `dart format lib` or `dart format .`: it reformats the generated messages.g.dart.
 dart format $(git ls-files '*.dart' | grep -v '\.g\.dart$')
 flutter analyze
 dart doc --validate-links
@@ -84,6 +87,8 @@ dart doc --validate-links
   from `README.md`, "linked to from" is `package-advanced_webview`) about repo files such as
   `README.ja.md`, `LICENSE`, `CONTRIBUTING.md` or `AGENTS.md` are expected: dartdoc doesn't
   copy those files into `doc/api/`, so the relative links dangle only there.
+- CI runs the same `dart doc` check, so run it locally before pushing a PR that adds public
+  members.
 - Optionally open `doc/api/index.html` (or run `dart pub global activate dhttpd` /
   any static server) and check the class and member pages read like the pub.dev reference.
 - If `mise` or the Dart SDK is not available in your environment, say so instead of
