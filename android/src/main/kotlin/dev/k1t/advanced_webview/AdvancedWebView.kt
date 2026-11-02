@@ -19,6 +19,7 @@ import android.print.PrintManager
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.ConsoleMessage
 import android.webkit.CookieManager
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
@@ -84,6 +85,7 @@ class AdvancedWebView(
     private val hasPermissionDelegate = params.hasPermissionDelegate
     private val hasSslErrorDelegate = params.hasSslErrorDelegate
     private val hasHttpAuthDelegate = params.hasHttpAuthDelegate
+    private val hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
     private var findQuery: String? = null
@@ -565,6 +567,25 @@ class AdvancedWebView(
 
         override fun onReceivedTitle(view: WebView, title: String?) {
             send { flutterApi.onTitleChanged(id, title) }
+        }
+
+        // Returning false keeps the platform logging (Logcat).
+        override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+            if (!hasConsoleMessageDelegate) return false
+            val message = ConsoleMessageMessage(
+                level = when (consoleMessage.messageLevel()) {
+                    ConsoleMessage.MessageLevel.DEBUG -> ConsoleMessageLevelMessage.DEBUG
+                    ConsoleMessage.MessageLevel.TIP -> ConsoleMessageLevelMessage.INFO
+                    ConsoleMessage.MessageLevel.WARNING -> ConsoleMessageLevelMessage.WARNING
+                    ConsoleMessage.MessageLevel.ERROR -> ConsoleMessageLevelMessage.ERROR
+                    else -> ConsoleMessageLevelMessage.LOG
+                },
+                message = consoleMessage.message(),
+                sourceUrl = consoleMessage.sourceId()?.takeIf { it.isNotEmpty() },
+                lineNumber = consoleMessage.lineNumber().toLong(),
+            )
+            send { flutterApi.onConsoleMessage(id, message) }
+            return false
         }
 
         override fun onShowFileChooser(

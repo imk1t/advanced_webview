@@ -27,6 +27,7 @@ void main() {
     PageEventCallback? onPageFinished,
     ScrollChangedCallback? onScrollChanged,
     LongPressCallback? onLongPress,
+    ConsoleMessageCallback? onConsoleMessage,
     WebResourceErrorCallback? onWebResourceError,
     NavigationRequestCallback? onNavigationRequest,
     NewWindowCallback? onNewWindow,
@@ -45,6 +46,7 @@ void main() {
       onPageFinished: onPageFinished,
       onScrollChanged: onScrollChanged,
       onLongPress: onLongPress,
+      onConsoleMessage: onConsoleMessage,
       onWebResourceError: onWebResourceError,
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
@@ -317,6 +319,71 @@ void main() {
       hostApi.nextRestoreResult = false;
       expect(await controller.restoreState(Uint8List(2)), isFalse);
       expect(hostApi.calls, contains('restoreState(2)'));
+    });
+  });
+
+  group('console messages', () {
+    test('are flagged at creation and routed to the callback', () {
+      final without = createController();
+      expect(
+        hostApi.created[without.webViewId]!.hasConsoleMessageDelegate,
+        isFalse,
+      );
+
+      final messages = <WebViewConsoleMessage>[];
+      final controller = createController(onConsoleMessage: messages.add);
+      expect(
+        hostApi.created[controller.webViewId]!.hasConsoleMessageDelegate,
+        isTrue,
+      );
+      dispatcher.onConsoleMessage(
+        controller.webViewId,
+        ConsoleMessageMessage(
+          level: ConsoleMessageLevelMessage.warning,
+          message: 'careful',
+          sourceUrl: 'https://a.dev/app.js',
+          lineNumber: 7,
+        ),
+      );
+      dispatcher.onConsoleMessage(
+        controller.webViewId,
+        ConsoleMessageMessage(
+          level: ConsoleMessageLevelMessage.debug,
+          message: 'details',
+        ),
+      );
+      expect(messages, const [
+        WebViewConsoleMessage(
+          level: WebViewConsoleMessageLevel.warning,
+          message: 'careful',
+          sourceUrl: 'https://a.dev/app.js',
+          lineNumber: 7,
+        ),
+        WebViewConsoleMessage(
+          level: WebViewConsoleMessageLevel.debug,
+          message: 'details',
+        ),
+      ]);
+    });
+
+    test('every level maps to the matching public level', () {
+      for (final level in ConsoleMessageLevelMessage.values) {
+        expect(WebViewConsoleMessageLevel.values[level.index].name, level.name);
+      }
+    });
+
+    test('are dropped after dispose', () async {
+      final messages = <WebViewConsoleMessage>[];
+      final controller = createController(onConsoleMessage: messages.add);
+      await controller.dispose();
+      dispatcher.onConsoleMessage(
+        controller.webViewId,
+        ConsoleMessageMessage(
+          level: ConsoleMessageLevelMessage.log,
+          message: 'late',
+        ),
+      );
+      expect(messages, isEmpty);
     });
   });
 

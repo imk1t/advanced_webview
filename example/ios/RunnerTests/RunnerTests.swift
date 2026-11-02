@@ -185,6 +185,36 @@ final class RunnerTests: XCTestCase {
     XCTAssertTrue(scripts[0].source.contains("window.bridge = "))
   }
 
+  func testConsoleMessagesInstallTheWrapperInAllFrames() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, hasConsoleMessageDelegate: true))
+
+    let scripts = try registry.get(1).webView.configuration.userContentController.userScripts
+    XCTAssertEqual(scripts.count, 1)
+    XCTAssertTrue(scripts[0].source.contains("advancedWebViewConsole"))
+    XCTAssertEqual(scripts[0].injectionTime, .atDocumentStart)
+    XCTAssertFalse(scripts[0].isForMainFrameOnly)
+  }
+
+  func testNoConsoleWrapperWithoutADelegate() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+
+    XCTAssertTrue(
+      try registry.get(1).webView.configuration.userContentController.userScripts.isEmpty)
+  }
+
+  func testRemovingUserScriptsKeepsTheConsoleWrapper() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, hasConsoleMessageDelegate: true))
+
+    try hostApi.removeAllUserScripts(webViewId: 1)
+
+    let scripts = try registry.get(1).webView.configuration.userContentController.userScripts
+    XCTAssertEqual(scripts.count, 1)
+    XCTAssertTrue(scripts[0].source.contains("advancedWebViewConsole"))
+  }
+
   func testNoBridgeShimWithoutHandlers() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))
@@ -344,6 +374,7 @@ final class RunnerTests: XCTestCase {
     hasHttpAuthDelegate: Bool = false,
     hasScrollDelegate: Bool = false,
     hasLongPressDelegate: Bool = false,
+    hasConsoleMessageDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
     return CreationParamsMessage(
@@ -360,6 +391,7 @@ final class RunnerTests: XCTestCase {
       hasHttpAuthDelegate: hasHttpAuthDelegate,
       hasScrollDelegate: hasScrollDelegate,
       hasLongPressDelegate: hasLongPressDelegate,
+      hasConsoleMessageDelegate: hasConsoleMessageDelegate,
       userScripts: userScripts)
   }
 

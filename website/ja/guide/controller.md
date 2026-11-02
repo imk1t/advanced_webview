@@ -90,6 +90,23 @@ AdvancedWebViewController(
 （テキスト選択やリンクメニュー）もそのまま動きます。`hitTest` は `document.elementFromPoint` で位置を調べるため、
 メインフレームのみが対象で、両プラットフォームで同じ結果になります。独自のコンテキストメニューを作るときに使います。
 
+## コンソールメッセージ
+
+```dart
+AdvancedWebViewController(
+  onConsoleMessage: (message) {
+    debugPrint('[${message.level.name}] ${message.message}');
+  },
+);
+```
+
+`onConsoleMessage` は、ページが任意のフレームで呼び出した `console.debug` / `log` / `info` / `warn` / `error` を通知します。
+プラットフォーム標準のコンソール出力（Logcat、Web Inspector）もそのまま動きます。キャッチされなかった例外や
+ブラウザー自身が出すメッセージは通知されません。Android ではスクリプトの URL と行番号が `sourceUrl` / `lineNumber`
+に入りますが、iOS ではその情報がないため `null` です（WebKit にコンソールのコールバックがないため、ドキュメント開始時に
+注入したスクリプトで `console` メソッドをラップしています）。Android では `console.info` が `log` として届くことがあります。
+ページのデバッグでは `WebViewSettings.inspectable` と併用してください。
+
 ## ページ内検索
 
 ```dart

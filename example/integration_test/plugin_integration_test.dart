@@ -54,6 +54,36 @@ void main() {
     expect(messages, ['hi']);
   });
 
+  testWidgets('console output is reported with its level', (tester) async {
+    final messages = <WebViewConsoleMessage>[];
+    final harness = _Harness(onConsoleMessage: messages.add);
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml(
+      '<html><body><iframe srcdoc="<script>console.log(\'from frame\')</script>">'
+      '</iframe></body></html>',
+    );
+    await harness.controller.runJavaScript('''
+      console.debug('d');
+      console.info('i');
+      console.log('a', 1, 'b');
+      console.warn('w');
+      console.error('e');
+    ''');
+    await _pumpUntil(tester, () => messages.length >= 6);
+
+    String? levelOf(String text) =>
+        messages.where((m) => m.message == text).firstOrNull?.level.name;
+    expect(levelOf('a 1 b'), 'log');
+    expect(levelOf('w'), 'warning');
+    expect(levelOf('e'), 'error');
+    // Android may map debug and info onto neighbouring levels.
+    expect(levelOf('d'), isNotNull);
+    expect(levelOf('i'), isNotNull);
+    expect(levelOf('from frame'), 'log');
+  });
+
   testWidgets('JavaScript channels are routed to the owning controller', (
     tester,
   ) async {
@@ -484,6 +514,7 @@ class _Harness {
     List<UserScript> userScripts = const [],
     NewWindowCallback? onNewWindow,
     DownloadStartCallback? onDownloadStart,
+    ConsoleMessageCallback? onConsoleMessage,
   }) {
     controller = AdvancedWebViewController(
       javaScriptChannels: javaScriptChannels,
@@ -492,6 +523,7 @@ class _Harness {
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
       onDownloadStart: onDownloadStart,
+      onConsoleMessage: onConsoleMessage,
       onPageStarted: startedUrls.add,
       onPageFinished: (url) {
         _pageFinished?.complete();

@@ -114,6 +114,26 @@ class WebViewSettingsMessage {
   String? userAgent;
 }
 
+enum ConsoleMessageLevelMessage { debug, log, info, warning, error }
+
+class ConsoleMessageMessage {
+  ConsoleMessageMessage({
+    required this.level,
+    required this.message,
+    this.sourceUrl,
+    this.lineNumber,
+  });
+
+  ConsoleMessageLevelMessage level;
+  String message;
+
+  /// Script that logged the message. `null` on iOS, which does not report it.
+  String? sourceUrl;
+
+  /// Line in [sourceUrl]. `null` on iOS, which does not report it.
+  int? lineNumber;
+}
+
 enum UserScriptInjectionTimeMessage { atDocumentStart, atDocumentEnd }
 
 class UserScriptMessage {
@@ -143,6 +163,7 @@ class CreationParamsMessage {
     required this.hasHttpAuthDelegate,
     required this.hasScrollDelegate,
     required this.hasLongPressDelegate,
+    required this.hasConsoleMessageDelegate,
     required this.userScripts,
   });
 
@@ -188,6 +209,10 @@ class CreationParamsMessage {
 
   /// When false, long presses are never reported to Dart.
   bool hasLongPressDelegate;
+
+  /// When false, console output is never reported to Dart (and, on iOS, the
+  /// `console` wrapper script is not injected).
+  bool hasConsoleMessageDelegate;
 
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
@@ -426,6 +451,10 @@ abstract class AdvancedWebViewFlutterApi {
   /// A long press at `x`, `y` (logical pixels, relative to the WebView).
   /// Only sent when the controller was created with `hasLongPressDelegate`.
   void onLongPress(int webViewId, double x, double y);
+
+  /// A `console.*` call made by the page. Only sent when the controller was
+  /// created with `hasConsoleMessageDelegate`.
+  void onConsoleMessage(int webViewId, ConsoleMessageMessage message);
 
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 
