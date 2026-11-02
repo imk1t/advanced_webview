@@ -88,6 +88,26 @@ final class RunnerTests: XCTestCase {
     XCTAssertTrue(webView.isInspectable)
   }
 
+  func testWindowAndScrollSettingsAreApplied() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, settings: settings()))
+    let webView = try registry.get(1).webView
+    XCTAssertTrue(webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically)
+    XCTAssertTrue(webView.scrollView.showsVerticalScrollIndicator)
+    XCTAssertTrue(webView.scrollView.bounces)
+
+    try hostApi.updateSettings(
+      webViewId: 1,
+      settings: settings(
+        javaScriptCanOpenWindowsAutomatically: false, scrollbarsVisible: false,
+        overScrollEnabled: false))
+
+    XCTAssertFalse(webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically)
+    XCTAssertFalse(webView.scrollView.showsVerticalScrollIndicator)
+    XCTAssertFalse(webView.scrollView.showsHorizontalScrollIndicator)
+    XCTAssertFalse(webView.scrollView.bounces)
+  }
+
   func testTextZoomAndMinimumFontSizeAreApplied() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(
@@ -252,6 +272,9 @@ final class RunnerTests: XCTestCase {
     inspectable: Bool = false,
     textZoom: Int = 100,
     cacheMode: CacheModeMessage = .normal,
+    javaScriptCanOpenWindowsAutomatically: Bool = true,
+    scrollbarsVisible: Bool = true,
+    overScrollEnabled: Bool = true,
     minimumFontSize: Int? = nil,
     userAgent: String? = nil
   ) -> WebViewSettingsMessage {
@@ -266,6 +289,9 @@ final class RunnerTests: XCTestCase {
       inspectable: inspectable,
       textZoom: Int64(textZoom),
       cacheMode: cacheMode,
+      javaScriptCanOpenWindowsAutomatically: javaScriptCanOpenWindowsAutomatically,
+      scrollbarsVisible: scrollbarsVisible,
+      overScrollEnabled: overScrollEnabled,
       minimumFontSize: minimumFontSize.map { Int64($0) },
       userAgent: userAgent)
   }

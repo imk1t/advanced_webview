@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `WebViewSettings.javaScriptCanOpenWindowsAutomatically` (default `true`, as before),
+  `scrollbarsVisible` and `overScrollEnabled`.
+
 - Add `WebViewSettings.cacheMode` and `WebViewCacheMode`. Android sets `WebSettings.setCacheMode` for
   every load; iOS applies the cache policy to requests started with `loadUrl`.
 

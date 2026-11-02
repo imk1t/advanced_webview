@@ -243,6 +243,13 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   /// Android: `WebSettings.setCacheMode`. iOS: `URLRequest.cachePolicy` of
   /// requests started with `loadUrl`.
   var cacheMode: CacheModeMessage
+  /// Android: `WebSettings.setJavaScriptCanOpenWindowsAutomatically`. iOS:
+  /// `WKPreferences.javaScriptCanOpenWindowsAutomatically`.
+  var javaScriptCanOpenWindowsAutomatically: Bool
+  /// Android: vertical and horizontal scroll bars. iOS: scroll indicators.
+  var scrollbarsVisible: Bool
+  /// Android: `View.setOverScrollMode`. iOS: `UIScrollView.bounces`.
+  var overScrollEnabled: Bool
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
   var minimumFontSize: Int64? = nil
@@ -261,8 +268,11 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     let inspectable = pigeonVar_list[7] as! Bool
     let textZoom = pigeonVar_list[8] as! Int64
     let cacheMode = pigeonVar_list[9] as! CacheModeMessage
-    let minimumFontSize: Int64? = nilOrValue(pigeonVar_list[10])
-    let userAgent: String? = nilOrValue(pigeonVar_list[11])
+    let javaScriptCanOpenWindowsAutomatically = pigeonVar_list[10] as! Bool
+    let scrollbarsVisible = pigeonVar_list[11] as! Bool
+    let overScrollEnabled = pigeonVar_list[12] as! Bool
+    let minimumFontSize: Int64? = nilOrValue(pigeonVar_list[13])
+    let userAgent: String? = nilOrValue(pigeonVar_list[14])
 
     return WebViewSettingsMessage(
       javaScriptEnabled: javaScriptEnabled,
@@ -275,6 +285,9 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       inspectable: inspectable,
       textZoom: textZoom,
       cacheMode: cacheMode,
+      javaScriptCanOpenWindowsAutomatically: javaScriptCanOpenWindowsAutomatically,
+      scrollbarsVisible: scrollbarsVisible,
+      overScrollEnabled: overScrollEnabled,
       minimumFontSize: minimumFontSize,
       userAgent: userAgent
     )
@@ -291,6 +304,9 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       inspectable,
       textZoom,
       cacheMode,
+      javaScriptCanOpenWindowsAutomatically,
+      scrollbarsVisible,
+      overScrollEnabled,
       minimumFontSize,
       userAgent,
     ]
@@ -299,7 +315,7 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.cacheMode, rhs.cacheMode) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent)
+    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.cacheMode, rhs.cacheMode) && MessagesPigeonInternal.deepEquals(lhs.javaScriptCanOpenWindowsAutomatically, rhs.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonInternal.deepEquals(lhs.scrollbarsVisible, rhs.scrollbarsVisible) && MessagesPigeonInternal.deepEquals(lhs.overScrollEnabled, rhs.overScrollEnabled) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -314,12 +330,15 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: inspectable, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: textZoom, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: cacheMode, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: javaScriptCanOpenWindowsAutomatically, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: scrollbarsVisible, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: overScrollEnabled, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: minimumFontSize, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userAgent, hasher: &hasher)
   }
 
   public var description: String {
-    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), cacheMode: \(String(describing: cacheMode)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)))"
+    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), cacheMode: \(String(describing: cacheMode)), javaScriptCanOpenWindowsAutomatically: \(String(describing: javaScriptCanOpenWindowsAutomatically)), scrollbarsVisible: \(String(describing: scrollbarsVisible)), overScrollEnabled: \(String(describing: overScrollEnabled)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)))"
   }
 }
 

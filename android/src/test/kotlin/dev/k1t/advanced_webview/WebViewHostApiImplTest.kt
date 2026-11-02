@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Looper
+import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
@@ -155,6 +156,30 @@ class WebViewHostApiImplTest {
         hostApi.updateSettings(1, settings(cacheMode = CacheModeMessage.NO_CACHE))
 
         assertEquals(WebSettings.LOAD_NO_CACHE, nativeSettings.cacheMode)
+    }
+
+    @Test
+    fun windowAndScrollSettingsAreAppliedAtCreationAndOnUpdate() {
+        hostApi.create(params(webViewId = 1, settings = settings()))
+        val webView = registry.get(1).webView
+        assertTrue(webView.settings.javaScriptCanOpenWindowsAutomatically)
+        assertTrue(webView.isVerticalScrollBarEnabled)
+        assertTrue(webView.isHorizontalScrollBarEnabled)
+        assertEquals(View.OVER_SCROLL_IF_CONTENT_SCROLLS, webView.overScrollMode)
+
+        hostApi.updateSettings(
+            1,
+            settings(
+                javaScriptCanOpenWindowsAutomatically = false,
+                scrollbarsVisible = false,
+                overScrollEnabled = false,
+            ),
+        )
+
+        assertFalse(webView.settings.javaScriptCanOpenWindowsAutomatically)
+        assertFalse(webView.isVerticalScrollBarEnabled)
+        assertFalse(webView.isHorizontalScrollBarEnabled)
+        assertEquals(View.OVER_SCROLL_NEVER, webView.overScrollMode)
     }
 
     @Test
@@ -484,6 +509,9 @@ class WebViewHostApiImplTest {
         inspectable: Boolean = false,
         textZoom: Long = 100,
         cacheMode: CacheModeMessage = CacheModeMessage.NORMAL,
+        javaScriptCanOpenWindowsAutomatically: Boolean = true,
+        scrollbarsVisible: Boolean = true,
+        overScrollEnabled: Boolean = true,
         minimumFontSize: Long? = null,
     ) = WebViewSettingsMessage(
         javaScriptEnabled = javaScriptEnabled,
@@ -496,6 +524,9 @@ class WebViewHostApiImplTest {
         inspectable = inspectable,
         textZoom = textZoom,
         cacheMode = cacheMode,
+        javaScriptCanOpenWindowsAutomatically = javaScriptCanOpenWindowsAutomatically,
+        scrollbarsVisible = scrollbarsVisible,
+        overScrollEnabled = overScrollEnabled,
         minimumFontSize = minimumFontSize,
         userAgent = userAgent,
     )
