@@ -380,6 +380,37 @@ void main() {
     );
   });
 
+  testWidgets('takeScreenshot returns a PNG of the visible page', (
+    tester,
+  ) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body><h1>shot</h1></body></html>');
+    final png = await harness.controller.takeScreenshot();
+
+    expect(png, isNotNull);
+    expect(png!.sublist(0, 4), [0x89, 0x50, 0x4e, 0x47]);
+  });
+
+  testWidgets('findText finds text and clearMatches removes the highlight', (
+    tester,
+  ) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body><p>alpha beta alpha</p></body></html>');
+
+    final hit = await harness.controller.findText('alpha');
+    final miss = await harness.controller.findText('zzz');
+    await harness.controller.clearMatches();
+
+    expect(hit.found, isTrue);
+    expect(miss.found, isFalse);
+  });
+
   testWidgets('the WebView outlives its widget', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);
