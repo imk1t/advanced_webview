@@ -22,6 +22,7 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `allowsBackForwardNavigationGestures` | `false` | Ignored | Yes |
 | `inspectable` | `false` | Yes (process-wide) | Yes |
 | `textZoom` | `100` | Text only | Whole page |
+| `incognito` | `false` | Ignored | Creation only |
 | `cacheMode` | `normal` | Yes | `loadUrl` only |
 | `javaScriptCanOpenWindowsAutomatically` | `true` | Yes | Yes |
 | `scrollbarsVisible` | `true` | Yes | Yes |

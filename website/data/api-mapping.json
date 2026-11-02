@@ -78,6 +78,7 @@
     "ios": {
       "WKWebView": "https://developer.apple.com/documentation/webkit/wkwebview",
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
+      "WKWebsiteDataStore": "https://developer.apple.com/documentation/webkit/wkwebsitedatastore",
       "WKPreferences": "https://developer.apple.com/documentation/webkit/wkpreferences",
       "WKWebpagePreferences": "https://developer.apple.com/documentation/webkit/wkwebpagepreferences",
       "WKNavigationDelegate": "https://developer.apple.com/documentation/webkit/wknavigationdelegate",
@@ -994,6 +995,26 @@
       "ios": {
         "status": "supported",
         "apis": ["URLRequest.CachePolicy"]
+      }
+    },
+    {
+      "dart": "WebViewSettings.incognito",
+      "group": "settings",
+      "summary": {
+        "en": "Keeps cookies, cache and storage in memory only (iOS).",
+        "ja": "Cookie・キャッシュ・ストレージをメモリ上だけに保持します（iOS）。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Android's WebView shares cookies, cache and storage across the app, so it cannot be isolated per WebView.",
+          "ja": "Android の WebView は Cookie・キャッシュ・ストレージをアプリ全体で共有するため、WebView ごとに分離できません。"
+        }
+      },
+      "ios": {
+        "status": "creationOnly",
+        "apis": ["WKWebViewConfiguration.websiteDataStore", "WKWebsiteDataStore.nonPersistent()"]
       }
     },
     {

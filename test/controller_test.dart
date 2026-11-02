@@ -122,6 +122,14 @@ void main() {
       expect(message.overScrollEnabled, isFalse);
     });
 
+    test('incognito is passed to native', () {
+      expect(const WebViewSettings().toMessage().incognito, isFalse);
+      expect(
+        const WebViewSettings(incognito: true).toMessage().incognito,
+        isTrue,
+      );
+    });
+
     test('cacheMode is passed to native', () {
       expect(
         const WebViewSettings().toMessage().cacheMode,

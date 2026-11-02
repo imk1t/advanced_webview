@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `WebViewSettings.incognito` (iOS only, creation only): the WebView uses
+  `WKWebsiteDataStore.nonPersistent()`. Ignored on Android, whose WebView shares data across the app.
+
 - Add `WebViewSettings.javaScriptCanOpenWindowsAutomatically` (default `true`, as before),
   `scrollbarsVisible` and `overScrollEnabled`.
 

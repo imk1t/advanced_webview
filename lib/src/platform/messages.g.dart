@@ -152,6 +152,7 @@ class WebViewSettingsMessage {
     required this.inspectable,
     required this.textZoom,
     required this.cacheMode,
+    required this.incognito,
     required this.javaScriptCanOpenWindowsAutomatically,
     required this.scrollbarsVisible,
     required this.overScrollEnabled,
@@ -189,6 +190,10 @@ class WebViewSettingsMessage {
   /// requests started with `loadUrl`.
   CacheModeMessage cacheMode;
 
+  /// iOS only, creation only: `WKWebsiteDataStore.nonPersistent()`. Ignored on
+  /// Android, whose WebView shares its data across the app.
+  bool incognito;
+
   /// Android: `WebSettings.setJavaScriptCanOpenWindowsAutomatically`. iOS:
   /// `WKPreferences.javaScriptCanOpenWindowsAutomatically`.
   bool javaScriptCanOpenWindowsAutomatically;
@@ -217,6 +222,7 @@ class WebViewSettingsMessage {
       inspectable,
       textZoom,
       cacheMode,
+      incognito,
       javaScriptCanOpenWindowsAutomatically,
       scrollbarsVisible,
       overScrollEnabled,
@@ -241,11 +247,12 @@ class WebViewSettingsMessage {
       inspectable: result[7]! as bool,
       textZoom: result[8]! as int,
       cacheMode: result[9]! as CacheModeMessage,
-      javaScriptCanOpenWindowsAutomatically: result[10]! as bool,
-      scrollbarsVisible: result[11]! as bool,
-      overScrollEnabled: result[12]! as bool,
-      minimumFontSize: result[13] as int?,
-      userAgent: result[14] as String?,
+      incognito: result[10]! as bool,
+      javaScriptCanOpenWindowsAutomatically: result[11]! as bool,
+      scrollbarsVisible: result[12]! as bool,
+      overScrollEnabled: result[13]! as bool,
+      minimumFontSize: result[14] as int?,
+      userAgent: result[15] as String?,
     );
   }
 
@@ -258,7 +265,7 @@ class WebViewSettingsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && _deepEquals(scrollbarsVisible, other.scrollbarsVisible) && _deepEquals(overScrollEnabled, other.overScrollEnabled) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent);
+    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(incognito, other.incognito) && _deepEquals(javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && _deepEquals(scrollbarsVisible, other.scrollbarsVisible) && _deepEquals(overScrollEnabled, other.overScrollEnabled) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent);
   }
 
   @override
@@ -267,7 +274,7 @@ class WebViewSettingsMessage {
 
   @override
   String toString() {
-    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, cacheMode: $cacheMode, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, scrollbarsVisible: $scrollbarsVisible, overScrollEnabled: $overScrollEnabled, minimumFontSize: $minimumFontSize, userAgent: $userAgent)';
+    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, cacheMode: $cacheMode, incognito: $incognito, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, scrollbarsVisible: $scrollbarsVisible, overScrollEnabled: $overScrollEnabled, minimumFontSize: $minimumFontSize, userAgent: $userAgent)';
   }
 }
 

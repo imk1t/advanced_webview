@@ -108,6 +108,15 @@ final class RunnerTests: XCTestCase {
     XCTAssertFalse(webView.scrollView.bounces)
   }
 
+  func testIncognitoUsesANonPersistentDataStore() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, settings: settings()))
+    try hostApi.create(params: params(webViewId: 2, settings: settings(incognito: true)))
+
+    XCTAssertTrue(try registry.get(1).webView.configuration.websiteDataStore.isPersistent)
+    XCTAssertFalse(try registry.get(2).webView.configuration.websiteDataStore.isPersistent)
+  }
+
   func testTextZoomAndMinimumFontSizeAreApplied() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(
@@ -272,6 +281,7 @@ final class RunnerTests: XCTestCase {
     inspectable: Bool = false,
     textZoom: Int = 100,
     cacheMode: CacheModeMessage = .normal,
+    incognito: Bool = false,
     javaScriptCanOpenWindowsAutomatically: Bool = true,
     scrollbarsVisible: Bool = true,
     overScrollEnabled: Bool = true,
@@ -289,6 +299,7 @@ final class RunnerTests: XCTestCase {
       inspectable: inspectable,
       textZoom: Int64(textZoom),
       cacheMode: cacheMode,
+      incognito: incognito,
       javaScriptCanOpenWindowsAutomatically: javaScriptCanOpenWindowsAutomatically,
       scrollbarsVisible: scrollbarsVisible,
       overScrollEnabled: overScrollEnabled,
