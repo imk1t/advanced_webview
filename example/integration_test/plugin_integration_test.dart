@@ -380,6 +380,50 @@ void main() {
     );
   });
 
+  testWidgets('takeScreenshot returns a PNG of the visible page', (
+    tester,
+  ) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body><h1>shot</h1></body></html>');
+    // The platform view gets its size asynchronously; wait until it has one.
+    final deadline = DateTime.now().add(_timeout);
+    while (await harness.controller.runJavaScriptReturningResult(
+          'window.innerWidth',
+        ) ==
+        0) {
+      expect(
+        DateTime.now().isBefore(deadline),
+        isTrue,
+        reason: 'view has no size',
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    final png = await harness.controller.takeScreenshot();
+
+    expect(png, isNotNull);
+    expect(png!.sublist(0, 4), [0x89, 0x50, 0x4e, 0x47]);
+  });
+
+  testWidgets('findText finds text and clearMatches removes the highlight', (
+    tester,
+  ) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body><p>alpha beta alpha</p></body></html>');
+
+    final hit = await harness.controller.findText('alpha');
+    final miss = await harness.controller.findText('zzz');
+    await harness.controller.clearMatches();
+
+    expect(hit.found, isTrue);
+    expect(miss.found, isFalse);
+  });
+
   testWidgets('the WebView outlives its widget', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);

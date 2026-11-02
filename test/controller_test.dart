@@ -131,6 +131,16 @@ void main() {
       );
     });
 
+    test('pullToRefreshEnabled is passed to native', () {
+      expect(const WebViewSettings().toMessage().pullToRefreshEnabled, isFalse);
+      expect(
+        const WebViewSettings(pullToRefreshEnabled: true)
+            .toMessage()
+            .pullToRefreshEnabled,
+        isTrue,
+      );
+    });
+
     test('cacheMode is passed to native', () {
       expect(
         const WebViewSettings().toMessage().cacheMode,

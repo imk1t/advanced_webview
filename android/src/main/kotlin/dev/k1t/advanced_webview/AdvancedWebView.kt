@@ -26,6 +26,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebSettingsCompat
@@ -61,6 +62,14 @@ class AdvancedWebView(
     // swapped in by [attachToContext] so dialogs and IME work correctly.
     private val contextWrapper = MutableContextWrapper(context)
     val webView: WebView = WebView(contextWrapper)
+
+    // The view Flutter shows: the WebView inside a pull-to-refresh container.
+    // Pull-to-refresh is off by default, so the container only passes touches through.
+    val container: SwipeRefreshLayout = SwipeRefreshLayout(contextWrapper).apply {
+        addView(webView)
+        isEnabled = false
+        setOnRefreshListener { webView.reload() }
+    }
 
     private val hasNavigationDelegate = params.hasNavigationDelegate
     private val hasNewWindowDelegate = params.hasNewWindowDelegate
@@ -105,7 +114,7 @@ class AdvancedWebView(
         contextWrapper.baseContext = context
         // A re-created platform view reuses this WebView; detach it from the
         // previous container so it can be added to the new one.
-        (webView.parent as? ViewGroup)?.removeView(webView)
+        (container.parent as? ViewGroup)?.removeView(container)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -142,6 +151,8 @@ class AdvancedWebView(
         webView.overScrollMode =
             if (settings.overScrollEnabled) View.OVER_SCROLL_IF_CONTENT_SCROLLS else View.OVER_SCROLL_NEVER
         WebView.setWebContentsDebuggingEnabled(settings.inspectable)
+        container.isEnabled = settings.pullToRefreshEnabled
+        if (!settings.pullToRefreshEnabled) container.isRefreshing = false
         webView.setBackgroundColor(if (settings.transparentBackground) Color.TRANSPARENT else Color.WHITE)
     }
 
@@ -336,7 +347,7 @@ class AdvancedWebView(
         }
     }
 
-    override fun getView(): View = webView
+    override fun getView(): View = container
 
     override fun dispose() {
         // Lifetime is owned by Dart (AdvancedWebViewHostApi.dispose), not by the
@@ -368,10 +379,12 @@ class AdvancedWebView(
         }
 
         override fun onPageFinished(view: WebView, url: String) {
+            container.isRefreshing = false
             send { flutterApi.onPageFinished(id, url) }
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+            container.isRefreshing = false
             val message = WebResourceErrorMessage(
                 errorCode = error.errorCode.toLong(),
                 message = error.description.toString(),

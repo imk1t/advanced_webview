@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `WebViewSettings.pullToRefreshEnabled`: pulling down from the top reloads the page with the
+  platform's refresh indicator (`SwipeRefreshLayout` on Android, `UIRefreshControl` on iOS).
+  On Android the platform view is now a `SwipeRefreshLayout` that contains the WebView.
+
 - Add find-in-page: `AdvancedWebViewController.findText` (returns a `FindResult`) and `clearMatches`.
   Android uses `WebView.findAllAsync` / `findNext`; iOS uses `WKWebView.find` and reports only
   whether a match was found (no count).

@@ -39,6 +39,7 @@ class WebViewSettings {
     this.javaScriptCanOpenWindowsAutomatically = true,
     this.scrollbarsVisible = true,
     this.overScrollEnabled = true,
+    this.pullToRefreshEnabled = false,
     this.minimumFontSize,
     this.userAgent,
   }) : assert(textZoom > 0, 'textZoom must be positive'),
@@ -117,6 +118,14 @@ class WebViewSettings {
   /// Android and the bounce on iOS.
   final bool overScrollEnabled;
 
+  /// Reloads the page when the user pulls down from the top, with the
+  /// platform's refresh indicator (`SwipeRefreshLayout` on Android,
+  /// `UIRefreshControl` on iOS). The indicator stops when the page finishes
+  /// loading or fails.
+  ///
+  /// On iOS it needs [overScrollEnabled], because the pull is a bounce.
+  final bool pullToRefreshEnabled;
+
   /// Smallest font size the WebView renders: sp on Android
   /// (`WebSettings.setMinimumFontSize`), pt on iOS
   /// (`WKPreferences.minimumFontSize`). `null` uses the platform default.
@@ -140,6 +149,7 @@ class WebViewSettings {
     bool? javaScriptCanOpenWindowsAutomatically,
     bool? scrollbarsVisible,
     bool? overScrollEnabled,
+    bool? pullToRefreshEnabled,
     ValueGetter<int?>? minimumFontSize,
     ValueGetter<String?>? userAgent,
   }) {
@@ -166,6 +176,7 @@ class WebViewSettings {
           this.javaScriptCanOpenWindowsAutomatically,
       scrollbarsVisible: scrollbarsVisible ?? this.scrollbarsVisible,
       overScrollEnabled: overScrollEnabled ?? this.overScrollEnabled,
+      pullToRefreshEnabled: pullToRefreshEnabled ?? this.pullToRefreshEnabled,
       minimumFontSize: minimumFontSize != null
           ? minimumFontSize()
           : this.minimumFontSize,
@@ -189,6 +200,7 @@ class WebViewSettings {
         javaScriptCanOpenWindowsAutomatically,
     scrollbarsVisible: scrollbarsVisible,
     overScrollEnabled: overScrollEnabled,
+    pullToRefreshEnabled: pullToRefreshEnabled,
     minimumFontSize: minimumFontSize,
     userAgent: userAgent,
   );
@@ -213,6 +225,7 @@ class WebViewSettings {
           javaScriptCanOpenWindowsAutomatically &&
       other.scrollbarsVisible == scrollbarsVisible &&
       other.overScrollEnabled == overScrollEnabled &&
+      other.pullToRefreshEnabled == pullToRefreshEnabled &&
       other.minimumFontSize == minimumFontSize &&
       other.userAgent == userAgent;
 
@@ -232,6 +245,7 @@ class WebViewSettings {
     javaScriptCanOpenWindowsAutomatically,
     scrollbarsVisible,
     overScrollEnabled,
+    pullToRefreshEnabled,
     minimumFontSize,
     userAgent,
   );
