@@ -67,6 +67,11 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     return try registry.get(webViewId).webView.url?.absoluteString
   }
 
+  @MainActor
+  func takeScreenshot(webViewId: Int64) async throws -> FlutterStandardTypedData? {
+    return try await registry.get(webViewId).takeScreenshot()
+  }
+
   func getTitle(webViewId: Int64) throws -> String? {
     return try registry.get(webViewId).webView.title
   }

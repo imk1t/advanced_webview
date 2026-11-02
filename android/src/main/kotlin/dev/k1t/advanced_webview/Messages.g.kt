@@ -1111,6 +1111,11 @@ interface AdvancedWebViewHostApi {
   fun getTitle(webViewId: Long): String?
   /** Returns the evaluation result encoded as JSON (or null). */
   suspend fun evaluateJavaScript(webViewId: Long, source: String): String?
+  /**
+   * Returns a PNG of the visible area, or null when it cannot be captured
+   * (for example when the view has no size yet).
+   */
+  suspend fun takeScreenshot(webViewId: Long): ByteArray?
   fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage)
   suspend fun setCookie(webViewId: Long, cookie: CookieMessage)
   /** Returns the cookies the WebView would send to `url`. */
@@ -1355,6 +1360,25 @@ interface AdvancedWebViewHostApi {
             CoroutineScope(Dispatchers.Main).launch {
               val wrapped: List<Any?> = try {
                 listOf(api.evaluateJavaScript(webViewIdArg, sourceArg))
+              } catch (exception: Throwable) {
+                MessagesPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.takeScreenshot$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.takeScreenshot(webViewIdArg))
               } catch (exception: Throwable) {
                 MessagesPigeonUtils.wrapError(exception)
               }

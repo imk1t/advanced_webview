@@ -218,6 +218,14 @@ class AdvancedWebViewController {
   Future<void> runJavaScript(String source) =>
       _call(() => _hostApi.evaluateJavaScript(webViewId, source));
 
+  /// Captures the visible area of the WebView as a PNG image.
+  ///
+  /// Returns `null` when nothing can be captured, for example while the view
+  /// has no size. Only what is currently on screen is captured, not the whole
+  /// page.
+  Future<Uint8List?> takeScreenshot() =>
+      _call(() => _hostApi.takeScreenshot(webViewId));
+
   Future<void> updateSettings(WebViewSettings settings) async {
     await _call(() => _hostApi.updateSettings(webViewId, settings.toMessage()));
     _settings = settings;

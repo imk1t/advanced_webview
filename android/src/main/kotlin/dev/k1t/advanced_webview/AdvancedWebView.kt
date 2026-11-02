@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.MutableContextWrapper
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.net.Uri
 import android.net.http.SslError
@@ -37,6 +38,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -138,6 +140,21 @@ class AdvancedWebView(
             if (settings.overScrollEnabled) View.OVER_SCROLL_IF_CONTENT_SCROLLS else View.OVER_SCROLL_NEVER
         WebView.setWebContentsDebuggingEnabled(settings.inspectable)
         webView.setBackgroundColor(if (settings.transparentBackground) Color.TRANSPARENT else Color.WHITE)
+    }
+
+    /** PNG of the visible area, or null while the view has no size. */
+    fun takeScreenshot(): ByteArray? {
+        if (webView.width <= 0 || webView.height <= 0) return null
+        val bitmap = Bitmap.createBitmap(webView.width, webView.height, Bitmap.Config.ARGB_8888)
+        return try {
+            webView.draw(Canvas(bitmap))
+            ByteArrayOutputStream().use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                out.toByteArray()
+            }
+        } finally {
+            bitmap.recycle()
+        }
     }
 
     suspend fun evaluateJavaScript(source: String): String? = suspendCancellableCoroutine { cont ->

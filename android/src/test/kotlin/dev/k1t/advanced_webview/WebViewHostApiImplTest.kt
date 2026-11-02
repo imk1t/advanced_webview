@@ -183,6 +183,21 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun takeScreenshotReturnsNullWithoutSizeAndPngOnceLaidOut() {
+        hostApi.create(params(webViewId = 1))
+        val view = registry.get(1)
+        val webView = view.webView
+        assertNull(view.takeScreenshot())
+
+        webView.layout(0, 0, 40, 30)
+        val png = view.takeScreenshot()
+
+        assertNotNull(png)
+        assertEquals(0x89.toByte(), png!![0])
+        assertEquals('P'.code.toByte(), png[1])
+    }
+
+    @Test
     fun textZoomAndMinimumFontSizeAreApplied() {
         hostApi.create(params(webViewId = 1, settings = settings(textZoom = 150, minimumFontSize = 14)))
         val nativeSettings = registry.get(1).webView.settings

@@ -49,6 +49,8 @@ class WebViewHostApiImpl(
     override suspend fun evaluateJavaScript(webViewId: Long, source: String): String? =
         registry.get(webViewId).evaluateJavaScript(source)
 
+    override suspend fun takeScreenshot(webViewId: Long): ByteArray? = registry.get(webViewId).takeScreenshot()
+
     override fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage) =
         registry.get(webViewId).applySettings(settings)
 

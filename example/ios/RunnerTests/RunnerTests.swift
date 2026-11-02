@@ -180,6 +180,20 @@ final class RunnerTests: XCTestCase {
       try registry.get(1).webView.configuration.userContentController.userScripts.isEmpty)
   }
 
+  @MainActor
+  func testTakeScreenshotReturnsPngOnceTheViewHasASize() async throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    defer { hostApi.disposeAll() }
+    let empty = try await hostApi.takeScreenshot(webViewId: 1)
+    XCTAssertNil(empty)
+
+    try registry.get(1).webView.frame = CGRect(x: 0, y: 0, width: 40, height: 30)
+    let data = try await hostApi.takeScreenshot(webViewId: 1)
+
+    XCTAssertEqual(data?.data.prefix(4), Data([0x89, 0x50, 0x4e, 0x47]))
+  }
+
   func testEvaluateJavaScriptReturnsJson() async throws {
     let (hostApi, _, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))
