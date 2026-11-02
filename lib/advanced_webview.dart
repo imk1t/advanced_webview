@@ -1,6 +1,7 @@
 /// A lean WebView plugin for Android and iOS.
 library;
 
+export 'src/console_message.dart';
 export 'src/controller.dart' show AdvancedWebViewController;
 export 'src/cookie.dart';
 export 'src/download.dart';

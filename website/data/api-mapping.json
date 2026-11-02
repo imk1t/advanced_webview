@@ -62,6 +62,7 @@
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
       "WebChromeClient": "https://developer.android.com/reference/android/webkit/WebChromeClient",
+      "ConsoleMessage": "https://developer.android.com/reference/android/webkit/ConsoleMessage",
       "WebResourceRequest": "https://developer.android.com/reference/android/webkit/WebResourceRequest",
       "WebResourceError": "https://developer.android.com/reference/android/webkit/WebResourceError",
       "JavascriptInterface": "https://developer.android.com/reference/android/webkit/JavascriptInterface",
@@ -815,6 +816,78 @@
       "ios": {
         "status": "supported",
         "apis": ["UILongPressGestureRecognizer"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onConsoleMessage",
+      "group": "events",
+      "summary": {
+        "en": "A console.debug, log, info, warn or error call made by the page.",
+        "ja": "ページが console.debug / log / info / warn / error を呼び出しました。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onConsoleMessage(ConsoleMessage)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKUserContentController.addUserScript(_:)",
+          "WKUserScript",
+          "WKScriptMessageHandler"
+        ],
+        "note": {
+          "en": "A user script wraps console.debug, log, info, warn and error in every frame and posts to a script message handler. WebKit reports no source URL or line number.",
+          "ja": "ユーザースクリプトが全フレームで console.debug / log / info / warn / error をラップし、スクリプトメッセージハンドラーへ送ります。WebKit はソース URL と行番号を報告しません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewConsoleMessage",
+      "group": "events",
+      "summary": {
+        "en": "The level, text and (Android only) source location of a console call.",
+        "ja": "console 呼び出しのレベル・テキスト・（Android のみ）ソース位置です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onConsoleMessage(ConsoleMessage)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKUserContentController.addUserScript(_:)",
+          "WKUserScript",
+          "WKScriptMessageHandler"
+        ],
+        "note": {
+          "en": "A user script wraps console.debug, log, info, warn and error in every frame and posts to a script message handler. WebKit reports no source URL or line number.",
+          "ja": "ユーザースクリプトが全フレームで console.debug / log / info / warn / error をラップし、スクリプトメッセージハンドラーへ送ります。WebKit はソース URL と行番号を報告しません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewConsoleMessageLevel",
+      "group": "events",
+      "summary": {
+        "en": "Which console method produced a message: debug, log, info, warning or error.",
+        "ja": "メッセージを出した console メソッド（debug / log / info / warning / error）を表します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onConsoleMessage(ConsoleMessage)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKUserContentController.addUserScript(_:)",
+          "WKUserScript",
+          "WKScriptMessageHandler"
+        ],
+        "note": {
+          "en": "A user script wraps console.debug, log, info, warn and error in every frame and posts to a script message handler. WebKit reports no source URL or line number.",
+          "ja": "ユーザースクリプトが全フレームで console.debug / log / info / warn / error をラップし、スクリプトメッセージハンドラーへ送ります。WebKit はソース URL と行番号を報告しません。"
+        }
       }
     },
     {

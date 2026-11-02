@@ -92,6 +92,23 @@ long-press behaviour (text selection, link menu) still happens. `hitTest` looks 
 `document.elementFromPoint`, so it only sees the main frame and works the same on both platforms. Use it
 to build a custom context menu.
 
+## Console messages
+
+```dart
+AdvancedWebViewController(
+  onConsoleMessage: (message) {
+    debugPrint('[${message.level.name}] ${message.message}');
+  },
+);
+```
+
+`onConsoleMessage` reports every `console.debug`, `log`, `info`, `warn` and `error` call the page makes, in any
+frame, and the platform's own console output (Logcat, Web Inspector) still happens. Uncaught exceptions and
+browser-generated messages are not reported. Android passes the script URL and line number as
+`sourceUrl` / `lineNumber`; iOS has no such information, so they are `null` there (WebKit has no console callback,
+so a script injected at document start wraps the `console` methods). Android may deliver `console.info` as
+`log`. Use it together with `WebViewSettings.inspectable` when debugging a page.
+
 ## Find in page
 
 ```dart

@@ -4,6 +4,7 @@ import 'dart:ui' show Offset;
 
 import 'package:flutter/foundation.dart';
 
+import 'console_message.dart';
 import 'cookie.dart';
 import 'download.dart';
 import 'find.dart';
@@ -34,6 +35,7 @@ class AdvancedWebViewController {
     this.onTitleChanged,
     this.onScrollChanged,
     this.onLongPress,
+    this.onConsoleMessage,
     this.onWebResourceError,
     this.onNavigationRequest,
     this.onNewWindow,
@@ -72,6 +74,7 @@ class AdvancedWebViewController {
         hasHttpAuthDelegate: onHttpAuthRequest != null,
         hasScrollDelegate: onScrollChanged != null,
         hasLongPressDelegate: onLongPress != null,
+        hasConsoleMessageDelegate: onConsoleMessage != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
@@ -111,6 +114,22 @@ class AdvancedWebViewController {
   /// The platform's own long-press behaviour (text selection, system link
   /// menu) still happens. Only set at construction.
   final LongPressCallback? onLongPress;
+
+  /// Called for every `console.debug`, `log`, `info`, `warn` and `error` call
+  /// the page makes, in any frame. Useful for debugging pages; combine with
+  /// [WebViewSettings.inspectable] for full inspector access.
+  ///
+  /// The platform's own console handling still happens (Logcat on Android, the
+  /// Web Inspector on iOS). Uncaught exceptions and browser-generated messages
+  /// are not reported. Only set at construction: leaving it `null` keeps
+  /// console output off the platform channel.
+  ///
+  /// Android: `WebChromeClient.onConsoleMessage(ConsoleMessage)`; the source
+  /// URL and line number are reported, and `console.info` may arrive as
+  /// [WebViewConsoleMessageLevel.log]. iOS: a user script injected at document
+  /// start in every frame wraps the `console` methods and posts to a
+  /// `WKScriptMessageHandler`; the source URL and line number are `null`.
+  final ConsoleMessageCallback? onConsoleMessage;
   final WebResourceErrorCallback? onWebResourceError;
 
   /// Called for main-frame navigations started by the page (links, forms,
@@ -420,6 +439,17 @@ class _EventListener implements WebViewEventListener {
   @override
   void onLongPress(double x, double y) =>
       _controller.onLongPress?.call(Offset(x, y));
+
+  @override
+  void onConsoleMessage(ConsoleMessageMessage message) =>
+      _controller.onConsoleMessage?.call(
+        WebViewConsoleMessage(
+          level: WebViewConsoleMessageLevel.values[message.level.index],
+          message: message.message,
+          sourceUrl: message.sourceUrl,
+          lineNumber: message.lineNumber,
+        ),
+      );
 
   @override
   void onReceivedError(WebResourceErrorMessage error) =>

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.net.http.SslError
 import android.os.Looper
 import android.view.View
+import android.webkit.ConsoleMessage
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
@@ -402,6 +403,37 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun consoleMessagesAreForwardedToDartAndKeepPlatformLogging() {
+        hostApi.create(params(webViewId = 1, hasConsoleMessageDelegate = true))
+        val message = ConsoleMessage("careful", "https://a.test/app.js", 7, ConsoleMessage.MessageLevel.WARNING)
+
+        val handled = registry.get(1).webView.webChromeClient!!.onConsoleMessage(message)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertFalse(handled)
+        verify(messenger).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onConsoleMessage"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun consoleMessagesAreNotForwardedWithoutADelegate() {
+        hostApi.create(params(webViewId = 1))
+        val message = ConsoleMessage("quiet", "", 1, ConsoleMessage.MessageLevel.LOG)
+
+        registry.get(1).webView.webChromeClient!!.onConsoleMessage(message)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(messenger, never()).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onConsoleMessage"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
     fun sslErrorsAreForwardedToDart() {
         hostApi.create(params(webViewId = 1, hasSslErrorDelegate = true))
         val error = mock(SslError::class.java)
@@ -604,6 +636,7 @@ class WebViewHostApiImplTest {
         hasHttpAuthDelegate: Boolean = false,
         hasScrollDelegate: Boolean = false,
         hasLongPressDelegate: Boolean = false,
+        hasConsoleMessageDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
         webViewId,
@@ -619,6 +652,7 @@ class WebViewHostApiImplTest {
         hasHttpAuthDelegate,
         hasScrollDelegate,
         hasLongPressDelegate,
+        hasConsoleMessageDelegate,
         userScripts,
     )
 

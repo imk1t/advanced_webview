@@ -14,6 +14,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasDownloadDelegate: Bool
   private let hasSslErrorDelegate: Bool
   private let hasHttpAuthDelegate: Bool
+  private let hasConsoleMessageDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private let hasJavaScriptHandlers: Bool
   private let handlerObjectName: String
@@ -33,6 +34,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.hasDownloadDelegate = params.hasDownloadDelegate
     self.hasSslErrorDelegate = params.hasSslErrorDelegate
     self.hasHttpAuthDelegate = params.hasHttpAuthDelegate
+    self.hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
     self.handlerObjectName = params.javaScriptHandlerObjectName
 
@@ -53,6 +55,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     params.javaScriptChannelNames.forEach(addJavaScriptChannel)
     params.userScripts.forEach(addUserScript)
     if hasJavaScriptHandlers { installHandlerBridge() }
+    if hasConsoleMessageDelegate { installConsoleBridge() }
     observeProperties()
     if params.hasLongPressDelegate {
       let recognizer = UILongPressGestureRecognizer(
@@ -312,6 +315,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     webView.configuration.userContentController.removeAllUserScripts()
     javaScriptChannelNames.forEach(addChannelShim)
     if hasJavaScriptHandlers { addHandlerShim() }
+    if hasConsoleMessageDelegate { addConsoleShim() }
   }
 
   private static let handlerBridgeName = "advancedWebView"
@@ -340,6 +344,50 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
               throw new Error(error && error.message ? error.message : String(error));
             });
           }
+        });
+      })();
+      """
+    webView.configuration.userContentController.addUserScript(
+      WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+  }
+
+  private static let consoleBridgeName = "advancedWebViewConsole"
+
+  /// WebKit has no console callback, so wrap the `console` methods in every frame. The wrapper
+  /// still calls the original method, which keeps the Web Inspector output. Source URL and line
+  /// number are not available.
+  private func installConsoleBridge() {
+    webView.configuration.userContentController.add(
+      WeakScriptMessageHandler(self), name: Self.consoleBridgeName)
+    addConsoleShim()
+  }
+
+  private func addConsoleShim() {
+    let source = """
+      (function () {
+        if (window.__advancedWebViewConsole) return;
+        window.__advancedWebViewConsole = true;
+        var bridge = window.webkit.messageHandlers['\(Self.consoleBridgeName)'];
+        function format(value) {
+          if (typeof value === 'string') return value;
+          if (value instanceof Error) return value.stack || String(value);
+          if (value !== null && typeof value === 'object') {
+            try { return JSON.stringify(value); } catch (e) { return String(value); }
+          }
+          return String(value);
+        }
+        [['debug', 'debug'], ['log', 'log'], ['info', 'info'], ['warn', 'warning'],
+         ['error', 'error']].forEach(function (pair) {
+          var original = console[pair[0]];
+          console[pair[0]] = function () {
+            try {
+              bridge.postMessage({
+                level: pair[1],
+                message: Array.prototype.map.call(arguments, format).join(' ')
+              });
+            } catch (e) {}
+            if (original) return original.apply(console, arguments);
+          };
         });
       })();
       """
@@ -648,11 +696,34 @@ extension AdvancedWebView: WKScriptMessageHandler {
   func userContentController(
     _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
   ) {
+    if message.name == Self.consoleBridgeName {
+      handleConsoleMessage(message.body)
+      return
+    }
     let channelName = message.name
     let body = (message.body as? String) ?? String(describing: message.body)
     send { api, id in
       try await api.onJavaScriptMessage(webViewId: id, channelName: channelName, message: body)
     }
+  }
+}
+
+extension AdvancedWebView {
+  fileprivate func handleConsoleMessage(_ body: Any) {
+    guard let body = body as? [String: Any],
+      let text = body["message"] as? String
+    else { return }
+    let level: ConsoleMessageLevelMessage =
+      switch body["level"] as? String {
+      case "debug": .debug
+      case "info": .info
+      case "warning": .warning
+      case "error": .error
+      default: .log
+      }
+    let message = ConsoleMessageMessage(
+      level: level, message: text, sourceUrl: nil, lineNumber: nil)
+    send { api, id in try await api.onConsoleMessage(webViewId: id, message: message) }
   }
 }
 

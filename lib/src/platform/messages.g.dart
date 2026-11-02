@@ -120,6 +120,14 @@ enum MixedContentModeMessage {
   alwaysAllow;
 }
 
+enum ConsoleMessageLevelMessage {
+  debug,
+  log,
+  info,
+  warning,
+  error;
+}
+
 enum UserScriptInjectionTimeMessage {
   atDocumentStart,
   atDocumentEnd;
@@ -315,6 +323,68 @@ class WebViewSettingsMessage {
   }
 }
 
+class ConsoleMessageMessage {
+  ConsoleMessageMessage({
+    required this.level,
+    required this.message,
+    this.sourceUrl,
+    this.lineNumber,
+  });
+
+  ConsoleMessageLevelMessage level;
+
+  String message;
+
+  /// Script that logged the message. `null` on iOS, which does not report it.
+  String? sourceUrl;
+
+  /// Line in [sourceUrl]. `null` on iOS, which does not report it.
+  int? lineNumber;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      level,
+      message,
+      sourceUrl,
+      lineNumber,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ConsoleMessageMessage decode(Object result) {
+    result as List<Object?>;
+    return ConsoleMessageMessage(
+      level: result[0]! as ConsoleMessageLevelMessage,
+      message: result[1]! as String,
+      sourceUrl: result[2] as String?,
+      lineNumber: result[3] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ConsoleMessageMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(level, other.level) && _deepEquals(message, other.message) && _deepEquals(sourceUrl, other.sourceUrl) && _deepEquals(lineNumber, other.lineNumber);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ConsoleMessageMessage(level: $level, message: $message, sourceUrl: $sourceUrl, lineNumber: $lineNumber)';
+  }
+}
+
 class UserScriptMessage {
   UserScriptMessage({
     required this.source,
@@ -385,6 +455,7 @@ class CreationParamsMessage {
     required this.hasHttpAuthDelegate,
     required this.hasScrollDelegate,
     required this.hasLongPressDelegate,
+    required this.hasConsoleMessageDelegate,
     required this.userScripts,
   });
 
@@ -432,6 +503,10 @@ class CreationParamsMessage {
   /// When false, long presses are never reported to Dart.
   bool hasLongPressDelegate;
 
+  /// When false, console output is never reported to Dart (and, on iOS, the
+  /// `console` wrapper script is not injected).
+  bool hasConsoleMessageDelegate;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 
@@ -450,6 +525,7 @@ class CreationParamsMessage {
       hasHttpAuthDelegate,
       hasScrollDelegate,
       hasLongPressDelegate,
+      hasConsoleMessageDelegate,
       userScripts,
     ];
   }
@@ -473,7 +549,8 @@ class CreationParamsMessage {
       hasHttpAuthDelegate: result[10]! as bool,
       hasScrollDelegate: result[11]! as bool,
       hasLongPressDelegate: result[12]! as bool,
-      userScripts: (result[13]! as List<Object?>).cast<UserScriptMessage>(),
+      hasConsoleMessageDelegate: result[13]! as bool,
+      userScripts: (result[14]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -486,7 +563,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -495,7 +572,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, userScripts: $userScripts)';
   }
 }
 
@@ -1075,59 +1152,65 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is MixedContentModeMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    }    else if (value is UserScriptInjectionTimeMessage) {
+    }    else if (value is ConsoleMessageLevelMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.index);
-    }    else if (value is NavigationDecisionMessage) {
+    }    else if (value is UserScriptInjectionTimeMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.index);
-    }    else if (value is SslErrorDecisionMessage) {
+    }    else if (value is NavigationDecisionMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.index);
-    }    else if (value is PermissionResourceMessage) {
+    }    else if (value is SslErrorDecisionMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.index);
-    }    else if (value is PermissionDecisionMessage) {
+    }    else if (value is PermissionResourceMessage) {
       buffer.putUint8(135);
       writeValue(buffer, value.index);
-    }    else if (value is WebViewSettingsMessage) {
+    }    else if (value is PermissionDecisionMessage) {
       buffer.putUint8(136);
-      writeValue(buffer, value.encode());
-    }    else if (value is UserScriptMessage) {
+      writeValue(buffer, value.index);
+    }    else if (value is WebViewSettingsMessage) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    }    else if (value is CreationParamsMessage) {
+    }    else if (value is ConsoleMessageMessage) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    }    else if (value is NavigationRequestMessage) {
+    }    else if (value is UserScriptMessage) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    }    else if (value is WebResourceErrorMessage) {
+    }    else if (value is CreationParamsMessage) {
       buffer.putUint8(140);
       writeValue(buffer, value.encode());
-    }    else if (value is SslErrorMessage) {
+    }    else if (value is NavigationRequestMessage) {
       buffer.putUint8(141);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthRequestMessage) {
+    }    else if (value is WebResourceErrorMessage) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthCredentialsMessage) {
+    }    else if (value is SslErrorMessage) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    }    else if (value is DownloadRequestMessage) {
+    }    else if (value is HttpAuthRequestMessage) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    }    else if (value is PermissionRequestMessage) {
+    }    else if (value is HttpAuthCredentialsMessage) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    }    else if (value is FindResultMessage) {
+    }    else if (value is DownloadRequestMessage) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    }    else if (value is ScrollPositionMessage) {
+    }    else if (value is PermissionRequestMessage) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is FindResultMessage) {
       buffer.putUint8(148);
+      writeValue(buffer, value.encode());
+    }    else if (value is ScrollPositionMessage) {
+      buffer.putUint8(149);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(150);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1145,44 +1228,49 @@ class _PigeonCodec extends StandardMessageCodec {
         return value == null ? null : MixedContentModeMessage.values[value];
       case 131:
         final value = readValue(buffer) as int?;
-        return value == null ? null : UserScriptInjectionTimeMessage.values[value];
+        return value == null ? null : ConsoleMessageLevelMessage.values[value];
       case 132:
         final value = readValue(buffer) as int?;
-        return value == null ? null : NavigationDecisionMessage.values[value];
+        return value == null ? null : UserScriptInjectionTimeMessage.values[value];
       case 133:
         final value = readValue(buffer) as int?;
-        return value == null ? null : SslErrorDecisionMessage.values[value];
+        return value == null ? null : NavigationDecisionMessage.values[value];
       case 134:
         final value = readValue(buffer) as int?;
-        return value == null ? null : PermissionResourceMessage.values[value];
+        return value == null ? null : SslErrorDecisionMessage.values[value];
       case 135:
         final value = readValue(buffer) as int?;
-        return value == null ? null : PermissionDecisionMessage.values[value];
+        return value == null ? null : PermissionResourceMessage.values[value];
       case 136:
-        return WebViewSettingsMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : PermissionDecisionMessage.values[value];
       case 137:
-        return UserScriptMessage.decode(readValue(buffer)!);
+        return WebViewSettingsMessage.decode(readValue(buffer)!);
       case 138:
-        return CreationParamsMessage.decode(readValue(buffer)!);
+        return ConsoleMessageMessage.decode(readValue(buffer)!);
       case 139:
-        return NavigationRequestMessage.decode(readValue(buffer)!);
+        return UserScriptMessage.decode(readValue(buffer)!);
       case 140:
-        return WebResourceErrorMessage.decode(readValue(buffer)!);
+        return CreationParamsMessage.decode(readValue(buffer)!);
       case 141:
-        return SslErrorMessage.decode(readValue(buffer)!);
+        return NavigationRequestMessage.decode(readValue(buffer)!);
       case 142:
-        return HttpAuthRequestMessage.decode(readValue(buffer)!);
+        return WebResourceErrorMessage.decode(readValue(buffer)!);
       case 143:
-        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
+        return SslErrorMessage.decode(readValue(buffer)!);
       case 144:
-        return DownloadRequestMessage.decode(readValue(buffer)!);
+        return HttpAuthRequestMessage.decode(readValue(buffer)!);
       case 145:
-        return PermissionRequestMessage.decode(readValue(buffer)!);
+        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
       case 146:
-        return FindResultMessage.decode(readValue(buffer)!);
+        return DownloadRequestMessage.decode(readValue(buffer)!);
       case 147:
-        return ScrollPositionMessage.decode(readValue(buffer)!);
+        return PermissionRequestMessage.decode(readValue(buffer)!);
       case 148:
+        return FindResultMessage.decode(readValue(buffer)!);
+      case 149:
+        return ScrollPositionMessage.decode(readValue(buffer)!);
+      case 150:
         return CookieMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1758,6 +1846,10 @@ abstract class AdvancedWebViewFlutterApi {
   /// Only sent when the controller was created with `hasLongPressDelegate`.
   void onLongPress(int webViewId, double x, double y);
 
+  /// A `console.*` call made by the page. Only sent when the controller was
+  /// created with `hasConsoleMessageDelegate`.
+  void onConsoleMessage(int webViewId, ConsoleMessageMessage message);
+
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 
   Future<NavigationDecisionMessage> shouldOverrideUrlLoading(int webViewId, NavigationRequestMessage request);
@@ -1915,6 +2007,28 @@ abstract class AdvancedWebViewFlutterApi {
           final double arg_y = args[2]! as double;
           try {
             api.onLongPress(arg_webViewId, arg_x, arg_y);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onConsoleMessage$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final ConsoleMessageMessage arg_message = args[1]! as ConsoleMessageMessage;
+          try {
+            api.onConsoleMessage(arg_webViewId, arg_message);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
