@@ -1014,7 +1014,11 @@
       },
       "ios": {
         "status": "creationOnly",
-        "apis": ["WKWebViewConfiguration.websiteDataStore", "WKWebsiteDataStore.nonPersistent()"]
+        "apis": ["WKWebViewConfiguration.websiteDataStore", "WKWebsiteDataStore.nonPersistent()"],
+        "note": {
+          "en": "Applied when the WebView is created; changing it later has no effect.",
+          "ja": "WebView の生成時に適用されます。後から変更しても反映されません。"
+        }
       }
     },
     {
