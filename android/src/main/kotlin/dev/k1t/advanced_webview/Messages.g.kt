@@ -1249,6 +1249,13 @@ interface AdvancedWebViewHostApi {
   /** Scrolls the page by `dx`, `dy` (logical pixels) without animation. */
   fun scrollBy(webViewId: Long, dx: Double, dy: Double)
   fun getScrollPosition(webViewId: Long): ScrollPositionMessage
+  /**
+   * Opaque snapshot of the back/forward list and scroll position, or null
+   * when there is nothing to save. Only valid on the same platform.
+   */
+  fun saveState(webViewId: Long): ByteArray?
+  /** Restores a snapshot from `saveState`. Returns false when it cannot be read. */
+  fun restoreState(webViewId: Long, state: ByteArray): Boolean
   fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage)
   suspend fun setCookie(webViewId: Long, cookie: CookieMessage)
   /** Returns the cookies the WebView would send to `url`. */
@@ -1609,6 +1616,41 @@ interface AdvancedWebViewHostApi {
             val webViewIdArg = args[0] as Long
             val wrapped: List<Any?> = try {
               listOf(api.getScrollPosition(webViewIdArg))
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.saveState$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val wrapped: List<Any?> = try {
+              listOf(api.saveState(webViewIdArg))
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.restoreState$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val stateArg = args[1] as ByteArray
+            val wrapped: List<Any?> = try {
+              listOf(api.restoreState(webViewIdArg, stateArg))
             } catch (exception: Throwable) {
               MessagesPigeonUtils.wrapError(exception)
             }

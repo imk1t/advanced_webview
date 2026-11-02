@@ -53,6 +53,18 @@ final offset = await controller.scrollPosition(); // Offset
 `onScrollChanged: (offset) {}` を渡します。スクロールの1ステップごとに呼ばれるため、処理は軽くしてください。
 未指定ならスクロールイベントはプラットフォームチャネルを通りません。
 
+## 状態の保存と復元
+
+```dart
+final state = await controller.saveState();     // Uint8List?（履歴とスクロール位置）
+// ... 後で（アプリ再起動後など）新しいコントローラで:
+final restored = await controller.restoreState(state!); // false: 読めない場合は通常どおり読み込む
+```
+
+バイト列は中身が不透明でプラットフォーム依存です（Android は `Bundle` をマーシャルしたもの、iOS は
+`WKWebView.interactionState` をアーカイブしたもの）。同じプラットフォームでのみ復元し、
+`restoreState` が `false` を返したら破棄してください。まだ履歴がなければ `saveState` は `null` を返します。
+
 ## ページ内検索
 
 ```dart

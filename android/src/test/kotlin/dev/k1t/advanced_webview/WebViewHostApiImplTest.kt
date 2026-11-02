@@ -211,6 +211,15 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun saveStateReturnsMarshalledBytes() {
+        // Robolectric cannot unmarshall parcels or restore a WebView, so restoring is covered by the
+        // integration test.
+        hostApi.create(params(webViewId = 1))
+
+        assertNotNull(hostApi.saveState(1))
+    }
+
+    @Test
     fun scrollToByAndPositionUseLogicalPixels() {
         hostApi.create(params(webViewId = 1))
         val webView = registry.get(1).webView

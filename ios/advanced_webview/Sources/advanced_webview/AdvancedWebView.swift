@@ -108,6 +108,26 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     webView.reload()
   }
 
+  /// `WKWebView.interactionState` (back/forward list and scroll position) archived as bytes,
+  /// or nil when there is nothing to save.
+  func saveState() -> FlutterStandardTypedData? {
+    guard let state = webView.interactionState,
+      let data = try? NSKeyedArchiver.archivedData(
+        withRootObject: state, requiringSecureCoding: false)
+    else { return nil }
+    return FlutterStandardTypedData(bytes: data)
+  }
+
+  func restoreState(_ data: FlutterStandardTypedData) -> Bool {
+    guard let unarchiver = try? NSKeyedUnarchiver(forReadingFrom: data.data) else { return false }
+    unarchiver.requiresSecureCoding = false
+    guard let state = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) else {
+      return false
+    }
+    webView.interactionState = state
+    return true
+  }
+
   /// Scroll offsets are logical pixels (points), like Flutter and Android.
   func scrollTo(x: Double, y: Double) {
     webView.scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)

@@ -217,6 +217,18 @@ final class RunnerTests: XCTestCase {
   }
 
   @MainActor
+  func testRestoreStateRejectsGarbage() throws {
+    let (hostApi, _, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    defer { hostApi.disposeAll() }
+
+    let restored = try hostApi.restoreState(
+      webViewId: 1, state: FlutterStandardTypedData(bytes: Data([1, 2, 3])))
+
+    XCTAssertFalse(restored)
+  }
+
+  @MainActor
   func testScrollToByAndPosition() throws {
     let (hostApi, _, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))

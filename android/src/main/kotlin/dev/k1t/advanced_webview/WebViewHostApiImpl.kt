@@ -62,6 +62,10 @@ class WebViewHostApiImpl(
 
     override fun getScrollPosition(webViewId: Long): ScrollPositionMessage = registry.get(webViewId).scrollPosition()
 
+    override fun saveState(webViewId: Long): ByteArray? = registry.get(webViewId).saveState()
+
+    override fun restoreState(webViewId: Long, state: ByteArray): Boolean = registry.get(webViewId).restoreState(state)
+
     override fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage) =
         registry.get(webViewId).applySettings(settings)
 
