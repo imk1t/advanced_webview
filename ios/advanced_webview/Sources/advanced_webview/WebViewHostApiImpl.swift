@@ -1,3 +1,4 @@
+import Flutter
 import Foundation
 
 /// Implements the Dart -> native calls by dispatching to `WebViewRegistry`.
