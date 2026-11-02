@@ -46,6 +46,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import kotlin.coroutines.resume
+import kotlin.math.roundToInt
 
 /** One native WebView plus the clients that forward its callbacks to Dart. */
 class AdvancedWebView(
@@ -91,6 +92,11 @@ class AdvancedWebView(
         params.javaScriptChannelNames.forEach(::addJavaScriptChannel)
         params.userScripts.forEach(::addUserScript)
         if (params.hasDownloadDelegate) webView.setDownloadListener(::onDownload)
+        if (params.hasScrollDelegate) {
+            webView.setOnScrollChangeListener { _, x, y, _, _ ->
+                send { flutterApi.onScrollChanged(id, x / density, y / density) }
+            }
+        }
         if (params.javaScriptHandlerNames.isNotEmpty()) installHandlerBridge(params.javaScriptHandlerObjectName)
     }
 
@@ -155,6 +161,18 @@ class AdvancedWebView(
         if (!settings.pullToRefreshEnabled) container.isRefreshing = false
         webView.setBackgroundColor(if (settings.transparentBackground) Color.TRANSPARENT else Color.WHITE)
     }
+
+    private val density: Double get() = webView.resources.displayMetrics.density.toDouble()
+
+    /** Scroll offsets are logical pixels, like Flutter and iOS. */
+    fun scrollTo(x: Double, y: Double) = webView.scrollTo((x * density).roundToInt(), (y * density).roundToInt())
+
+    fun scrollBy(dx: Double, dy: Double) = webView.scrollBy((dx * density).roundToInt(), (dy * density).roundToInt())
+
+    fun scrollPosition(): ScrollPositionMessage = ScrollPositionMessage(
+        webView.scrollX / density,
+        webView.scrollY / density,
+    )
 
     /** PNG of the visible area, or null while the view has no size. */
     fun takeScreenshot(): ByteArray? {

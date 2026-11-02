@@ -54,6 +54,15 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     params.userScripts.forEach(addUserScript)
     if hasJavaScriptHandlers { installHandlerBridge() }
     observeProperties()
+    if params.hasScrollDelegate {
+      observations.append(
+        webView.scrollView.observe(\.contentOffset, options: [.new]) { [weak self] scrollView, _ in
+          let offset = scrollView.contentOffset
+          self?.send { api, id in
+            try await api.onScrollChanged(webViewId: id, x: Double(offset.x), y: Double(offset.y))
+          }
+        })
+    }
   }
 
   func view() -> UIView {
@@ -97,6 +106,21 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
 
   @objc private func handleRefresh() {
     webView.reload()
+  }
+
+  /// Scroll offsets are logical pixels (points), like Flutter and Android.
+  func scrollTo(x: Double, y: Double) {
+    webView.scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+  }
+
+  func scrollBy(dx: Double, dy: Double) {
+    let offset = webView.scrollView.contentOffset
+    scrollTo(x: Double(offset.x) + dx, y: Double(offset.y) + dy)
+  }
+
+  func scrollPosition() -> ScrollPositionMessage {
+    let offset = webView.scrollView.contentOffset
+    return ScrollPositionMessage(x: Double(offset.x), y: Double(offset.y))
   }
 
   /// PNG of the visible area, or nil while the view has no size.

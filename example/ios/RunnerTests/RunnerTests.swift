@@ -217,6 +217,20 @@ final class RunnerTests: XCTestCase {
   }
 
   @MainActor
+  func testScrollToByAndPosition() throws {
+    let (hostApi, _, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    defer { hostApi.disposeAll() }
+
+    try hostApi.scrollTo(webViewId: 1, x: 10, y: 20)
+    try hostApi.scrollBy(webViewId: 1, dx: 5, dy: -5)
+
+    let position = try hostApi.getScrollPosition(webViewId: 1)
+    XCTAssertEqual(position.x, 15)
+    XCTAssertEqual(position.y, 15)
+  }
+
+  @MainActor
   func testTakeScreenshotReturnsPngOnceTheViewHasASize() async throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))
@@ -305,6 +319,7 @@ final class RunnerTests: XCTestCase {
     hasDownloadDelegate: Bool = false,
     hasSslErrorDelegate: Bool = false,
     hasHttpAuthDelegate: Bool = false,
+    hasScrollDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
     return CreationParamsMessage(
@@ -319,6 +334,7 @@ final class RunnerTests: XCTestCase {
       hasDownloadDelegate: hasDownloadDelegate,
       hasSslErrorDelegate: hasSslErrorDelegate,
       hasHttpAuthDelegate: hasHttpAuthDelegate,
+      hasScrollDelegate: hasScrollDelegate,
       userScripts: userScripts)
   }
 

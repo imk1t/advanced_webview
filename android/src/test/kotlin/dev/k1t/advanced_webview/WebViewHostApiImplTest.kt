@@ -211,6 +211,21 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun scrollToByAndPositionUseLogicalPixels() {
+        hostApi.create(params(webViewId = 1))
+        val webView = registry.get(1).webView
+        webView.layout(0, 0, 100, 100)
+        val density = webView.resources.displayMetrics.density.toDouble()
+
+        hostApi.scrollTo(1, 10.0, 20.0)
+        hostApi.scrollBy(1, 5.0, -5.0)
+
+        val position = hostApi.getScrollPosition(1)
+        assertEquals(15.0, position.x, 1.0 / density)
+        assertEquals(15.0, position.y, 1.0 / density)
+    }
+
+    @Test
     fun takeScreenshotReturnsNullWithoutSizeAndPngOnceLaidOut() {
         hostApi.create(params(webViewId = 1))
         val view = registry.get(1)
@@ -544,6 +559,7 @@ class WebViewHostApiImplTest {
         hasDownloadDelegate: Boolean = false,
         hasSslErrorDelegate: Boolean = false,
         hasHttpAuthDelegate: Boolean = false,
+        hasScrollDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
         webViewId,
@@ -557,6 +573,7 @@ class WebViewHostApiImplTest {
         hasDownloadDelegate,
         hasSslErrorDelegate,
         hasHttpAuthDelegate,
+        hasScrollDelegate,
         userScripts,
     )
 

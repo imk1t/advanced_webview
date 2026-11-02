@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui' show Offset;
 
 import 'package:flutter/foundation.dart';
 
@@ -30,6 +31,7 @@ class AdvancedWebViewController {
     this.onPageFinished,
     this.onProgress,
     this.onTitleChanged,
+    this.onScrollChanged,
     this.onWebResourceError,
     this.onNavigationRequest,
     this.onNewWindow,
@@ -66,6 +68,7 @@ class AdvancedWebViewController {
         hasDownloadDelegate: onDownloadStart != null,
         hasSslErrorDelegate: onSslError != null,
         hasHttpAuthDelegate: onHttpAuthRequest != null,
+        hasScrollDelegate: onScrollChanged != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
@@ -90,6 +93,13 @@ class AdvancedWebViewController {
   final PageEventCallback? onPageFinished;
   final ProgressCallback? onProgress;
   final TitleChangedCallback? onTitleChanged;
+
+  /// Called whenever the page scrolls, with the new offset in logical pixels.
+  ///
+  /// Reported for every scroll step, so keep the callback cheap. Only set at
+  /// construction: leaving it `null` keeps scroll events off the platform
+  /// channel.
+  final ScrollChangedCallback? onScrollChanged;
   final WebResourceErrorCallback? onWebResourceError;
 
   /// Called for main-frame navigations started by the page (links, forms,
@@ -239,6 +249,20 @@ class AdvancedWebViewController {
   /// Removes the highlights left by [findText].
   Future<void> clearMatches() => _call(() => _hostApi.clearMatches(webViewId));
 
+  /// Scrolls the page to [x], [y] (logical pixels) without animation.
+  Future<void> scrollTo(double x, double y) =>
+      _call(() => _hostApi.scrollTo(webViewId, x, y));
+
+  /// Scrolls the page by [dx], [dy] (logical pixels) without animation.
+  Future<void> scrollBy(double dx, double dy) =>
+      _call(() => _hostApi.scrollBy(webViewId, dx, dy));
+
+  /// The current scroll offset of the page in logical pixels.
+  Future<Offset> scrollPosition() async {
+    final position = await _call(() => _hostApi.getScrollPosition(webViewId));
+    return Offset(position.x, position.y);
+  }
+
   /// Captures the visible area of the WebView as a PNG image.
   ///
   /// Returns `null` when nothing can be captured, for example while the view
@@ -342,6 +366,10 @@ class _EventListener implements WebViewEventListener {
 
   @override
   void onTitleChanged(String? title) => _controller.onTitleChanged?.call(title);
+
+  @override
+  void onScrollChanged(double x, double y) =>
+      _controller.onScrollChanged?.call(Offset(x, y));
 
   @override
   void onReceivedError(WebResourceErrorMessage error) =>

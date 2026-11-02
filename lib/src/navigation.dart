@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show Offset;
 
 import 'package:flutter/foundation.dart';
 
@@ -36,6 +37,7 @@ class WebResourceError {
 typedef PageEventCallback = void Function(String url);
 typedef ProgressCallback = void Function(int progress);
 typedef TitleChangedCallback = void Function(String? title);
+typedef ScrollChangedCallback = void Function(Offset offset);
 typedef WebResourceErrorCallback = void Function(WebResourceError error);
 typedef NavigationRequestCallback = FutureOr<NavigationDecision> Function(
   NavigationRequest request,

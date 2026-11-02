@@ -42,6 +42,18 @@ final png = await controller.takeScreenshot(); // Uint8List? (PNG)
 
 Captures only the visible area, not the whole page. Returns `null` while the view has no size.
 
+## Scrolling
+
+```dart
+await controller.scrollTo(0, 500);        // absolute, no animation
+await controller.scrollBy(0, 100);        // relative
+final offset = await controller.scrollPosition(); // Offset
+```
+
+Offsets are logical pixels on both platforms. To follow the scroll position, pass
+`onScrollChanged: (offset) {}` to the constructor. It fires for every scroll step, so keep it cheap;
+when it is not set, no scroll events cross the platform channel.
+
 ## Find in page
 
 ```dart
@@ -64,6 +76,7 @@ AdvancedWebViewController(
   onPageFinished: (url) {},
   onProgress: (progress) {},   // 0-100
   onTitleChanged: (title) {},
+  onScrollChanged: (offset) {},
   onWebResourceError: (error) {
     // error.errorCode is platform specific:
     // WebViewClient.ERROR_* on Android, NSError.code on iOS.

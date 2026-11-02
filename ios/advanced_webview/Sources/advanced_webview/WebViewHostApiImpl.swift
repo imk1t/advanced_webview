@@ -82,6 +82,18 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     try registry.get(webViewId).clearMatches()
   }
 
+  func scrollTo(webViewId: Int64, x: Double, y: Double) throws {
+    try registry.get(webViewId).scrollTo(x: x, y: y)
+  }
+
+  func scrollBy(webViewId: Int64, dx: Double, dy: Double) throws {
+    try registry.get(webViewId).scrollBy(dx: dx, dy: dy)
+  }
+
+  func getScrollPosition(webViewId: Int64) throws -> ScrollPositionMessage {
+    return try registry.get(webViewId).scrollPosition()
+  }
+
   func getTitle(webViewId: Int64) throws -> String? {
     return try registry.get(webViewId).webView.title
   }
