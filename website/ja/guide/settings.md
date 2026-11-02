@@ -21,6 +21,7 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `allowsBackForwardNavigationGestures` | `false` | 無視 | 対応 |
 | `inspectable` | `false` | 対応（プロセス全体） | 対応 |
 | `textZoom` | `100` | 文字のみ | ページ全体 |
+| `incognito` | `false` | 無視 | 生成時のみ |
 | `cacheMode` | `normal` | 対応 | `loadUrl` のみ |
 | `javaScriptCanOpenWindowsAutomatically` | `true` | 対応 | 対応 |
 | `scrollbarsVisible` | `true` | 対応 | 対応 |

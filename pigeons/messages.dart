@@ -35,6 +35,7 @@ class WebViewSettingsMessage {
     required this.inspectable,
     required this.textZoom,
     required this.cacheMode,
+    required this.incognito,
     required this.javaScriptCanOpenWindowsAutomatically,
     required this.scrollbarsVisible,
     required this.overScrollEnabled,
@@ -69,6 +70,10 @@ class WebViewSettingsMessage {
   /// Android: `WebSettings.setCacheMode`. iOS: `URLRequest.cachePolicy` of
   /// requests started with `loadUrl`.
   CacheModeMessage cacheMode;
+
+  /// iOS only, creation only: `WKWebsiteDataStore.nonPersistent()`. Ignored on
+  /// Android, whose WebView shares its data across the app.
+  bool incognito;
 
   /// Android: `WebSettings.setJavaScriptCanOpenWindowsAutomatically`. iOS:
   /// `WKPreferences.javaScriptCanOpenWindowsAutomatically`.

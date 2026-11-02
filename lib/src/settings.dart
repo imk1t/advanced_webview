@@ -35,6 +35,7 @@ class WebViewSettings {
     this.inspectable = false,
     this.textZoom = 100,
     this.cacheMode = WebViewCacheMode.normal,
+    this.incognito = false,
     this.javaScriptCanOpenWindowsAutomatically = true,
     this.scrollbarsVisible = true,
     this.overScrollEnabled = true,
@@ -97,6 +98,14 @@ class WebViewSettings {
   /// use the default policy.
   final WebViewCacheMode cacheMode;
 
+  /// Keeps cookies, cache and storage in memory only, so nothing is written to
+  /// disk and the data is gone when the controller is disposed.
+  ///
+  /// iOS only, creation only (`WKWebsiteDataStore.nonPersistent()`). Android's
+  /// WebView shares cookies, cache and storage across the whole app, so the
+  /// setting is ignored there.
+  final bool incognito;
+
   /// Lets scripts call `window.open` without a user gesture. When `false`,
   /// `window.open` only works in response to a tap or click.
   final bool javaScriptCanOpenWindowsAutomatically;
@@ -127,6 +136,7 @@ class WebViewSettings {
     bool? inspectable,
     int? textZoom,
     WebViewCacheMode? cacheMode,
+    bool? incognito,
     bool? javaScriptCanOpenWindowsAutomatically,
     bool? scrollbarsVisible,
     bool? overScrollEnabled,
@@ -150,6 +160,7 @@ class WebViewSettings {
       inspectable: inspectable ?? this.inspectable,
       textZoom: textZoom ?? this.textZoom,
       cacheMode: cacheMode ?? this.cacheMode,
+      incognito: incognito ?? this.incognito,
       javaScriptCanOpenWindowsAutomatically:
           javaScriptCanOpenWindowsAutomatically ??
           this.javaScriptCanOpenWindowsAutomatically,
@@ -173,6 +184,7 @@ class WebViewSettings {
     inspectable: inspectable,
     textZoom: textZoom,
     cacheMode: CacheModeMessage.values[cacheMode.index],
+    incognito: incognito,
     javaScriptCanOpenWindowsAutomatically:
         javaScriptCanOpenWindowsAutomatically,
     scrollbarsVisible: scrollbarsVisible,
@@ -196,6 +208,7 @@ class WebViewSettings {
       other.inspectable == inspectable &&
       other.textZoom == textZoom &&
       other.cacheMode == cacheMode &&
+      other.incognito == incognito &&
       other.javaScriptCanOpenWindowsAutomatically ==
           javaScriptCanOpenWindowsAutomatically &&
       other.scrollbarsVisible == scrollbarsVisible &&
@@ -215,6 +228,7 @@ class WebViewSettings {
     inspectable,
     textZoom,
     cacheMode,
+    incognito,
     javaScriptCanOpenWindowsAutomatically,
     scrollbarsVisible,
     overScrollEnabled,
