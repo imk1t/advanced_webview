@@ -132,8 +132,8 @@ class AdvancedWebView(
                 },
             )
         }
-        webView.isVerticalScrollBarEnabled = settings.scrollbarsVisible
-        webView.isHorizontalScrollBarEnabled = settings.scrollbarsVisible
+        webView.setVerticalScrollBarEnabled(settings.scrollbarsVisible)
+        webView.setHorizontalScrollBarEnabled(settings.scrollbarsVisible)
         webView.overScrollMode =
             if (settings.overScrollEnabled) View.OVER_SCROLL_IF_CONTENT_SCROLLS else View.OVER_SCROLL_NEVER
         WebView.setWebContentsDebuggingEnabled(settings.inspectable)

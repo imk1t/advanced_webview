@@ -53,6 +53,7 @@
   "classes": {
     "android": {
       "WebView": "https://developer.android.com/reference/android/webkit/WebView",
+      "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
       "WebChromeClient": "https://developer.android.com/reference/android/webkit/WebChromeClient",
