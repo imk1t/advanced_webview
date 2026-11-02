@@ -56,6 +56,12 @@ class WebViewHostApiImpl(
 
     override fun clearMatches(webViewId: Long) = registry.get(webViewId).clearMatches()
 
+    override fun scrollTo(webViewId: Long, x: Double, y: Double) = registry.get(webViewId).scrollTo(x, y)
+
+    override fun scrollBy(webViewId: Long, dx: Double, dy: Double) = registry.get(webViewId).scrollBy(dx, dy)
+
+    override fun getScrollPosition(webViewId: Long): ScrollPositionMessage = registry.get(webViewId).scrollPosition()
+
     override fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage) =
         registry.get(webViewId).applySettings(settings)
 

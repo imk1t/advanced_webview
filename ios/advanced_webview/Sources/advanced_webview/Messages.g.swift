@@ -430,6 +430,8 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
   /// When false, HTTP authentication challenges get the platform default
   /// handling without a round trip to Dart.
   var hasHttpAuthDelegate: Bool
+  /// When false, scroll changes are never reported to Dart.
+  var hasScrollDelegate: Bool
   /// Scripts injected into every page loaded after creation.
   var userScripts: [UserScriptMessage]
 
@@ -447,7 +449,8 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     let hasDownloadDelegate = pigeonVar_list[8] as! Bool
     let hasSslErrorDelegate = pigeonVar_list[9] as! Bool
     let hasHttpAuthDelegate = pigeonVar_list[10] as! Bool
-    let userScripts = pigeonVar_list[11] as! [UserScriptMessage]
+    let hasScrollDelegate = pigeonVar_list[11] as! Bool
+    let userScripts = pigeonVar_list[12] as! [UserScriptMessage]
 
     return CreationParamsMessage(
       webViewId: webViewId,
@@ -461,6 +464,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       hasDownloadDelegate: hasDownloadDelegate,
       hasSslErrorDelegate: hasSslErrorDelegate,
       hasHttpAuthDelegate: hasHttpAuthDelegate,
+      hasScrollDelegate: hasScrollDelegate,
       userScripts: userScripts
     )
   }
@@ -477,6 +481,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       hasDownloadDelegate,
       hasSslErrorDelegate,
       hasHttpAuthDelegate,
+      hasScrollDelegate,
       userScripts,
     ]
   }
@@ -484,7 +489,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasDownloadDelegate, rhs.hasDownloadDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasSslErrorDelegate, rhs.hasSslErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpAuthDelegate, rhs.hasHttpAuthDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
+    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasDownloadDelegate, rhs.hasDownloadDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasSslErrorDelegate, rhs.hasSslErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpAuthDelegate, rhs.hasHttpAuthDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasScrollDelegate, rhs.hasScrollDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -500,11 +505,12 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: hasDownloadDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasSslErrorDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasHttpAuthDelegate, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: hasScrollDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userScripts, hasher: &hasher)
   }
 
   public var description: String {
-    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), hasDownloadDelegate: \(String(describing: hasDownloadDelegate)), hasSslErrorDelegate: \(String(describing: hasSslErrorDelegate)), hasHttpAuthDelegate: \(String(describing: hasHttpAuthDelegate)), userScripts: \(String(describing: userScripts)))"
+    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), hasDownloadDelegate: \(String(describing: hasDownloadDelegate)), hasSslErrorDelegate: \(String(describing: hasSslErrorDelegate)), hasHttpAuthDelegate: \(String(describing: hasHttpAuthDelegate)), hasScrollDelegate: \(String(describing: hasScrollDelegate)), userScripts: \(String(describing: userScripts)))"
   }
 }
 
@@ -863,6 +869,48 @@ struct FindResultMessage: Hashable, CustomStringConvertible {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct ScrollPositionMessage: Hashable, CustomStringConvertible {
+  /// Horizontal offset in logical pixels.
+  var x: Double
+  /// Vertical offset in logical pixels.
+  var y: Double
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ScrollPositionMessage? {
+    let x = pigeonVar_list[0] as! Double
+    let y = pigeonVar_list[1] as! Double
+
+    return ScrollPositionMessage(
+      x: x,
+      y: y
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      x,
+      y,
+    ]
+  }
+  static func == (lhs: ScrollPositionMessage, rhs: ScrollPositionMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.x, rhs.x) && MessagesPigeonInternal.deepEquals(lhs.y, rhs.y)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("ScrollPositionMessage")
+    MessagesPigeonInternal.deepHash(value: x, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: y, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "ScrollPositionMessage(x: \(String(describing: x)), y: \(String(describing: y)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct CookieMessage: Hashable, CustomStringConvertible {
   var name: String
   var value: String
@@ -990,6 +1038,8 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 145:
       return FindResultMessage.fromList(self.readValue() as! [Any?])
     case 146:
+      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+    case 147:
       return CookieMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1050,8 +1100,11 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? FindResultMessage {
       super.writeByte(145)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? ScrollPositionMessage {
       super.writeByte(146)
+      super.writeValue(value.toList())
+    } else if let value = value as? CookieMessage {
+      super.writeByte(147)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1100,6 +1153,11 @@ protocol AdvancedWebViewHostApi {
   func findText(webViewId: Int64, query: String, forward: Bool) async throws -> FindResultMessage
   /// Removes the highlights left by `findText`.
   func clearMatches(webViewId: Int64) throws
+  /// Scrolls the page to `x`, `y` (logical pixels) without animation.
+  func scrollTo(webViewId: Int64, x: Double, y: Double) throws
+  /// Scrolls the page by `dx`, `dy` (logical pixels) without animation.
+  func scrollBy(webViewId: Int64, dx: Double, dy: Double) throws
+  func getScrollPosition(webViewId: Int64) throws -> ScrollPositionMessage
   func updateSettings(webViewId: Int64, settings: WebViewSettingsMessage) throws
   func setCookie(webViewId: Int64, cookie: CookieMessage) async throws
   /// Returns the cookies the WebView would send to `url`.
@@ -1377,6 +1435,57 @@ class AdvancedWebViewHostApiSetup {
     } else {
       clearMatchesChannel.setMessageHandler(nil)
     }
+    /// Scrolls the page to `x`, `y` (logical pixels) without animation.
+    let scrollToChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.scrollTo\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      scrollToChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let xArg = args[1] as! Double
+        let yArg = args[2] as! Double
+        do {
+          try api.scrollTo(webViewId: webViewIdArg, x: xArg, y: yArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      scrollToChannel.setMessageHandler(nil)
+    }
+    /// Scrolls the page by `dx`, `dy` (logical pixels) without animation.
+    let scrollByChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.scrollBy\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      scrollByChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let dxArg = args[1] as! Double
+        let dyArg = args[2] as! Double
+        do {
+          try api.scrollBy(webViewId: webViewIdArg, dx: dxArg, dy: dyArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      scrollByChannel.setMessageHandler(nil)
+    }
+    let getScrollPositionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getScrollPosition\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getScrollPositionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        do {
+          let result = try api.getScrollPosition(webViewId: webViewIdArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getScrollPositionChannel.setMessageHandler(nil)
+    }
     let updateSettingsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.updateSettings\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       updateSettingsChannel.setMessageHandler { message, reply in
@@ -1488,6 +1597,8 @@ protocol AdvancedWebViewFlutterApiProtocol {
   @MainActor func onPageFinished(webViewId webViewIdArg: Int64, url urlArg: String) async throws
   @MainActor func onProgressChanged(webViewId webViewIdArg: Int64, progress progressArg: Int64) async throws
   @MainActor func onTitleChanged(webViewId webViewIdArg: Int64, title titleArg: String?) async throws
+  /// Only sent when the controller was created with `hasScrollDelegate`.
+  @MainActor func onScrollChanged(webViewId webViewIdArg: Int64, x xArg: Double, y yArg: Double) async throws
   @MainActor func onReceivedError(webViewId webViewIdArg: Int64, error errorArg: WebResourceErrorMessage) async throws
   @MainActor func shouldOverrideUrlLoading(webViewId webViewIdArg: Int64, request requestArg: NavigationRequestMessage) async throws -> NavigationDecisionMessage
   @MainActor func onJavaScriptMessage(webViewId webViewIdArg: Int64, channelName channelNameArg: String, message messageArg: String) async throws
@@ -1581,6 +1692,27 @@ class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
       let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onTitleChanged\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, titleArg] as [Any?]) { response in
+        guard let listResponse = response as? [Any?] else {
+          continuation.resume(throwing: createConnectionError(withChannelName: channelName))
+          return
+        }
+        if listResponse.count > 1 {
+          let code: String = listResponse[0] as! String
+          let message: String? = nilOrValue(listResponse[1])
+          let details: String? = nilOrValue(listResponse[2])
+          continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
+        } else {
+          continuation.resume()
+        }
+      }
+    }
+  }
+  /// Only sent when the controller was created with `hasScrollDelegate`.
+  @MainActor func onScrollChanged(webViewId webViewIdArg: Int64, x xArg: Double, y yArg: Double) async throws {
+    return try await withCheckedThrowingContinuation { continuation in
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onScrollChanged\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([webViewIdArg, xArg, yArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
           continuation.resume(throwing: createConnectionError(withChannelName: channelName))
           return

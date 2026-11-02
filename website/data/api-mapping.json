@@ -446,6 +446,54 @@
       }
     },
     {
+      "dart": "AdvancedWebViewController.scrollTo",
+      "group": "loading",
+      "summary": {
+        "en": "Scrolls the page to an absolute offset in logical pixels, without animation.",
+        "ja": "ページを論理ピクセル単位の絶対位置へスクロールします（アニメーションなし）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.scrollTo(int, int)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.setContentOffset(_:animated:)"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.scrollBy",
+      "group": "loading",
+      "summary": {
+        "en": "Scrolls the page by a relative offset in logical pixels, without animation.",
+        "ja": "ページを論理ピクセル単位の相対量でスクロールします（アニメーションなし）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.scrollBy(int, int)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.setContentOffset(_:animated:)"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.scrollPosition",
+      "group": "loading",
+      "summary": {
+        "en": "Returns the current scroll offset in logical pixels.",
+        "ja": "現在のスクロール位置を論理ピクセルで返します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.getScrollX()", "View.getScrollY()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.contentOffset"]
+      }
+    },
+    {
       "dart": "AdvancedWebViewController.runJavaScript",
       "group": "javascript",
       "summary": {
@@ -635,6 +683,22 @@
           "en": "Observed with KVO.",
           "ja": "KVO で監視します。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onScrollChanged",
+      "group": "events",
+      "summary": {
+        "en": "The page scrolled; reports the new offset in logical pixels.",
+        "ja": "ページがスクロールしました。新しい位置を論理ピクセルで通知します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.setOnScrollChangeListener(OnScrollChangeListener)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.contentOffset"]
       }
     },
     {

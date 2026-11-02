@@ -41,6 +41,18 @@ final png = await controller.takeScreenshot(); // Uint8List?（PNG）
 
 ページ全体ではなく、表示されている領域だけを取得します。ビューのサイズが 0 の間は `null` を返します。
 
+## スクロール
+
+```dart
+await controller.scrollTo(0, 500);        // 絶対位置（アニメーションなし）
+await controller.scrollBy(0, 100);        // 相対移動
+final offset = await controller.scrollPosition(); // Offset
+```
+
+オフセットは両プラットフォームとも論理ピクセルです。スクロール位置を追いたい場合は、コンストラクタに
+`onScrollChanged: (offset) {}` を渡します。スクロールの1ステップごとに呼ばれるため、処理は軽くしてください。
+未指定ならスクロールイベントはプラットフォームチャネルを通りません。
+
 ## ページ内検索
 
 ```dart
@@ -63,6 +75,7 @@ AdvancedWebViewController(
   onPageFinished: (url) {},
   onProgress: (progress) {},   // 0-100
   onTitleChanged: (title) {},
+  onScrollChanged: (offset) {},
   onWebResourceError: (error) {
     // error.errorCode はプラットフォーム依存:
     // Android は WebViewClient.ERROR_*、iOS は NSError.code。

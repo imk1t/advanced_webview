@@ -25,6 +25,7 @@ void main() {
     String javaScriptHandlerObjectName = 'advanced_webview',
     List<UserScript> userScripts = const [],
     PageEventCallback? onPageFinished,
+    ScrollChangedCallback? onScrollChanged,
     WebResourceErrorCallback? onWebResourceError,
     NavigationRequestCallback? onNavigationRequest,
     NewWindowCallback? onNewWindow,
@@ -41,6 +42,7 @@ void main() {
       javaScriptHandlerObjectName: javaScriptHandlerObjectName,
       userScripts: userScripts,
       onPageFinished: onPageFinished,
+      onScrollChanged: onScrollChanged,
       onWebResourceError: onWebResourceError,
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
@@ -248,6 +250,31 @@ void main() {
 
       dispatcher.onNewWindowRequest(controller.webViewId, 'https://a.dev/');
       expect(urls, ['https://a.dev/']);
+    });
+  });
+
+  group('scrolling', () {
+    test('scrollTo, scrollBy and scrollPosition use the host API', () async {
+      final controller = createController();
+      await controller.scrollTo(1, 2);
+      await controller.scrollBy(3, 4);
+      hostApi.nextScrollPosition = ScrollPositionMessage(x: 5, y: 6);
+      expect(await controller.scrollPosition(), const Offset(5, 6));
+      expect(
+        hostApi.calls,
+        containsAllInOrder(['scrollTo(1.0, 2.0)', 'scrollBy(3.0, 4.0)']),
+      );
+    });
+
+    test('onScrollChanged is routed and flagged at creation', () {
+      final without = createController();
+      expect(hostApi.created[without.webViewId]!.hasScrollDelegate, isFalse);
+
+      final offsets = <Offset>[];
+      final controller = createController(onScrollChanged: offsets.add);
+      expect(hostApi.created[controller.webViewId]!.hasScrollDelegate, isTrue);
+      dispatcher.onScrollChanged(controller.webViewId, 1.5, 20);
+      expect(offsets, [const Offset(1.5, 20)]);
     });
   });
 

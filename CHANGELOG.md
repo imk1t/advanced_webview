@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add scrolling: `AdvancedWebViewController.scrollTo`, `scrollBy`, `scrollPosition` and the
+  `onScrollChanged` callback. Offsets are logical pixels on both platforms (`WebView.scrollTo` /
+  `setOnScrollChangeListener` on Android, `UIScrollView.contentOffset` on iOS).
+
 ## 0.3.0 - 2026-11-02
 
 - Add `WebViewSettings.pullToRefreshEnabled`: pulling down from the top reloads the page with the

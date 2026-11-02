@@ -123,6 +123,7 @@ class CreationParamsMessage {
     required this.hasDownloadDelegate,
     required this.hasSslErrorDelegate,
     required this.hasHttpAuthDelegate,
+    required this.hasScrollDelegate,
     required this.userScripts,
   });
 
@@ -162,6 +163,9 @@ class CreationParamsMessage {
   /// When false, HTTP authentication challenges get the platform default
   /// handling without a round trip to Dart.
   bool hasHttpAuthDelegate;
+
+  /// When false, scroll changes are never reported to Dart.
+  bool hasScrollDelegate;
 
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
@@ -262,6 +266,16 @@ class FindResultMessage {
   int? activeMatchIndex;
 }
 
+class ScrollPositionMessage {
+  ScrollPositionMessage({required this.x, required this.y});
+
+  /// Horizontal offset in logical pixels.
+  double x;
+
+  /// Vertical offset in logical pixels.
+  double y;
+}
+
 class CookieMessage {
   CookieMessage({
     required this.name,
@@ -333,6 +347,14 @@ abstract class AdvancedWebViewHostApi {
   /// Removes the highlights left by `findText`.
   void clearMatches(int webViewId);
 
+  /// Scrolls the page to `x`, `y` (logical pixels) without animation.
+  void scrollTo(int webViewId, double x, double y);
+
+  /// Scrolls the page by `dx`, `dy` (logical pixels) without animation.
+  void scrollBy(int webViewId, double dx, double dy);
+
+  ScrollPositionMessage getScrollPosition(int webViewId);
+
   void updateSettings(int webViewId, WebViewSettingsMessage settings);
 
   @async
@@ -364,6 +386,9 @@ abstract class AdvancedWebViewFlutterApi {
   void onProgressChanged(int webViewId, int progress);
 
   void onTitleChanged(int webViewId, String? title);
+
+  /// Only sent when the controller was created with `hasScrollDelegate`.
+  void onScrollChanged(int webViewId, double x, double y);
 
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 

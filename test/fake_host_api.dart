@@ -62,6 +62,22 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     return nextJavaScriptResult;
   }
 
+  ScrollPositionMessage nextScrollPosition = ScrollPositionMessage(x: 0, y: 0);
+
+  @override
+  Future<void> scrollTo(int webViewId, double x, double y) async =>
+      calls.add('scrollTo($x, $y)');
+
+  @override
+  Future<void> scrollBy(int webViewId, double dx, double dy) async =>
+      calls.add('scrollBy($dx, $dy)');
+
+  @override
+  Future<ScrollPositionMessage> getScrollPosition(int webViewId) async {
+    calls.add('getScrollPosition');
+    return nextScrollPosition;
+  }
+
   FindResultMessage nextFindResult = FindResultMessage(found: false);
 
   @override
