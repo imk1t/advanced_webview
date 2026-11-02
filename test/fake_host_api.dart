@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:advanced_webview/src/platform/messages.g.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -58,6 +60,14 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
   Future<String?> evaluateJavaScript(int webViewId, String source) async {
     calls.add('evaluateJavaScript($source)');
     return nextJavaScriptResult;
+  }
+
+  Uint8List? nextScreenshot;
+
+  @override
+  Future<Uint8List?> takeScreenshot(int webViewId) async {
+    calls.add('takeScreenshot');
+    return nextScreenshot;
   }
 
   @override

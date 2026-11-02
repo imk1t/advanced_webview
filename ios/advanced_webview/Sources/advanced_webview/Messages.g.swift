@@ -1033,6 +1033,9 @@ protocol AdvancedWebViewHostApi {
   func getTitle(webViewId: Int64) throws -> String?
   /// Returns the evaluation result encoded as JSON (or null).
   func evaluateJavaScript(webViewId: Int64, source: String) async throws -> String?
+  /// Returns a PNG of the visible area, or null when it cannot be captured
+  /// (for example when the view has no size yet).
+  func takeScreenshot(webViewId: Int64) async throws -> FlutterStandardTypedData?
   func updateSettings(webViewId: Int64, settings: WebViewSettingsMessage) throws
   func setCookie(webViewId: Int64, cookie: CookieMessage) async throws
   /// Returns the cookies the WebView would send to `url`.
@@ -1253,6 +1256,25 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       evaluateJavaScriptChannel.setMessageHandler(nil)
+    }
+    /// Returns a PNG of the visible area, or null when it cannot be captured
+    /// (for example when the view has no size yet).
+    let takeScreenshotChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.takeScreenshot\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      takeScreenshotChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        Task { @MainActor in
+          do {
+            let result = try await api.takeScreenshot(webViewId: webViewIdArg)
+            reply(wrapResult(result))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      takeScreenshotChannel.setMessageHandler(nil)
     }
     let updateSettingsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.updateSettings\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

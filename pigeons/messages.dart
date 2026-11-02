@@ -299,6 +299,11 @@ abstract class AdvancedWebViewHostApi {
   @async
   String? evaluateJavaScript(int webViewId, String source);
 
+  /// Returns a PNG of the visible area, or null when it cannot be captured
+  /// (for example when the view has no size yet).
+  @async
+  Uint8List? takeScreenshot(int webViewId);
+
   void updateSettings(int webViewId, WebViewSettingsMessage settings);
 
   @async

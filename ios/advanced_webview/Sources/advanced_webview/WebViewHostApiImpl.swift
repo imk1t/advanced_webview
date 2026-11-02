@@ -1,3 +1,4 @@
+import Flutter
 import Foundation
 
 /// Implements the Dart -> native calls by dispatching to `WebViewRegistry`.
@@ -65,6 +66,11 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
 
   func getUrl(webViewId: Int64) throws -> String? {
     return try registry.get(webViewId).webView.url?.absoluteString
+  }
+
+  @MainActor
+  func takeScreenshot(webViewId: Int64) async throws -> FlutterStandardTypedData? {
+    return try await registry.get(webViewId).takeScreenshot()
   }
 
   func getTitle(webViewId: Int64) throws -> String? {

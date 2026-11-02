@@ -53,6 +53,7 @@
   "classes": {
     "android": {
       "WebView": "https://developer.android.com/reference/android/webkit/WebView",
+      "Bitmap": "https://developer.android.com/reference/android/graphics/Bitmap",
       "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
@@ -79,6 +80,7 @@
       "WKWebView": "https://developer.apple.com/documentation/webkit/wkwebview",
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
       "WKWebsiteDataStore": "https://developer.apple.com/documentation/webkit/wkwebsitedatastore",
+      "UIImage": "https://developer.apple.com/documentation/uikit/uiimage",
       "WKPreferences": "https://developer.apple.com/documentation/webkit/wkpreferences",
       "WKWebpagePreferences": "https://developer.apple.com/documentation/webkit/wkwebpagepreferences",
       "WKNavigationDelegate": "https://developer.apple.com/documentation/webkit/wknavigationdelegate",
@@ -373,6 +375,26 @@
       "ios": {
         "status": "supported",
         "apis": ["WKWebView.title"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.takeScreenshot",
+      "group": "loading",
+      "summary": {
+        "en": "Captures the visible area of the WebView as a PNG.",
+        "ja": "WebView の表示領域を PNG として取得します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.draw(Canvas)", "Bitmap.compress(PNG)"],
+        "note": {
+          "en": "Returns null while the view has no size.",
+          "ja": "ビューのサイズが 0 の間は null を返します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.takeSnapshot(configuration:)", "UIImage.pngData()"]
       }
     },
     {

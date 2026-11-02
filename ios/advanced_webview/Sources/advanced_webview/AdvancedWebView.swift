@@ -86,6 +86,14 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     webView.scrollView.backgroundColor = webView.backgroundColor
   }
 
+  /// PNG of the visible area, or nil while the view has no size.
+  @MainActor
+  func takeScreenshot() async throws -> FlutterStandardTypedData? {
+    guard webView.bounds.width > 0, webView.bounds.height > 0 else { return nil }
+    let image = try await webView.takeSnapshot(configuration: nil)
+    return image.pngData().map { FlutterStandardTypedData(bytes: $0) }
+  }
+
   /// Loads a request started by the app. Like Android, it does not consult
   /// the navigation delegate.
   func load(_ request: URLRequest) {

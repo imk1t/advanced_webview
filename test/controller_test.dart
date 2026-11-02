@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:advanced_webview/advanced_webview.dart';
 import 'package:advanced_webview/src/platform/event_dispatcher.dart';
@@ -157,6 +158,16 @@ void main() {
         () => WebViewSettings(textZoom: 0),
         throwsA(isA<AssertionError>()),
       );
+    });
+
+    test('takeScreenshot returns the PNG bytes from native', () async {
+      final controller = createController();
+      final bytes = Uint8List.fromList([0x89, 0x50, 0x4e, 0x47]);
+      hostApi.nextScreenshot = bytes;
+      expect(await controller.takeScreenshot(), bytes);
+      expect(hostApi.calls, contains('takeScreenshot'));
+      hostApi.nextScreenshot = null;
+      expect(await controller.takeScreenshot(), isNull);
     });
 
     test('passkeysEnabled is passed to the native settings', () {
