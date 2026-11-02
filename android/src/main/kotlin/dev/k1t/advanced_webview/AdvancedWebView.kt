@@ -33,6 +33,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import io.flutter.Log
 import io.flutter.plugin.platform.PlatformView
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -68,6 +69,8 @@ class AdvancedWebView(
     private val hasHttpAuthDelegate = params.hasHttpAuthDelegate
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
+    private var findQuery: String? = null
+    private var pendingFind: CancellableContinuation<FindResultMessage>? = null
 
     init {
         webView.settings.domStorageEnabled = true
@@ -155,6 +158,51 @@ class AdvancedWebView(
         } finally {
             bitmap.recycle()
         }
+    }
+
+    /**
+     * A new query starts a search ([WebView.findAllAsync]); repeating it moves
+     * to the next or previous match ([WebView.findNext]). Completes when the
+     * WebView has finished counting. A search started while another is pending
+     * completes the earlier one as "not found".
+     */
+    suspend fun find(query: String, forward: Boolean): FindResultMessage {
+        if (query.isEmpty()) {
+            clearMatches()
+            return FindResultMessage(found = false, matchCount = 0)
+        }
+        return suspendCancellableCoroutine { cont ->
+            pendingFind?.resume(FindResultMessage(found = false))
+            pendingFind = cont
+            cont.invokeOnCancellation { if (pendingFind === cont) pendingFind = null }
+            webView.setFindListener(::onFindResult)
+            if (query == findQuery) {
+                webView.findNext(forward)
+            } else {
+                findQuery = query
+                webView.findAllAsync(query)
+            }
+        }
+    }
+
+    internal fun onFindResult(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
+        if (!isDoneCounting) return
+        val cont = pendingFind ?: return
+        pendingFind = null
+        cont.resume(
+            FindResultMessage(
+                found = numberOfMatches > 0,
+                matchCount = numberOfMatches.toLong(),
+                activeMatchIndex = if (numberOfMatches > 0) activeMatchOrdinal.toLong() else null,
+            ),
+        )
+    }
+
+    fun clearMatches() {
+        findQuery = null
+        pendingFind?.resume(FindResultMessage(found = false))
+        pendingFind = null
+        webView.clearMatches()
     }
 
     suspend fun evaluateJavaScript(source: String): String? = suspendCancellableCoroutine { cont ->

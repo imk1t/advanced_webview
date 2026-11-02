@@ -73,6 +73,15 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     return try await registry.get(webViewId).takeScreenshot()
   }
 
+  @MainActor
+  func findText(webViewId: Int64, query: String, forward: Bool) async throws -> FindResultMessage {
+    return try await registry.get(webViewId).find(query, forward: forward)
+  }
+
+  func clearMatches(webViewId: Int64) throws {
+    try registry.get(webViewId).clearMatches()
+  }
+
   func getTitle(webViewId: Int64) throws -> String? {
     return try registry.get(webViewId).webView.title
   }

@@ -62,6 +62,21 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     return nextJavaScriptResult;
   }
 
+  FindResultMessage nextFindResult = FindResultMessage(found: false);
+
+  @override
+  Future<FindResultMessage> findText(
+    int webViewId,
+    String query,
+    bool forward,
+  ) async {
+    calls.add('findText($query, $forward)');
+    return nextFindResult;
+  }
+
+  @override
+  Future<void> clearMatches(int webViewId) async => calls.add('clearMatches');
+
   Uint8List? nextScreenshot;
 
   @override

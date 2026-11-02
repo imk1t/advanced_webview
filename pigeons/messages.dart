@@ -241,6 +241,22 @@ class PermissionRequestMessage {
 
 enum PermissionDecisionMessage { grant, deny }
 
+class FindResultMessage {
+  FindResultMessage({
+    required this.found,
+    this.matchCount,
+    this.activeMatchIndex,
+  });
+
+  bool found;
+
+  /// Total matches on the page. Null on iOS, which does not report a count.
+  int? matchCount;
+
+  /// Zero-based index of the highlighted match. Null on iOS.
+  int? activeMatchIndex;
+}
+
 class CookieMessage {
   CookieMessage({
     required this.name,
@@ -303,6 +319,14 @@ abstract class AdvancedWebViewHostApi {
   /// (for example when the view has no size yet).
   @async
   Uint8List? takeScreenshot(int webViewId);
+
+  /// Finds `query` in the page and highlights a match. A new query starts at
+  /// the first match; repeating the same query moves to the next or previous.
+  @async
+  FindResultMessage findText(int webViewId, String query, bool forward);
+
+  /// Removes the highlights left by `findText`.
+  void clearMatches(int webViewId);
 
   void updateSettings(int webViewId, WebViewSettingsMessage settings);
 

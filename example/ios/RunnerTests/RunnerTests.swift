@@ -181,6 +181,29 @@ final class RunnerTests: XCTestCase {
   }
 
   @MainActor
+  func testFindTextReportsWhetherTheQueryWasFound() async throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    defer { hostApi.disposeAll() }
+    let webView = try registry.get(1).webView
+    webView.frame = CGRect(x: 0, y: 0, width: 200, height: 200)
+    try hostApi.loadHtmlString(
+      webViewId: 1, html: "<p>alpha beta alpha</p>", baseUrl: nil)
+    for _ in 0..<100 where webView.isLoading || webView.url == nil {
+      try await Task.sleep(nanoseconds: 50_000_000)
+    }
+
+    let hit = try await hostApi.findText(webViewId: 1, query: "alpha", forward: true)
+    let miss = try await hostApi.findText(webViewId: 1, query: "zzz", forward: true)
+    let empty = try await hostApi.findText(webViewId: 1, query: "", forward: true)
+
+    XCTAssertTrue(hit.found)
+    XCTAssertNil(hit.matchCount)
+    XCTAssertFalse(miss.found)
+    XCTAssertFalse(empty.found)
+  }
+
+  @MainActor
   func testTakeScreenshotReturnsPngOnceTheViewHasASize() async throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))

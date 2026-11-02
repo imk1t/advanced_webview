@@ -34,6 +34,26 @@ final url = await controller.currentUrl();
 final title = await controller.title();
 ```
 
+## Screenshots
+
+```dart
+final png = await controller.takeScreenshot(); // Uint8List? (PNG)
+```
+
+Captures only the visible area, not the whole page. Returns `null` while the view has no size.
+
+## Find in page
+
+```dart
+final result = await controller.findText('flutter');
+// result.found; on Android also result.matchCount and result.activeMatchIndex.
+await controller.findText('flutter');                 // same query: next match
+await controller.findText('flutter', forward: false); // previous match
+await controller.clearMatches();                      // remove the highlights
+```
+
+iOS reports only whether a match was found; `matchCount` and `activeMatchIndex` are `null` there.
+
 ## Callbacks
 
 Pass callbacks to the constructor:
