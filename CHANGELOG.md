@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.2.0 - 2026-11-01
+
 - Add `AdvancedWebViewController.onSslError` and `onHttpAuthRequest` (`SslError`, `SslErrorDecision`,
   `HttpAuthRequest`, `HttpAuthCredentials`). Certificate errors are still refused unless the callback
   returns `proceed`; HTTP authentication is cancelled unless the callback returns credentials.
