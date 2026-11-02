@@ -280,7 +280,7 @@ class AdvancedWebViewController {
   ///
   /// Returns once the dialog is presented, not when printing finishes. The
   /// WebView must be shown (attached to an [AdvancedWebView]); otherwise this
-  /// throws a [PlatformException] with code `not-attached`. [jobName] titles
+  /// throws a `PlatformException` with code `not-attached`. [jobName] titles
   /// the print job (the page title by default on Android, the document name
   /// on iOS).
   Future<void> printPage({String? jobName}) =>
