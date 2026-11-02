@@ -117,6 +117,19 @@ final class RunnerTests: XCTestCase {
     XCTAssertFalse(try registry.get(2).webView.configuration.websiteDataStore.isPersistent)
   }
 
+  func testPullToRefreshAddsAndRemovesTheRefreshControl() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, settings: settings()))
+    let webView = try registry.get(1).webView
+    XCTAssertNil(webView.scrollView.refreshControl)
+
+    try hostApi.updateSettings(webViewId: 1, settings: settings(pullToRefreshEnabled: true))
+    XCTAssertNotNil(webView.scrollView.refreshControl)
+
+    try hostApi.updateSettings(webViewId: 1, settings: settings())
+    XCTAssertNil(webView.scrollView.refreshControl)
+  }
+
   func testTextZoomAndMinimumFontSizeAreApplied() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(
@@ -322,6 +335,7 @@ final class RunnerTests: XCTestCase {
     javaScriptCanOpenWindowsAutomatically: Bool = true,
     scrollbarsVisible: Bool = true,
     overScrollEnabled: Bool = true,
+    pullToRefreshEnabled: Bool = false,
     minimumFontSize: Int? = nil,
     userAgent: String? = nil
   ) -> WebViewSettingsMessage {
@@ -340,6 +354,7 @@ final class RunnerTests: XCTestCase {
       javaScriptCanOpenWindowsAutomatically: javaScriptCanOpenWindowsAutomatically,
       scrollbarsVisible: scrollbarsVisible,
       overScrollEnabled: overScrollEnabled,
+      pullToRefreshEnabled: pullToRefreshEnabled,
       minimumFontSize: minimumFontSize.map { Int64($0) },
       userAgent: userAgent)
   }

@@ -501,13 +501,28 @@ class WebViewHostApiImplTest {
         hostApi.create(params(webViewId = 5))
         val instance = registry.get(5)
         val oldParent = FrameLayout(RuntimeEnvironment.getApplication())
-        oldParent.addView(instance.webView)
+        oldParent.addView(instance.container)
 
         val view = AdvancedWebViewFactory(registry)
             .create(RuntimeEnvironment.getApplication(), 0, mapOf("webViewId" to 5))
 
         assertSame(instance, view)
-        assertNull(instance.webView.parent)
+        assertNull(instance.container.parent)
+        assertSame(instance.container, instance.view)
+    }
+
+    @Test
+    fun pullToRefreshIsOffByDefaultAndReloadsWhenEnabled() {
+        hostApi.create(params(webViewId = 1))
+        val instance = registry.get(1)
+        assertFalse(instance.container.isEnabled)
+        assertSame(instance.webView, instance.container.getChildAt(0))
+
+        hostApi.updateSettings(1, settings(pullToRefreshEnabled = true))
+        assertTrue(instance.container.isEnabled)
+
+        hostApi.updateSettings(1, settings(pullToRefreshEnabled = false))
+        assertFalse(instance.container.isEnabled)
     }
 
     private fun shouldOverride(webView: WebView, url: String, isMainFrame: Boolean): Boolean {
@@ -558,6 +573,7 @@ class WebViewHostApiImplTest {
         javaScriptCanOpenWindowsAutomatically: Boolean = true,
         scrollbarsVisible: Boolean = true,
         overScrollEnabled: Boolean = true,
+        pullToRefreshEnabled: Boolean = false,
         minimumFontSize: Long? = null,
     ) = WebViewSettingsMessage(
         javaScriptEnabled = javaScriptEnabled,
@@ -574,6 +590,7 @@ class WebViewHostApiImplTest {
         javaScriptCanOpenWindowsAutomatically = javaScriptCanOpenWindowsAutomatically,
         scrollbarsVisible = scrollbarsVisible,
         overScrollEnabled = overScrollEnabled,
+        pullToRefreshEnabled = pullToRefreshEnabled,
         minimumFontSize = minimumFontSize,
         userAgent = userAgent,
     )

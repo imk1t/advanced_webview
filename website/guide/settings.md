@@ -27,6 +27,7 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `javaScriptCanOpenWindowsAutomatically` | `true` | Yes | Yes |
 | `scrollbarsVisible` | `true` | Yes | Yes |
 | `overScrollEnabled` | `true` | Yes | Yes |
+| `pullToRefreshEnabled` | `false` | Yes | Yes (needs `overScrollEnabled`) |
 | `minimumFontSize` | `null` (platform default) | Yes | Yes |
 | `userAgent` | `null` (platform default) | Yes | Yes |
 

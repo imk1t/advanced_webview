@@ -26,6 +26,7 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `javaScriptCanOpenWindowsAutomatically` | `true` | 対応 | 対応 |
 | `scrollbarsVisible` | `true` | 対応 | 対応 |
 | `overScrollEnabled` | `true` | 対応 | 対応 |
+| `pullToRefreshEnabled` | `false` | 対応 | 対応（`overScrollEnabled` が必要） |
 | `minimumFontSize` | `null`（プラットフォーム既定） | 対応 | 対応 |
 | `userAgent` | `null`（プラットフォーム既定） | 対応 | 対応 |
 

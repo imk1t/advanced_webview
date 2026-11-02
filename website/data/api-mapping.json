@@ -53,6 +53,7 @@
   "classes": {
     "android": {
       "WebView": "https://developer.android.com/reference/android/webkit/WebView",
+      "SwipeRefreshLayout": "https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout",
       "Bitmap": "https://developer.android.com/reference/android/graphics/Bitmap",
       "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
@@ -83,6 +84,7 @@
       "UIImage": "https://developer.apple.com/documentation/uikit/uiimage",
       "WKFindResult": "https://developer.apple.com/documentation/webkit/wkfindresult",
       "WKFindConfiguration": "https://developer.apple.com/documentation/webkit/wkfindconfiguration",
+      "UIRefreshControl": "https://developer.apple.com/documentation/uikit/uirefreshcontrol",
       "WKPreferences": "https://developer.apple.com/documentation/webkit/wkpreferences",
       "WKWebpagePreferences": "https://developer.apple.com/documentation/webkit/wkwebpagepreferences",
       "WKNavigationDelegate": "https://developer.apple.com/documentation/webkit/wknavigationdelegate",
@@ -1167,6 +1169,33 @@
       "ios": {
         "status": "supported",
         "apis": ["UIScrollView.bounces"]
+      }
+    },
+    {
+      "dart": "WebViewSettings.pullToRefreshEnabled",
+      "group": "settings",
+      "summary": {
+        "en": "Reloads the page when the user pulls down from the top.",
+        "ja": "ページ上端から引き下げたときにページを再読み込みします。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "SwipeRefreshLayout",
+          "SwipeRefreshLayout.setOnRefreshListener(OnRefreshListener)"
+        ],
+        "note": {
+          "en": "The platform view is a SwipeRefreshLayout that contains the WebView.",
+          "ja": "プラットフォームビューは WebView を含む SwipeRefreshLayout です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.refreshControl", "UIRefreshControl"],
+        "note": {
+          "en": "The pull is a bounce, so overScrollEnabled must stay on.",
+          "ja": "引き下げはバウンスで行うため、overScrollEnabled を有効のままにしてください。"
+        }
       }
     },
     {

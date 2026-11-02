@@ -39,6 +39,7 @@ class WebViewSettingsMessage {
     required this.javaScriptCanOpenWindowsAutomatically,
     required this.scrollbarsVisible,
     required this.overScrollEnabled,
+    required this.pullToRefreshEnabled,
     this.minimumFontSize,
     this.userAgent,
   });
@@ -84,6 +85,10 @@ class WebViewSettingsMessage {
 
   /// Android: `View.setOverScrollMode`. iOS: `UIScrollView.bounces`.
   bool overScrollEnabled;
+
+  /// Android: `SwipeRefreshLayout`. iOS: `UIRefreshControl`. A pull reloads the
+  /// page.
+  bool pullToRefreshEnabled;
 
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.

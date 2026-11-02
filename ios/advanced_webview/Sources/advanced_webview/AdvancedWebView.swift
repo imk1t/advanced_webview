@@ -77,6 +77,15 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     webView.scrollView.showsVerticalScrollIndicator = settings.scrollbarsVisible
     webView.scrollView.showsHorizontalScrollIndicator = settings.scrollbarsVisible
     webView.scrollView.bounces = settings.overScrollEnabled
+    if settings.pullToRefreshEnabled {
+      if webView.scrollView.refreshControl == nil {
+        let control = UIRefreshControl()
+        control.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        webView.scrollView.refreshControl = control
+      }
+    } else {
+      webView.scrollView.refreshControl = nil
+    }
     webView.pageZoom = CGFloat(settings.textZoom) / 100
     webView.configuration.preferences.minimumFontSize =
       settings.minimumFontSize.map { CGFloat($0) } ?? 0
@@ -84,6 +93,10 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     webView.isOpaque = !settings.transparentBackground
     webView.backgroundColor = settings.transparentBackground ? .clear : .white
     webView.scrollView.backgroundColor = webView.backgroundColor
+  }
+
+  @objc private func handleRefresh() {
+    webView.reload()
   }
 
   /// PNG of the visible area, or nil while the view has no size.
@@ -314,6 +327,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   }
 
   private func reportError(_ error: Error, url: URL?) {
+    webView.scrollView.refreshControl?.endRefreshing()
     let nsError = error as NSError
     // Navigations cancelled by us (e.g. a delegate decision) are not errors.
     if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled { return }
@@ -336,6 +350,7 @@ extension AdvancedWebView: WKNavigationDelegate {
   }
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    webView.scrollView.refreshControl?.endRefreshing()
     let url = webView.url?.absoluteString ?? ""
     send { api, id in try await api.onPageFinished(webViewId: id, url: url) }
   }
