@@ -2,6 +2,20 @@ import 'package:flutter/foundation.dart';
 
 import 'platform/messages.g.dart';
 
+/// How the WebView treats HTTP content on an HTTPS page (Android only).
+enum WebViewMixedContentMode {
+  /// Blocks all insecure content on secure pages (the safe choice).
+  neverAllow,
+
+  /// Loads insecure images and the like, but blocks scripts and frames, as
+  /// recent browsers do.
+  compatibility,
+
+  /// Loads everything. This lets an attacker on the network tamper with a
+  /// secure page, so avoid it outside of tests.
+  alwaysAllow,
+}
+
 /// How the WebView uses its HTTP cache.
 enum WebViewCacheMode {
   /// Follows HTTP cache headers (the platform default).
@@ -40,6 +54,10 @@ class WebViewSettings {
     this.scrollbarsVisible = true,
     this.overScrollEnabled = true,
     this.pullToRefreshEnabled = false,
+    this.domStorageEnabled = true,
+    this.allowFileAccess = false,
+    this.allowContentAccess = false,
+    this.mixedContentMode = WebViewMixedContentMode.neverAllow,
     this.minimumFontSize,
     this.userAgent,
   }) : assert(textZoom > 0, 'textZoom must be positive'),
@@ -126,6 +144,25 @@ class WebViewSettings {
   /// On iOS it needs [overScrollEnabled], because the pull is a bounce.
   final bool pullToRefreshEnabled;
 
+  /// Lets pages use `localStorage` and `sessionStorage`. Android only
+  /// (`WebSettings.setDomStorageEnabled`); WKWebView always allows them.
+  final bool domStorageEnabled;
+
+  /// Lets pages and loads reach `file://` URLs. Android only
+  /// (`WebSettings.setAllowFileAccess`). Off by default: a page that can read
+  /// local files can leak app data. iOS has no equivalent.
+  final bool allowFileAccess;
+
+  /// Lets the WebView load `content://` URLs from content providers. Android
+  /// only (`WebSettings.setAllowContentAccess`). Off by default for the same
+  /// reason as [allowFileAccess]. iOS has no equivalent.
+  final bool allowContentAccess;
+
+  /// What happens to HTTP content on an HTTPS page. Android only
+  /// (`WebSettings.setMixedContentMode`); WKWebView blocks it and has no
+  /// setting.
+  final WebViewMixedContentMode mixedContentMode;
+
   /// Smallest font size the WebView renders: sp on Android
   /// (`WebSettings.setMinimumFontSize`), pt on iOS
   /// (`WKPreferences.minimumFontSize`). `null` uses the platform default.
@@ -150,6 +187,10 @@ class WebViewSettings {
     bool? scrollbarsVisible,
     bool? overScrollEnabled,
     bool? pullToRefreshEnabled,
+    bool? domStorageEnabled,
+    bool? allowFileAccess,
+    bool? allowContentAccess,
+    WebViewMixedContentMode? mixedContentMode,
     ValueGetter<int?>? minimumFontSize,
     ValueGetter<String?>? userAgent,
   }) {
@@ -177,6 +218,10 @@ class WebViewSettings {
       scrollbarsVisible: scrollbarsVisible ?? this.scrollbarsVisible,
       overScrollEnabled: overScrollEnabled ?? this.overScrollEnabled,
       pullToRefreshEnabled: pullToRefreshEnabled ?? this.pullToRefreshEnabled,
+      domStorageEnabled: domStorageEnabled ?? this.domStorageEnabled,
+      allowFileAccess: allowFileAccess ?? this.allowFileAccess,
+      allowContentAccess: allowContentAccess ?? this.allowContentAccess,
+      mixedContentMode: mixedContentMode ?? this.mixedContentMode,
       minimumFontSize: minimumFontSize != null
           ? minimumFontSize()
           : this.minimumFontSize,
@@ -201,6 +246,10 @@ class WebViewSettings {
     scrollbarsVisible: scrollbarsVisible,
     overScrollEnabled: overScrollEnabled,
     pullToRefreshEnabled: pullToRefreshEnabled,
+    domStorageEnabled: domStorageEnabled,
+    allowFileAccess: allowFileAccess,
+    allowContentAccess: allowContentAccess,
+    mixedContentMode: MixedContentModeMessage.values[mixedContentMode.index],
     minimumFontSize: minimumFontSize,
     userAgent: userAgent,
   );
@@ -226,11 +275,15 @@ class WebViewSettings {
       other.scrollbarsVisible == scrollbarsVisible &&
       other.overScrollEnabled == overScrollEnabled &&
       other.pullToRefreshEnabled == pullToRefreshEnabled &&
+      other.domStorageEnabled == domStorageEnabled &&
+      other.allowFileAccess == allowFileAccess &&
+      other.allowContentAccess == allowContentAccess &&
+      other.mixedContentMode == mixedContentMode &&
       other.minimumFontSize == minimumFontSize &&
       other.userAgent == userAgent;
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     javaScriptEnabled,
     mediaPlaybackRequiresUserGesture,
     allowsInlineMediaPlayback,
@@ -246,7 +299,11 @@ class WebViewSettings {
     scrollbarsVisible,
     overScrollEnabled,
     pullToRefreshEnabled,
+    domStorageEnabled,
+    allowFileAccess,
+    allowContentAccess,
+    mixedContentMode,
     minimumFontSize,
     userAgent,
-  );
+  ]);
 }

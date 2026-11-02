@@ -145,6 +145,24 @@ void main() {
       );
     });
 
+    test('Android security settings default to the safe values', () {
+      final defaults = const WebViewSettings().toMessage();
+      expect(defaults.domStorageEnabled, isTrue);
+      expect(defaults.allowFileAccess, isFalse);
+      expect(defaults.allowContentAccess, isFalse);
+      expect(defaults.mixedContentMode, MixedContentModeMessage.neverAllow);
+      final message = const WebViewSettings(
+        domStorageEnabled: false,
+        allowFileAccess: true,
+        allowContentAccess: true,
+        mixedContentMode: WebViewMixedContentMode.compatibility,
+      ).toMessage();
+      expect(message.domStorageEnabled, isFalse);
+      expect(message.allowFileAccess, isTrue);
+      expect(message.allowContentAccess, isTrue);
+      expect(message.mixedContentMode, MixedContentModeMessage.compatibility);
+    });
+
     test('cacheMode is passed to native', () {
       expect(
         const WebViewSettings().toMessage().cacheMode,

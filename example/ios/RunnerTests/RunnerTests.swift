@@ -377,6 +377,10 @@ final class RunnerTests: XCTestCase {
     scrollbarsVisible: Bool = true,
     overScrollEnabled: Bool = true,
     pullToRefreshEnabled: Bool = false,
+    domStorageEnabled: Bool = true,
+    allowFileAccess: Bool = false,
+    allowContentAccess: Bool = false,
+    mixedContentMode: MixedContentModeMessage = .neverAllow,
     minimumFontSize: Int? = nil,
     userAgent: String? = nil
   ) -> WebViewSettingsMessage {
@@ -396,6 +400,10 @@ final class RunnerTests: XCTestCase {
       scrollbarsVisible: scrollbarsVisible,
       overScrollEnabled: overScrollEnabled,
       pullToRefreshEnabled: pullToRefreshEnabled,
+      domStorageEnabled: domStorageEnabled,
+      allowFileAccess: allowFileAccess,
+      allowContentAccess: allowContentAccess,
+      mixedContentMode: mixedContentMode,
       minimumFontSize: minimumFontSize.map { Int64($0) },
       userAgent: userAgent)
   }

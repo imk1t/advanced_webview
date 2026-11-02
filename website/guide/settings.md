@@ -28,11 +28,23 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `scrollbarsVisible` | `true` | Yes | Yes |
 | `overScrollEnabled` | `true` | Yes | Yes |
 | `pullToRefreshEnabled` | `false` | Yes | Yes (needs `overScrollEnabled`) |
+| `domStorageEnabled` | `true` | Yes | Ignored (always on) |
+| `allowFileAccess` | `false` | Yes | Ignored |
+| `allowContentAccess` | `false` | Yes | Ignored |
+| `mixedContentMode` | `neverAllow` | Yes | Ignored (WebKit blocks it) |
 | `minimumFontSize` | `null` (platform default) | Yes | Yes |
 | `userAgent` | `null` (platform default) | Yes | Yes |
 
 "Creation only" settings are applied when the native view is created and ignored by
 `updateSettings` on that platform.
+
+## Android security settings
+
+`allowFileAccess`, `allowContentAccess` and `mixedContentMode` default to the restrictive values, so a page
+cannot read local files or `content://` providers and HTTP content is blocked on HTTPS pages. Loosen them
+only for content you control. `mixedContentMode: alwaysAllow` lets a network attacker tamper with secure
+pages. iOS has no equivalent settings: WebKit blocks mixed content and there is no file access switch.
+`domStorageEnabled` stays on by default, as in earlier versions.
 
 ## Passkeys (WebAuthn)
 

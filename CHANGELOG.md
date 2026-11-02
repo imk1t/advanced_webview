@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add the Android settings `WebViewSettings.domStorageEnabled` (default `true`, as before),
+  `allowFileAccess`, `allowContentAccess` and `mixedContentMode` (`WebViewMixedContentMode`). iOS
+  ignores them. **Behaviour change:** `allowFileAccess` and `allowContentAccess` now default to
+  `false` (previously the WebView defaults applied: `content://` access was on, and `file://` access
+  depended on the app's target SDK), and mixed content is explicitly blocked. Set them to `true`
+  to restore the old behaviour.
+
 - Add `AdvancedWebViewController.onLongPress` (touch position in logical pixels) and `hitTest`, which
   reports the link and/or image under a point (`WebViewHitTestResult`). Together they let apps build a
   custom context menu. `hitTest` uses `document.elementFromPoint`, so it is main-frame only and

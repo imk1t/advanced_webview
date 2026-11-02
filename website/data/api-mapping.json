@@ -1264,6 +1264,110 @@
       }
     },
     {
+      "dart": "WebViewSettings.domStorageEnabled",
+      "group": "settings",
+      "summary": {
+        "en": "Lets pages use localStorage and sessionStorage (Android).",
+        "ja": "ページが localStorage / sessionStorage を使えるようにします（Android）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setDomStorageEnabled(boolean)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "WKWebView always allows DOM storage.",
+          "ja": "WKWebView は常に DOM ストレージを許可します。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewSettings.allowFileAccess",
+      "group": "settings",
+      "summary": {
+        "en": "Lets the WebView reach file:// URLs (Android, off by default).",
+        "ja": "WebView が file:// URL にアクセスできるようにします（Android、既定は無効）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setAllowFileAccess(boolean)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "No equivalent switch on iOS.",
+          "ja": "iOS に同等の切り替えはありません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewSettings.allowContentAccess",
+      "group": "settings",
+      "summary": {
+        "en": "Lets the WebView load content:// URLs (Android, off by default).",
+        "ja": "WebView が content:// URL を読み込めるようにします（Android、既定は無効）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setAllowContentAccess(boolean)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "No equivalent on iOS.",
+          "ja": "iOS に同等の設定はありません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewSettings.mixedContentMode",
+      "group": "settings",
+      "summary": {
+        "en": "Controls HTTP content on HTTPS pages (Android, blocked by default).",
+        "ja": "HTTPS ページ上の HTTP コンテンツの扱いを決めます（Android、既定は遮断）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setMixedContentMode(int)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "WebKit blocks mixed content and has no setting.",
+          "ja": "WebKit は混在コンテンツを遮断し、設定はありません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewMixedContentMode",
+      "group": "settings",
+      "summary": {
+        "en": "The values accepted by WebViewSettings.mixedContentMode.",
+        "ja": "WebViewSettings.mixedContentMode に指定できる値です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebSettings.MIXED_CONTENT_NEVER_ALLOW",
+          "WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE",
+          "WebSettings.MIXED_CONTENT_ALWAYS_ALLOW"
+        ]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Not applicable on iOS.",
+          "ja": "iOS には該当しません。"
+        }
+      }
+    },
+    {
       "dart": "WebViewSettings.incognito",
       "group": "settings",
       "summary": {

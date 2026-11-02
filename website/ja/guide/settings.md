@@ -27,10 +27,22 @@ await controller.updateSettings(const WebViewSettings(javaScriptEnabled: false))
 | `scrollbarsVisible` | `true` | 対応 | 対応 |
 | `overScrollEnabled` | `true` | 対応 | 対応 |
 | `pullToRefreshEnabled` | `false` | 対応 | 対応（`overScrollEnabled` が必要） |
+| `domStorageEnabled` | `true` | 対応 | 無視（常に有効） |
+| `allowFileAccess` | `false` | 対応 | 無視 |
+| `allowContentAccess` | `false` | 対応 | 無視 |
+| `mixedContentMode` | `neverAllow` | 対応 | 無視（WebKit が遮断） |
 | `minimumFontSize` | `null`（プラットフォーム既定） | 対応 | 対応 |
 | `userAgent` | `null`（プラットフォーム既定） | 対応 | 対応 |
 
 「生成時のみ」の設定はネイティブビューの生成時に適用され、そのプラットフォームでは `updateSettings` で変更しても無視されます。
+
+## Android のセキュリティ設定
+
+`allowFileAccess`・`allowContentAccess`・`mixedContentMode` の既定値は制限的な側です。ページはローカルファイルや
+`content://` プロバイダーを読めず、HTTPS ページ上の HTTP コンテンツは遮断されます。緩めるのは自分が管理する
+コンテンツに限ってください。`mixedContentMode: alwaysAllow` はネットワーク上の攻撃者に安全なページを改ざんされる
+恐れがあります。iOS には同等の設定がありません（WebKit が混在コンテンツを遮断し、ファイルアクセスの切り替えもありません）。
+`domStorageEnabled` は従来どおり既定で有効です。
 
 ## パスキー（WebAuthn） {#passkeys-webauthn}
 
