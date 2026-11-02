@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- **Breaking:** platform-specific settings moved out of `WebViewSettings` into two new classes,
+  passed as `WebViewSettings.android` and `WebViewSettings.ios`. The other platform ignores them.
+  Defaults are unchanged.
+  - `AndroidWebViewSettings`: `supportZoom`, `passkeysEnabled`, `domStorageEnabled`,
+    `allowFileAccess`, `allowContentAccess`, `mixedContentMode`.
+  - `IOSWebViewSettings`: `allowsInlineMediaPlayback`, `allowsBackForwardNavigationGestures`,
+    `incognito`.
+
+  Before: `WebViewSettings(passkeysEnabled: true, incognito: true)`. After:
+  `WebViewSettings(android: AndroidWebViewSettings(passkeysEnabled: true), ios: IOSWebViewSettings(incognito: true))`.
+
 ## 0.4.0 - 2026-11-02
 
 - Add the Android settings `WebViewSettings.domStorageEnabled` (default `true`, as before),

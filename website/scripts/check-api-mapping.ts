@@ -17,7 +17,13 @@ const fail = (message: string) => errors.push(message)
 // Dart: extract the public API surface
 
 /** Classes whose members are mapped one by one. Every other public type needs one type-level entry. */
-const MEMBER_LEVEL = new Set(['AdvancedWebViewController', 'AdvancedWebView', 'WebViewSettings'])
+const MEMBER_LEVEL = new Set([
+  'AdvancedWebViewController',
+  'AdvancedWebView',
+  'WebViewSettings',
+  'AndroidWebViewSettings',
+  'IOSWebViewSettings',
+])
 /** Public members that are plumbing, not API surface. */
 const IGNORED_MEMBERS = new Set(['copyWith', 'toMessage'])
 
