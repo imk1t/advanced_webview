@@ -50,6 +50,8 @@ jobs:
       - uses: dart-lang/setup-dart@v1.8.1
         if: steps.pub-dev.outputs.published == 'false'
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
