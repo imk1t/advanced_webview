@@ -53,6 +53,12 @@ const badgeTone: Record<Status, string> = {
   unsupported: 'tw:bg-(--vp-c-danger-soft) tw:text-(--vp-c-danger-1)',
 }
 
+// Break opportunities for long identifiers: after dots, parens, commas and colons, so the
+// names stay intact and only wrap at those points (or at a hard limit via overflow-wrap).
+function parts(text: string) {
+  return text.split(/(?<=[.(,:])/)
+}
+
 function refOf(platform: Platform, api: string) {
   const ref = parseRef(api)
   if (!ref) return { api, className: api, rest: '', href: undefined }
@@ -88,7 +94,11 @@ const rows = computed(() =>
       <tbody>
         <tr v-for="row in rows" :id="anchorFor(row.entry.dart)" :key="row.entry.dart">
           <td>
-            <code>{{ row.entry.dart }}</code>
+            <code
+              ><template v-for="(part, i) in parts(row.entry.dart)" :key="i"
+                ><wbr v-if="i > 0" />{{ part }}</template
+              ></code
+            >
             <p>{{ row.entry.summary[locale] }}</p>
           </td>
           <td
@@ -116,7 +126,9 @@ const rows = computed(() =>
                         ref.className
                       }}</a
                       ><template v-else>{{ ref.className }}</template
-                      >{{ ref.rest }}</code
+                      ><template v-for="(part, i) in parts(ref.rest)" :key="i"
+                        ><wbr v-if="i > 0" />{{ part }}</template
+                      ></code
                     >
                   </li>
                 </ul>

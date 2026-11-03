@@ -29,6 +29,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       - run: flutter pub get
       # Pigeon output (*.g.dart) is committed as generated and not reformatted.
       - name: Check formatting
@@ -120,6 +122,8 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       - name: Build example APK
         working-directory: example
         run: flutter build apk --debug
@@ -139,6 +143,8 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -162,6 +168,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       # Swift Package Manager is Flutter's default; enable it explicitly so this
       # job keeps covering it. The `ios-cocoapods` job covers the podspec.
       - run: flutter config --enable-swift-package-manager
@@ -224,6 +232,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       - run: flutter config --no-enable-swift-package-manager
       # The example references the plugin as a local Swift package
       # (../../ios/advanced_webview) so Xcode can edit its sources. That
