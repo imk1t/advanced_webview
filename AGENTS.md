@@ -35,7 +35,7 @@ website/                           Docs site (VitePress), deployed to GitHub Pag
 website/data/api-mapping.json      Dart API -> native Android/iOS API mapping (source of the "API mapping" pages)
 website/.vitepress/theme/          Theme: Tailwind v4 (`tw:` prefix, no preflight), layout.css (content width), ApiMapping.vue
 website/.vitepress/theme/tokens.css       Design tokens (--aw-*), light and dark
-website/.vitepress/theme/components/      Design system components (Aw*.vue), documented in website/guide/design-system.md
+website/.vitepress/theme/components/      Design system components (Aw*.vue), documented in website/.vitepress/theme/README.md
 website/scripts/check-api-mapping.ts  Fails when the mapping drifts from lib/ and the native sources
 ```
 
@@ -142,8 +142,8 @@ claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both p
   which native API it calls, update that file in the same change (English and Japanese text
   both). `bun run check:mapping` (part of the docs build and CI) fails on drift.
 - **Docs design system.** New site UI uses the tokens in `tokens.css` and the `Aw*` components
-  (see `website/guide/design-system.md`); add a token or component there instead of hard-coding
-  colours or one-off styles. Update the EN and JA design-system pages when you change either.
+  (see `website/.vitepress/theme/README.md`, not published on the site); add a token or component there instead of hard-coding
+  colours or one-off styles. Update that README when you change either.
 - The docs site has English pages in `website/` and Japanese in `website/ja/`; keep them in
   sync, like README.md and README.ja.md. When a user-visible behaviour changes, update the
   matching guide page too.

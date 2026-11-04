@@ -1,8 +1,9 @@
-# Design system
+# Docs site design system
 
 The docs site has a small design system so new pages and features look like the rest of the
 site. Tokens live in CSS variables, components are Vue files, and both are registered globally,
-so Markdown pages can use them without imports. This page is for contributors editing `website/`.
+so Markdown pages can use them without imports. This file is for contributors editing `website/`
+and is not published on the site.
 
 ## Where things live
 
@@ -75,3 +76,4 @@ aside: false
 - Tailwind utilities carry the `tw:` prefix and are not in a cascade layer, on purpose: VitePress'
   own styles are unlayered and would otherwise win.
 - Keep English and Japanese pages in sync, and check both colour schemes and a phone-width view.
+- Do not add this material to the published docs; it stays in this file.
