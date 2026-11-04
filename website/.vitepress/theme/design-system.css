@@ -1,0 +1,92 @@
+/*
+ * Styles that cannot be expressed as Tailwind utilities on the Aw* components: the dot
+ * pattern, the dark code panel (VitePress `::: code-group` restyled) and the page-level
+ * layout of the custom home. Colours come from tokens.css only.
+ */
+@reference './tailwind.css';
+
+.aw-dots {
+  background-image: radial-gradient(var(--aw-dot) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.aw-dots-accent {
+  background-color: var(--aw-accent-soft);
+  background-image: radial-gradient(var(--aw-dot-accent) 1.5px, transparent 1.5px);
+  background-size: 14px 14px;
+}
+
+.aw-dots-accent-2 {
+  background-color: var(--aw-accent-2-soft);
+  background-image: radial-gradient(var(--aw-dot-accent-2) 1.5px, transparent 1.5px);
+  background-size: 14px 14px;
+}
+
+/* Code panel: `<AwCodePanel>` wraps a `::: code-group`; make it the dark showcase panel. */
+.aw-code-panel .vp-code-group {
+  @apply tw:m-0 tw:overflow-hidden tw:rounded-(--aw-radius-lg) tw:bg-(--aw-panel) tw:shadow-2xl;
+}
+
+.aw-code-panel .vp-code-group .tabs {
+  @apply tw:items-center tw:border-b tw:border-(--aw-panel-line) tw:bg-transparent tw:px-3 tw:py-2;
+}
+
+.aw-code-panel .vp-code-group .tabs label {
+  @apply tw:rounded-md tw:px-3 tw:py-1.5 tw:leading-6 tw:font-(family-name:--aw-font-mono) tw:text-[13px] tw:text-(--aw-panel-muted);
+}
+
+.aw-code-panel .vp-code-group input:checked + label {
+  @apply tw:bg-(--aw-panel-raised) tw:text-white;
+}
+
+.aw-code-panel .vp-code-group .tabs label::after {
+  display: none;
+}
+
+.aw-code-panel .vp-code-group div[class*='language-'] {
+  @apply tw:m-0 tw:rounded-none tw:bg-transparent;
+}
+
+.aw-code-panel .vp-code-group pre,
+.aw-code-panel .vp-code-group code {
+  --vp-code-block-bg: transparent;
+  --vp-code-line-number-color: #4a5568;
+  @apply tw:text-sm tw:leading-7;
+}
+
+.aw-code-panel .vp-code-group .lang,
+.aw-code-panel .vp-code-group .copy {
+  display: none;
+}
+
+/* Custom pages (layout: page) fill the width; AwContainer re-centres the content. */
+.VPPage {
+  @apply tw:bg-(--aw-bg);
+}
+
+/* Keep Japanese display text from breaking mid-word. */
+.aw-display,
+.aw-lead {
+  @apply tw:[word-break:auto-phrase];
+}
+
+/* The panel is dark in both colour schemes, so always use Shiki's dark palette inside it. */
+.aw-code-panel .shiki,
+.aw-code-panel .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: transparent !important;
+}
+
+.aw-code-panel .vp-code-group div[class*='language-'] {
+  padding: 0;
+}
+
+.aw-code-panel .vp-code-group div[class*='language-'] pre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+}
+
+/* Dark panels sit on a dark page in dark mode, so give them an edge. */
+.aw-code-panel .vp-code-group {
+  @apply tw:border tw:border-(--aw-panel-line);
+}
