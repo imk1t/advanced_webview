@@ -1505,6 +1505,30 @@
       }
     },
     {
+      "dart": "IOSWebViewSettings.applicationNameForUserAgent",
+      "group": "settings",
+      "summary": {
+        "en": "Appends a token to the default user agent without replacing it (iOS).",
+        "ja": "既定の User-Agent を置き換えずに、末尾へ文字列を追加します（iOS）。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Android has no equivalent; use WebViewSettings.userAgent to replace the whole string.",
+          "ja": "Android には該当する設定がありません。全体を置き換えるには WebViewSettings.userAgent を使います。"
+        }
+      },
+      "ios": {
+        "status": "creationOnly",
+        "apis": ["WKWebViewConfiguration.applicationNameForUserAgent"],
+        "note": {
+          "en": "Applied when the WebView is created; changing it later has no effect. Ignored while WebViewSettings.userAgent is set.",
+          "ja": "WebView の生成時に適用されます。後から変更しても反映されません。WebViewSettings.userAgent を設定している間は無視されます。"
+        }
+      }
+    },
+    {
       "dart": "WebViewSettings.cacheMode",
       "group": "settings",
       "summary": {

@@ -60,6 +60,7 @@ Passed as `WebViewSettings.ios`. Android ignores all of them.
 | `allowsInlineMediaPlayback` | `false` | Ignored | Creation only |
 | `allowsBackForwardNavigationGestures` | `false` | Ignored | Yes |
 | `incognito` | `false` | Ignored | Creation only |
+| `applicationNameForUserAgent` | `null` | Ignored | Creation only |
 
 "Creation only" settings are applied when the native view is created and ignored by
 `updateSettings` on that platform.

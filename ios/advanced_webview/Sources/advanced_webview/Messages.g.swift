@@ -282,6 +282,9 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
   var minimumFontSize: Int64? = nil
   var userAgent: String? = nil
+  /// iOS only, creation only: `WKWebViewConfiguration.applicationNameForUserAgent`.
+  /// Ignored on Android. `null` uses the platform default.
+  var applicationNameForUserAgent: String? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -307,6 +310,7 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     let mixedContentMode = pigeonVar_list[18] as! MixedContentModeMessage
     let minimumFontSize: Int64? = nilOrValue(pigeonVar_list[19])
     let userAgent: String? = nilOrValue(pigeonVar_list[20])
+    let applicationNameForUserAgent: String? = nilOrValue(pigeonVar_list[21])
 
     return WebViewSettingsMessage(
       javaScriptEnabled: javaScriptEnabled,
@@ -329,7 +333,8 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       allowContentAccess: allowContentAccess,
       mixedContentMode: mixedContentMode,
       minimumFontSize: minimumFontSize,
-      userAgent: userAgent
+      userAgent: userAgent,
+      applicationNameForUserAgent: applicationNameForUserAgent
     )
   }
   func toList() -> [Any?] {
@@ -355,13 +360,14 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       mixedContentMode,
       minimumFontSize,
       userAgent,
+      applicationNameForUserAgent,
     ]
   }
   static func == (lhs: WebViewSettingsMessage, rhs: WebViewSettingsMessage) -> Bool {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.cacheMode, rhs.cacheMode) && MessagesPigeonInternal.deepEquals(lhs.incognito, rhs.incognito) && MessagesPigeonInternal.deepEquals(lhs.javaScriptCanOpenWindowsAutomatically, rhs.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonInternal.deepEquals(lhs.scrollbarsVisible, rhs.scrollbarsVisible) && MessagesPigeonInternal.deepEquals(lhs.overScrollEnabled, rhs.overScrollEnabled) && MessagesPigeonInternal.deepEquals(lhs.pullToRefreshEnabled, rhs.pullToRefreshEnabled) && MessagesPigeonInternal.deepEquals(lhs.domStorageEnabled, rhs.domStorageEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowFileAccess, rhs.allowFileAccess) && MessagesPigeonInternal.deepEquals(lhs.allowContentAccess, rhs.allowContentAccess) && MessagesPigeonInternal.deepEquals(lhs.mixedContentMode, rhs.mixedContentMode) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent)
+    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.cacheMode, rhs.cacheMode) && MessagesPigeonInternal.deepEquals(lhs.incognito, rhs.incognito) && MessagesPigeonInternal.deepEquals(lhs.javaScriptCanOpenWindowsAutomatically, rhs.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonInternal.deepEquals(lhs.scrollbarsVisible, rhs.scrollbarsVisible) && MessagesPigeonInternal.deepEquals(lhs.overScrollEnabled, rhs.overScrollEnabled) && MessagesPigeonInternal.deepEquals(lhs.pullToRefreshEnabled, rhs.pullToRefreshEnabled) && MessagesPigeonInternal.deepEquals(lhs.domStorageEnabled, rhs.domStorageEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowFileAccess, rhs.allowFileAccess) && MessagesPigeonInternal.deepEquals(lhs.allowContentAccess, rhs.allowContentAccess) && MessagesPigeonInternal.deepEquals(lhs.mixedContentMode, rhs.mixedContentMode) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent) && MessagesPigeonInternal.deepEquals(lhs.applicationNameForUserAgent, rhs.applicationNameForUserAgent)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -387,10 +393,11 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: mixedContentMode, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: minimumFontSize, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userAgent, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: applicationNameForUserAgent, hasher: &hasher)
   }
 
   public var description: String {
-    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), cacheMode: \(String(describing: cacheMode)), incognito: \(String(describing: incognito)), javaScriptCanOpenWindowsAutomatically: \(String(describing: javaScriptCanOpenWindowsAutomatically)), scrollbarsVisible: \(String(describing: scrollbarsVisible)), overScrollEnabled: \(String(describing: overScrollEnabled)), pullToRefreshEnabled: \(String(describing: pullToRefreshEnabled)), domStorageEnabled: \(String(describing: domStorageEnabled)), allowFileAccess: \(String(describing: allowFileAccess)), allowContentAccess: \(String(describing: allowContentAccess)), mixedContentMode: \(String(describing: mixedContentMode)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)))"
+    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), cacheMode: \(String(describing: cacheMode)), incognito: \(String(describing: incognito)), javaScriptCanOpenWindowsAutomatically: \(String(describing: javaScriptCanOpenWindowsAutomatically)), scrollbarsVisible: \(String(describing: scrollbarsVisible)), overScrollEnabled: \(String(describing: overScrollEnabled)), pullToRefreshEnabled: \(String(describing: pullToRefreshEnabled)), domStorageEnabled: \(String(describing: domStorageEnabled)), allowFileAccess: \(String(describing: allowFileAccess)), allowContentAccess: \(String(describing: allowContentAccess)), mixedContentMode: \(String(describing: mixedContentMode)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)), applicationNameForUserAgent: \(String(describing: applicationNameForUserAgent)))"
   }
 }
 

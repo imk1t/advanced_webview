@@ -129,6 +129,19 @@ void main() {
       expect(message.overScrollEnabled, isFalse);
     });
 
+    test('applicationNameForUserAgent is passed to native', () {
+      expect(
+        const WebViewSettings().toMessage().applicationNameForUserAgent,
+        isNull,
+      );
+      expect(
+        const WebViewSettings(
+          ios: IOSWebViewSettings(applicationNameForUserAgent: 'MyApp/1.0'),
+        ).toMessage().applicationNameForUserAgent,
+        'MyApp/1.0',
+      );
+    });
+
     test('incognito is passed to native', () {
       expect(const WebViewSettings().toMessage().incognito, isFalse);
       expect(

@@ -128,6 +128,7 @@ class IOSWebViewSettings {
     this.allowsInlineMediaPlayback = false,
     this.allowsBackForwardNavigationGestures = false,
     this.incognito = false,
+    this.applicationNameForUserAgent,
   });
 
   /// Plays videos inline instead of full screen
@@ -147,10 +148,20 @@ class IOSWebViewSettings {
   /// so there is no equivalent.
   final bool incognito;
 
+  /// Text appended to the default user agent, after the version
+  /// (`WKWebViewConfiguration.applicationNameForUserAgent`). Creation only.
+  ///
+  /// Unlike [WebViewSettings.userAgent], it keeps the platform's own user
+  /// agent and only adds a token, e.g. `MyApp/1.0`. It has no effect while
+  /// [WebViewSettings.userAgent] is set. `null` uses the platform default.
+  /// Android has no equivalent; use [WebViewSettings.userAgent] there.
+  final String? applicationNameForUserAgent;
+
   IOSWebViewSettings copyWith({
     bool? allowsInlineMediaPlayback,
     bool? allowsBackForwardNavigationGestures,
     bool? incognito,
+    ValueGetter<String?>? applicationNameForUserAgent,
   }) {
     return IOSWebViewSettings(
       allowsInlineMediaPlayback:
@@ -159,6 +170,9 @@ class IOSWebViewSettings {
           allowsBackForwardNavigationGestures ??
           this.allowsBackForwardNavigationGestures,
       incognito: incognito ?? this.incognito,
+      applicationNameForUserAgent: applicationNameForUserAgent != null
+          ? applicationNameForUserAgent()
+          : this.applicationNameForUserAgent,
     );
   }
 
@@ -168,13 +182,15 @@ class IOSWebViewSettings {
       other.allowsInlineMediaPlayback == allowsInlineMediaPlayback &&
       other.allowsBackForwardNavigationGestures ==
           allowsBackForwardNavigationGestures &&
-      other.incognito == incognito;
+      other.incognito == incognito &&
+      other.applicationNameForUserAgent == applicationNameForUserAgent;
 
   @override
   int get hashCode => Object.hash(
     allowsInlineMediaPlayback,
     allowsBackForwardNavigationGestures,
     incognito,
+    applicationNameForUserAgent,
   );
 }
 
@@ -333,6 +349,7 @@ class WebViewSettings {
         MixedContentModeMessage.values[android.mixedContentMode.index],
     minimumFontSize: minimumFontSize,
     userAgent: userAgent,
+    applicationNameForUserAgent: ios.applicationNameForUserAgent,
   );
 
   @override
