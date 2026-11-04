@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.7.0 - 2026-11-05
+
 - Add `AdvancedInAppBrowser` and `InAppBrowserOptions`: a full-screen native browser with a toolbar (title or URL, back/forward/reload, close), opened and closed from Dart on Android and iOS, with `onOpened`, `onClosed`, `onPageStarted`, `onPageFinished` and `onLoadError` callbacks and `loadUrl` / `evaluateJavaScript` while it is open.
 - Add a pub.dev badge and install instructions to the READMEs, and a pub.dev link to the docs site navigation.
 
