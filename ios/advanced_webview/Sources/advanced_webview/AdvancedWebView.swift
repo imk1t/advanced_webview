@@ -85,6 +85,12 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
       settings.javaScriptEnabled
     webView.allowsBackForwardNavigationGestures = settings.allowsBackForwardNavigationGestures
     webView.isInspectable = settings.inspectable
+    webView.configuration.defaultWebpagePreferences.preferredContentMode =
+      switch settings.contentMode {
+      case .recommended: .recommended
+      case .mobile: .mobile
+      case .desktop: .desktop
+      }
     cachePolicy =
       switch settings.cacheMode {
       case .normal: .useProtocolCachePolicy

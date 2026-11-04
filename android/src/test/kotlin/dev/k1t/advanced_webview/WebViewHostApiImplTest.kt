@@ -695,6 +695,7 @@ class WebViewHostApiImplTest {
         allowFileAccess = allowFileAccess,
         allowContentAccess = allowContentAccess,
         mixedContentMode = mixedContentMode,
+        contentMode = ContentModeMessage.RECOMMENDED,
         minimumFontSize = minimumFontSize,
         userAgent = userAgent,
     )

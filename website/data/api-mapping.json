@@ -1481,6 +1481,26 @@
       }
     },
     {
+      "dart": "WebViewContentMode",
+      "group": "settings",
+      "summary": {
+        "en": "The values accepted by IOSWebViewSettings.contentMode.",
+        "ja": "IOSWebViewSettings.contentMode に指定できる値です。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Not applicable on Android.",
+          "ja": "Android には該当しません。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebpagePreferences.preferredContentMode"]
+      }
+    },
+    {
       "dart": "IOSWebViewSettings.incognito",
       "group": "settings",
       "summary": {
@@ -1525,6 +1545,30 @@
         "note": {
           "en": "Applied when the WebView is created; changing it later has no effect. Ignored while WebViewSettings.userAgent is set.",
           "ja": "WebView の生成時に適用されます。後から変更しても反映されません。WebViewSettings.userAgent を設定している間は無視されます。"
+        }
+      }
+    },
+    {
+      "dart": "IOSWebViewSettings.contentMode",
+      "group": "settings",
+      "summary": {
+        "en": "Asks sites for their mobile or desktop version: recommended, mobile or desktop (iOS).",
+        "ja": "サイトのモバイル版・デスクトップ版のどちらを要求するかを選びます（recommended / mobile / desktop、iOS）。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Android has no equivalent; use WebViewSettings.userAgent to request a desktop site.",
+          "ja": "Android には該当する設定がありません。デスクトップ版を要求するには WebViewSettings.userAgent を使います。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebpagePreferences.preferredContentMode"],
+        "note": {
+          "en": "Takes effect on the next navigation.",
+          "ja": "次のナビゲーションから反映されます。"
         }
       }
     },

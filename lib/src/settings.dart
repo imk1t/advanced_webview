@@ -16,6 +16,19 @@ enum WebViewMixedContentMode {
   alwaysAllow,
 }
 
+/// Which version of a site the WebView asks for (iOS only).
+enum WebViewContentMode {
+  /// Lets WebKit choose for the device: mobile sites on iPhone, desktop sites
+  /// on iPad.
+  recommended,
+
+  /// Asks for the mobile version of sites.
+  mobile,
+
+  /// Asks for the desktop version of sites.
+  desktop,
+}
+
 /// How the WebView uses its HTTP cache.
 enum WebViewCacheMode {
   /// Follows HTTP cache headers (the platform default).
@@ -129,6 +142,7 @@ class IOSWebViewSettings {
     this.allowsBackForwardNavigationGestures = false,
     this.incognito = false,
     this.applicationNameForUserAgent,
+    this.contentMode = WebViewContentMode.recommended,
   });
 
   /// Plays videos inline instead of full screen
@@ -157,11 +171,18 @@ class IOSWebViewSettings {
   /// Android has no equivalent; use [WebViewSettings.userAgent] there.
   final String? applicationNameForUserAgent;
 
+  /// Whether sites are asked for their mobile or desktop version
+  /// (`WKWebpagePreferences.preferredContentMode`). Takes effect on the next
+  /// navigation. An explicit [WebViewSettings.userAgent] takes precedence over
+  /// it. Android has no equivalent; use [WebViewSettings.userAgent] there.
+  final WebViewContentMode contentMode;
+
   IOSWebViewSettings copyWith({
     bool? allowsInlineMediaPlayback,
     bool? allowsBackForwardNavigationGestures,
     bool? incognito,
     ValueGetter<String?>? applicationNameForUserAgent,
+    WebViewContentMode? contentMode,
   }) {
     return IOSWebViewSettings(
       allowsInlineMediaPlayback:
@@ -173,6 +194,7 @@ class IOSWebViewSettings {
       applicationNameForUserAgent: applicationNameForUserAgent != null
           ? applicationNameForUserAgent()
           : this.applicationNameForUserAgent,
+      contentMode: contentMode ?? this.contentMode,
     );
   }
 
@@ -183,7 +205,8 @@ class IOSWebViewSettings {
       other.allowsBackForwardNavigationGestures ==
           allowsBackForwardNavigationGestures &&
       other.incognito == incognito &&
-      other.applicationNameForUserAgent == applicationNameForUserAgent;
+      other.applicationNameForUserAgent == applicationNameForUserAgent &&
+      other.contentMode == contentMode;
 
   @override
   int get hashCode => Object.hash(
@@ -191,6 +214,7 @@ class IOSWebViewSettings {
     allowsBackForwardNavigationGestures,
     incognito,
     applicationNameForUserAgent,
+    contentMode,
   );
 }
 
@@ -347,6 +371,7 @@ class WebViewSettings {
     allowContentAccess: android.allowContentAccess,
     mixedContentMode:
         MixedContentModeMessage.values[android.mixedContentMode.index],
+    contentMode: ContentModeMessage.values[ios.contentMode.index],
     minimumFontSize: minimumFontSize,
     userAgent: userAgent,
     applicationNameForUserAgent: ios.applicationNameForUserAgent,
