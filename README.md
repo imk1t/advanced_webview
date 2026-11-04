@@ -2,6 +2,7 @@
 
 English | [日本語](README.ja.md)
 
+[![pub package](https://img.shields.io/pub/v/advanced_webview.svg)](https://pub.dev/packages/advanced_webview)
 [![CI](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml/badge.svg)](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -27,8 +28,13 @@ either, depending on your Flutter setting (`flutter config --enable-swift-packag
 
 ## Installation
 
-Before the first release, use the Git dependency below. After publication on pub.dev,
-use `flutter pub add advanced_webview` instead.
+Install from [pub.dev](https://pub.dev/packages/advanced_webview):
+
+```sh
+flutter pub add advanced_webview
+```
+
+To track the latest `main` instead, use the Git dependency:
 
 ```yaml
 dependencies:
