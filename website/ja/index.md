@@ -7,9 +7,9 @@ title: advanced_webview
 
 <AwHero
   eyebrow="Flutter · Android · iOS"
-  title="Android でも iOS でも、"
-  accent="同じように動く WebView。"
-  lead="ナビゲーション、JavaScript、Cookie などを、型付きの Dart API ひとつで扱えます。一度書けば、両方のプラットフォームで同じ動きになります。"
+  title="シンプルに使えて、"
+  accent="必要な機能はひととおり。"
+  lead="コントローラとウィジェットだけで始められます。ナビゲーション、JavaScript、Cookie、ダウンロード、権限などの機能も、必要なときに同じ API で使えます。Android と iOS で動きも揃っています。"
 >
   <template #actions>
     <AwButton href="/ja/guide/getting-started">はじめる</AwButton>

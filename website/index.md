@@ -7,9 +7,9 @@ title: advanced_webview
 
 <AwHero
   eyebrow="Flutter · Android · iOS"
-  title="One WebView for Flutter,"
-  accent="the same on Android and iOS."
-  lead="Navigation, JavaScript, cookies and more through one typed Dart API. Write it once and it behaves the same on both platforms."
+  title="A simple WebView for Flutter,"
+  accent="with everything you need."
+  lead="One controller and one widget to get started. Navigation, JavaScript, cookies, downloads, permissions and more are there when you need them, and they behave the same on Android and iOS."
 >
   <template #actions>
     <AwButton href="/guide/getting-started">Get started</AwButton>
