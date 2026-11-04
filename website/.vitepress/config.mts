@@ -5,7 +5,7 @@ const repo = 'https://github.com/imk1t/advanced_webview'
 
 export default defineConfig({
   title: 'advanced_webview',
-  description: 'A lean, type-safe WebView plugin for Android and iOS built on Pigeon.',
+  description: 'A lean, type-safe WebView plugin for Android and iOS.',
   // Served from https://imk1t.github.io/advanced_webview/ (project Pages).
   // Change to '/' when a custom domain is configured.
   base: '/advanced_webview/',
@@ -36,6 +36,9 @@ export default defineConfig({
               { text: 'JavaScript', link: '/guide/javascript' },
               { text: 'Navigation', link: '/guide/navigation' },
               { text: 'Cookies', link: '/guide/cookies' },
+              { text: 'Permissions', link: '/guide/permissions' },
+              { text: 'Downloads', link: '/guide/downloads' },
+              { text: 'Certificates and auth', link: '/guide/certificates-and-auth' },
               { text: 'Settings', link: '/guide/settings' },
               { text: 'Platform API mapping', link: '/guide/api-mapping' },
             ],
@@ -66,9 +69,11 @@ export default defineConfig({
               { text: 'JavaScript', link: '/ja/guide/javascript' },
               { text: 'ナビゲーション', link: '/ja/guide/navigation' },
               { text: 'Cookie', link: '/ja/guide/cookies' },
+              { text: '権限', link: '/ja/guide/permissions' },
+              { text: 'ダウンロード', link: '/ja/guide/downloads' },
+              { text: '証明書と認証', link: '/ja/guide/certificates-and-auth' },
               { text: '設定', link: '/ja/guide/settings' },
               { text: 'ネイティブ API 対応表', link: '/ja/guide/api-mapping' },
-              { text: 'アーキテクチャ', link: '/ja/guide/architecture' },
             ],
           },
         ],

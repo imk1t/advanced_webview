@@ -53,9 +53,16 @@
   "classes": {
     "android": {
       "WebView": "https://developer.android.com/reference/android/webkit/WebView",
+      "SwipeRefreshLayout": "https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout",
+      "Bitmap": "https://developer.android.com/reference/android/graphics/Bitmap",
+      "PrintManager": "https://developer.android.com/reference/android/print/PrintManager",
+      "Bundle": "https://developer.android.com/reference/android/os/Bundle",
+      "Parcel": "https://developer.android.com/reference/android/os/Parcel",
+      "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
       "WebChromeClient": "https://developer.android.com/reference/android/webkit/WebChromeClient",
+      "ConsoleMessage": "https://developer.android.com/reference/android/webkit/ConsoleMessage",
       "WebResourceRequest": "https://developer.android.com/reference/android/webkit/WebResourceRequest",
       "WebResourceError": "https://developer.android.com/reference/android/webkit/WebResourceError",
       "JavascriptInterface": "https://developer.android.com/reference/android/webkit/JavascriptInterface",
@@ -63,12 +70,30 @@
       "CookieManager": "https://developer.android.com/reference/android/webkit/CookieManager",
       "WebViewCompat": "https://developer.android.com/reference/androidx/webkit/WebViewCompat",
       "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler",
+      "PermissionRequest": "https://developer.android.com/reference/android/webkit/PermissionRequest",
+      "GeolocationPermissions": "https://developer.android.com/reference/android/webkit/GeolocationPermissions",
+      "DownloadListener": "https://developer.android.com/reference/android/webkit/DownloadListener",
+      "URLUtil": "https://developer.android.com/reference/android/webkit/URLUtil",
+      "SslErrorHandler": "https://developer.android.com/reference/android/webkit/SslErrorHandler",
+      "SslError": "https://developer.android.com/reference/android/net/http/SslError",
+      "HttpAuthHandler": "https://developer.android.com/reference/android/webkit/HttpAuthHandler",
+      "JavaScriptReplyProxy": "https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy",
       "WebSettingsCompat": "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat",
       "WebViewFeature": "https://developer.android.com/reference/androidx/webkit/WebViewFeature"
     },
     "ios": {
       "WKWebView": "https://developer.apple.com/documentation/webkit/wkwebview",
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
+      "WKWebsiteDataStore": "https://developer.apple.com/documentation/webkit/wkwebsitedatastore",
+      "UIImage": "https://developer.apple.com/documentation/uikit/uiimage",
+      "UILongPressGestureRecognizer": "https://developer.apple.com/documentation/uikit/uilongpressgesturerecognizer",
+      "UIPrintInteractionController": "https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller",
+      "NSKeyedArchiver": "https://developer.apple.com/documentation/foundation/nskeyedarchiver",
+      "NSKeyedUnarchiver": "https://developer.apple.com/documentation/foundation/nskeyedunarchiver",
+      "WKFindResult": "https://developer.apple.com/documentation/webkit/wkfindresult",
+      "WKFindConfiguration": "https://developer.apple.com/documentation/webkit/wkfindconfiguration",
+      "UIRefreshControl": "https://developer.apple.com/documentation/uikit/uirefreshcontrol",
+      "WKPreferences": "https://developer.apple.com/documentation/webkit/wkpreferences",
       "WKWebpagePreferences": "https://developer.apple.com/documentation/webkit/wkwebpagepreferences",
       "WKNavigationDelegate": "https://developer.apple.com/documentation/webkit/wknavigationdelegate",
       "WKNavigationAction": "https://developer.apple.com/documentation/webkit/wknavigationaction",
@@ -76,6 +101,16 @@
       "WKUserContentController": "https://developer.apple.com/documentation/webkit/wkusercontentcontroller",
       "WKUserScript": "https://developer.apple.com/documentation/webkit/wkuserscript",
       "WKScriptMessageHandler": "https://developer.apple.com/documentation/webkit/wkscriptmessagehandler",
+      "WKNavigationResponse": "https://developer.apple.com/documentation/webkit/wknavigationresponse",
+      "WKNavigationAction": "https://developer.apple.com/documentation/webkit/wknavigationaction",
+      "SecTrustEvaluateWithError": "https://developer.apple.com/documentation/security/sectrustevaluatewitherror(_:_:)",
+      "URLCredential": "https://developer.apple.com/documentation/foundation/urlcredential",
+      "URLAuthenticationChallenge": "https://developer.apple.com/documentation/foundation/urlauthenticationchallenge",
+      "URLSession": "https://developer.apple.com/documentation/foundation/urlsession",
+      "WKSecurityOrigin": "https://developer.apple.com/documentation/webkit/wksecurityorigin",
+      "WKMediaCaptureType": "https://developer.apple.com/documentation/webkit/wkmediacapturetype",
+      "WKPermissionDecision": "https://developer.apple.com/documentation/webkit/wkpermissiondecision",
+      "WKScriptMessageHandlerWithReply": "https://developer.apple.com/documentation/webkit/wkscriptmessagehandlerwithreply",
       "UIView": "https://developer.apple.com/documentation/uikit/uiview",
       "UIScrollView": "https://developer.apple.com/documentation/uikit/uiscrollview",
       "NSError": "https://developer.apple.com/documentation/foundation/nserror",
@@ -110,8 +145,8 @@
       "group": "lifecycle",
       "dartOnly": true,
       "summary": {
-        "en": "Identifies the WebView in every Pigeon call.",
-        "ja": "すべての Pigeon 呼び出しで WebView を識別する ID です。"
+        "en": "Identifies the WebView in every call to the native side.",
+        "ja": "ネイティブ側へのすべての呼び出しで WebView を識別する ID です。"
       }
     },
     {
@@ -355,6 +390,224 @@
       }
     },
     {
+      "dart": "AdvancedWebViewController.takeScreenshot",
+      "group": "loading",
+      "summary": {
+        "en": "Captures the visible area of the WebView as a PNG.",
+        "ja": "WebView の表示領域を PNG として取得します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.draw(Canvas)", "Bitmap.compress(PNG)"],
+        "note": {
+          "en": "Returns null while the view has no size.",
+          "ja": "ビューのサイズが 0 の間は null を返します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.takeSnapshot(configuration:)", "UIImage.pngData()"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.findText",
+      "group": "loading",
+      "summary": {
+        "en": "Finds text in the page and highlights a match; repeating the query moves to the next or previous match.",
+        "ja": "ページ内のテキストを検索してハイライトします。同じクエリを繰り返すと次／前の一致に移動します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebView.findAllAsync(String)",
+          "WebView.findNext(boolean)",
+          "WebView.setFindListener(FindListener)"
+        ]
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["WKWebView.find(_:configuration:)", "WKFindConfiguration"],
+        "note": {
+          "en": "Only reports whether a match was found; matchCount and activeMatchIndex are null.",
+          "ja": "一致の有無のみ返します。matchCount と activeMatchIndex は null です。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.clearMatches",
+      "group": "loading",
+      "summary": {
+        "en": "Removes the highlights left by findText.",
+        "ja": "findText が付けたハイライトを消します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.clearMatches()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:completionHandler:)"],
+        "note": {
+          "en": "Clears the selection with window.getSelection().removeAllRanges().",
+          "ja": "window.getSelection().removeAllRanges() で選択を解除します。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.hitTest",
+      "group": "javascript",
+      "summary": {
+        "en": "Reports the link and image at a point, using document.elementFromPoint.",
+        "ja": "指定位置のリンクと画像を document.elementFromPoint で調べます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.evaluateJavascript(String, ValueCallback)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:)"]
+      }
+    },
+    {
+      "dart": "WebViewHitTestResult",
+      "group": "javascript",
+      "summary": {
+        "en": "The link and image URLs found by hitTest.",
+        "ja": "hitTest が見つけたリンクと画像の URL です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.evaluateJavascript(String, ValueCallback)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:)"]
+      }
+    },
+    {
+      "dart": "WebViewHitTestType",
+      "group": "javascript",
+      "summary": {
+        "en": "Whether hitTest found a link, an image, both or neither.",
+        "ja": "hitTest がリンク・画像・両方・どちらでもないのどれを見つけたかを表します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.evaluateJavascript(String, ValueCallback)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:)"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.printPage",
+      "group": "loading",
+      "summary": {
+        "en": "Opens the system print dialog for the current page.",
+        "ja": "現在のページのシステム印刷ダイアログを開きます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebView.createPrintDocumentAdapter(String)",
+          "PrintManager.print(String, PrintDocumentAdapter, PrintAttributes)"
+        ],
+        "note": {
+          "en": "Needs the Activity the platform view is shown in.",
+          "ja": "プラットフォームビューが表示されている Activity が必要です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "UIPrintInteractionController.present(animated:completionHandler:)",
+          "WKWebView.viewPrintFormatter()"
+        ]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.saveState",
+      "group": "loading",
+      "summary": {
+        "en": "Saves the back/forward history and scroll position as opaque bytes.",
+        "ja": "戻る/進む履歴とスクロール位置を、中身が不透明なバイト列として保存します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.saveState(Bundle)", "Parcel.marshall()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.interactionState", "NSKeyedArchiver"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.restoreState",
+      "group": "loading",
+      "summary": {
+        "en": "Restores bytes from saveState; returns false when they cannot be read.",
+        "ja": "saveState のバイト列を復元します。読めない場合は false を返します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.restoreState(Bundle)", "Parcel.unmarshall(byte[], int, int)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.interactionState", "NSKeyedUnarchiver"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.scrollTo",
+      "group": "loading",
+      "summary": {
+        "en": "Scrolls the page to an absolute offset in logical pixels, without animation.",
+        "ja": "ページを論理ピクセル単位の絶対位置へスクロールします（アニメーションなし）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.scrollTo(int, int)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.setContentOffset(_:animated:)"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.scrollBy",
+      "group": "loading",
+      "summary": {
+        "en": "Scrolls the page by a relative offset in logical pixels, without animation.",
+        "ja": "ページを論理ピクセル単位の相対量でスクロールします（アニメーションなし）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.scrollBy(int, int)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.setContentOffset(_:animated:)"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.scrollPosition",
+      "group": "loading",
+      "summary": {
+        "en": "Returns the current scroll offset in logical pixels.",
+        "ja": "現在のスクロール位置を論理ピクセルで返します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.getScrollX()", "View.getScrollY()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.contentOffset"]
+      }
+    },
+    {
       "dart": "AdvancedWebViewController.runJavaScript",
       "group": "javascript",
       "summary": {
@@ -415,6 +668,62 @@
         "note": {
           "en": "A user script at document start defines window.<name>.postMessage to match Android.",
           "ja": "Android と揃えるため、ドキュメント開始時のユーザースクリプトで window.<name>.postMessage を定義します。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.javaScriptHandlers",
+      "group": "javascript",
+      "summary": {
+        "en": "Named handlers the page can call as window.advanced_webview.callHandler(name, ...args); the Dart return value resolves the page's promise.",
+        "ja": "ページから window.advanced_webview.callHandler(name, ...args) で呼べる名前付きハンドラです。Dart の戻り値がページ側の Promise の結果になります。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewCompat.addWebMessageListener",
+          "WebViewCompat.addDocumentStartJavaScript",
+          "JavaScriptReplyProxy"
+        ],
+        "note": {
+          "en": "Needs WEB_MESSAGE_LISTENER and DOCUMENT_START_SCRIPT. A document-start shim turns web messages into promises; replies go back to the frame that asked.",
+          "ja": "WEB_MESSAGE_LISTENER と DOCUMENT_START_SCRIPT が必要です。ドキュメント開始時のシムが Web メッセージを Promise に変換し、返信は呼び出したフレームに届きます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKUserContentController.addScriptMessageHandler(_:contentWorld:name:)",
+          "WKScriptMessageHandlerWithReply",
+          "WKUserScript"
+        ],
+        "note": {
+          "en": "The reply handler settles the promise; a document-start user script defines window.advanced_webview.",
+          "ja": "reply ハンドラが Promise を解決します。ドキュメント開始時のユーザースクリプトが window.advanced_webview を定義します。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.javaScriptHandlerObjectName",
+      "group": "javascript",
+      "summary": {
+        "en": "Name of the global (window.<name>) that exposes callHandler. Defaults to advanced_webview.",
+        "ja": "callHandler を公開するグローバル（window.<name>）の名前です。既定値は advanced_webview です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewCompat.addDocumentStartJavaScript"],
+        "note": {
+          "en": "The document-start shim assigns the global under this name.",
+          "ja": "ドキュメント開始時のシムが、この名前でグローバルを定義します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKUserScript"],
+        "note": {
+          "en": "The document-start user script assigns the global under this name.",
+          "ja": "ドキュメント開始時のユーザースクリプトが、この名前でグローバルを定義します。"
         }
       }
     },
@@ -491,6 +800,113 @@
       }
     },
     {
+      "dart": "AdvancedWebViewController.onLongPress",
+      "group": "events",
+      "summary": {
+        "en": "The user long-pressed the page; reports the touch position in logical pixels.",
+        "ja": "ユーザーがページを長押ししました。タッチ位置を論理ピクセルで通知します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "View.setOnLongClickListener(OnLongClickListener)",
+          "View.setOnTouchListener(OnTouchListener)"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UILongPressGestureRecognizer"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onConsoleMessage",
+      "group": "events",
+      "summary": {
+        "en": "A console.debug, log, info, warn or error call made by the page.",
+        "ja": "ページが console.debug / log / info / warn / error を呼び出しました。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onConsoleMessage(ConsoleMessage)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKUserContentController.addUserScript(_:)",
+          "WKUserScript",
+          "WKScriptMessageHandler"
+        ],
+        "note": {
+          "en": "A user script wraps console.debug, log, info, warn and error in every frame and posts to a script message handler. WebKit reports no source URL or line number.",
+          "ja": "ユーザースクリプトが全フレームで console.debug / log / info / warn / error をラップし、スクリプトメッセージハンドラーへ送ります。WebKit はソース URL と行番号を報告しません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewConsoleMessage",
+      "group": "events",
+      "summary": {
+        "en": "The level, text and (Android only) source location of a console call.",
+        "ja": "console 呼び出しのレベル・テキスト・（Android のみ）ソース位置です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onConsoleMessage(ConsoleMessage)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKUserContentController.addUserScript(_:)",
+          "WKUserScript",
+          "WKScriptMessageHandler"
+        ],
+        "note": {
+          "en": "A user script wraps console.debug, log, info, warn and error in every frame and posts to a script message handler. WebKit reports no source URL or line number.",
+          "ja": "ユーザースクリプトが全フレームで console.debug / log / info / warn / error をラップし、スクリプトメッセージハンドラーへ送ります。WebKit はソース URL と行番号を報告しません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewConsoleMessageLevel",
+      "group": "events",
+      "summary": {
+        "en": "Which console method produced a message: debug, log, info, warning or error.",
+        "ja": "メッセージを出した console メソッド（debug / log / info / warning / error）を表します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onConsoleMessage(ConsoleMessage)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKUserContentController.addUserScript(_:)",
+          "WKUserScript",
+          "WKScriptMessageHandler"
+        ],
+        "note": {
+          "en": "A user script wraps console.debug, log, info, warn and error in every frame and posts to a script message handler. WebKit reports no source URL or line number.",
+          "ja": "ユーザースクリプトが全フレームで console.debug / log / info / warn / error をラップし、スクリプトメッセージハンドラーへ送ります。WebKit はソース URL と行番号を報告しません。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onScrollChanged",
+      "group": "events",
+      "summary": {
+        "en": "The page scrolled; reports the new offset in logical pixels.",
+        "ja": "ページがスクロールしました。新しい位置を論理ピクセルで通知します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.setOnScrollChangeListener(OnScrollChangeListener)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.contentOffset"]
+      }
+    },
+    {
       "dart": "AdvancedWebViewController.onWebResourceError",
       "group": "events",
       "summary": {
@@ -531,8 +947,8 @@
           "WebView.loadUrl(String)"
         ],
         "note": {
-          "en": "Android needs a synchronous answer, so the navigation is cancelled, Dart is asked, and an allowed one is re-issued as a GET (POST bodies and redirects are not preserved).",
-          "ja": "Android は同期的な応答が必要なため、遷移をいったんキャンセルして Dart に問い合わせ、許可された場合は GET として再実行します(POST の本文やリダイレクトは保持されません)。"
+          "en": "POST requests are not reported. Other intercepted navigations are cancelled, Dart is asked, and allowed ones are re-issued as GET; redirects and request metadata may change. Callback errors allow navigation.",
+          "ja": "POST は通知されません。他の判定対象の遷移はいったんキャンセルして Dart に問い合わせ、許可時は GET で再実行するため、リダイレクトやリクエスト情報が変わる場合があります。コールバック失敗時は許可します。"
         }
       },
       "ios": {
@@ -541,6 +957,61 @@
           "WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)",
           "WKNavigationActionPolicy"
         ]
+      }
+    },
+    {
+      "dart": "PermissionRequest",
+      "group": "events",
+      "summary": {
+        "en": "The origin and resources a page asks for.",
+        "ja": "ページが要求しているオリジンとリソースです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["PermissionRequest.getOrigin()", "PermissionRequest.getResources()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKSecurityOrigin", "WKMediaCaptureType"]
+      }
+    },
+    {
+      "dart": "PermissionResource",
+      "group": "events",
+      "summary": {
+        "en": "Camera, microphone or geolocation.",
+        "ja": "カメラ、マイク、または位置情報です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "PermissionRequest.RESOURCE_VIDEO_CAPTURE",
+          "PermissionRequest.RESOURCE_AUDIO_CAPTURE"
+        ]
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["WKMediaCaptureType"],
+        "note": {
+          "en": "geolocation is never reported on iOS.",
+          "ja": "iOS では geolocation は通知されません。"
+        }
+      }
+    },
+    {
+      "dart": "PermissionDecision",
+      "group": "events",
+      "summary": {
+        "en": "Whether to grant or deny a permission request.",
+        "ja": "権限リクエストを許可するか拒否するかです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["PermissionRequest.grant(String[])", "PermissionRequest.deny()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKPermissionDecision"]
       }
     },
     {
@@ -653,6 +1124,46 @@
       }
     },
     {
+      "dart": "WebViewSettings.android",
+      "group": "settings",
+      "summary": {
+        "en": "Android-only settings (AndroidWebViewSettings); iOS ignores them.",
+        "ja": "Android 専用の設定（AndroidWebViewSettings）です。iOS では無視されます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Not applicable on iOS.",
+          "ja": "iOS には該当しません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewSettings.ios",
+      "group": "settings",
+      "summary": {
+        "en": "iOS-only settings (IOSWebViewSettings); Android ignores them.",
+        "ja": "iOS 専用の設定（IOSWebViewSettings）です。Android では無視されます。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Not applicable on Android.",
+          "ja": "Android には該当しません。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebViewConfiguration"]
+      }
+    },
+    {
       "dart": "WebViewSettings.javaScriptEnabled",
       "group": "settings",
       "summary": {
@@ -689,7 +1200,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.allowsInlineMediaPlayback",
+      "dart": "IOSWebViewSettings.allowsInlineMediaPlayback",
       "group": "settings",
       "summary": {
         "en": "Plays video inline instead of full screen.",
@@ -713,7 +1224,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.supportZoom",
+      "dart": "AndroidWebViewSettings.supportZoom",
       "group": "settings",
       "summary": {
         "en": "Allows pinch-to-zoom.",
@@ -757,7 +1268,7 @@
       }
     },
     {
-      "dart": "WebViewSettings.passkeysEnabled",
+      "dart": "AndroidWebViewSettings.passkeysEnabled",
       "group": "settings",
       "summary": {
         "en": "Enables WebAuthn / passkeys for web content (Android).",
@@ -767,11 +1278,12 @@
         "status": "supported",
         "apis": [
           "WebViewFeature.isFeatureSupported(WEB_AUTHENTICATION)",
-          "WebSettingsCompat.setWebAuthenticationSupport(WEB_AUTHENTICATION_SUPPORT_FOR_APP)"
+          "WebSettingsCompat.setWebAuthenticationSupport(WEB_AUTHENTICATION_SUPPORT_FOR_APP)",
+          "WebSettingsCompat.setWebAuthenticationSupport(WEB_AUTHENTICATION_SUPPORT_NONE)"
         ],
         "note": {
-          "en": "Needs Digital Asset Links for the site's domain. Ignored when the installed WebView does not support WebAuthn.",
-          "ja": "サイトのドメインに Digital Asset Links の設定が必要です。インストール済みの WebView が WebAuthn に対応していない場合は無視されます。"
+          "en": "Needs Digital Asset Links for the site's domain. Updates select FOR_APP when enabled and NONE when disabled. Ignored when the installed WebView does not support WebAuthn.",
+          "ja": "サイトのドメインに Digital Asset Links の設定が必要です。更新時は有効なら FOR_APP、無効なら NONE を設定します。インストール済みの WebView が WebAuthn に対応していない場合は無視されます。"
         }
       },
       "ios": {
@@ -780,6 +1292,346 @@
         "note": {
           "en": "WKWebView supports passkeys when the app has the Associated Domains webcredentials entitlement for the site's domain.",
           "ja": "アプリがサイトのドメインの Associated Domains（webcredentials）entitlement を持っていれば、WKWebView でパスキーが使えます。"
+        }
+      }
+    },
+    {
+      "dart": "IOSWebViewSettings.allowsBackForwardNavigationGestures",
+      "group": "settings",
+      "summary": {
+        "en": "Lets the user swipe from the screen edge to go back and forward (iOS).",
+        "ja": "画面端からのスワイプで戻る・進むを可能にします（iOS）。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "WebView has no edge-swipe navigation; handle the system back gesture in the app.",
+          "ja": "WebView には画面端スワイプのナビゲーションがありません。システムの戻る操作はアプリ側で処理してください。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.allowsBackForwardNavigationGestures"]
+      }
+    },
+    {
+      "dart": "WebViewSettings.inspectable",
+      "group": "settings",
+      "summary": {
+        "en": "Allows the page to be inspected with Safari Web Inspector or chrome://inspect.",
+        "ja": "Safari Web Inspector または chrome://inspect でページを調査できるようにします。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.setWebContentsDebuggingEnabled(boolean)"],
+        "note": {
+          "en": "Process-wide: it applies to every WebView in the app, and the latest value set wins.",
+          "ja": "プロセス全体に効きます。アプリ内のすべての WebView が対象で、最後に設定した値が有効になります。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.isInspectable"]
+      }
+    },
+    {
+      "dart": "WebViewSettings.textZoom",
+      "group": "settings",
+      "summary": {
+        "en": "Text size as a percentage (100 is normal).",
+        "ja": "文字サイズをパーセントで指定します（100 が標準）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setTextZoom(int)"]
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["WKWebView.pageZoom"],
+        "note": {
+          "en": "iOS has no text-only zoom, so the whole page is scaled.",
+          "ja": "iOS には文字のみのズームがないため、ページ全体が拡大縮小されます。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewCacheMode",
+      "group": "settings",
+      "summary": {
+        "en": "The values accepted by WebViewSettings.cacheMode.",
+        "ja": "WebViewSettings.cacheMode に指定できる値です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebSettings.LOAD_DEFAULT",
+          "WebSettings.LOAD_CACHE_ELSE_NETWORK",
+          "WebSettings.LOAD_CACHE_ONLY",
+          "WebSettings.LOAD_NO_CACHE"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLRequest.CachePolicy"]
+      }
+    },
+    {
+      "dart": "AndroidWebViewSettings.domStorageEnabled",
+      "group": "settings",
+      "summary": {
+        "en": "Lets pages use localStorage and sessionStorage (Android).",
+        "ja": "ページが localStorage / sessionStorage を使えるようにします（Android）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setDomStorageEnabled(boolean)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "WKWebView always allows DOM storage.",
+          "ja": "WKWebView は常に DOM ストレージを許可します。"
+        }
+      }
+    },
+    {
+      "dart": "AndroidWebViewSettings.allowFileAccess",
+      "group": "settings",
+      "summary": {
+        "en": "Lets the WebView reach file:// URLs (Android, off by default).",
+        "ja": "WebView が file:// URL にアクセスできるようにします（Android、既定は無効）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setAllowFileAccess(boolean)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "No equivalent switch on iOS.",
+          "ja": "iOS に同等の切り替えはありません。"
+        }
+      }
+    },
+    {
+      "dart": "AndroidWebViewSettings.allowContentAccess",
+      "group": "settings",
+      "summary": {
+        "en": "Lets the WebView load content:// URLs (Android, off by default).",
+        "ja": "WebView が content:// URL を読み込めるようにします（Android、既定は無効）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setAllowContentAccess(boolean)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "No equivalent on iOS.",
+          "ja": "iOS に同等の設定はありません。"
+        }
+      }
+    },
+    {
+      "dart": "AndroidWebViewSettings.mixedContentMode",
+      "group": "settings",
+      "summary": {
+        "en": "Controls HTTP content on HTTPS pages (Android, blocked by default).",
+        "ja": "HTTPS ページ上の HTTP コンテンツの扱いを決めます（Android、既定は遮断）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setMixedContentMode(int)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "WebKit blocks mixed content and has no setting.",
+          "ja": "WebKit は混在コンテンツを遮断し、設定はありません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewMixedContentMode",
+      "group": "settings",
+      "summary": {
+        "en": "The values accepted by WebViewSettings.mixedContentMode.",
+        "ja": "WebViewSettings.mixedContentMode に指定できる値です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebSettings.MIXED_CONTENT_NEVER_ALLOW",
+          "WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE",
+          "WebSettings.MIXED_CONTENT_ALWAYS_ALLOW"
+        ]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Not applicable on iOS.",
+          "ja": "iOS には該当しません。"
+        }
+      }
+    },
+    {
+      "dart": "IOSWebViewSettings.incognito",
+      "group": "settings",
+      "summary": {
+        "en": "Keeps cookies, cache and storage in memory only (iOS).",
+        "ja": "Cookie・キャッシュ・ストレージをメモリ上だけに保持します（iOS）。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Android's WebView shares cookies, cache and storage across the app, so it cannot be isolated per WebView.",
+          "ja": "Android の WebView は Cookie・キャッシュ・ストレージをアプリ全体で共有するため、WebView ごとに分離できません。"
+        }
+      },
+      "ios": {
+        "status": "creationOnly",
+        "apis": ["WKWebViewConfiguration.websiteDataStore", "WKWebsiteDataStore.nonPersistent()"],
+        "note": {
+          "en": "Applied when the WebView is created; changing it later has no effect.",
+          "ja": "WebView の生成時に適用されます。後から変更しても反映されません。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewSettings.cacheMode",
+      "group": "settings",
+      "summary": {
+        "en": "How loads use the HTTP cache: normal, preferCache, cacheOnly or noCache.",
+        "ja": "読み込み時の HTTP キャッシュの使い方（normal / preferCache / cacheOnly / noCache）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebSettings.setCacheMode(int)",
+          "WebSettings.LOAD_DEFAULT",
+          "WebSettings.LOAD_CACHE_ELSE_NETWORK",
+          "WebSettings.LOAD_CACHE_ONLY",
+          "WebSettings.LOAD_NO_CACHE"
+        ]
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["URLRequest.cachePolicy"],
+        "note": {
+          "en": "Applied to requests started with loadUrl; link taps and subresources use the default policy.",
+          "ja": "loadUrl で開始したリクエストに適用されます。リンクのタップやサブリソースは既定のポリシーです。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewSettings.javaScriptCanOpenWindowsAutomatically",
+      "group": "settings",
+      "summary": {
+        "en": "Lets scripts call window.open without a user gesture.",
+        "ja": "ユーザー操作なしでスクリプトから window.open を呼べるようにします。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setJavaScriptCanOpenWindowsAutomatically(boolean)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKPreferences.javaScriptCanOpenWindowsAutomatically"]
+      }
+    },
+    {
+      "dart": "WebViewSettings.scrollbarsVisible",
+      "group": "settings",
+      "summary": {
+        "en": "Shows scroll bars (Android) or scroll indicators (iOS).",
+        "ja": "スクロールバー（Android）／スクロールインジケータ（iOS）を表示します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "View.setVerticalScrollBarEnabled(boolean)",
+          "View.setHorizontalScrollBarEnabled(boolean)"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "UIScrollView.showsVerticalScrollIndicator",
+          "UIScrollView.showsHorizontalScrollIndicator"
+        ]
+      }
+    },
+    {
+      "dart": "WebViewSettings.overScrollEnabled",
+      "group": "settings",
+      "summary": {
+        "en": "Allows scrolling past the content edge (stretch on Android, bounce on iOS).",
+        "ja": "コンテンツの端を越えたスクロールを許可します（Android はストレッチ、iOS はバウンス）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["View.setOverScrollMode(int)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.bounces"]
+      }
+    },
+    {
+      "dart": "WebViewSettings.pullToRefreshEnabled",
+      "group": "settings",
+      "summary": {
+        "en": "Reloads the page when the user pulls down from the top.",
+        "ja": "ページ上端から引き下げたときにページを再読み込みします。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "SwipeRefreshLayout",
+          "SwipeRefreshLayout.setOnRefreshListener(OnRefreshListener)"
+        ],
+        "note": {
+          "en": "The platform view is a SwipeRefreshLayout that contains the WebView.",
+          "ja": "プラットフォームビューは WebView を含む SwipeRefreshLayout です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.refreshControl", "UIRefreshControl"],
+        "note": {
+          "en": "The pull is a bounce, so overScrollEnabled must stay on.",
+          "ja": "引き下げはバウンスで行うため、overScrollEnabled を有効のままにしてください。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewSettings.minimumFontSize",
+      "group": "settings",
+      "summary": {
+        "en": "Smallest font size the WebView renders. null uses the platform default.",
+        "ja": "WebView が表示する最小のフォントサイズ。null ならプラットフォームの既定値です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setMinimumFontSize(int)"],
+        "note": {
+          "en": "null restores the Android default of 8.",
+          "ja": "null なら Android の既定値 8 に戻します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKPreferences.minimumFontSize"],
+        "note": {
+          "en": "null restores the default of 0.",
+          "ja": "null なら既定値 0 に戻します。"
         }
       }
     },
@@ -972,6 +1824,227 @@
       "ios": {
         "status": "supported",
         "apis": ["WKUserContentController.addUserScript(_:)", "WKUserScript"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onPermissionRequest",
+      "group": "events",
+      "summary": {
+        "en": "Decides whether a page may use the camera, microphone or location. Without a callback every request is denied.",
+        "ja": "ページにカメラ・マイク・位置情報の使用を許可するかを決めます。コールバックがない場合はすべて拒否します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebChromeClient.onPermissionRequest(PermissionRequest)",
+          "WebChromeClient.onGeolocationPermissionsShowPrompt(String, GeolocationPermissions.Callback)"
+        ],
+        "note": {
+          "en": "After Dart allows a request, the plugin also asks for the Android runtime permission (CAMERA, RECORD_AUDIO, ACCESS_FINE_LOCATION); the request is denied if the user refuses. Protected media and MIDI are always denied.",
+          "ja": "Dart が許可した後、プラグインが Android の実行時権限（CAMERA、RECORD_AUDIO、ACCESS_FINE_LOCATION）も要求し、ユーザーが拒否した場合は拒否します。保護メディアと MIDI は常に拒否します。"
+        }
+      },
+      "ios": {
+        "status": "partial",
+        "apis": [
+          "WKUIDelegate.webView(_:requestMediaCapturePermissionFor:initiatedByFrame:type:decisionHandler:)"
+        ],
+        "note": {
+          "en": "Camera and microphone only. WebKit has no delegate for geolocation, so it asks the user itself and the callback is never called for it.",
+          "ja": "カメラとマイクのみです。WebKit には位置情報用のデリゲートがなく、WebKit 自身がユーザーに確認するため、位置情報ではコールバックは呼ばれません。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onDownloadStart",
+      "group": "events",
+      "summary": {
+        "en": "Called when the page starts a download. The WebView does not save the file.",
+        "ja": "ページがダウンロードを始めたときに呼ばれます。WebView はファイルを保存しません。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebView.setDownloadListener(DownloadListener)",
+          "URLUtil.guessFileName(String, String, String)"
+        ],
+        "note": {
+          "en": "The file name is always guessed from the URL and Content-Disposition.",
+          "ja": "ファイル名は常に URL と Content-Disposition から推測します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)",
+          "WKNavigationResponse.canShowMIMEType",
+          "WKNavigationAction.shouldPerformDownload"
+        ],
+        "note": {
+          "en": "Attachments and unshowable types are detected on the response, download links on the action; the navigation is cancelled. The file name can be null for download links.",
+          "ja": "添付ファイルと表示できない種類はレスポンスで、download リンクはアクションで検出し、遷移をキャンセルします。download リンクではファイル名が null になることがあります。"
+        }
+      }
+    },
+    {
+      "dart": "FindResult",
+      "group": "loading",
+      "summary": {
+        "en": "Whether the query was found, with the match count and active match (Android).",
+        "ja": "検索語が見つかったかどうか。Android では一致数と現在の位置も含みます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.setFindListener(FindListener)"]
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["WKFindResult.matchFound"],
+        "note": {
+          "en": "WebKit does not report a count, so matchCount and activeMatchIndex are null.",
+          "ja": "WebKit は一致数を返さないため、matchCount と activeMatchIndex は null です。"
+        }
+      }
+    },
+    {
+      "dart": "DownloadRequest",
+      "group": "events",
+      "summary": {
+        "en": "The URL, file name, MIME type and size of a download.",
+        "ja": "ダウンロードの URL、ファイル名、MIME タイプ、サイズです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["URLUtil.guessFileName(String, String, String)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKNavigationResponse", "WKNavigationAction"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onSslError",
+      "group": "events",
+      "summary": {
+        "en": "Decides what to do about a certificate problem. Without a callback the load is refused.",
+        "ja": "証明書の問題にどう対処するかを決めます。コールバックがない場合は読み込みを拒否します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewClient.onReceivedSslError(WebView, SslErrorHandler, SslError)",
+          "SslErrorHandler.proceed()",
+          "SslErrorHandler.cancel()"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKNavigationDelegate.webView(_:didReceive:completionHandler:)",
+          "SecTrustEvaluateWithError(_:_:)",
+          "URLCredential(trust:)"
+        ],
+        "note": {
+          "en": "Only called after the system's own trust evaluation failed.",
+          "ja": "システム自身の信頼性評価が失敗した後にだけ呼ばれます。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onHttpAuthRequest",
+      "group": "events",
+      "summary": {
+        "en": "Supplies credentials for HTTP Basic, Digest or NTLM authentication, or cancels with null.",
+        "ja": "HTTP Basic / Digest / NTLM 認証の認証情報を渡します。null を返すとキャンセルします。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewClient.onReceivedHttpAuthRequest(WebView, HttpAuthHandler, String, String)",
+          "HttpAuthHandler.proceed(String, String)",
+          "HttpAuthHandler.cancel()"
+        ],
+        "note": {
+          "en": "Without a callback the request is cancelled.",
+          "ja": "コールバックがない場合はリクエストをキャンセルします。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKNavigationDelegate.webView(_:didReceive:completionHandler:)",
+          "URLCredential(user:password:persistence:)"
+        ],
+        "note": {
+          "en": "Without a callback the system default handling runs, which also fails the request. Proxy authentication is left to the system.",
+          "ja": "コールバックがない場合はシステムの既定処理になり、リクエストは失敗します。プロキシ認証はシステムに任せます。"
+        }
+      }
+    },
+    {
+      "dart": "SslError",
+      "group": "events",
+      "summary": {
+        "en": "The URL, host and description of a certificate problem.",
+        "ja": "証明書の問題の URL、ホスト、説明です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["SslError.getUrl()", "SslError.getPrimaryError()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["SecTrustEvaluateWithError(_:_:)"]
+      }
+    },
+    {
+      "dart": "SslErrorDecision",
+      "group": "events",
+      "summary": {
+        "en": "Whether to proceed despite a certificate problem or cancel the load.",
+        "ja": "証明書の問題があっても続行するか、読み込みをキャンセルするかです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["SslErrorHandler.proceed()", "SslErrorHandler.cancel()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLCredential(trust:)", "URLSession.AuthChallengeDisposition"]
+      }
+    },
+    {
+      "dart": "HttpAuthRequest",
+      "group": "events",
+      "summary": {
+        "en": "The host and realm of an authentication request.",
+        "ja": "認証要求のホストとレルムです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewClient.onReceivedHttpAuthRequest(WebView, HttpAuthHandler, String, String)"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLAuthenticationChallenge.protectionSpace"]
+      }
+    },
+    {
+      "dart": "HttpAuthCredentials",
+      "group": "events",
+      "summary": {
+        "en": "A user name and password for an authentication request.",
+        "ja": "認証要求に対するユーザー名とパスワードです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["HttpAuthHandler.proceed(String, String)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLCredential(user:password:persistence:)"]
       }
     },
     {

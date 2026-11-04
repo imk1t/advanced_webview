@@ -38,6 +38,17 @@ cd example && flutter build ios --simulator --debug && cd ios && \
   -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
+Run the CI checks locally with mise (macOS runners are costly, so iOS CI is limited):
+
+```sh
+mise run check          # Dart format/Pigeon/analyze/test + ktlint + swift-format
+mise run check:ios      # macOS only: SwiftPM build, integration test, XCTest (`tool/check-ios.sh cocoapods|all` for the podspec)
+git config core.hooksPath .githooks   # optional pre-push hook running the above (SKIP_IOS=1 skips the simulator)
+```
+
+CI runs only the Dart and lint jobs on every PR. The Android and iOS build/test jobs run on a PR
+labelled `full-ci`, or manually from the Actions tab (Run workflow).
+
 Format and lint native code (generated Pigeon files are excluded):
 
 ```sh
@@ -90,6 +101,21 @@ Style is configured in `.editorconfig` (ktlint, `intellij_idea` code style) and
 
 By contributing, you agree that your contributions will be licensed under the
 [MIT License](LICENSE).
+
+## Releasing (maintainers)
+
+1. In a PR, set `version` in `pubspec.yaml` and rename `## Unreleased` in `CHANGELOG.md` to
+   `## X.Y.Z - YYYY-MM-DD` (leave an empty `## Unreleased` above it). Merge it.
+2. Tag the merge commit and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+3. `.github/workflows/publish.yml` checks that the tag matches `pubspec.yaml`, has a
+   `CHANGELOG.md` section and is on `main`, then runs analyze and tests, publishes to pub.dev and
+   creates a GitHub Release from the changelog section (skipped if a release for the tag already exists). If the exact version is already on
+   pub.dev, it still runs analyze and tests, but skips pub.dev credentials and publication
+   (including the publish dry-run) and proceeds to the GitHub Release. A missing package
+   (HTTP 404) follows the normal publish path; other HTTP/network errors or invalid package
+   metadata stop the workflow rather than assuming publication succeeded.
+   The first release must be published manually (`mise exec -- flutter pub publish`) before pushing
+   its tag, and automated publishing enabled on pub.dev for subsequent versions.
 
 ## Using AI coding agents
 

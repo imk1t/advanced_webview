@@ -1,3 +1,4 @@
+import Flutter
 import Foundation
 
 /// Implements the Dart -> native calls by dispatching to `WebViewRegistry`.
@@ -65,6 +66,44 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
 
   func getUrl(webViewId: Int64) throws -> String? {
     return try registry.get(webViewId).webView.url?.absoluteString
+  }
+
+  @MainActor
+  func takeScreenshot(webViewId: Int64) async throws -> FlutterStandardTypedData? {
+    return try await registry.get(webViewId).takeScreenshot()
+  }
+
+  @MainActor
+  func findText(webViewId: Int64, query: String, forward: Bool) async throws -> FindResultMessage {
+    return try await registry.get(webViewId).find(query, forward: forward)
+  }
+
+  func clearMatches(webViewId: Int64) throws {
+    try registry.get(webViewId).clearMatches()
+  }
+
+  func scrollTo(webViewId: Int64, x: Double, y: Double) throws {
+    try registry.get(webViewId).scrollTo(x: x, y: y)
+  }
+
+  func scrollBy(webViewId: Int64, dx: Double, dy: Double) throws {
+    try registry.get(webViewId).scrollBy(dx: dx, dy: dy)
+  }
+
+  func getScrollPosition(webViewId: Int64) throws -> ScrollPositionMessage {
+    return try registry.get(webViewId).scrollPosition()
+  }
+
+  func saveState(webViewId: Int64) throws -> FlutterStandardTypedData? {
+    return try registry.get(webViewId).saveState()
+  }
+
+  func restoreState(webViewId: Int64, state: FlutterStandardTypedData) throws -> Bool {
+    return try registry.get(webViewId).restoreState(state)
+  }
+
+  func printPage(webViewId: Int64, jobName: String?) throws {
+    try registry.get(webViewId).printPage(jobName: jobName)
   }
 
   func getTitle(webViewId: Int64) throws -> String? {

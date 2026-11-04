@@ -15,7 +15,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'actions/deploy-pages@v5.0.1'
         - 'actions/upload-pages-artifact@v5.0.0'
-        - 'jdx/mise-action@v5.2.5'
+        - 'oven-sh/setup-bun@v2.2.0'
     '.github/workflows/publish.yml':
         - 'actions/checkout@v7.0.1'
         - 'dart-lang/setup-dart@v1.8.1'
@@ -72,6 +72,11 @@ dependencies:
         commit: 'sha1-6612f0ef07ed2a736cd1e00a94a065522dd41195'
         owner_id: 216188
         repo_id: 738284564
+    'oven-sh/setup-bun@v2.2.0':
+        ref: 'v2.2.0'
+        commit: 'sha1-0c5077e51419868618aeaa5fe8019c62421857d6'
+        owner_id: 108928776
+        repo_id: 512644635
     'reactivecircus/android-emulator-runner@v2.38.0':
         ref: 'v2.38.0'
         commit: 'sha1-a421e43855164a8197daf9d8d40fe71c6996bb0d'

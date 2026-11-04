@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:advanced_webview/src/platform/messages.g.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -58,6 +60,64 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
   Future<String?> evaluateJavaScript(int webViewId, String source) async {
     calls.add('evaluateJavaScript($source)');
     return nextJavaScriptResult;
+  }
+
+  @override
+  Future<void> printPage(int webViewId, String? jobName) async =>
+      calls.add('printPage($jobName)');
+
+  Uint8List? nextState;
+  bool nextRestoreResult = true;
+
+  @override
+  Future<Uint8List?> saveState(int webViewId) async {
+    calls.add('saveState');
+    return nextState;
+  }
+
+  @override
+  Future<bool> restoreState(int webViewId, Uint8List state) async {
+    calls.add('restoreState(${state.length})');
+    return nextRestoreResult;
+  }
+
+  ScrollPositionMessage nextScrollPosition = ScrollPositionMessage(x: 0, y: 0);
+
+  @override
+  Future<void> scrollTo(int webViewId, double x, double y) async =>
+      calls.add('scrollTo($x, $y)');
+
+  @override
+  Future<void> scrollBy(int webViewId, double dx, double dy) async =>
+      calls.add('scrollBy($dx, $dy)');
+
+  @override
+  Future<ScrollPositionMessage> getScrollPosition(int webViewId) async {
+    calls.add('getScrollPosition');
+    return nextScrollPosition;
+  }
+
+  FindResultMessage nextFindResult = FindResultMessage(found: false);
+
+  @override
+  Future<FindResultMessage> findText(
+    int webViewId,
+    String query,
+    bool forward,
+  ) async {
+    calls.add('findText($query, $forward)');
+    return nextFindResult;
+  }
+
+  @override
+  Future<void> clearMatches(int webViewId) async => calls.add('clearMatches');
+
+  Uint8List? nextScreenshot;
+
+  @override
+  Future<Uint8List?> takeScreenshot(int webViewId) async {
+    calls.add('takeScreenshot');
+    return nextScreenshot;
   }
 
   @override

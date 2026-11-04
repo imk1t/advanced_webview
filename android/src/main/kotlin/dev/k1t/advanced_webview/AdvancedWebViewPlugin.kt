@@ -15,6 +15,7 @@ class AdvancedWebViewPlugin :
     FlutterPlugin,
     ActivityAware {
     private val fileChooser = FileChooser()
+    private val permissionRequester = PermissionRequester()
     private var hostApi: WebViewHostApiImpl? = null
     private var scope: CoroutineScope? = null
 
@@ -22,8 +23,14 @@ class AdvancedWebViewPlugin :
         val scope = MainScope().also { scope = it }
         val registry = WebViewRegistry()
         val flutterApi = AdvancedWebViewFlutterApi(binding.binaryMessenger)
-        val hostApi = WebViewHostApiImpl(binding.applicationContext, registry, flutterApi, scope, fileChooser)
-            .also { hostApi = it }
+        val hostApi = WebViewHostApiImpl(
+            binding.applicationContext,
+            registry,
+            flutterApi,
+            scope,
+            fileChooser,
+            permissionRequester,
+        ).also { hostApi = it }
 
         AdvancedWebViewHostApi.setUp(binding.binaryMessenger, hostApi)
         binding.platformViewRegistry.registerViewFactory(
@@ -40,13 +47,23 @@ class AdvancedWebViewPlugin :
         scope = null
     }
 
-    override fun onAttachedToActivity(binding: ActivityPluginBinding) = fileChooser.attach(binding)
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) = attach(binding)
 
-    override fun onDetachedFromActivityForConfigChanges() = fileChooser.detach()
+    override fun onDetachedFromActivityForConfigChanges() = detach()
 
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) = fileChooser.attach(binding)
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) = attach(binding)
 
-    override fun onDetachedFromActivity() = fileChooser.detach()
+    override fun onDetachedFromActivity() = detach()
+
+    private fun attach(binding: ActivityPluginBinding) {
+        fileChooser.attach(binding)
+        permissionRequester.attach(binding)
+    }
+
+    private fun detach() {
+        fileChooser.detach()
+        permissionRequester.detach()
+    }
 
     companion object {
         /** Must match `AdvancedWebView.viewType` on the Dart side. */

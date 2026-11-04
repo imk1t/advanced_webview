@@ -40,11 +40,11 @@ jobs:
       - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0 # git history for "last updated"
-      - uses: jdx/mise-action@v5.2.5
+      # `bun lint` / `bun fmt` need Bun canary (see mise.toml). mise-action failed on the moving
+      # canary release asset's checksum, so install it with setup-bun instead.
+      - uses: oven-sh/setup-bun@v2.2.0
         with:
-          # Only Bun (canary, see mise.toml); the docs build does not need Flutter.
-          install_args: github:oven-sh/bun
-          working_directory: .
+          bun-version: canary
       - run: bun install --frozen-lockfile
       - run: bun run lint
       - run: bun run format:check

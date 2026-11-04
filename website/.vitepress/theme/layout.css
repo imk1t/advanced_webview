@@ -1,27 +1,136 @@
 /*
  * Wider reading area than the VitePress default (688px content / 1104px layout).
- * VitePress scopes its own sizes, so overriding them needs !important.
+ * These rules target VitePress' own markup, so they stay as selectors, but the declarations are
+ * Tailwind utilities. VitePress styles are unlayered, so overriding them needs `!`.
  */
+@reference './tailwind.css';
+
 :root {
   --vp-layout-max-width: 1760px;
 }
 
 .VPDoc .container,
-.VPDoc:not(.has-sidebar) .container {
-  max-width: none !important;
-}
-
+.VPDoc:not(.has-sidebar) .container,
 .VPDoc .content,
 .VPDoc:not(.has-sidebar) .content {
-  max-width: none !important;
+  @apply tw:max-w-none!;
 }
 
 .VPDoc.has-aside .content-container,
 .VPDoc:not(.has-sidebar) .content-container {
-  max-width: 1100px !important;
+  @apply tw:max-w-[1100px]!;
 }
 
-.vp-doc table {
-  display: table;
-  width: 100%;
+/*
+ * Tables. VitePress' defaults (zebra stripes, 16px cell padding, 28px line height) make the
+ * reference tables tall and hard to scan, so tighten them and rely on row dividers instead.
+ * Below 640px VitePress' own scrollable block table is kept for plain Markdown tables.
+ */
+@media (min-width: 640px) {
+  .vp-doc table {
+    @apply tw:table tw:w-full;
+  }
+}
+
+.vp-doc th {
+  @apply tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:tracking-wide tw:text-(--vp-c-text-2);
+}
+
+.vp-doc td {
+  @apply tw:px-3 tw:py-2 tw:text-sm tw:leading-6;
+}
+
+.vp-doc tr,
+.vp-doc tr:nth-child(2n) {
+  @apply tw:bg-transparent;
+}
+
+.vp-doc tbody tr:hover {
+  @apply tw:bg-(--vp-c-bg-soft);
+}
+
+.vp-doc td code {
+  @apply tw:text-[0.8125rem];
+}
+
+/* API mapping table (ApiMapping.vue). */
+.vp-doc .api-map table {
+  @apply tw:table-fixed;
+}
+
+.vp-doc .api-map td {
+  @apply tw:align-top;
+}
+
+/* Wide enough for the longest class name (e.g. WKScriptMessageHandlerWithReply); narrower
+   containers scroll horizontally instead of splitting identifiers. */
+@media (min-width: 640px) {
+  .vp-doc .api-map table {
+    @apply tw:min-w-[48rem];
+  }
+}
+
+.vp-doc .api-map ul {
+  @apply tw:mt-1.5 tw:mb-0 tw:list-none tw:p-0;
+}
+
+.vp-doc .api-map li {
+  @apply tw:my-0.5 tw:leading-5;
+}
+
+.vp-doc .api-map td p {
+  @apply tw:mt-1 tw:mb-0 tw:text-[13px] tw:leading-5 tw:text-(--vp-c-text-2);
+}
+
+.vp-doc .api-map td > code {
+  @apply tw:text-[0.8125rem] tw:font-semibold tw:[overflow-wrap:break-word];
+}
+
+.vp-doc .api-map li code {
+  @apply tw:text-xs tw:[overflow-wrap:break-word];
+}
+
+.vp-doc .api-map .api-map-platform {
+  @apply tw:border-l tw:border-(--vp-c-divider);
+}
+
+/* On narrow screens each row becomes a card: Dart API on top, then Android and iOS. */
+@media (max-width: 639px) {
+  .vp-doc .api-map thead {
+    @apply tw:sr-only;
+  }
+
+  .vp-doc .api-map table,
+  .vp-doc .api-map tbody {
+    @apply tw:block;
+  }
+
+  .vp-doc .api-map tr {
+    @apply tw:mb-3 tw:block tw:overflow-hidden tw:rounded-lg tw:border tw:border-(--vp-c-divider);
+  }
+
+  .vp-doc .api-map td {
+    @apply tw:block tw:border-0;
+  }
+
+  .vp-doc .api-map td.api-map-platform {
+    @apply tw:border-t tw:border-l-0 tw:border-(--vp-c-divider);
+  }
+
+  .vp-doc .api-map td[data-label]::before {
+    content: attr(data-label);
+    @apply tw:mb-1 tw:block tw:text-xs tw:font-semibold tw:text-(--vp-c-text-2);
+  }
+}
+
+/* Keep Japanese hero text from breaking in the middle of a word. */
+.VPHero .text,
+.VPHero .tagline {
+  @apply tw:[word-break:auto-phrase];
+}
+
+@media (min-width: 960px) {
+  .VPHero:not(.has-image) .container .main {
+    @apply tw:max-w-[900px];
+  }
 }

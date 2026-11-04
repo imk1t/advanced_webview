@@ -10,26 +10,42 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let flutterApi: AdvancedWebViewFlutterApi
   private let hasNavigationDelegate: Bool
   private let hasNewWindowDelegate: Bool
+  private let hasPermissionDelegate: Bool
+  private let hasDownloadDelegate: Bool
+  private let hasSslErrorDelegate: Bool
+  private let hasHttpAuthDelegate: Bool
+  private let hasConsoleMessageDelegate: Bool
   private var javaScriptChannelNames: [String] = []
+  private let hasJavaScriptHandlers: Bool
+  private let handlerObjectName: String
   private var observations: [NSKeyValueObservation] = []
   private var isDestroyed = false
   /// URL of the load started by `load(_:)` / `loadHTMLString(_:baseURL:)`
   /// whose policy decision has not arrived yet.
   private var pendingAppInitiatedURL: String?
+  private var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
 
   init(params: CreationParamsMessage, flutterApi: AdvancedWebViewFlutterApi) {
     self.id = params.webViewId
     self.flutterApi = flutterApi
     self.hasNavigationDelegate = params.hasNavigationDelegate
     self.hasNewWindowDelegate = params.hasNewWindowDelegate
+    self.hasPermissionDelegate = params.hasPermissionDelegate
+    self.hasDownloadDelegate = params.hasDownloadDelegate
+    self.hasSslErrorDelegate = params.hasSslErrorDelegate
+    self.hasHttpAuthDelegate = params.hasHttpAuthDelegate
+    self.hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
+    self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
+    self.handlerObjectName = params.javaScriptHandlerObjectName
 
     // Some WKWebView options can only be set at creation time.
     let configuration = WKWebViewConfiguration()
     configuration.allowsInlineMediaPlayback = params.settings.allowsInlineMediaPlayback
     configuration.mediaTypesRequiringUserActionForPlayback =
       params.settings.mediaPlaybackRequiresUserGesture ? .all : []
-    // Same as Android: let scripts call window.open without a user gesture.
-    configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
+    if params.settings.incognito {
+      configuration.websiteDataStore = .nonPersistent()
+    }
     self.webView = WKWebView(frame: .zero, configuration: configuration)
     super.init()
 
@@ -38,7 +54,25 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     apply(settings: params.settings)
     params.javaScriptChannelNames.forEach(addJavaScriptChannel)
     params.userScripts.forEach(addUserScript)
+    if hasJavaScriptHandlers { installHandlerBridge() }
+    if hasConsoleMessageDelegate { installConsoleBridge() }
     observeProperties()
+    if params.hasLongPressDelegate {
+      let recognizer = UILongPressGestureRecognizer(
+        target: self, action: #selector(handleLongPress(_:)))
+      recognizer.delegate = self
+      recognizer.cancelsTouchesInView = false
+      webView.addGestureRecognizer(recognizer)
+    }
+    if params.hasScrollDelegate {
+      observations.append(
+        webView.scrollView.observe(\.contentOffset, options: [.new]) { [weak self] scrollView, _ in
+          let offset = scrollView.contentOffset
+          self?.send { api, id in
+            try await api.onScrollChanged(webViewId: id, x: Double(offset.x), y: Double(offset.y))
+          }
+        })
+    }
   }
 
   func view() -> UIView {
@@ -48,15 +82,123 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   func apply(settings: WebViewSettingsMessage) {
     webView.configuration.defaultWebpagePreferences.allowsContentJavaScript =
       settings.javaScriptEnabled
+    webView.allowsBackForwardNavigationGestures = settings.allowsBackForwardNavigationGestures
+    webView.isInspectable = settings.inspectable
+    cachePolicy =
+      switch settings.cacheMode {
+      case .normal: .useProtocolCachePolicy
+      case .preferCache: .returnCacheDataElseLoad
+      case .cacheOnly: .returnCacheDataDontLoad
+      case .noCache: .reloadIgnoringLocalCacheData
+      }
+    webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically =
+      settings.javaScriptCanOpenWindowsAutomatically
+    webView.scrollView.showsVerticalScrollIndicator = settings.scrollbarsVisible
+    webView.scrollView.showsHorizontalScrollIndicator = settings.scrollbarsVisible
+    webView.scrollView.bounces = settings.overScrollEnabled
+    if settings.pullToRefreshEnabled {
+      if webView.scrollView.refreshControl == nil {
+        let control = UIRefreshControl()
+        control.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        webView.scrollView.refreshControl = control
+      }
+    } else {
+      webView.scrollView.refreshControl = nil
+    }
+    webView.pageZoom = CGFloat(settings.textZoom) / 100
+    webView.configuration.preferences.minimumFontSize =
+      settings.minimumFontSize.map { CGFloat($0) } ?? 0
     webView.customUserAgent = settings.userAgent
     webView.isOpaque = !settings.transparentBackground
     webView.backgroundColor = settings.transparentBackground ? .clear : .white
     webView.scrollView.backgroundColor = webView.backgroundColor
   }
 
+  @objc private func handleRefresh() {
+    webView.reload()
+  }
+
+  /// `WKWebView.interactionState` (back/forward list and scroll position) archived as bytes,
+  /// or nil when there is nothing to save.
+  func saveState() -> FlutterStandardTypedData? {
+    guard let state = webView.interactionState,
+      let data = try? NSKeyedArchiver.archivedData(
+        withRootObject: state, requiringSecureCoding: false)
+    else { return nil }
+    return FlutterStandardTypedData(bytes: data)
+  }
+
+  func restoreState(_ data: FlutterStandardTypedData) -> Bool {
+    guard let unarchiver = try? NSKeyedUnarchiver(forReadingFrom: data.data) else { return false }
+    unarchiver.requiresSecureCoding = false
+    guard let state = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) else {
+      return false
+    }
+    webView.interactionState = state
+    return true
+  }
+
+  /// Opens the system print dialog; needs the WebView to be in a window.
+  func printPage(jobName: String?) throws {
+    guard webView.window != nil else {
+      throw PigeonError(code: "not-attached", message: "The WebView is not shown", details: nil)
+    }
+    let info = UIPrintInfo.printInfo()
+    info.outputType = .general
+    info.jobName = jobName ?? webView.title ?? "Document"
+    let controller = UIPrintInteractionController.shared
+    controller.printInfo = info
+    controller.printFormatter = webView.viewPrintFormatter()
+    controller.present(animated: true, completionHandler: nil)
+  }
+
+  /// Scroll offsets are logical pixels (points), like Flutter and Android.
+  func scrollTo(x: Double, y: Double) {
+    webView.scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+  }
+
+  func scrollBy(dx: Double, dy: Double) {
+    let offset = webView.scrollView.contentOffset
+    scrollTo(x: Double(offset.x) + dx, y: Double(offset.y) + dy)
+  }
+
+  func scrollPosition() -> ScrollPositionMessage {
+    let offset = webView.scrollView.contentOffset
+    return ScrollPositionMessage(x: Double(offset.x), y: Double(offset.y))
+  }
+
+  /// PNG of the visible area, or nil while the view has no size.
+  @MainActor
+  func takeScreenshot() async throws -> FlutterStandardTypedData? {
+    guard webView.bounds.width > 0, webView.bounds.height > 0 else { return nil }
+    let image = try await webView.takeSnapshot(configuration: nil)
+    return image.pngData().map { FlutterStandardTypedData(bytes: $0) }
+  }
+
+  /// Like Android, repeating the same query moves to the next match. WebKit
+  /// searches from the current selection, so no query state is needed here.
+  @MainActor
+  func find(_ query: String, forward: Bool) async throws -> FindResultMessage {
+    guard !query.isEmpty else {
+      clearMatches()
+      return FindResultMessage(found: false)
+    }
+    let configuration = WKFindConfiguration()
+    configuration.backwards = !forward
+    configuration.wraps = true
+    let result = try await webView.find(query, configuration: configuration)
+    return FindResultMessage(found: result.matchFound)
+  }
+
+  func clearMatches() {
+    webView.evaluateJavaScript("window.getSelection().removeAllRanges()", completionHandler: nil)
+  }
+
   /// Loads a request started by the app. Like Android, it does not consult
   /// the navigation delegate.
   func load(_ request: URLRequest) {
+    var request = request
+    request.cachePolicy = cachePolicy
     pendingAppInitiatedURL = request.url?.absoluteString
     webView.load(request)
   }
@@ -114,13 +256,21 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   func cookies(for url: URL) async -> [CookieMessage] {
     let all = await webView.configuration.websiteDataStore.httpCookieStore.allCookies()
     let host = url.host?.lowercased() ?? ""
-    let path = url.path.isEmpty ? "/" : url.path
+    // URL.path can strip a trailing slash; cookie matching needs the request path verbatim.
+    let requestPath =
+      URLComponents(url: url, resolvingAgainstBaseURL: false)?.percentEncodedPath ?? ""
+    let path = requestPath.isEmpty ? "/" : requestPath
     let isSecureScheme = url.scheme?.lowercased() == "https"
     return all.filter { cookie in
       let domain = cookie.domain.lowercased()
       let bare = domain.hasPrefix(".") ? String(domain.dropFirst()) : domain
       let hostMatches = host == bare || (domain.hasPrefix(".") && host.hasSuffix("." + bare))
-      return hostMatches && path.hasPrefix(cookie.path) && (!cookie.isSecure || isSecureScheme)
+      let cookiePath = cookie.path
+      let pathMatches =
+        path == cookiePath
+        || (path.hasPrefix(cookiePath)
+          && (cookiePath.hasSuffix("/") || path.hasPrefix(cookiePath + "/")))
+      return hostMatches && pathMatches && (!cookie.isSecure || isSecureScheme)
     }.map { cookie in
       CookieMessage(
         name: cookie.name,
@@ -164,6 +314,85 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   func removeAllUserScripts() {
     webView.configuration.userContentController.removeAllUserScripts()
     javaScriptChannelNames.forEach(addChannelShim)
+    if hasJavaScriptHandlers { addHandlerShim() }
+    if hasConsoleMessageDelegate { addConsoleShim() }
+  }
+
+  private static let handlerBridgeName = "advancedWebView"
+
+  /// `window.<objectName>.callHandler(name, ...args)` returns a promise. The reply
+  /// handler of `WKScriptMessageHandlerWithReply` settles it, so no call ids are needed.
+  private func installHandlerBridge() {
+    webView.configuration.userContentController.addScriptMessageHandler(
+      WeakReplyScriptMessageHandler(self), contentWorld: .page, name: Self.handlerBridgeName)
+    addHandlerShim()
+  }
+
+  private func addHandlerShim() {
+    let source = """
+      (function () {
+        if (window.\(handlerObjectName)) return;
+        var bridge = window.webkit.messageHandlers['\(Self.handlerBridgeName)'];
+        window.\(handlerObjectName) = Object.freeze({
+          callHandler: function (name) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            return Promise.resolve().then(function () {
+              return bridge.postMessage({ name: String(name), args: JSON.stringify(args) });
+            }).then(function (value) {
+              return JSON.parse(value);
+            }, function (error) {
+              throw new Error(error && error.message ? error.message : String(error));
+            });
+          }
+        });
+      })();
+      """
+    webView.configuration.userContentController.addUserScript(
+      WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+  }
+
+  private static let consoleBridgeName = "advancedWebViewConsole"
+
+  /// WebKit has no console callback, so wrap the `console` methods in every frame. The wrapper
+  /// still calls the original method, which keeps the Web Inspector output. Source URL and line
+  /// number are not available.
+  private func installConsoleBridge() {
+    webView.configuration.userContentController.add(
+      WeakScriptMessageHandler(self), name: Self.consoleBridgeName)
+    addConsoleShim()
+  }
+
+  private func addConsoleShim() {
+    let source = """
+      (function () {
+        if (window.__advancedWebViewConsole) return;
+        window.__advancedWebViewConsole = true;
+        var bridge = window.webkit.messageHandlers['\(Self.consoleBridgeName)'];
+        function format(value) {
+          if (typeof value === 'string') return value;
+          if (value instanceof Error) return value.stack || String(value);
+          if (value !== null && typeof value === 'object') {
+            try { return JSON.stringify(value); } catch (e) { return String(value); }
+          }
+          return String(value);
+        }
+        [['debug', 'debug'], ['log', 'log'], ['info', 'info'], ['warn', 'warning'],
+         ['error', 'error']].forEach(function (pair) {
+          var original = console[pair[0]];
+          console[pair[0]] = function () {
+            try {
+              bridge.postMessage({
+                level: pair[1],
+                message: Array.prototype.map.call(arguments, format).join(' ')
+              });
+            } catch (e) {}
+            if (original) return original.apply(console, arguments);
+          };
+        });
+      })();
+      """
+    webView.configuration.userContentController.addUserScript(
+      WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false))
   }
 
   private func addJavaScriptChannel(_ name: String) {
@@ -196,6 +425,14 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     ]
   }
 
+  @objc private func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
+    guard recognizer.state == .began else { return }
+    let point = recognizer.location(in: webView)
+    send { api, id in
+      try await api.onLongPress(webViewId: id, x: Double(point.x), y: Double(point.y))
+    }
+  }
+
   /// Fire-and-forget call into Dart. Failures are logged, never thrown.
   private func send(_ block: @escaping (AdvancedWebViewFlutterApi, Int64) async throws -> Void) {
     let api = flutterApi
@@ -211,9 +448,12 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   }
 
   private func reportError(_ error: Error, url: URL?) {
+    webView.scrollView.refreshControl?.endRefreshing()
     let nsError = error as NSError
     // Navigations cancelled by us (e.g. a delegate decision) are not errors.
     if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled { return }
+    // "Frame load interrupted": the response was turned into a download event.
+    if nsError.domain == "WebKitErrorDomain" && nsError.code == 102 { return }
     let message = WebResourceErrorMessage(
       errorCode: Int64(nsError.code),
       message: nsError.localizedDescription,
@@ -231,6 +471,7 @@ extension AdvancedWebView: WKNavigationDelegate {
   }
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    webView.scrollView.refreshControl?.endRefreshing()
     let url = webView.url?.absoluteString ?? ""
     send { api, id in try await api.onPageFinished(webViewId: id, url: url) }
   }
@@ -248,10 +489,117 @@ extension AdvancedWebView: WKNavigationDelegate {
     reportError(error, url: webView.url)
   }
 
+  /// Certificate problems and HTTP authentication. Without a Dart delegate a bad certificate
+  /// is refused (the default) and authentication gets the system default handling.
+  func webView(
+    _ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+  ) {
+    let space = challenge.protectionSpace
+    switch space.authenticationMethod {
+    case NSURLAuthenticationMethodServerTrust:
+      guard hasSslErrorDelegate, let trust = space.serverTrust else {
+        completionHandler(.performDefaultHandling, nil)
+        return
+      }
+      var trustError: CFError?
+      if SecTrustEvaluateWithError(trust, &trustError) {
+        completionHandler(.performDefaultHandling, nil)
+        return
+      }
+      let reason =
+        (trustError as Error?)?.localizedDescription ?? "The certificate is not trusted"
+      let host = space.host
+      let url = webView.url?.absoluteString ?? "https://\(host)/"
+      let error = SslErrorMessage(url: url, host: host, message: reason)
+      let api = flutterApi
+      let id = self.id
+      Task { @MainActor in
+        let decision: SslErrorDecisionMessage
+        do {
+          decision = try await api.onSslError(webViewId: id, error: error)
+        } catch {
+          NSLog("AdvancedWebView: SSL error delegate failed, refusing the load: \(error)")
+          decision = .cancel
+        }
+        if decision == .proceed {
+          completionHandler(.useCredential, URLCredential(trust: trust))
+        } else {
+          completionHandler(.cancelAuthenticationChallenge, nil)
+        }
+      }
+    case NSURLAuthenticationMethodHTTPBasic, NSURLAuthenticationMethodHTTPDigest,
+      NSURLAuthenticationMethodNTLM:
+      guard hasHttpAuthDelegate, !space.isProxy() else {
+        completionHandler(.performDefaultHandling, nil)
+        return
+      }
+      let request = HttpAuthRequestMessage(host: space.host, realm: space.realm)
+      let api = flutterApi
+      let id = self.id
+      Task { @MainActor in
+        let credentials: HttpAuthCredentialsMessage?
+        do {
+          credentials = try await api.onHttpAuthRequest(webViewId: id, request: request)
+        } catch {
+          NSLog("AdvancedWebView: HTTP auth delegate failed, cancelling: \(error)")
+          credentials = nil
+        }
+        if let credentials = credentials {
+          completionHandler(
+            .useCredential,
+            URLCredential(
+              user: credentials.username, password: credentials.password, persistence: .forSession))
+        } else {
+          completionHandler(.cancelAuthenticationChallenge, nil)
+        }
+      }
+    default:
+      completionHandler(.performDefaultHandling, nil)
+    }
+  }
+
+  /// Attachments and types WebKit cannot show are reported to Dart instead of being loaded.
+  func webView(
+    _ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
+    decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
+  ) {
+    guard hasDownloadDelegate, let url = navigationResponse.response.url else {
+      decisionHandler(.allow)
+      return
+    }
+    let response = navigationResponse.response
+    let disposition = (response as? HTTPURLResponse)?
+      .value(forHTTPHeaderField: "Content-Disposition")?.lowercased()
+    let isAttachment = disposition?.hasPrefix("attachment") ?? false
+    guard isAttachment || !navigationResponse.canShowMIMEType else {
+      decisionHandler(.allow)
+      return
+    }
+    let length = response.expectedContentLength
+    let request = DownloadRequestMessage(
+      url: url.absoluteString,
+      suggestedFilename: response.suggestedFilename,
+      mimeType: response.mimeType,
+      contentLength: length > 0 ? length : nil)
+    send { api, id in try await api.onDownloadStart(webViewId: id, request: request) }
+    decisionHandler(.cancel)
+  }
+
   func webView(
     _ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
   ) {
+    // `<a download>` links: WebKit marks the action instead of loading a response.
+    if hasDownloadDelegate, navigationAction.shouldPerformDownload,
+      let url = navigationAction.request.url
+    {
+      let request = DownloadRequestMessage(
+        url: url.absoluteString, suggestedFilename: nil, mimeType: nil, contentLength: nil)
+      send { api, id in try await api.onDownloadStart(webViewId: id, request: request) }
+      decisionHandler(.cancel)
+      return
+    }
     // Same rules as Android: only main-frame navigations started by the page
     // reach Dart. App-initiated loads, reloads and back/forward never do.
     let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true
@@ -305,16 +653,102 @@ extension AdvancedWebView: WKUIDelegate {
     }
     return nil
   }
+
+  /// Camera and microphone. Without a Dart delegate the request is denied, like Android.
+  /// WebKit has no delegate for geolocation; it asks the user itself.
+  func webView(
+    _ webView: WKWebView, requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+    initiatedByFrame frame: WKFrameInfo, type: WKMediaCaptureType,
+    decisionHandler: @escaping (WKPermissionDecision) -> Void
+  ) {
+    guard hasPermissionDelegate else {
+      decisionHandler(.deny)
+      return
+    }
+    let resources: [PermissionResourceMessage]
+    switch type {
+    case .camera: resources = [.camera]
+    case .microphone: resources = [.microphone]
+    case .cameraAndMicrophone: resources = [.camera, .microphone]
+    @unknown default:
+      decisionHandler(.deny)
+      return
+    }
+    let port = origin.port == 0 ? "" : ":\(origin.port)"
+    let request = PermissionRequestMessage(
+      origin: "\(origin.protocol)://\(origin.host)\(port)", resources: resources)
+    let api = flutterApi
+    let id = self.id
+    Task { @MainActor in
+      let decision: PermissionDecisionMessage
+      do {
+        decision = try await api.onPermissionRequest(webViewId: id, request: request)
+      } catch {
+        NSLog("AdvancedWebView: permission delegate failed, denying: \(error)")
+        decision = .deny
+      }
+      decisionHandler(decision == .grant ? .grant : .deny)
+    }
+  }
 }
 
 extension AdvancedWebView: WKScriptMessageHandler {
   func userContentController(
     _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
   ) {
+    if message.name == Self.consoleBridgeName {
+      handleConsoleMessage(message.body)
+      return
+    }
     let channelName = message.name
     let body = (message.body as? String) ?? String(describing: message.body)
     send { api, id in
       try await api.onJavaScriptMessage(webViewId: id, channelName: channelName, message: body)
+    }
+  }
+}
+
+extension AdvancedWebView {
+  fileprivate func handleConsoleMessage(_ body: Any) {
+    guard let body = body as? [String: Any],
+      let text = body["message"] as? String
+    else { return }
+    let level: ConsoleMessageLevelMessage =
+      switch body["level"] as? String {
+      case "debug": .debug
+      case "info": .info
+      case "warning": .warning
+      case "error": .error
+      default: .log
+      }
+    let message = ConsoleMessageMessage(
+      level: level, message: text, sourceUrl: nil, lineNumber: nil)
+    send { api, id in try await api.onConsoleMessage(webViewId: id, message: message) }
+  }
+}
+
+extension AdvancedWebView: WKScriptMessageHandlerWithReply {
+  func userContentController(
+    _ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
+    replyHandler: @escaping @MainActor (Any?, String?) -> Void
+  ) {
+    guard let body = message.body as? [String: Any],
+      let name = body["name"] as? String,
+      let argsJson = body["args"] as? String
+    else {
+      replyHandler(nil, "Invalid JavaScript handler call")
+      return
+    }
+    let api = flutterApi
+    let id = self.id
+    Task { @MainActor in
+      do {
+        let result = try await api.onJavaScriptHandlerCall(
+          webViewId: id, handlerName: name, argsJson: argsJson)
+        replyHandler(result, nil)
+      } catch {
+        replyHandler(nil, (error as? PigeonError)?.message ?? String(describing: error))
+      }
     }
   }
 }
@@ -331,5 +765,35 @@ private final class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
     _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
   ) {
     target?.userContentController(userContentController, didReceive: message)
+  }
+}
+
+private final class WeakReplyScriptMessageHandler: NSObject, WKScriptMessageHandlerWithReply {
+  private weak var target: WKScriptMessageHandlerWithReply?
+
+  init(_ target: WKScriptMessageHandlerWithReply) {
+    self.target = target
+  }
+
+  func userContentController(
+    _ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
+    replyHandler: @escaping @MainActor (Any?, String?) -> Void
+  ) {
+    guard let target = target else {
+      replyHandler(nil, "The WebView was destroyed")
+      return
+    }
+    target.userContentController(
+      userContentController, didReceive: message, replyHandler: replyHandler)
+  }
+}
+
+extension AdvancedWebView: UIGestureRecognizerDelegate {
+  /// Let WKWebView's own long-press handling (link preview, text selection) keep working.
+  func gestureRecognizer(
+    _ gestureRecognizer: UIGestureRecognizer,
+    shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer
+  ) -> Bool {
+    return true
   }
 }

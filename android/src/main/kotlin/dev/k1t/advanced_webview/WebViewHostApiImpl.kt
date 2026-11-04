@@ -10,9 +10,10 @@ class WebViewHostApiImpl(
     private val flutterApi: AdvancedWebViewFlutterApi,
     private val scope: CoroutineScope,
     private val fileChooser: FileChooser = FileChooser(),
+    private val permissionRequester: PermissionRequester = PermissionRequester(),
 ) : AdvancedWebViewHostApi {
     override fun create(params: CreationParamsMessage) {
-        registry.add(AdvancedWebView(context, params, flutterApi, scope, fileChooser))
+        registry.add(AdvancedWebView(context, params, flutterApi, scope, fileChooser, permissionRequester))
     }
 
     override fun dispose(webViewId: Long) {
@@ -47,6 +48,25 @@ class WebViewHostApiImpl(
 
     override suspend fun evaluateJavaScript(webViewId: Long, source: String): String? =
         registry.get(webViewId).evaluateJavaScript(source)
+
+    override suspend fun takeScreenshot(webViewId: Long): ByteArray? = registry.get(webViewId).takeScreenshot()
+
+    override suspend fun findText(webViewId: Long, query: String, forward: Boolean): FindResultMessage =
+        registry.get(webViewId).find(query, forward)
+
+    override fun clearMatches(webViewId: Long) = registry.get(webViewId).clearMatches()
+
+    override fun scrollTo(webViewId: Long, x: Double, y: Double) = registry.get(webViewId).scrollTo(x, y)
+
+    override fun scrollBy(webViewId: Long, dx: Double, dy: Double) = registry.get(webViewId).scrollBy(dx, dy)
+
+    override fun getScrollPosition(webViewId: Long): ScrollPositionMessage = registry.get(webViewId).scrollPosition()
+
+    override fun saveState(webViewId: Long): ByteArray? = registry.get(webViewId).saveState()
+
+    override fun restoreState(webViewId: Long, state: ByteArray): Boolean = registry.get(webViewId).restoreState(state)
+
+    override fun printPage(webViewId: Long, jobName: String?) = registry.get(webViewId).printPage(jobName)
 
     override fun updateSettings(webViewId: Long, settings: WebViewSettingsMessage) =
         registry.get(webViewId).applySettings(settings)

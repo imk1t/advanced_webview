@@ -6,6 +6,107 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.5.0 - 2026-11-02
+
+- Add `AdvancedWebViewController.onConsoleMessage`, which reports the page's `console.debug`, `log`,
+  `info`, `warn` and `error` calls as `WebViewConsoleMessage` (level, text, and on Android the source
+  URL and line number). Android uses `WebChromeClient.onConsoleMessage`; iOS wraps the `console`
+  methods with a user script injected into every frame, so the source location is `null` there.
+
+- **Breaking:** platform-specific settings moved out of `WebViewSettings` into two new classes,
+  passed as `WebViewSettings.android` and `WebViewSettings.ios`. The other platform ignores them.
+  Defaults are unchanged.
+  - `AndroidWebViewSettings`: `supportZoom`, `passkeysEnabled`, `domStorageEnabled`,
+    `allowFileAccess`, `allowContentAccess`, `mixedContentMode`.
+  - `IOSWebViewSettings`: `allowsInlineMediaPlayback`, `allowsBackForwardNavigationGestures`,
+    `incognito`.
+
+  Before: `WebViewSettings(passkeysEnabled: true, incognito: true)`. After:
+  `WebViewSettings(android: AndroidWebViewSettings(passkeysEnabled: true), ios: IOSWebViewSettings(incognito: true))`.
+
+## 0.4.0 - 2026-11-02
+
+- Add the Android settings `WebViewSettings.domStorageEnabled` (default `true`, as before),
+  `allowFileAccess`, `allowContentAccess` and `mixedContentMode` (`WebViewMixedContentMode`). iOS
+  ignores them. **Behaviour change:** `allowFileAccess` and `allowContentAccess` now default to
+  `false` (previously the WebView defaults applied: `content://` access was on, and `file://` access
+  depended on the app's target SDK), and mixed content is explicitly blocked. Set them to `true`
+  to restore the old behaviour.
+
+- Add `AdvancedWebViewController.onLongPress` (touch position in logical pixels) and `hitTest`, which
+  reports the link and/or image under a point (`WebViewHitTestResult`). Together they let apps build a
+  custom context menu. `hitTest` uses `document.elementFromPoint`, so it is main-frame only and
+  identical on both platforms; the platform's own long-press behaviour is not suppressed.
+
+- Add `AdvancedWebViewController.printPage`, which opens the system print dialog for the current page
+  (`PrintManager` on Android, `UIPrintInteractionController` on iOS).
+
+- Add `AdvancedWebViewController.saveState` and `restoreState`, which snapshot and restore the
+  back/forward history and scroll position as opaque bytes (`WebView.saveState` on Android,
+  `WKWebView.interactionState` on iOS). Snapshots only work on the platform that created them.
+
+- Add scrolling: `AdvancedWebViewController.scrollTo`, `scrollBy`, `scrollPosition` and the
+  `onScrollChanged` callback. Offsets are logical pixels on both platforms (`WebView.scrollTo` /
+  `setOnScrollChangeListener` on Android, `UIScrollView.contentOffset` on iOS).
+
+## 0.3.0 - 2026-11-02
+
+- Add `WebViewSettings.pullToRefreshEnabled`: pulling down from the top reloads the page with the
+  platform's refresh indicator (`SwipeRefreshLayout` on Android, `UIRefreshControl` on iOS).
+  On Android the platform view is now a `SwipeRefreshLayout` that contains the WebView.
+
+- Add find-in-page: `AdvancedWebViewController.findText` (returns a `FindResult`) and `clearMatches`.
+  Android uses `WebView.findAllAsync` / `findNext`; iOS uses `WKWebView.find` and reports only
+  whether a match was found (no count).
+
+- Add `AdvancedWebViewController.takeScreenshot`, which returns a PNG of the visible area
+  (`WebView.draw` on Android, `WKWebView.takeSnapshot` on iOS).
+
+- Add `WebViewSettings.incognito` (iOS only, creation only): the WebView uses
+  `WKWebsiteDataStore.nonPersistent()`. Ignored on Android, whose WebView shares data across the app.
+
+- Add `WebViewSettings.javaScriptCanOpenWindowsAutomatically` (default `true`, as before),
+  `scrollbarsVisible` and `overScrollEnabled`.
+
+- Add `WebViewSettings.cacheMode` and `WebViewCacheMode`. Android sets `WebSettings.setCacheMode` for
+  every load; iOS applies the cache policy to requests started with `loadUrl`.
+
+- Add `WebViewSettings.textZoom` (percent; Android scales text only, iOS scales the page with
+  `WKWebView.pageZoom`) and `WebViewSettings.minimumFontSize`.
+
+- Add `WebViewSettings.allowsBackForwardNavigationGestures` (iOS only, swipe to go back/forward) and
+  `WebViewSettings.inspectable` (Safari Web Inspector on iOS; `WebView.setWebContentsDebuggingEnabled`
+  on Android, which is process-wide).
+
+## 0.2.0 - 2026-11-01
+
+- Add `AdvancedWebViewController.onSslError` and `onHttpAuthRequest` (`SslError`, `SslErrorDecision`,
+  `HttpAuthRequest`, `HttpAuthCredentials`). Certificate errors are still refused unless the callback
+  returns `proceed`; HTTP authentication is cancelled unless the callback returns credentials.
+
+- Add `AdvancedWebViewController.onDownloadStart` and `DownloadRequest`: the WebView reports
+  downloads (attachments, files it cannot show, `download` links) instead of saving them, so the
+  app decides how to fetch the file. Android uses `WebView.setDownloadListener`; iOS cancels the
+  `WKNavigationResponse` / `WKNavigationAction` and reports it.
+
+- Add `AdvancedWebViewController.onPermissionRequest` to decide whether a page may use the camera,
+  microphone or location (`PermissionRequest`, `PermissionResource`, `PermissionDecision`).
+  Without a callback every request is denied. On Android the plugin also asks for the runtime
+  permission after you grant; geolocation is Android only because WebKit has no delegate for it.
+
+- Add JavaScript handlers with return values: the `javaScriptHandlers` constructor parameter and
+  `window.advanced_webview.callHandler(name, ...args)`, which returns a promise settled with the
+  Dart handler's result (or rejected when it throws). The global is `window.advanced_webview` by
+  default; `javaScriptHandlerObjectName` renames it. Android needs `WEB_MESSAGE_LISTENER`.
+
+## 0.1.0 - 2026-10-31
+
+First release on pub.dev.
+
+- Raise the minimum Flutter SDK to 3.47.8 (Dart 3.13.7), the version the plugin is built and tested with.
+- Android: disabling `passkeysEnabled` now resets WebAuthn support after it was enabled.
+- iOS: `getCookies` matches cookie paths at slash boundaries instead of arbitrary prefixes.
+- Clarify navigation and JavaScript channel trust boundaries in English and Japanese, and document app setup requirements.
 - Add `WebViewSettings.passkeysEnabled` to enable WebAuthn / passkeys on Android
   (`WebSettingsCompat.setWebAuthenticationSupport`). iOS needs no setting; the app must have the
   Associated Domains `webcredentials` entitlement.

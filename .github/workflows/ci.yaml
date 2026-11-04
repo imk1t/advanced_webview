@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+
+# CI is kept minimal: Dart/lint jobs run on every PR, while the Android and iOS build/test
+# jobs (needs: dart, `if: ... full-ci`) run only on a PR labelled `full-ci` or when started
+# manually (Actions > CI > Run workflow). Run `mise run check` / `mise run check:ios` locally.
 
 # Cancel superseded runs of a PR so they don't hold the few macOS runners.
 concurrency:
@@ -11,11 +17,20 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  release-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Test pub.dev publication detection
+        run: python3 -m unittest discover -s .github/tests -p 'test_*.py'
+
   dart:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       - run: flutter pub get
       # Pigeon output (*.g.dart) is committed as generated and not reformatted.
       - name: Check formatting
@@ -98,6 +113,7 @@ jobs:
   android:
     runs-on: ubuntu-latest
     needs: dart
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'full-ci')
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7.0.1
@@ -106,6 +122,8 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       - name: Build example APK
         working-directory: example
         run: flutter build apk --debug
@@ -116,6 +134,7 @@ jobs:
   android-integration:
     runs-on: ubuntu-latest
     needs: dart
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'full-ci')
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7.0.1
@@ -124,6 +143,8 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -142,10 +163,13 @@ jobs:
   ios:
     runs-on: macos-latest
     needs: dart
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'full-ci')
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       # Swift Package Manager is Flutter's default; enable it explicitly so this
       # job keeps covering it. The `ios-cocoapods` job covers the podspec.
       - run: flutter config --enable-swift-package-manager
@@ -203,10 +227,13 @@ jobs:
   ios-cocoapods:
     runs-on: macos-latest
     needs: dart
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'full-ci')
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: jdx/mise-action@v5.2.5
+        with:
+          install_args: flutter
       - run: flutter config --no-enable-swift-package-manager
       # The example references the plugin as a local Swift package
       # (../../ios/advanced_webview) so Xcode can edit its sources. That

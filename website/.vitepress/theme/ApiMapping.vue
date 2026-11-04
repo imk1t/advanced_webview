@@ -42,6 +42,23 @@ const labels = {
 
 const platforms: Platform[] = ['android', 'ios']
 
+// Badge classes carry the `tw:` prefix. Table, cell and code styling lives in layout.css
+// (`.api-map`), because VitePress' own unlayered styles beat Tailwind's layered utilities.
+const badgeBase =
+  'tw:inline-block tw:rounded-[10px] tw:px-2 tw:text-xs tw:leading-5 tw:font-semibold'
+const badgeTone: Record<Status, string> = {
+  supported: 'tw:bg-(--vp-c-success-soft) tw:text-(--vp-c-success-1)',
+  partial: 'tw:bg-(--vp-c-warning-soft) tw:text-(--vp-c-warning-1)',
+  creationOnly: 'tw:bg-(--vp-c-warning-soft) tw:text-(--vp-c-warning-1)',
+  unsupported: 'tw:bg-(--vp-c-danger-soft) tw:text-(--vp-c-danger-1)',
+}
+
+// Break opportunities for long identifiers: after dots, parens, commas and colons, so the
+// names stay intact and only wrap at those points (or at a hard limit via overflow-wrap).
+function parts(text: string) {
+  return text.split(/(?<=[.(,:])/)
+}
+
 function refOf(platform: Platform, api: string) {
   const ref = parseRef(api)
   if (!ref) return { api, className: api, rest: '', href: undefined }
@@ -65,42 +82,57 @@ const rows = computed(() =>
 </script>
 
 <template>
-  <div class="tw:my-4 tw:overflow-x-auto">
-    <table class="api-mapping">
+  <div class="api-map tw:my-4 tw:overflow-x-auto">
+    <table>
       <thead>
         <tr>
-          <th>{{ labels[locale].dart }}</th>
-          <th>{{ labels[locale].android }}</th>
-          <th>{{ labels[locale].ios }}</th>
+          <th class="tw:w-[30%]">{{ labels[locale].dart }}</th>
+          <th class="tw:w-[35%]">{{ labels[locale].android }}</th>
+          <th class="tw:w-[35%]">{{ labels[locale].ios }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="row in rows" :id="anchorFor(row.entry.dart)" :key="row.entry.dart">
           <td>
-            <code>{{ row.entry.dart }}</code>
-            <p class="api-mapping__summary">{{ row.entry.summary[locale] }}</p>
+            <code
+              ><template v-for="(part, i) in parts(row.entry.dart)" :key="i"
+                ><wbr v-if="i > 0" />{{ part }}</template
+              ></code
+            >
+            <p>{{ row.entry.summary[locale] }}</p>
           </td>
-          <td v-if="row.entry.dartOnly" colspan="2" class="api-mapping__dart-only">
+          <td
+            v-if="row.entry.dartOnly"
+            colspan="2"
+            class="api-map-platform tw:text-[13px]! tw:text-(--vp-c-text-3)"
+          >
             {{ labels[locale].dartOnly }}
           </td>
           <template v-else>
-            <td v-for="{ platform, side, refs } in row.sides" :key="platform">
+            <td
+              v-for="{ platform, side, refs } in row.sides"
+              :key="platform"
+              :data-label="labels[locale][platform]"
+              class="api-map-platform"
+            >
               <template v-if="side">
-                <span :class="['api-mapping__badge', `api-mapping__badge--${side.status}`]">
+                <span :class="[badgeBase, badgeTone[side.status]]">
                   {{ labels[locale].status[side.status] }}
                 </span>
-                <ul v-if="refs.length" class="api-mapping__apis">
+                <ul v-if="refs.length">
                   <li v-for="ref in refs" :key="ref.api">
                     <code
                       ><a v-if="ref.href" :href="ref.href" target="_blank" rel="noreferrer">{{
                         ref.className
                       }}</a
                       ><template v-else>{{ ref.className }}</template
-                      >{{ ref.rest }}</code
+                      ><template v-for="(part, i) in parts(ref.rest)" :key="i"
+                        ><wbr v-if="i > 0" />{{ part }}</template
+                      ></code
                     >
                   </li>
                 </ul>
-                <p v-if="side.note" class="api-mapping__note">{{ side.note[locale] }}</p>
+                <p v-if="side.note">{{ side.note[locale] }}</p>
               </template>
             </td>
           </template>

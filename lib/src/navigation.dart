@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show Offset;
 
 import 'package:flutter/foundation.dart';
 
@@ -36,6 +37,8 @@ class WebResourceError {
 typedef PageEventCallback = void Function(String url);
 typedef ProgressCallback = void Function(int progress);
 typedef TitleChangedCallback = void Function(String? title);
+typedef LongPressCallback = void Function(Offset offset);
+typedef ScrollChangedCallback = void Function(Offset offset);
 typedef WebResourceErrorCallback = void Function(WebResourceError error);
 typedef NavigationRequestCallback = FutureOr<NavigationDecision> Function(
   NavigationRequest request,
@@ -44,3 +47,11 @@ typedef NavigationRequestCallback = FutureOr<NavigationDecision> Function(
 /// Called with the URL a page asked to open in a new window.
 typedef NewWindowCallback = void Function(String url);
 typedef JavaScriptMessageCallback = void Function(String message);
+
+/// Handles a call from `window.advanced_webview.callHandler(name, ...args)`.
+///
+/// [arguments] holds the JSON-decoded arguments the page passed. The returned
+/// value must be JSON-encodable (`null`, `bool`, `num`, `String`, `List` or
+/// `Map`); it resolves the page's promise. Throwing rejects the promise with
+/// an `Error` carrying the exception text.
+typedef JavaScriptHandler = FutureOr<Object?> Function(List<Object?> arguments);

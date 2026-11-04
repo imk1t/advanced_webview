@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Opt-in: `git config core.hooksPath .githooks`. Set SKIP_IOS=1 to skip the simulator run.
+set -e
+mise run check
+if [ "$(uname)" = Darwin ] && [ -z "${SKIP_IOS:-}" ] && ! git diff --quiet @{push}.. -- ios example/ios pigeons lib 2>/dev/null; then
+  mise run check:ios
+fi

@@ -1,16 +1,32 @@
 package dev.k1t.advanced_webview
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.MutableContextWrapper
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.net.Uri
+import android.net.http.SslError
+import android.os.Bundle
 import android.os.Message
+import android.os.Parcel
+import android.print.PrintAttributes
+import android.print.PrintManager
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.ConsoleMessage
 import android.webkit.CookieManager
+import android.webkit.GeolocationPermissions
+import android.webkit.HttpAuthHandler
 import android.webkit.JavascriptInterface
+import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
+import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -18,20 +34,27 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import io.flutter.Log
 import io.flutter.plugin.platform.PlatformView
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import kotlin.coroutines.resume
+import kotlin.math.roundToInt
 
 /** One native WebView plus the clients that forward its callbacks to Dart. */
 class AdvancedWebView(
@@ -40,6 +63,7 @@ class AdvancedWebView(
     private val flutterApi: AdvancedWebViewFlutterApi,
     private val scope: CoroutineScope,
     private val fileChooser: FileChooser,
+    private val permissionRequester: PermissionRequester,
 ) : PlatformView {
     val id: Long = params.webViewId
 
@@ -48,28 +72,83 @@ class AdvancedWebView(
     private val contextWrapper = MutableContextWrapper(context)
     val webView: WebView = WebView(contextWrapper)
 
+    // The view Flutter shows: the WebView inside a pull-to-refresh container.
+    // Pull-to-refresh is off by default, so the container only passes touches through.
+    val container: SwipeRefreshLayout = SwipeRefreshLayout(contextWrapper).apply {
+        addView(webView)
+        isEnabled = false
+        setOnRefreshListener { webView.reload() }
+    }
+
     private val hasNavigationDelegate = params.hasNavigationDelegate
     private val hasNewWindowDelegate = params.hasNewWindowDelegate
+    private val hasPermissionDelegate = params.hasPermissionDelegate
+    private val hasSslErrorDelegate = params.hasSslErrorDelegate
+    private val hasHttpAuthDelegate = params.hasHttpAuthDelegate
+    private val hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
+    private var findQuery: String? = null
+    private var pendingFind: CancellableContinuation<FindResultMessage>? = null
 
     init {
-        webView.settings.domStorageEnabled = true
         // Without a delegate, window.open and target=_blank load in this WebView.
         webView.settings.setSupportMultipleWindows(hasNewWindowDelegate)
-        webView.settings.javaScriptCanOpenWindowsAutomatically = true
         applySettings(params.settings)
         webView.webViewClient = Client()
         webView.webChromeClient = ChromeClient()
         params.javaScriptChannelNames.forEach(::addJavaScriptChannel)
         params.userScripts.forEach(::addUserScript)
+        if (params.hasDownloadDelegate) webView.setDownloadListener(::onDownload)
+        if (params.hasLongPressDelegate) installLongPress()
+        if (params.hasScrollDelegate) {
+            webView.setOnScrollChangeListener { _, x, y, _, _ ->
+                send { flutterApi.onScrollChanged(id, x / density, y / density) }
+            }
+        }
+        if (params.javaScriptHandlerNames.isNotEmpty()) installHandlerBridge(params.javaScriptHandlerObjectName)
+    }
+
+    // The long-click callback has no position, so remember where the last touch went down.
+    @SuppressLint("ClickableViewAccessibility")
+    private fun installLongPress() {
+        var downX = 0f
+        var downY = 0f
+        webView.setOnTouchListener { _, event ->
+            if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                downX = event.x
+                downY = event.y
+            }
+            false
+        }
+        // Returning false keeps the platform behaviour (text selection, context menu).
+        webView.setOnLongClickListener {
+            send { flutterApi.onLongPress(id, downX / density, downY / density) }
+            false
+        }
+    }
+
+    private fun onDownload(
+        url: String,
+        @Suppress("UNUSED_PARAMETER") userAgent: String?,
+        contentDisposition: String?,
+        mimeType: String?,
+        contentLength: Long,
+    ) {
+        val request = DownloadRequestMessage(
+            url = url,
+            suggestedFilename = URLUtil.guessFileName(url, contentDisposition, mimeType),
+            mimeType = mimeType?.takeIf { it.isNotEmpty() },
+            contentLength = contentLength.takeIf { it > 0 },
+        )
+        send { flutterApi.onDownloadStart(id, request) }
     }
 
     fun attachToContext(context: Context) {
         contextWrapper.baseContext = context
         // A re-created platform view reuses this WebView; detach it from the
         // previous container so it can be added to the new one.
-        (webView.parent as? ViewGroup)?.removeView(webView)
+        (container.parent as? ViewGroup)?.removeView(container)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -80,15 +159,153 @@ class AdvancedWebView(
             setSupportZoom(settings.supportZoom)
             builtInZoomControls = settings.supportZoom
             displayZoomControls = false
+            javaScriptCanOpenWindowsAutomatically = settings.javaScriptCanOpenWindowsAutomatically
+            textZoom = settings.textZoom.toInt()
+            cacheMode = when (settings.cacheMode) {
+                CacheModeMessage.NORMAL -> WebSettings.LOAD_DEFAULT
+                CacheModeMessage.PREFER_CACHE -> WebSettings.LOAD_CACHE_ELSE_NETWORK
+                CacheModeMessage.CACHE_ONLY -> WebSettings.LOAD_CACHE_ONLY
+                CacheModeMessage.NO_CACHE -> WebSettings.LOAD_NO_CACHE
+            }
+            domStorageEnabled = settings.domStorageEnabled
+            allowFileAccess = settings.allowFileAccess
+            allowContentAccess = settings.allowContentAccess
+            mixedContentMode = when (settings.mixedContentMode) {
+                MixedContentModeMessage.NEVER_ALLOW -> WebSettings.MIXED_CONTENT_NEVER_ALLOW
+                MixedContentModeMessage.COMPATIBILITY -> WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                MixedContentModeMessage.ALWAYS_ALLOW -> WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+            }
+            minimumFontSize = settings.minimumFontSize?.toInt() ?: DEFAULT_MINIMUM_FONT_SIZE
             userAgentString = settings.userAgent ?: WebSettings.getDefaultUserAgent(webView.context)
         }
-        if (settings.passkeysEnabled && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
             WebSettingsCompat.setWebAuthenticationSupport(
                 webView.settings,
-                WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP,
+                if (settings.passkeysEnabled) {
+                    WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP
+                } else {
+                    WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_NONE
+                },
             )
         }
+        webView.setVerticalScrollBarEnabled(settings.scrollbarsVisible)
+        webView.setHorizontalScrollBarEnabled(settings.scrollbarsVisible)
+        webView.overScrollMode =
+            if (settings.overScrollEnabled) View.OVER_SCROLL_IF_CONTENT_SCROLLS else View.OVER_SCROLL_NEVER
+        WebView.setWebContentsDebuggingEnabled(settings.inspectable)
+        container.isEnabled = settings.pullToRefreshEnabled
+        if (!settings.pullToRefreshEnabled) container.isRefreshing = false
         webView.setBackgroundColor(if (settings.transparentBackground) Color.TRANSPARENT else Color.WHITE)
+    }
+
+    /** Back/forward list and scroll position as a marshalled [Bundle], or null while the list is empty. */
+    fun saveState(): ByteArray? {
+        val bundle = Bundle()
+        if (webView.saveState(bundle) == null) return null
+        val parcel = Parcel.obtain()
+        return try {
+            parcel.writeBundle(bundle)
+            parcel.marshall()
+        } finally {
+            parcel.recycle()
+        }
+    }
+
+    fun restoreState(state: ByteArray): Boolean {
+        val parcel = Parcel.obtain()
+        return try {
+            parcel.unmarshall(state, 0, state.size)
+            parcel.setDataPosition(0)
+            val bundle = parcel.readBundle(AdvancedWebView::class.java.classLoader)
+            bundle != null && webView.restoreState(bundle) != null
+        } catch (e: RuntimeException) {
+            // A snapshot from another version can fail to parse.
+            false
+        } finally {
+            parcel.recycle()
+        }
+    }
+
+    /** Opens the system print dialog; needs the Activity the platform view is shown in. */
+    fun printPage(jobName: String?) {
+        var current: Context? = webView.context
+        while (current is ContextWrapper && current !is Activity) current = current.baseContext
+        val activity = current as? Activity ?: throw FlutterError("not-attached", "The WebView is not shown", null)
+        val name = jobName ?: webView.title ?: "Document"
+        val printManager = activity.getSystemService(Context.PRINT_SERVICE) as PrintManager
+        printManager.print(name, webView.createPrintDocumentAdapter(name), PrintAttributes.Builder().build())
+    }
+
+    private val density: Double get() = webView.resources.displayMetrics.density.toDouble()
+
+    /** Scroll offsets are logical pixels, like Flutter and iOS. */
+    fun scrollTo(x: Double, y: Double) = webView.scrollTo((x * density).roundToInt(), (y * density).roundToInt())
+
+    fun scrollBy(dx: Double, dy: Double) = webView.scrollBy((dx * density).roundToInt(), (dy * density).roundToInt())
+
+    fun scrollPosition(): ScrollPositionMessage = ScrollPositionMessage(
+        webView.scrollX / density,
+        webView.scrollY / density,
+    )
+
+    /** PNG of the visible area, or null while the view has no size. */
+    fun takeScreenshot(): ByteArray? {
+        if (webView.width <= 0 || webView.height <= 0) return null
+        val bitmap = Bitmap.createBitmap(webView.width, webView.height, Bitmap.Config.ARGB_8888)
+        return try {
+            webView.draw(Canvas(bitmap))
+            ByteArrayOutputStream().use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                out.toByteArray()
+            }
+        } finally {
+            bitmap.recycle()
+        }
+    }
+
+    /**
+     * A new query starts a search ([WebView.findAllAsync]); repeating it moves
+     * to the next or previous match ([WebView.findNext]). Completes when the
+     * WebView has finished counting. A search started while another is pending
+     * completes the earlier one as "not found".
+     */
+    suspend fun find(query: String, forward: Boolean): FindResultMessage {
+        if (query.isEmpty()) {
+            clearMatches()
+            return FindResultMessage(found = false, matchCount = 0)
+        }
+        return suspendCancellableCoroutine { cont ->
+            pendingFind?.resume(FindResultMessage(found = false))
+            pendingFind = cont
+            cont.invokeOnCancellation { if (pendingFind === cont) pendingFind = null }
+            webView.setFindListener(::onFindResult)
+            if (query == findQuery) {
+                webView.findNext(forward)
+            } else {
+                findQuery = query
+                webView.findAllAsync(query)
+            }
+        }
+    }
+
+    internal fun onFindResult(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
+        if (!isDoneCounting) return
+        val cont = pendingFind ?: return
+        pendingFind = null
+        cont.resume(
+            FindResultMessage(
+                found = numberOfMatches > 0,
+                matchCount = numberOfMatches.toLong(),
+                activeMatchIndex = if (numberOfMatches > 0) activeMatchOrdinal.toLong() else null,
+            ),
+        )
+    }
+
+    fun clearMatches() {
+        findQuery = null
+        pendingFind?.resume(FindResultMessage(found = false))
+        pendingFind = null
+        webView.clearMatches()
     }
 
     suspend fun evaluateJavaScript(source: String): String? = suspendCancellableCoroutine { cont ->
@@ -174,7 +391,55 @@ class AdvancedWebView(
         )
     }
 
-    override fun getView(): View = webView
+    /**
+     * Exposes `window.<objectName>.callHandler(name, ...args)`. Requests travel over a
+     * `WebMessageListener` (which replies to the frame that asked), and a document-start
+     * shim turns them into promises. The shim is not tracked in [scriptHandlers], so
+     * [removeAllUserScripts] leaves it alone.
+     */
+    private fun installHandlerBridge(objectName: String) {
+        check(
+            WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
+                WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT),
+        ) {
+            "JavaScript handlers need a WebView that supports WEB_MESSAGE_LISTENER and DOCUMENT_START_SCRIPT"
+        }
+        WebViewCompat.addWebMessageListener(webView, BRIDGE_NAME, setOf("*")) { _, message, _, _, replyProxy ->
+            handleHandlerCall(message.data, replyProxy)
+        }
+        WebViewCompat.addDocumentStartJavaScript(webView, handlerShim(objectName), setOf("*"))
+    }
+
+    private fun handleHandlerCall(data: String?, replyProxy: JavaScriptReplyProxy) {
+        val request = try {
+            JSONObject(data ?: return)
+        } catch (e: JSONException) {
+            return
+        }
+        val callId = request.optString("id")
+        scope.launch {
+            val response = JSONObject().put("id", callId)
+            try {
+                val value = flutterApi.onJavaScriptHandlerCall(
+                    id,
+                    request.getString("name"),
+                    request.getString("args"),
+                )
+                response.put("ok", true).put("value", value)
+            } catch (e: Throwable) {
+                response.put("ok", false).put("error", e.message ?: e.toString())
+            }
+            if (isDestroyed) return@launch
+            try {
+                replyProxy.postMessage(response.toString())
+            } catch (e: Throwable) {
+                // The frame went away (navigation) before the answer was ready.
+                Log.w(TAG, "Failed to reply to a JavaScript handler call: ${e.message}")
+            }
+        }
+    }
+
+    override fun getView(): View = container
 
     override fun dispose() {
         // Lifetime is owned by Dart (AdvancedWebViewHostApi.dispose), not by the
@@ -206,10 +471,12 @@ class AdvancedWebView(
         }
 
         override fun onPageFinished(view: WebView, url: String) {
+            container.isRefreshing = false
             send { flutterApi.onPageFinished(id, url) }
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+            container.isRefreshing = false
             val message = WebResourceErrorMessage(
                 errorCode = error.errorCode.toLong(),
                 message = error.description.toString(),
@@ -217,6 +484,45 @@ class AdvancedWebView(
                 url = request.url.toString(),
             )
             send { flutterApi.onReceivedError(id, message) }
+        }
+
+        override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
+            if (!hasSslErrorDelegate) {
+                handler.cancel()
+                return
+            }
+            val url = error.url.orEmpty()
+            val message = SslErrorMessage(url, Uri.parse(url).host.orEmpty(), error.describe())
+            scope.launch {
+                val decision = try {
+                    flutterApi.onSslError(id, message)
+                } catch (e: Throwable) {
+                    Log.w(TAG, "SSL error delegate failed, refusing the load: ${e.message}")
+                    SslErrorDecisionMessage.CANCEL
+                }
+                if (decision == SslErrorDecisionMessage.PROCEED && !isDestroyed) handler.proceed() else handler.cancel()
+            }
+        }
+
+        override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String?) {
+            if (!hasHttpAuthDelegate) {
+                handler.cancel()
+                return
+            }
+            val request = HttpAuthRequestMessage(host, realm?.takeIf { it.isNotEmpty() })
+            scope.launch {
+                val credentials = try {
+                    flutterApi.onHttpAuthRequest(id, request)
+                } catch (e: Throwable) {
+                    Log.w(TAG, "HTTP auth delegate failed, cancelling: ${e.message}")
+                    null
+                }
+                if (credentials != null && !isDestroyed) {
+                    handler.proceed(credentials.username, credentials.password)
+                } else {
+                    handler.cancel()
+                }
+            }
         }
 
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -240,6 +546,20 @@ class AdvancedWebView(
         }
     }
 
+    /** Asks Dart whether a page may use [resources]. Errors count as a denial. */
+    private fun askDart(origin: String, resources: List<PermissionResourceMessage>, onDecision: (Boolean) -> Unit) {
+        scope.launch {
+            val allowed = try {
+                flutterApi.onPermissionRequest(id, PermissionRequestMessage(origin, resources)) ==
+                    PermissionDecisionMessage.GRANT
+            } catch (e: Throwable) {
+                Log.w(TAG, "Permission delegate failed, denying: ${e.message}")
+                false
+            }
+            if (!isDestroyed) onDecision(allowed)
+        }
+    }
+
     private inner class ChromeClient : WebChromeClient() {
         override fun onProgressChanged(view: WebView, newProgress: Int) {
             send { flutterApi.onProgressChanged(id, newProgress.toLong()) }
@@ -249,11 +569,76 @@ class AdvancedWebView(
             send { flutterApi.onTitleChanged(id, title) }
         }
 
+        // Returning false keeps the platform logging (Logcat).
+        override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+            if (!hasConsoleMessageDelegate) return false
+            val message = ConsoleMessageMessage(
+                level = when (consoleMessage.messageLevel()) {
+                    ConsoleMessage.MessageLevel.DEBUG -> ConsoleMessageLevelMessage.DEBUG
+                    ConsoleMessage.MessageLevel.TIP -> ConsoleMessageLevelMessage.INFO
+                    ConsoleMessage.MessageLevel.WARNING -> ConsoleMessageLevelMessage.WARNING
+                    ConsoleMessage.MessageLevel.ERROR -> ConsoleMessageLevelMessage.ERROR
+                    else -> ConsoleMessageLevelMessage.LOG
+                },
+                message = consoleMessage.message(),
+                sourceUrl = consoleMessage.sourceId()?.takeIf { it.isNotEmpty() },
+                lineNumber = consoleMessage.lineNumber().toLong(),
+            )
+            send { flutterApi.onConsoleMessage(id, message) }
+            return false
+        }
+
         override fun onShowFileChooser(
             webView: WebView,
             filePathCallback: ValueCallback<Array<Uri>>,
             fileChooserParams: FileChooserParams,
         ): Boolean = fileChooser.show(filePathCallback, fileChooserParams)
+
+        override fun onPermissionRequest(request: PermissionRequest) {
+            // Resources without a Dart equivalent (protected media, MIDI) are never granted.
+            val mapped = request.resources.mapNotNull { resource ->
+                when (resource) {
+                    PermissionRequest.RESOURCE_VIDEO_CAPTURE ->
+                        Triple(resource, PermissionResourceMessage.CAMERA, Manifest.permission.CAMERA)
+
+                    PermissionRequest.RESOURCE_AUDIO_CAPTURE ->
+                        Triple(resource, PermissionResourceMessage.MICROPHONE, Manifest.permission.RECORD_AUDIO)
+
+                    else -> null
+                }
+            }
+            if (!hasPermissionDelegate || mapped.isEmpty() || mapped.size != request.resources.size) {
+                request.deny()
+                return
+            }
+            askDart(request.origin.toString(), mapped.map { it.second }) { allowed ->
+                if (!allowed) {
+                    request.deny()
+                    return@askDart
+                }
+                // The page may only use what the user also allowed the app to use.
+                permissionRequester.request(mapped.map { it.third }) { held ->
+                    val granted = mapped.filter { it.third in held }.map { it.first }
+                    if (granted.size == mapped.size) request.grant(granted.toTypedArray()) else request.deny()
+                }
+            }
+        }
+
+        override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+            if (!hasPermissionDelegate) {
+                callback.invoke(origin, false, false)
+                return
+            }
+            askDart(origin, listOf(PermissionResourceMessage.GEOLOCATION)) { allowed ->
+                if (!allowed) {
+                    callback.invoke(origin, false, false)
+                    return@askDart
+                }
+                permissionRequester.request(listOf(Manifest.permission.ACCESS_FINE_LOCATION)) { held ->
+                    callback.invoke(origin, Manifest.permission.ACCESS_FINE_LOCATION in held, false)
+                }
+            }
+        }
 
         override fun onCreateWindow(
             view: WebView,
@@ -292,6 +677,15 @@ class AdvancedWebView(
         }
     }
 
+    private fun SslError.describe(): String = when (primaryError) {
+        SslError.SSL_NOTYETVALID -> "The certificate is not valid yet"
+        SslError.SSL_EXPIRED -> "The certificate has expired"
+        SslError.SSL_IDMISMATCH -> "The certificate does not match the host name"
+        SslError.SSL_UNTRUSTED -> "The certificate authority is not trusted"
+        SslError.SSL_DATE_INVALID -> "The certificate date is invalid"
+        else -> "The certificate is invalid"
+    }
+
     private fun CookieMessage.toSetCookieHeader(): String = buildString {
         append("$name=$value; Domain=$domain; Path=$path")
         expiresMillis?.let {
@@ -303,7 +697,45 @@ class AdvancedWebView(
         if (isHttpOnly) append("; HttpOnly")
     }
 
-    private companion object {
-        const val TAG = "AdvancedWebView"
+    companion object {
+        private const val TAG = "AdvancedWebView"
+
+        // WebSettings.getMinimumFontSize() default.
+        private const val DEFAULT_MINIMUM_FONT_SIZE = 8
+        private const val BRIDGE_NAME = "advancedWebViewBridge"
+
+        // Same contract as the iOS shim: callHandler(name, ...args) returns a promise.
+        internal fun handlerShim(objectName: String) = """
+            (function () {
+              if (window.$objectName) return;
+              var bridge = window.$BRIDGE_NAME;
+              var pending = {};
+              var counter = 0;
+              var prefix = Math.random().toString(36).slice(2) + '-';
+              bridge.onmessage = function (event) {
+                var reply = JSON.parse(event.data);
+                var call = pending[reply.id];
+                if (!call) return;
+                delete pending[reply.id];
+                if (reply.ok) call.resolve(JSON.parse(reply.value));
+                else call.reject(new Error(reply.error));
+              };
+              window.$objectName = Object.freeze({
+                callHandler: function (name) {
+                  var args = Array.prototype.slice.call(arguments, 1);
+                  return new Promise(function (resolve, reject) {
+                    var id = prefix + (++counter);
+                    pending[id] = { resolve: resolve, reject: reject };
+                    try {
+                      bridge.postMessage(JSON.stringify({ id: id, name: String(name), args: JSON.stringify(args) }));
+                    } catch (e) {
+                      delete pending[id];
+                      reject(e);
+                    }
+                  });
+                }
+              });
+            })();
+        """.trimIndent()
     }
 }

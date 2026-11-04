@@ -107,6 +107,27 @@ int _deepHash(Object? value) {
 }
 
 
+enum CacheModeMessage {
+  normal,
+  preferCache,
+  cacheOnly,
+  noCache;
+}
+
+enum MixedContentModeMessage {
+  neverAllow,
+  compatibility,
+  alwaysAllow;
+}
+
+enum ConsoleMessageLevelMessage {
+  debug,
+  log,
+  info,
+  warning,
+  error;
+}
+
 enum UserScriptInjectionTimeMessage {
   atDocumentStart,
   atDocumentEnd;
@@ -117,6 +138,22 @@ enum NavigationDecisionMessage {
   prevent;
 }
 
+enum SslErrorDecisionMessage {
+  proceed,
+  cancel;
+}
+
+enum PermissionResourceMessage {
+  camera,
+  microphone,
+  geolocation;
+}
+
+enum PermissionDecisionMessage {
+  grant,
+  deny;
+}
+
 class WebViewSettingsMessage {
   WebViewSettingsMessage({
     required this.javaScriptEnabled,
@@ -125,6 +162,20 @@ class WebViewSettingsMessage {
     required this.supportZoom,
     required this.transparentBackground,
     required this.passkeysEnabled,
+    required this.allowsBackForwardNavigationGestures,
+    required this.inspectable,
+    required this.textZoom,
+    required this.cacheMode,
+    required this.incognito,
+    required this.javaScriptCanOpenWindowsAutomatically,
+    required this.scrollbarsVisible,
+    required this.overScrollEnabled,
+    required this.pullToRefreshEnabled,
+    required this.domStorageEnabled,
+    required this.allowFileAccess,
+    required this.allowContentAccess,
+    required this.mixedContentMode,
+    this.minimumFontSize,
     this.userAgent,
   });
 
@@ -143,6 +194,55 @@ class WebViewSettingsMessage {
   /// Android only. Ignored on iOS, where WebAuthn is governed by entitlements.
   bool passkeysEnabled;
 
+  /// iOS only. Ignored on Android.
+  bool allowsBackForwardNavigationGestures;
+
+  /// Android: process-wide `WebView.setWebContentsDebuggingEnabled`.
+  /// iOS: `WKWebView.isInspectable`.
+  bool inspectable;
+
+  /// Percent, 100 is normal. Android: `WebSettings.setTextZoom`. iOS: scales
+  /// the whole page with `WKWebView.pageZoom`.
+  int textZoom;
+
+  /// Android: `WebSettings.setCacheMode`. iOS: `URLRequest.cachePolicy` of
+  /// requests started with `loadUrl`.
+  CacheModeMessage cacheMode;
+
+  /// iOS only, creation only: `WKWebsiteDataStore.nonPersistent()`. Ignored on
+  /// Android, whose WebView shares its data across the app.
+  bool incognito;
+
+  /// Android: `WebSettings.setJavaScriptCanOpenWindowsAutomatically`. iOS:
+  /// `WKPreferences.javaScriptCanOpenWindowsAutomatically`.
+  bool javaScriptCanOpenWindowsAutomatically;
+
+  /// Android: vertical and horizontal scroll bars. iOS: scroll indicators.
+  bool scrollbarsVisible;
+
+  /// Android: `View.setOverScrollMode`. iOS: `UIScrollView.bounces`.
+  bool overScrollEnabled;
+
+  /// Android: `SwipeRefreshLayout`. iOS: `UIRefreshControl`. A pull reloads the
+  /// page.
+  bool pullToRefreshEnabled;
+
+  /// Android: `WebSettings.setDomStorageEnabled`. iOS has no switch.
+  bool domStorageEnabled;
+
+  /// Android: `WebSettings.setAllowFileAccess`. iOS has no equivalent.
+  bool allowFileAccess;
+
+  /// Android: `WebSettings.setAllowContentAccess`. iOS has no equivalent.
+  bool allowContentAccess;
+
+  /// Android: `WebSettings.setMixedContentMode`. iOS has no equivalent.
+  MixedContentModeMessage mixedContentMode;
+
+  /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
+  /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
+  int? minimumFontSize;
+
   String? userAgent;
 
   List<Object?> _toList() {
@@ -153,6 +253,20 @@ class WebViewSettingsMessage {
       supportZoom,
       transparentBackground,
       passkeysEnabled,
+      allowsBackForwardNavigationGestures,
+      inspectable,
+      textZoom,
+      cacheMode,
+      incognito,
+      javaScriptCanOpenWindowsAutomatically,
+      scrollbarsVisible,
+      overScrollEnabled,
+      pullToRefreshEnabled,
+      domStorageEnabled,
+      allowFileAccess,
+      allowContentAccess,
+      mixedContentMode,
+      minimumFontSize,
       userAgent,
     ];
   }
@@ -169,7 +283,21 @@ class WebViewSettingsMessage {
       supportZoom: result[3]! as bool,
       transparentBackground: result[4]! as bool,
       passkeysEnabled: result[5]! as bool,
-      userAgent: result[6] as String?,
+      allowsBackForwardNavigationGestures: result[6]! as bool,
+      inspectable: result[7]! as bool,
+      textZoom: result[8]! as int,
+      cacheMode: result[9]! as CacheModeMessage,
+      incognito: result[10]! as bool,
+      javaScriptCanOpenWindowsAutomatically: result[11]! as bool,
+      scrollbarsVisible: result[12]! as bool,
+      overScrollEnabled: result[13]! as bool,
+      pullToRefreshEnabled: result[14]! as bool,
+      domStorageEnabled: result[15]! as bool,
+      allowFileAccess: result[16]! as bool,
+      allowContentAccess: result[17]! as bool,
+      mixedContentMode: result[18]! as MixedContentModeMessage,
+      minimumFontSize: result[19] as int?,
+      userAgent: result[20] as String?,
     );
   }
 
@@ -182,7 +310,7 @@ class WebViewSettingsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(userAgent, other.userAgent);
+    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(incognito, other.incognito) && _deepEquals(javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && _deepEquals(scrollbarsVisible, other.scrollbarsVisible) && _deepEquals(overScrollEnabled, other.overScrollEnabled) && _deepEquals(pullToRefreshEnabled, other.pullToRefreshEnabled) && _deepEquals(domStorageEnabled, other.domStorageEnabled) && _deepEquals(allowFileAccess, other.allowFileAccess) && _deepEquals(allowContentAccess, other.allowContentAccess) && _deepEquals(mixedContentMode, other.mixedContentMode) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent);
   }
 
   @override
@@ -191,7 +319,69 @@ class WebViewSettingsMessage {
 
   @override
   String toString() {
-    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, userAgent: $userAgent)';
+    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, cacheMode: $cacheMode, incognito: $incognito, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, scrollbarsVisible: $scrollbarsVisible, overScrollEnabled: $overScrollEnabled, pullToRefreshEnabled: $pullToRefreshEnabled, domStorageEnabled: $domStorageEnabled, allowFileAccess: $allowFileAccess, allowContentAccess: $allowContentAccess, mixedContentMode: $mixedContentMode, minimumFontSize: $minimumFontSize, userAgent: $userAgent)';
+  }
+}
+
+class ConsoleMessageMessage {
+  ConsoleMessageMessage({
+    required this.level,
+    required this.message,
+    this.sourceUrl,
+    this.lineNumber,
+  });
+
+  ConsoleMessageLevelMessage level;
+
+  String message;
+
+  /// Script that logged the message. `null` on iOS, which does not report it.
+  String? sourceUrl;
+
+  /// Line in [sourceUrl]. `null` on iOS, which does not report it.
+  int? lineNumber;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      level,
+      message,
+      sourceUrl,
+      lineNumber,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ConsoleMessageMessage decode(Object result) {
+    result as List<Object?>;
+    return ConsoleMessageMessage(
+      level: result[0]! as ConsoleMessageLevelMessage,
+      message: result[1]! as String,
+      sourceUrl: result[2] as String?,
+      lineNumber: result[3] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ConsoleMessageMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(level, other.level) && _deepEquals(message, other.message) && _deepEquals(sourceUrl, other.sourceUrl) && _deepEquals(lineNumber, other.lineNumber);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ConsoleMessageMessage(level: $level, message: $message, sourceUrl: $sourceUrl, lineNumber: $lineNumber)';
   }
 }
 
@@ -255,8 +445,17 @@ class CreationParamsMessage {
     required this.webViewId,
     required this.settings,
     required this.javaScriptChannelNames,
+    required this.javaScriptHandlerNames,
+    required this.javaScriptHandlerObjectName,
     required this.hasNavigationDelegate,
     required this.hasNewWindowDelegate,
+    required this.hasPermissionDelegate,
+    required this.hasDownloadDelegate,
+    required this.hasSslErrorDelegate,
+    required this.hasHttpAuthDelegate,
+    required this.hasScrollDelegate,
+    required this.hasLongPressDelegate,
+    required this.hasConsoleMessageDelegate,
     required this.userScripts,
   });
 
@@ -267,12 +466,46 @@ class CreationParamsMessage {
   /// Names exposed to JS as `window.<name>.postMessage(String)`.
   List<String> javaScriptChannelNames;
 
+  /// Handlers the page can call with `window.advanced_webview.callHandler`.
+  /// The bridge is only installed when this is not empty.
+  List<String> javaScriptHandlerNames;
+
+  /// Name of the global object (`window.<name>`) that exposes `callHandler`.
+  /// Always a valid JavaScript identifier.
+  String javaScriptHandlerObjectName;
+
   /// When false, native code never round-trips navigation decisions to Dart.
   bool hasNavigationDelegate;
 
   /// When false, `window.open` and `target="_blank"` load in the same WebView
   /// and never round-trip to Dart.
   bool hasNewWindowDelegate;
+
+  /// When false, permission requests (camera, microphone, geolocation) are
+  /// denied natively without a round trip to Dart.
+  bool hasPermissionDelegate;
+
+  /// When false, downloads are left to the platform default and never
+  /// round-trip to Dart.
+  bool hasDownloadDelegate;
+
+  /// When false, certificate errors are refused natively without a round trip
+  /// to Dart.
+  bool hasSslErrorDelegate;
+
+  /// When false, HTTP authentication challenges get the platform default
+  /// handling without a round trip to Dart.
+  bool hasHttpAuthDelegate;
+
+  /// When false, scroll changes are never reported to Dart.
+  bool hasScrollDelegate;
+
+  /// When false, long presses are never reported to Dart.
+  bool hasLongPressDelegate;
+
+  /// When false, console output is never reported to Dart (and, on iOS, the
+  /// `console` wrapper script is not injected).
+  bool hasConsoleMessageDelegate;
 
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
@@ -282,8 +515,17 @@ class CreationParamsMessage {
       webViewId,
       settings,
       javaScriptChannelNames,
+      javaScriptHandlerNames,
+      javaScriptHandlerObjectName,
       hasNavigationDelegate,
       hasNewWindowDelegate,
+      hasPermissionDelegate,
+      hasDownloadDelegate,
+      hasSslErrorDelegate,
+      hasHttpAuthDelegate,
+      hasScrollDelegate,
+      hasLongPressDelegate,
+      hasConsoleMessageDelegate,
       userScripts,
     ];
   }
@@ -297,9 +539,18 @@ class CreationParamsMessage {
       webViewId: result[0]! as int,
       settings: result[1]! as WebViewSettingsMessage,
       javaScriptChannelNames: (result[2]! as List<Object?>).cast<String>(),
-      hasNavigationDelegate: result[3]! as bool,
-      hasNewWindowDelegate: result[4]! as bool,
-      userScripts: (result[5]! as List<Object?>).cast<UserScriptMessage>(),
+      javaScriptHandlerNames: (result[3]! as List<Object?>).cast<String>(),
+      javaScriptHandlerObjectName: result[4]! as String,
+      hasNavigationDelegate: result[5]! as bool,
+      hasNewWindowDelegate: result[6]! as bool,
+      hasPermissionDelegate: result[7]! as bool,
+      hasDownloadDelegate: result[8]! as bool,
+      hasSslErrorDelegate: result[9]! as bool,
+      hasHttpAuthDelegate: result[10]! as bool,
+      hasScrollDelegate: result[11]! as bool,
+      hasLongPressDelegate: result[12]! as bool,
+      hasConsoleMessageDelegate: result[13]! as bool,
+      userScripts: (result[14]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -312,7 +563,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -321,7 +572,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, userScripts: $userScripts)';
   }
 }
 
@@ -435,6 +686,382 @@ class WebResourceErrorMessage {
   }
 }
 
+class SslErrorMessage {
+  SslErrorMessage({
+    required this.url,
+    required this.host,
+    required this.message,
+  });
+
+  String url;
+
+  String host;
+
+  String message;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      url,
+      host,
+      message,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static SslErrorMessage decode(Object result) {
+    result as List<Object?>;
+    return SslErrorMessage(
+      url: result[0]! as String,
+      host: result[1]! as String,
+      message: result[2]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! SslErrorMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(url, other.url) && _deepEquals(host, other.host) && _deepEquals(message, other.message);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'SslErrorMessage(url: $url, host: $host, message: $message)';
+  }
+}
+
+class HttpAuthRequestMessage {
+  HttpAuthRequestMessage({
+    required this.host,
+    this.realm,
+  });
+
+  String host;
+
+  String? realm;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      host,
+      realm,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static HttpAuthRequestMessage decode(Object result) {
+    result as List<Object?>;
+    return HttpAuthRequestMessage(
+      host: result[0]! as String,
+      realm: result[1] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! HttpAuthRequestMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(host, other.host) && _deepEquals(realm, other.realm);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'HttpAuthRequestMessage(host: $host, realm: $realm)';
+  }
+}
+
+class HttpAuthCredentialsMessage {
+  HttpAuthCredentialsMessage({
+    required this.username,
+    required this.password,
+  });
+
+  String username;
+
+  String password;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      username,
+      password,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static HttpAuthCredentialsMessage decode(Object result) {
+    result as List<Object?>;
+    return HttpAuthCredentialsMessage(
+      username: result[0]! as String,
+      password: result[1]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! HttpAuthCredentialsMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(username, other.username) && _deepEquals(password, other.password);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'HttpAuthCredentialsMessage(username: $username, password: $password)';
+  }
+}
+
+class DownloadRequestMessage {
+  DownloadRequestMessage({
+    required this.url,
+    this.suggestedFilename,
+    this.mimeType,
+    this.contentLength,
+  });
+
+  String url;
+
+  String? suggestedFilename;
+
+  String? mimeType;
+
+  /// Size in bytes; null when the server did not say.
+  int? contentLength;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      url,
+      suggestedFilename,
+      mimeType,
+      contentLength,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static DownloadRequestMessage decode(Object result) {
+    result as List<Object?>;
+    return DownloadRequestMessage(
+      url: result[0]! as String,
+      suggestedFilename: result[1] as String?,
+      mimeType: result[2] as String?,
+      contentLength: result[3] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! DownloadRequestMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(url, other.url) && _deepEquals(suggestedFilename, other.suggestedFilename) && _deepEquals(mimeType, other.mimeType) && _deepEquals(contentLength, other.contentLength);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'DownloadRequestMessage(url: $url, suggestedFilename: $suggestedFilename, mimeType: $mimeType, contentLength: $contentLength)';
+  }
+}
+
+class PermissionRequestMessage {
+  PermissionRequestMessage({
+    required this.origin,
+    required this.resources,
+  });
+
+  /// Origin of the requesting page, e.g. `https://example.com`.
+  String origin;
+
+  List<PermissionResourceMessage> resources;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      origin,
+      resources,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static PermissionRequestMessage decode(Object result) {
+    result as List<Object?>;
+    return PermissionRequestMessage(
+      origin: result[0]! as String,
+      resources: (result[1]! as List<Object?>).cast<PermissionResourceMessage>(),
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! PermissionRequestMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(origin, other.origin) && _deepEquals(resources, other.resources);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'PermissionRequestMessage(origin: $origin, resources: $resources)';
+  }
+}
+
+class FindResultMessage {
+  FindResultMessage({
+    required this.found,
+    this.matchCount,
+    this.activeMatchIndex,
+  });
+
+  bool found;
+
+  /// Total matches on the page. Null on iOS, which does not report a count.
+  int? matchCount;
+
+  /// Zero-based index of the highlighted match. Null on iOS.
+  int? activeMatchIndex;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      found,
+      matchCount,
+      activeMatchIndex,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static FindResultMessage decode(Object result) {
+    result as List<Object?>;
+    return FindResultMessage(
+      found: result[0]! as bool,
+      matchCount: result[1] as int?,
+      activeMatchIndex: result[2] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! FindResultMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(found, other.found) && _deepEquals(matchCount, other.matchCount) && _deepEquals(activeMatchIndex, other.activeMatchIndex);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'FindResultMessage(found: $found, matchCount: $matchCount, activeMatchIndex: $activeMatchIndex)';
+  }
+}
+
+class ScrollPositionMessage {
+  ScrollPositionMessage({
+    required this.x,
+    required this.y,
+  });
+
+  /// Horizontal offset in logical pixels.
+  double x;
+
+  /// Vertical offset in logical pixels.
+  double y;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      x,
+      y,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ScrollPositionMessage decode(Object result) {
+    result as List<Object?>;
+    return ScrollPositionMessage(
+      x: result[0]! as double,
+      y: result[1]! as double,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ScrollPositionMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(x, other.x) && _deepEquals(y, other.y);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ScrollPositionMessage(x: $x, y: $y)';
+  }
+}
+
 class CookieMessage {
   CookieMessage({
     required this.name,
@@ -519,29 +1146,71 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is UserScriptInjectionTimeMessage) {
+    }    else if (value is CacheModeMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    }    else if (value is NavigationDecisionMessage) {
+    }    else if (value is MixedContentModeMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    }    else if (value is WebViewSettingsMessage) {
+    }    else if (value is ConsoleMessageLevelMessage) {
       buffer.putUint8(131);
+      writeValue(buffer, value.index);
+    }    else if (value is UserScriptInjectionTimeMessage) {
+      buffer.putUint8(132);
+      writeValue(buffer, value.index);
+    }    else if (value is NavigationDecisionMessage) {
+      buffer.putUint8(133);
+      writeValue(buffer, value.index);
+    }    else if (value is SslErrorDecisionMessage) {
+      buffer.putUint8(134);
+      writeValue(buffer, value.index);
+    }    else if (value is PermissionResourceMessage) {
+      buffer.putUint8(135);
+      writeValue(buffer, value.index);
+    }    else if (value is PermissionDecisionMessage) {
+      buffer.putUint8(136);
+      writeValue(buffer, value.index);
+    }    else if (value is WebViewSettingsMessage) {
+      buffer.putUint8(137);
+      writeValue(buffer, value.encode());
+    }    else if (value is ConsoleMessageMessage) {
+      buffer.putUint8(138);
       writeValue(buffer, value.encode());
     }    else if (value is UserScriptMessage) {
-      buffer.putUint8(132);
+      buffer.putUint8(139);
       writeValue(buffer, value.encode());
     }    else if (value is CreationParamsMessage) {
-      buffer.putUint8(133);
+      buffer.putUint8(140);
       writeValue(buffer, value.encode());
     }    else if (value is NavigationRequestMessage) {
-      buffer.putUint8(134);
+      buffer.putUint8(141);
       writeValue(buffer, value.encode());
     }    else if (value is WebResourceErrorMessage) {
-      buffer.putUint8(135);
+      buffer.putUint8(142);
+      writeValue(buffer, value.encode());
+    }    else if (value is SslErrorMessage) {
+      buffer.putUint8(143);
+      writeValue(buffer, value.encode());
+    }    else if (value is HttpAuthRequestMessage) {
+      buffer.putUint8(144);
+      writeValue(buffer, value.encode());
+    }    else if (value is HttpAuthCredentialsMessage) {
+      buffer.putUint8(145);
+      writeValue(buffer, value.encode());
+    }    else if (value is DownloadRequestMessage) {
+      buffer.putUint8(146);
+      writeValue(buffer, value.encode());
+    }    else if (value is PermissionRequestMessage) {
+      buffer.putUint8(147);
+      writeValue(buffer, value.encode());
+    }    else if (value is FindResultMessage) {
+      buffer.putUint8(148);
+      writeValue(buffer, value.encode());
+    }    else if (value is ScrollPositionMessage) {
+      buffer.putUint8(149);
       writeValue(buffer, value.encode());
     }    else if (value is CookieMessage) {
-      buffer.putUint8(136);
+      buffer.putUint8(150);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -553,21 +1222,55 @@ class _PigeonCodec extends StandardMessageCodec {
     switch (type) {
       case 129:
         final value = readValue(buffer) as int?;
-        return value == null ? null : UserScriptInjectionTimeMessage.values[value];
+        return value == null ? null : CacheModeMessage.values[value];
       case 130:
         final value = readValue(buffer) as int?;
-        return value == null ? null : NavigationDecisionMessage.values[value];
+        return value == null ? null : MixedContentModeMessage.values[value];
       case 131:
-        return WebViewSettingsMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : ConsoleMessageLevelMessage.values[value];
       case 132:
-        return UserScriptMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : UserScriptInjectionTimeMessage.values[value];
       case 133:
-        return CreationParamsMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : NavigationDecisionMessage.values[value];
       case 134:
-        return NavigationRequestMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : SslErrorDecisionMessage.values[value];
       case 135:
-        return WebResourceErrorMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : PermissionResourceMessage.values[value];
       case 136:
+        final value = readValue(buffer) as int?;
+        return value == null ? null : PermissionDecisionMessage.values[value];
+      case 137:
+        return WebViewSettingsMessage.decode(readValue(buffer)!);
+      case 138:
+        return ConsoleMessageMessage.decode(readValue(buffer)!);
+      case 139:
+        return UserScriptMessage.decode(readValue(buffer)!);
+      case 140:
+        return CreationParamsMessage.decode(readValue(buffer)!);
+      case 141:
+        return NavigationRequestMessage.decode(readValue(buffer)!);
+      case 142:
+        return WebResourceErrorMessage.decode(readValue(buffer)!);
+      case 143:
+        return SslErrorMessage.decode(readValue(buffer)!);
+      case 144:
+        return HttpAuthRequestMessage.decode(readValue(buffer)!);
+      case 145:
+        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
+      case 146:
+        return DownloadRequestMessage.decode(readValue(buffer)!);
+      case 147:
+        return PermissionRequestMessage.decode(readValue(buffer)!);
+      case 148:
+        return FindResultMessage.decode(readValue(buffer)!);
+      case 149:
+        return ScrollPositionMessage.decode(readValue(buffer)!);
+      case 150:
         return CookieMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -834,6 +1537,185 @@ class AdvancedWebViewHostApi {
     return pigeonVar_replyValue as String?;
   }
 
+  /// Returns a PNG of the visible area, or null when it cannot be captured
+  /// (for example when the view has no size yet).
+  Future<Uint8List?> takeScreenshot(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.takeScreenshot$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+    return pigeonVar_replyValue as Uint8List?;
+  }
+
+  /// Finds `query` in the page and highlights a match. A new query starts at
+  /// the first match; repeating the same query moves to the next or previous.
+  Future<FindResultMessage> findText(int webViewId, String query, bool forward) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.findText$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, query, forward]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return pigeonVar_replyValue! as FindResultMessage;
+  }
+
+  /// Removes the highlights left by `findText`.
+  Future<void> clearMatches(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearMatches$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// Scrolls the page to `x`, `y` (logical pixels) without animation.
+  Future<void> scrollTo(int webViewId, double x, double y) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.scrollTo$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, x, y]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// Scrolls the page by `dx`, `dy` (logical pixels) without animation.
+  Future<void> scrollBy(int webViewId, double dx, double dy) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.scrollBy$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, dx, dy]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  Future<ScrollPositionMessage> getScrollPosition(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getScrollPosition$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return pigeonVar_replyValue! as ScrollPositionMessage;
+  }
+
+  /// Opaque snapshot of the back/forward list and scroll position, or null
+  /// when there is nothing to save. Only valid on the same platform.
+  Future<Uint8List?> saveState(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.saveState$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+    return pigeonVar_replyValue as Uint8List?;
+  }
+
+  /// Restores a snapshot from `saveState`. Returns false when it cannot be read.
+  Future<bool> restoreState(int webViewId, Uint8List state) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.restoreState$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, state]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return pigeonVar_replyValue! as bool;
+  }
+
+  /// Opens the system print dialog for the current page. Fails with
+  /// `not-attached` when the WebView is not shown in a window.
+  Future<void> printPage(int webViewId, String? jobName) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.printPage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, jobName]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
   Future<void> updateSettings(int webViewId, WebViewSettingsMessage settings) async {
     final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.updateSettings$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
@@ -957,11 +1839,39 @@ abstract class AdvancedWebViewFlutterApi {
 
   void onTitleChanged(int webViewId, String? title);
 
+  /// Only sent when the controller was created with `hasScrollDelegate`.
+  void onScrollChanged(int webViewId, double x, double y);
+
+  /// A long press at `x`, `y` (logical pixels, relative to the WebView).
+  /// Only sent when the controller was created with `hasLongPressDelegate`.
+  void onLongPress(int webViewId, double x, double y);
+
+  /// A `console.*` call made by the page. Only sent when the controller was
+  /// created with `hasConsoleMessageDelegate`.
+  void onConsoleMessage(int webViewId, ConsoleMessageMessage message);
+
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 
   Future<NavigationDecisionMessage> shouldOverrideUrlLoading(int webViewId, NavigationRequestMessage request);
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
+
+  /// The WebView found a certificate problem. Cancelling refuses the load.
+  Future<SslErrorDecisionMessage> onSslError(int webViewId, SslErrorMessage error);
+
+  /// A server asked for credentials. Null cancels the request.
+  Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(int webViewId, HttpAuthRequestMessage request);
+
+  /// The page started a download. The WebView does not save the file.
+  void onDownloadStart(int webViewId, DownloadRequestMessage request);
+
+  /// The page asked for camera, microphone or location access.
+  Future<PermissionDecisionMessage> onPermissionRequest(int webViewId, PermissionRequestMessage request);
+
+  /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
+  /// argument list; the result is the JSON-encoded return value. Throwing
+  /// rejects the page's promise.
+  Future<String> onJavaScriptHandlerCall(int webViewId, String handlerName, String argsJson);
 
   /// The page asked for a new window; the WebView did not load `url` itself.
   void onNewWindowRequest(int webViewId, String url);
@@ -1062,6 +1972,74 @@ abstract class AdvancedWebViewFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onScrollChanged$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final double arg_x = args[1]! as double;
+          final double arg_y = args[2]! as double;
+          try {
+            api.onScrollChanged(arg_webViewId, arg_x, arg_y);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onLongPress$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final double arg_x = args[1]! as double;
+          final double arg_y = args[2]! as double;
+          try {
+            api.onLongPress(arg_webViewId, arg_x, arg_y);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onConsoleMessage$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final ConsoleMessageMessage arg_message = args[1]! as ConsoleMessageMessage;
+          try {
+            api.onConsoleMessage(arg_webViewId, arg_message);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
           'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onReceivedError$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
@@ -1119,6 +2097,117 @@ abstract class AdvancedWebViewFlutterApi {
           try {
             api.onJavaScriptMessage(arg_webViewId, arg_channelName, arg_message);
             return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onSslError$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final SslErrorMessage arg_error = args[1]! as SslErrorMessage;
+          try {
+            final SslErrorDecisionMessage output = await api.onSslError(arg_webViewId, arg_error);
+            return wrapResponse(result: output);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onHttpAuthRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final HttpAuthRequestMessage arg_request = args[1]! as HttpAuthRequestMessage;
+          try {
+            final HttpAuthCredentialsMessage? output = await api.onHttpAuthRequest(arg_webViewId, arg_request);
+            return wrapResponse(result: output);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onDownloadStart$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final DownloadRequestMessage arg_request = args[1]! as DownloadRequestMessage;
+          try {
+            api.onDownloadStart(arg_webViewId, arg_request);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPermissionRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final PermissionRequestMessage arg_request = args[1]! as PermissionRequestMessage;
+          try {
+            final PermissionDecisionMessage output = await api.onPermissionRequest(arg_webViewId, arg_request);
+            return wrapResponse(result: output);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptHandlerCall$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final String arg_handlerName = args[1]! as String;
+          final String arg_argsJson = args[2]! as String;
+          try {
+            final String output = await api.onJavaScriptHandlerCall(arg_webViewId, arg_handlerName, arg_argsJson);
+            return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
           }          catch (e) {

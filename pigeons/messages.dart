@@ -21,6 +21,10 @@ import 'package:pigeon/pigeon.dart';
 // ---------------------------------------------------------------------------
 // Data classes
 // ---------------------------------------------------------------------------
+enum CacheModeMessage { normal, preferCache, cacheOnly, noCache }
+
+enum MixedContentModeMessage { neverAllow, compatibility, alwaysAllow }
+
 class WebViewSettingsMessage {
   WebViewSettingsMessage({
     required this.javaScriptEnabled,
@@ -29,6 +33,20 @@ class WebViewSettingsMessage {
     required this.supportZoom,
     required this.transparentBackground,
     required this.passkeysEnabled,
+    required this.allowsBackForwardNavigationGestures,
+    required this.inspectable,
+    required this.textZoom,
+    required this.cacheMode,
+    required this.incognito,
+    required this.javaScriptCanOpenWindowsAutomatically,
+    required this.scrollbarsVisible,
+    required this.overScrollEnabled,
+    required this.pullToRefreshEnabled,
+    required this.domStorageEnabled,
+    required this.allowFileAccess,
+    required this.allowContentAccess,
+    required this.mixedContentMode,
+    this.minimumFontSize,
     this.userAgent,
   });
 
@@ -44,7 +62,76 @@ class WebViewSettingsMessage {
 
   /// Android only. Ignored on iOS, where WebAuthn is governed by entitlements.
   bool passkeysEnabled;
+
+  /// iOS only. Ignored on Android.
+  bool allowsBackForwardNavigationGestures;
+
+  /// Android: process-wide `WebView.setWebContentsDebuggingEnabled`.
+  /// iOS: `WKWebView.isInspectable`.
+  bool inspectable;
+
+  /// Percent, 100 is normal. Android: `WebSettings.setTextZoom`. iOS: scales
+  /// the whole page with `WKWebView.pageZoom`.
+  int textZoom;
+
+  /// Android: `WebSettings.setCacheMode`. iOS: `URLRequest.cachePolicy` of
+  /// requests started with `loadUrl`.
+  CacheModeMessage cacheMode;
+
+  /// iOS only, creation only: `WKWebsiteDataStore.nonPersistent()`. Ignored on
+  /// Android, whose WebView shares its data across the app.
+  bool incognito;
+
+  /// Android: `WebSettings.setJavaScriptCanOpenWindowsAutomatically`. iOS:
+  /// `WKPreferences.javaScriptCanOpenWindowsAutomatically`.
+  bool javaScriptCanOpenWindowsAutomatically;
+
+  /// Android: vertical and horizontal scroll bars. iOS: scroll indicators.
+  bool scrollbarsVisible;
+
+  /// Android: `View.setOverScrollMode`. iOS: `UIScrollView.bounces`.
+  bool overScrollEnabled;
+
+  /// Android: `SwipeRefreshLayout`. iOS: `UIRefreshControl`. A pull reloads the
+  /// page.
+  bool pullToRefreshEnabled;
+
+  /// Android: `WebSettings.setDomStorageEnabled`. iOS has no switch.
+  bool domStorageEnabled;
+
+  /// Android: `WebSettings.setAllowFileAccess`. iOS has no equivalent.
+  bool allowFileAccess;
+
+  /// Android: `WebSettings.setAllowContentAccess`. iOS has no equivalent.
+  bool allowContentAccess;
+
+  /// Android: `WebSettings.setMixedContentMode`. iOS has no equivalent.
+  MixedContentModeMessage mixedContentMode;
+
+  /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
+  /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
+  int? minimumFontSize;
   String? userAgent;
+}
+
+enum ConsoleMessageLevelMessage { debug, log, info, warning, error }
+
+class ConsoleMessageMessage {
+  ConsoleMessageMessage({
+    required this.level,
+    required this.message,
+    this.sourceUrl,
+    this.lineNumber,
+  });
+
+  ConsoleMessageLevelMessage level;
+  String message;
+
+  /// Script that logged the message. `null` on iOS, which does not report it.
+  String? sourceUrl;
+
+  /// Line in [sourceUrl]. `null` on iOS, which does not report it.
+  int? lineNumber;
 }
 
 enum UserScriptInjectionTimeMessage { atDocumentStart, atDocumentEnd }
@@ -66,8 +153,17 @@ class CreationParamsMessage {
     required this.webViewId,
     required this.settings,
     required this.javaScriptChannelNames,
+    required this.javaScriptHandlerNames,
+    required this.javaScriptHandlerObjectName,
     required this.hasNavigationDelegate,
     required this.hasNewWindowDelegate,
+    required this.hasPermissionDelegate,
+    required this.hasDownloadDelegate,
+    required this.hasSslErrorDelegate,
+    required this.hasHttpAuthDelegate,
+    required this.hasScrollDelegate,
+    required this.hasLongPressDelegate,
+    required this.hasConsoleMessageDelegate,
     required this.userScripts,
   });
 
@@ -77,12 +173,46 @@ class CreationParamsMessage {
   /// Names exposed to JS as `window.<name>.postMessage(String)`.
   List<String> javaScriptChannelNames;
 
+  /// Handlers the page can call with `window.advanced_webview.callHandler`.
+  /// The bridge is only installed when this is not empty.
+  List<String> javaScriptHandlerNames;
+
+  /// Name of the global object (`window.<name>`) that exposes `callHandler`.
+  /// Always a valid JavaScript identifier.
+  String javaScriptHandlerObjectName;
+
   /// When false, native code never round-trips navigation decisions to Dart.
   bool hasNavigationDelegate;
 
   /// When false, `window.open` and `target="_blank"` load in the same WebView
   /// and never round-trip to Dart.
   bool hasNewWindowDelegate;
+
+  /// When false, permission requests (camera, microphone, geolocation) are
+  /// denied natively without a round trip to Dart.
+  bool hasPermissionDelegate;
+
+  /// When false, downloads are left to the platform default and never
+  /// round-trip to Dart.
+  bool hasDownloadDelegate;
+
+  /// When false, certificate errors are refused natively without a round trip
+  /// to Dart.
+  bool hasSslErrorDelegate;
+
+  /// When false, HTTP authentication challenges get the platform default
+  /// handling without a round trip to Dart.
+  bool hasHttpAuthDelegate;
+
+  /// When false, scroll changes are never reported to Dart.
+  bool hasScrollDelegate;
+
+  /// When false, long presses are never reported to Dart.
+  bool hasLongPressDelegate;
+
+  /// When false, console output is never reported to Dart (and, on iOS, the
+  /// `console` wrapper script is not injected).
+  bool hasConsoleMessageDelegate;
 
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
@@ -109,6 +239,88 @@ class WebResourceErrorMessage {
   String message;
   bool isMainFrame;
   String? url;
+}
+
+class SslErrorMessage {
+  SslErrorMessage({
+    required this.url,
+    required this.host,
+    required this.message,
+  });
+
+  String url;
+  String host;
+  String message;
+}
+
+enum SslErrorDecisionMessage { proceed, cancel }
+
+class HttpAuthRequestMessage {
+  HttpAuthRequestMessage({required this.host, this.realm});
+
+  String host;
+  String? realm;
+}
+
+class HttpAuthCredentialsMessage {
+  HttpAuthCredentialsMessage({required this.username, required this.password});
+
+  String username;
+  String password;
+}
+
+class DownloadRequestMessage {
+  DownloadRequestMessage({
+    required this.url,
+    this.suggestedFilename,
+    this.mimeType,
+    this.contentLength,
+  });
+
+  String url;
+  String? suggestedFilename;
+  String? mimeType;
+
+  /// Size in bytes; null when the server did not say.
+  int? contentLength;
+}
+
+enum PermissionResourceMessage { camera, microphone, geolocation }
+
+class PermissionRequestMessage {
+  PermissionRequestMessage({required this.origin, required this.resources});
+
+  /// Origin of the requesting page, e.g. `https://example.com`.
+  String origin;
+  List<PermissionResourceMessage> resources;
+}
+
+enum PermissionDecisionMessage { grant, deny }
+
+class FindResultMessage {
+  FindResultMessage({
+    required this.found,
+    this.matchCount,
+    this.activeMatchIndex,
+  });
+
+  bool found;
+
+  /// Total matches on the page. Null on iOS, which does not report a count.
+  int? matchCount;
+
+  /// Zero-based index of the highlighted match. Null on iOS.
+  int? activeMatchIndex;
+}
+
+class ScrollPositionMessage {
+  ScrollPositionMessage({required this.x, required this.y});
+
+  /// Horizontal offset in logical pixels.
+  double x;
+
+  /// Vertical offset in logical pixels.
+  double y;
 }
 
 class CookieMessage {
@@ -169,6 +381,38 @@ abstract class AdvancedWebViewHostApi {
   @async
   String? evaluateJavaScript(int webViewId, String source);
 
+  /// Returns a PNG of the visible area, or null when it cannot be captured
+  /// (for example when the view has no size yet).
+  @async
+  Uint8List? takeScreenshot(int webViewId);
+
+  /// Finds `query` in the page and highlights a match. A new query starts at
+  /// the first match; repeating the same query moves to the next or previous.
+  @async
+  FindResultMessage findText(int webViewId, String query, bool forward);
+
+  /// Removes the highlights left by `findText`.
+  void clearMatches(int webViewId);
+
+  /// Scrolls the page to `x`, `y` (logical pixels) without animation.
+  void scrollTo(int webViewId, double x, double y);
+
+  /// Scrolls the page by `dx`, `dy` (logical pixels) without animation.
+  void scrollBy(int webViewId, double dx, double dy);
+
+  ScrollPositionMessage getScrollPosition(int webViewId);
+
+  /// Opaque snapshot of the back/forward list and scroll position, or null
+  /// when there is nothing to save. Only valid on the same platform.
+  Uint8List? saveState(int webViewId);
+
+  /// Restores a snapshot from `saveState`. Returns false when it cannot be read.
+  bool restoreState(int webViewId, Uint8List state);
+
+  /// Opens the system print dialog for the current page. Fails with
+  /// `not-attached` when the WebView is not shown in a window.
+  void printPage(int webViewId, String? jobName);
+
   void updateSettings(int webViewId, WebViewSettingsMessage settings);
 
   @async
@@ -201,6 +445,17 @@ abstract class AdvancedWebViewFlutterApi {
 
   void onTitleChanged(int webViewId, String? title);
 
+  /// Only sent when the controller was created with `hasScrollDelegate`.
+  void onScrollChanged(int webViewId, double x, double y);
+
+  /// A long press at `x`, `y` (logical pixels, relative to the WebView).
+  /// Only sent when the controller was created with `hasLongPressDelegate`.
+  void onLongPress(int webViewId, double x, double y);
+
+  /// A `console.*` call made by the page. Only sent when the controller was
+  /// created with `hasConsoleMessageDelegate`.
+  void onConsoleMessage(int webViewId, ConsoleMessageMessage message);
+
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 
   @async
@@ -210,6 +465,37 @@ abstract class AdvancedWebViewFlutterApi {
   );
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
+
+  /// The WebView found a certificate problem. Cancelling refuses the load.
+  @async
+  SslErrorDecisionMessage onSslError(int webViewId, SslErrorMessage error);
+
+  /// A server asked for credentials. Null cancels the request.
+  @async
+  HttpAuthCredentialsMessage? onHttpAuthRequest(
+    int webViewId,
+    HttpAuthRequestMessage request,
+  );
+
+  /// The page started a download. The WebView does not save the file.
+  void onDownloadStart(int webViewId, DownloadRequestMessage request);
+
+  /// The page asked for camera, microphone or location access.
+  @async
+  PermissionDecisionMessage onPermissionRequest(
+    int webViewId,
+    PermissionRequestMessage request,
+  );
+
+  /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
+  /// argument list; the result is the JSON-encoded return value. Throwing
+  /// rejects the page's promise.
+  @async
+  String onJavaScriptHandlerCall(
+    int webViewId,
+    String handlerName,
+    String argsJson,
+  );
 
   /// The page asked for a new window; the WebView did not load `url` itself.
   void onNewWindowRequest(int webViewId, String url);

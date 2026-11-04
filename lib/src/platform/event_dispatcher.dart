@@ -8,12 +8,24 @@ abstract interface class WebViewEventListener {
   void onPageFinished(String url);
   void onProgressChanged(int progress);
   void onTitleChanged(String? title);
+  void onScrollChanged(double x, double y);
+  void onLongPress(double x, double y);
+  void onConsoleMessage(ConsoleMessageMessage message);
   void onReceivedError(WebResourceErrorMessage error);
   Future<NavigationDecisionMessage> shouldOverrideUrlLoading(
     NavigationRequestMessage request,
   );
   void onJavaScriptMessage(String channelName, String message);
   void onNewWindowRequest(String url);
+  void onDownloadStart(DownloadRequestMessage request);
+  Future<SslErrorDecisionMessage> onSslError(SslErrorMessage error);
+  Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(
+    HttpAuthRequestMessage request,
+  );
+  Future<PermissionDecisionMessage> onPermissionRequest(
+    PermissionRequestMessage request,
+  );
+  Future<String> onJavaScriptHandlerCall(String handlerName, String argsJson);
 }
 
 /// Single [AdvancedWebViewFlutterApi] implementation that routes every event to
@@ -54,6 +66,18 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
       _listeners[webViewId]?.onTitleChanged(title);
 
   @override
+  void onScrollChanged(int webViewId, double x, double y) =>
+      _listeners[webViewId]?.onScrollChanged(x, y);
+
+  @override
+  void onLongPress(int webViewId, double x, double y) =>
+      _listeners[webViewId]?.onLongPress(x, y);
+
+  @override
+  void onConsoleMessage(int webViewId, ConsoleMessageMessage message) =>
+      _listeners[webViewId]?.onConsoleMessage(message);
+
+  @override
   void onReceivedError(int webViewId, WebResourceErrorMessage error) =>
       _listeners[webViewId]?.onReceivedError(error);
 
@@ -74,4 +98,47 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   @override
   void onNewWindowRequest(int webViewId, String url) =>
       _listeners[webViewId]?.onNewWindowRequest(url);
+
+  @override
+  void onDownloadStart(int webViewId, DownloadRequestMessage request) =>
+      _listeners[webViewId]?.onDownloadStart(request);
+
+  @override
+  Future<SslErrorDecisionMessage> onSslError(
+    int webViewId,
+    SslErrorMessage error,
+  ) async {
+    final listener = _listeners[webViewId];
+    if (listener == null) return SslErrorDecisionMessage.cancel;
+    return listener.onSslError(error);
+  }
+
+  @override
+  Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(
+    int webViewId,
+    HttpAuthRequestMessage request,
+  ) async => _listeners[webViewId]?.onHttpAuthRequest(request);
+
+  @override
+  Future<PermissionDecisionMessage> onPermissionRequest(
+    int webViewId,
+    PermissionRequestMessage request,
+  ) async {
+    final listener = _listeners[webViewId];
+    if (listener == null) return PermissionDecisionMessage.deny;
+    return listener.onPermissionRequest(request);
+  }
+
+  @override
+  Future<String> onJavaScriptHandlerCall(
+    int webViewId,
+    String handlerName,
+    String argsJson,
+  ) async {
+    final listener = _listeners[webViewId];
+    if (listener == null) {
+      throw StateError('WebView $webViewId is no longer registered');
+    }
+    return listener.onJavaScriptHandlerCall(handlerName, argsJson);
+  }
 }

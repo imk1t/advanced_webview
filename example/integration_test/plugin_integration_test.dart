@@ -3,6 +3,7 @@
 // These tests exercise the native implementations end to end, so they are the
 // place to pin down behaviour that must match on Android and iOS.
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:advanced_webview/advanced_webview.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,36 @@ void main() {
     expect(messages, ['hi']);
   });
 
+  testWidgets('console output is reported with its level', (tester) async {
+    final messages = <WebViewConsoleMessage>[];
+    final harness = _Harness(onConsoleMessage: messages.add);
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml(
+      '<html><body><iframe srcdoc="<script>console.log(\'from frame\')</script>">'
+      '</iframe></body></html>',
+    );
+    await harness.controller.runJavaScript('''
+      console.debug('d');
+      console.info('i');
+      console.log('a', 1, 'b');
+      console.warn('w');
+      console.error('e');
+    ''');
+    await _pumpUntil(tester, () => messages.length >= 6);
+
+    String? levelOf(String text) =>
+        messages.where((m) => m.message == text).firstOrNull?.level.name;
+    expect(levelOf('a 1 b'), 'log');
+    expect(levelOf('w'), 'warning');
+    expect(levelOf('e'), 'error');
+    // Android may map debug and info onto neighbouring levels.
+    expect(levelOf('d'), isNotNull);
+    expect(levelOf('i'), isNotNull);
+    expect(levelOf('from frame'), 'log');
+  });
+
   testWidgets('JavaScript channels are routed to the owning controller', (
     tester,
   ) async {
@@ -82,6 +113,68 @@ void main() {
 
     expect(first, ['from a']);
     expect(second, ['from b']);
+  });
+
+  testWidgets('JavaScript handlers return values and reject on errors', (
+    tester,
+  ) async {
+    final results = <String>[];
+    final harness = _Harness(
+      javaScriptChannels: {'Out': results.add},
+      javaScriptHandlers: {
+        'sum': (args) => args.fold<num>(0, (a, b) => a + (b as num)),
+        'echo': (args) async => {'args': args},
+        'fail': (_) => throw StateError('boom'),
+      },
+    );
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body></body></html>');
+
+    // runJavaScript does not await promises, so report through a channel.
+    // `void` keeps WKWebView from rejecting the Promise as an unsupported result.
+    await harness.controller.runJavaScript('''
+      void (async () => {
+        const total = await window.advanced_webview.callHandler('sum', 1, 2, 3);
+        const echoed = await window.advanced_webview.callHandler('echo', 'a', {b: [1]});
+        let error = null;
+        try { await window.advanced_webview.callHandler('fail'); }
+        catch (e) { error = String(e.message); }
+        Out.postMessage(JSON.stringify({total, echoed, error}));
+      })();
+    ''');
+    await _pumpUntil(tester, () => results.isNotEmpty);
+
+    final result = jsonDecode(results.single) as Map<String, Object?>;
+    expect(result['total'], 6);
+    expect(result['echoed'], {
+      'args': [
+        'a',
+        {
+          'b': [1],
+        },
+      ],
+    });
+    expect(result['error'], contains('boom'));
+  });
+
+  testWidgets('downloads are reported instead of saved', (tester) async {
+    final downloads = <DownloadRequest>[];
+    final harness = _Harness(onDownloadStart: downloads.add);
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml(
+      '<html><body><a id="a" href="data:text/plain;base64,aGk=" '
+      'download="hi.txt">get</a></body></html>',
+    );
+    await harness.controller.runJavaScript(
+      'document.getElementById("a").click()',
+    );
+    await _pumpUntil(tester, () => downloads.isNotEmpty);
+
+    expect(downloads.single.url, startsWith('data:text/plain'));
   });
 
   testWidgets('navigation delegate can prevent a main-frame navigation', (
@@ -317,6 +410,81 @@ void main() {
     );
   });
 
+  testWidgets('takeScreenshot returns a PNG of the visible page', (
+    tester,
+  ) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body><h1>shot</h1></body></html>');
+    await harness.waitForSize(tester);
+    final png = await harness.controller.takeScreenshot();
+
+    expect(png, isNotNull);
+    expect(png!.sublist(0, 4), [0x89, 0x50, 0x4e, 0x47]);
+  });
+
+  testWidgets('findText finds text and clearMatches removes the highlight', (
+    tester,
+  ) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body><p>alpha beta alpha</p></body></html>');
+
+    final hit = await harness.controller.findText('alpha');
+    final miss = await harness.controller.findText('zzz');
+    await harness.controller.clearMatches();
+
+    expect(hit.found, isTrue);
+    expect(miss.found, isFalse);
+  });
+
+  testWidgets('hitTest finds the link and image under a point', (tester) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+    await harness.show(tester);
+    await harness.loadHtml(
+      '<html><body style="margin:0">'
+      '<a href="https://example.com/target" style="display:block;height:50px">link</a>'
+      '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" '
+      'style="display:block;width:50px;height:50px">'
+      '</body></html>',
+    );
+
+    await harness.waitForSize(tester);
+
+    final link = await harness.controller.hitTest(const Offset(10, 10));
+    final image = await harness.controller.hitTest(const Offset(10, 70));
+    final none = await harness.controller.hitTest(const Offset(10, 400));
+
+    expect(link.type, WebViewHitTestType.link);
+    expect(link.linkUrl, 'https://example.com/target');
+    expect(image.type, WebViewHitTestType.image);
+    expect(image.imageUrl, startsWith('data:image/gif'));
+    expect(none.type, WebViewHitTestType.none);
+  });
+
+  testWidgets('saveState from one WebView is accepted by another', (
+    tester,
+  ) async {
+    final source = _Harness();
+    addTearDown(source.dispose);
+    await source.show(tester);
+    await source.loadHtml('<html><body><p>saved</p></body></html>');
+
+    final state = await source.controller.saveState();
+
+    expect(state, isNotNull);
+    expect(state, isNotEmpty);
+    final target = _Harness();
+    addTearDown(target.dispose);
+    await target.show(tester);
+    expect(await target.controller.restoreState(state!), isTrue);
+  });
+
   testWidgets('the WebView outlives its widget', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);
@@ -341,15 +509,21 @@ void main() {
 class _Harness {
   _Harness({
     Map<String, JavaScriptMessageCallback> javaScriptChannels = const {},
+    Map<String, JavaScriptHandler> javaScriptHandlers = const {},
     NavigationRequestCallback? onNavigationRequest,
     List<UserScript> userScripts = const [],
     NewWindowCallback? onNewWindow,
+    DownloadStartCallback? onDownloadStart,
+    ConsoleMessageCallback? onConsoleMessage,
   }) {
     controller = AdvancedWebViewController(
       javaScriptChannels: javaScriptChannels,
+      javaScriptHandlers: javaScriptHandlers,
       userScripts: userScripts,
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
+      onDownloadStart: onDownloadStart,
+      onConsoleMessage: onConsoleMessage,
       onPageStarted: startedUrls.add,
       onPageFinished: (url) {
         _pageFinished?.complete();
@@ -379,7 +553,28 @@ class _Harness {
     await finished.future.timeout(_timeout);
   }
 
+  /// The platform view gets its size asynchronously; wait until the page has a viewport.
+  Future<void> waitForSize(WidgetTester tester) => _pumpUntilAsync(
+    tester,
+    () async =>
+        await controller.runJavaScriptReturningResult('window.innerWidth') != 0,
+  );
+
   Future<void> dispose() => controller.dispose();
+}
+
+/// Like [_pumpUntil] for a condition that has to be awaited.
+Future<void> _pumpUntilAsync(
+  WidgetTester tester,
+  Future<bool> Function() condition,
+) async {
+  final deadline = DateTime.now().add(_timeout);
+  while (!await condition()) {
+    if (DateTime.now().isAfter(deadline)) {
+      fail('Condition not met within $_timeout');
+    }
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 }
 
 /// Pumps frames until [condition] holds, failing after [_timeout].
