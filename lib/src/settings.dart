@@ -143,6 +143,7 @@ class IOSWebViewSettings {
     this.incognito = false,
     this.applicationNameForUserAgent,
     this.contentMode = WebViewContentMode.recommended,
+    this.allowsLinkPreview = true,
   });
 
   /// Plays videos inline instead of full screen
@@ -177,12 +178,17 @@ class IOSWebViewSettings {
   /// it. Android has no equivalent; use [WebViewSettings.userAgent] there.
   final WebViewContentMode contentMode;
 
+  /// Shows the link preview when the user presses and holds a link
+  /// (`WKWebView.allowsLinkPreview`). Android has no equivalent.
+  final bool allowsLinkPreview;
+
   IOSWebViewSettings copyWith({
     bool? allowsInlineMediaPlayback,
     bool? allowsBackForwardNavigationGestures,
     bool? incognito,
     ValueGetter<String?>? applicationNameForUserAgent,
     WebViewContentMode? contentMode,
+    bool? allowsLinkPreview,
   }) {
     return IOSWebViewSettings(
       allowsInlineMediaPlayback:
@@ -195,6 +201,7 @@ class IOSWebViewSettings {
           ? applicationNameForUserAgent()
           : this.applicationNameForUserAgent,
       contentMode: contentMode ?? this.contentMode,
+      allowsLinkPreview: allowsLinkPreview ?? this.allowsLinkPreview,
     );
   }
 
@@ -206,7 +213,8 @@ class IOSWebViewSettings {
           allowsBackForwardNavigationGestures &&
       other.incognito == incognito &&
       other.applicationNameForUserAgent == applicationNameForUserAgent &&
-      other.contentMode == contentMode;
+      other.contentMode == contentMode &&
+      other.allowsLinkPreview == allowsLinkPreview;
 
   @override
   int get hashCode => Object.hash(
@@ -215,6 +223,7 @@ class IOSWebViewSettings {
     incognito,
     applicationNameForUserAgent,
     contentMode,
+    allowsLinkPreview,
   );
 }
 
@@ -372,6 +381,7 @@ class WebViewSettings {
     mixedContentMode:
         MixedContentModeMessage.values[android.mixedContentMode.index],
     contentMode: ContentModeMessage.values[ios.contentMode.index],
+    allowsLinkPreview: ios.allowsLinkPreview,
     minimumFontSize: minimumFontSize,
     userAgent: userAgent,
     applicationNameForUserAgent: ios.applicationNameForUserAgent,

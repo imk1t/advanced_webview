@@ -155,6 +155,16 @@ void main() {
       );
     });
 
+    test('allowsLinkPreview is passed to native', () {
+      expect(const WebViewSettings().toMessage().allowsLinkPreview, isTrue);
+      expect(
+        const WebViewSettings(ios: IOSWebViewSettings(allowsLinkPreview: false))
+            .toMessage()
+            .allowsLinkPreview,
+        isFalse,
+      );
+    });
+
     test('incognito is passed to native', () {
       expect(const WebViewSettings().toMessage().incognito, isFalse);
       expect(

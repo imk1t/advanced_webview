@@ -60,6 +60,7 @@ const WebViewSettings(
 | `incognito` | `false` | 無視 | 生成時のみ |
 | `applicationNameForUserAgent` | `null` | 無視 | 生成時のみ |
 | `contentMode` | `recommended` | 無視 | 対応 |
+| `allowsLinkPreview` | `true` | 無視 | 対応 |
 
 「生成時のみ」の設定はネイティブビューの生成時に適用され、そのプラットフォームでは `updateSettings` で変更しても無視されます。
 
