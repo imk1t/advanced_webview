@@ -1,9 +1,9 @@
 name: advanced_webview
-description: "A lean, type-safe WebView plugin for Android and iOS built on Pigeon."
+description: "A lean, type-safe Flutter WebView plugin for Android and iOS, built on Pigeon with a small public API."
 version: 0.5.0
 repository: https://github.com/imk1t/advanced_webview
 issue_tracker: https://github.com/imk1t/advanced_webview/issues
-documentation: https://github.com/imk1t/advanced_webview/blob/main/doc/architecture.md
+documentation: https://imk1t.github.io/advanced_webview/
 topics:
   - webview
   - browser
