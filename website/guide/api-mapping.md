@@ -44,3 +44,7 @@ Native class names marked with ↗ link to the official documentation.
 ## User scripts
 
 <ApiMapping group="userScripts" />
+
+## In-app browser
+
+<ApiMapping group="inAppBrowser" />

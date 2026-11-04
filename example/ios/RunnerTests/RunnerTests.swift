@@ -386,6 +386,86 @@ final class RunnerTests: XCTestCase {
     XCTAssertTrue(view === instance)
   }
 
+  // MARK: - In-app browser
+
+  func testOpenInAppBrowserRejectsAnUnknownWebView() {
+    let (hostApi, _, _) = makeHostApi()
+
+    XCTAssertThrowsError(try hostApi.openInAppBrowser(params: browserParams(webViewId: 42))) {
+      error in
+      XCTAssertEqual((error as? PigeonError)?.code, "not-found")
+    }
+  }
+
+  func testCloseInAppBrowserIsANoOpWhenNotOpen() {
+    let (hostApi, _, _) = makeHostApi()
+
+    XCTAssertNoThrow(try hostApi.closeInAppBrowser(webViewId: 1))
+  }
+
+  func testInAppBrowserShowsTheWebViewAndReportsClosedOnce() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    let browser = try registry.get(1)
+    var closed = 0
+    let controller = InAppBrowserViewController(
+      browser: browser, params: browserParams(toolbarTitle: "Docs", showUrl: true)
+    ) { closed += 1 }
+
+    controller.loadViewIfNeeded()
+
+    XCTAssertTrue(browser.webView.isDescendant(of: controller.view))
+    let titleView = controller.navigationItem.titleView as? UIStackView
+    XCTAssertEqual((titleView?.arrangedSubviews.first as? UILabel)?.text, "Docs")
+    XCTAssertEqual(titleView?.arrangedSubviews.count, 2)
+    controller.finish()
+    controller.finish()
+    XCTAssertEqual(closed, 1)
+    XCTAssertNil(browser.webView.superview)
+    // The WebView belongs to Dart and is still registered.
+    XCTAssertNoThrow(try registry.get(1))
+  }
+
+  func testInAppBrowserNavigationButtonsAreOptional() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    let browser = try registry.get(1)
+
+    let shown = InAppBrowserViewController(browser: browser, params: browserParams()) {}
+    shown.loadViewIfNeeded()
+    XCTAssertEqual(shown.toolbarItems?.count, 4)
+
+    let hidden = InAppBrowserViewController(
+      browser: browser, params: browserParams(showNavigationButtons: false)
+    ) {}
+    hidden.loadViewIfNeeded()
+    XCTAssertNil(hidden.toolbarItems)
+  }
+
+  func testInAppBrowserCloseButtonLabel() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    let controller = InAppBrowserViewController(
+      browser: try registry.get(1), params: browserParams(closeButtonLabel: "Done")
+    ) {}
+
+    controller.loadViewIfNeeded()
+
+    XCTAssertEqual(controller.navigationItem.leftBarButtonItem?.title, "Done")
+  }
+
+  private func browserParams(
+    webViewId: Int64 = 1,
+    toolbarTitle: String? = nil,
+    showUrl: Bool = false,
+    showNavigationButtons: Bool = true,
+    closeButtonLabel: String? = nil
+  ) -> InAppBrowserParamsMessage {
+    return InAppBrowserParamsMessage(
+      webViewId: webViewId, showUrl: showUrl, showNavigationButtons: showNavigationButtons,
+      toolbarColor: nil, toolbarTitle: toolbarTitle, closeButtonLabel: closeButtonLabel)
+  }
+
   // MARK: - Helpers
 
   private func makeHostApi() -> (WebViewHostApiImpl, WebViewRegistry, FakeBinaryMessenger) {

@@ -43,6 +43,14 @@ HostApi / FlutterApi は全 WebView で1組を共有し、操作とイベント�
 `WebViewEventDispatcher` がネイティブからのイベントを対応するコントローラへ届ける。
 PlatformView ごとにチャネルを追加したり、ウィジェットにネイティブ WebView の破棄を任せたりしない。
 
+### アプリ内ブラウザ
+
+`AdvancedInAppBrowser`（`lib/src/in_app_browser.dart`）は、内部で `AdvancedWebViewController` を1つ作り、
+その WebView を全画面のネイティブ画面（Android は `InAppBrowserActivity`、iOS は `InAppBrowserViewController`）に
+載せて表示する。専用のチャネルや WebView 実装は持たず、HostApi に `openInAppBrowser` / `closeInAppBrowser`、
+FlutterApi に `onInAppBrowserClosed` を足しただけなので、読み込み・JavaScript・ページイベントは通常の
+コントローラと同じ経路を通る。WebView の所有者は Dart のまま（ブラウザが閉じたあとに Dart が `dispose` する）。
+
 ## Pigeon の採用
 
 Pigeon のバージョンは [pubspec.yaml](pubspec.yaml) で固定している。

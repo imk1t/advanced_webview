@@ -1111,6 +1111,75 @@ struct CookieMessage: Hashable, CustomStringConvertible {
   }
 }
 
+/// Chrome of the full-screen in-app browser that hosts an existing WebView.
+///
+/// Generated class from Pigeon that represents data sent in messages.
+struct InAppBrowserParamsMessage: Hashable, CustomStringConvertible {
+  /// The WebView created with `create`; the browser shows it and does not own
+  /// its lifetime.
+  var webViewId: Int64
+  var showUrl: Bool
+  var showNavigationButtons: Bool
+  /// Toolbar background as ARGB (`Color.toARGB32`); `null` uses the platform
+  /// default.
+  var toolbarColor: Int64? = nil
+  /// Fixed toolbar title; `null` shows the page title.
+  var toolbarTitle: String? = nil
+  /// Label of the button that closes the browser; `null` uses a localized
+  /// platform default.
+  var closeButtonLabel: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> InAppBrowserParamsMessage? {
+    let webViewId = pigeonVar_list[0] as! Int64
+    let showUrl = pigeonVar_list[1] as! Bool
+    let showNavigationButtons = pigeonVar_list[2] as! Bool
+    let toolbarColor: Int64? = nilOrValue(pigeonVar_list[3])
+    let toolbarTitle: String? = nilOrValue(pigeonVar_list[4])
+    let closeButtonLabel: String? = nilOrValue(pigeonVar_list[5])
+
+    return InAppBrowserParamsMessage(
+      webViewId: webViewId,
+      showUrl: showUrl,
+      showNavigationButtons: showNavigationButtons,
+      toolbarColor: toolbarColor,
+      toolbarTitle: toolbarTitle,
+      closeButtonLabel: closeButtonLabel
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      webViewId,
+      showUrl,
+      showNavigationButtons,
+      toolbarColor,
+      toolbarTitle,
+      closeButtonLabel,
+    ]
+  }
+  static func == (lhs: InAppBrowserParamsMessage, rhs: InAppBrowserParamsMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.showUrl, rhs.showUrl) && MessagesPigeonInternal.deepEquals(lhs.showNavigationButtons, rhs.showNavigationButtons) && MessagesPigeonInternal.deepEquals(lhs.toolbarColor, rhs.toolbarColor) && MessagesPigeonInternal.deepEquals(lhs.toolbarTitle, rhs.toolbarTitle) && MessagesPigeonInternal.deepEquals(lhs.closeButtonLabel, rhs.closeButtonLabel)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("InAppBrowserParamsMessage")
+    MessagesPigeonInternal.deepHash(value: webViewId, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: showUrl, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: showNavigationButtons, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: toolbarColor, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: toolbarTitle, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: closeButtonLabel, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "InAppBrowserParamsMessage(webViewId: \(String(describing: webViewId)), showUrl: \(String(describing: showUrl)), showNavigationButtons: \(String(describing: showNavigationButtons)), toolbarColor: \(String(describing: toolbarColor)), toolbarTitle: \(String(describing: toolbarTitle)), closeButtonLabel: \(String(describing: closeButtonLabel)))"
+  }
+}
+
 private class MessagesPigeonCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -1196,6 +1265,8 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
       return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
     case 151:
       return CookieMessage.fromList(self.readValue() as! [Any?])
+    case 152:
+      return InAppBrowserParamsMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
     }
@@ -1273,6 +1344,9 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? CookieMessage {
       super.writeByte(151)
       super.writeValue(value.toList())
+    } else if let value = value as? InAppBrowserParamsMessage {
+      super.writeByte(152)
+      super.writeValue(value.toList())
     } else {
       super.writeValue(value)
     }
@@ -1341,6 +1415,13 @@ protocol AdvancedWebViewHostApi {
   /// Registers a script for pages loaded from now on.
   func addUserScript(webViewId: Int64, script: UserScriptMessage) throws
   func removeAllUserScripts(webViewId: Int64) throws
+  /// Presents the WebView `params.webViewId` full screen with a toolbar. Fails
+  /// with `not-attached` when there is no screen to present from and with
+  /// `already-open` when it is already presented.
+  func openInAppBrowser(params: InAppBrowserParamsMessage) throws
+  /// Dismisses the in-app browser; a no-op when it is not open. The WebView
+  /// itself stays alive.
+  func closeInAppBrowser(webViewId: Int64) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1815,6 +1896,41 @@ class AdvancedWebViewHostApiSetup {
     } else {
       removeAllUserScriptsChannel.setMessageHandler(nil)
     }
+    /// Presents the WebView `params.webViewId` full screen with a toolbar. Fails
+    /// with `not-attached` when there is no screen to present from and with
+    /// `already-open` when it is already presented.
+    let openInAppBrowserChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.openInAppBrowser\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      openInAppBrowserChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let paramsArg = args[0] as! InAppBrowserParamsMessage
+        do {
+          try api.openInAppBrowser(params: paramsArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      openInAppBrowserChannel.setMessageHandler(nil)
+    }
+    /// Dismisses the in-app browser; a no-op when it is not open. The WebView
+    /// itself stays alive.
+    let closeInAppBrowserChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.closeInAppBrowser\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      closeInAppBrowserChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        do {
+          try api.closeInAppBrowser(webViewId: webViewIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      closeInAppBrowserChannel.setMessageHandler(nil)
+    }
   }
 }
 
@@ -1849,6 +1965,8 @@ protocol AdvancedWebViewFlutterApiProtocol {
   @MainActor func onJavaScriptHandlerCall(webViewId webViewIdArg: Int64, handlerName handlerNameArg: String, argsJson argsJsonArg: String) async throws -> String
   /// The page asked for a new window; the WebView did not load `url` itself.
   @MainActor func onNewWindowRequest(webViewId webViewIdArg: Int64, url urlArg: String) async throws
+  /// The in-app browser was dismissed, by the user or by `closeInAppBrowser`.
+  @MainActor func onInAppBrowserClosed(webViewId webViewIdArg: Int64) async throws
 }
 class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -2191,6 +2309,27 @@ class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
       let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onNewWindowRequest\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, urlArg] as [Any?]) { response in
+        guard let listResponse = response as? [Any?] else {
+          continuation.resume(throwing: createConnectionError(withChannelName: channelName))
+          return
+        }
+        if listResponse.count > 1 {
+          let code: String = listResponse[0] as! String
+          let message: String? = nilOrValue(listResponse[1])
+          let details: String? = nilOrValue(listResponse[2])
+          continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
+        } else {
+          continuation.resume()
+        }
+      }
+    }
+  }
+  /// The in-app browser was dismissed, by the user or by `closeInAppBrowser`.
+  @MainActor func onInAppBrowserClosed(webViewId webViewIdArg: Int64) async throws {
+    return try await withCheckedThrowingContinuation { continuation in
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInAppBrowserClosed\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([webViewIdArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
           continuation.resume(throwing: createConnectionError(withChannelName: channelName))
           return

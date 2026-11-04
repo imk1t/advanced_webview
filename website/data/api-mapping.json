@@ -48,6 +48,13 @@
         "en": "User scripts",
         "ja": "ユーザースクリプト"
       }
+    },
+    {
+      "id": "inAppBrowser",
+      "title": {
+        "en": "In-app browser",
+        "ja": "アプリ内ブラウザ"
+      }
     }
   ],
   "classes": {
@@ -79,7 +86,9 @@
       "HttpAuthHandler": "https://developer.android.com/reference/android/webkit/HttpAuthHandler",
       "JavaScriptReplyProxy": "https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy",
       "WebSettingsCompat": "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat",
-      "WebViewFeature": "https://developer.android.com/reference/androidx/webkit/WebViewFeature"
+      "WebViewFeature": "https://developer.android.com/reference/androidx/webkit/WebViewFeature",
+      "Activity": "https://developer.android.com/reference/android/app/Activity",
+      "Toolbar": "https://developer.android.com/reference/android/widget/Toolbar"
     },
     "ios": {
       "WKWebView": "https://developer.apple.com/documentation/webkit/wkwebview",
@@ -102,7 +111,6 @@
       "WKUserScript": "https://developer.apple.com/documentation/webkit/wkuserscript",
       "WKScriptMessageHandler": "https://developer.apple.com/documentation/webkit/wkscriptmessagehandler",
       "WKNavigationResponse": "https://developer.apple.com/documentation/webkit/wknavigationresponse",
-      "WKNavigationAction": "https://developer.apple.com/documentation/webkit/wknavigationaction",
       "SecTrustEvaluateWithError": "https://developer.apple.com/documentation/security/sectrustevaluatewitherror(_:_:)",
       "URLCredential": "https://developer.apple.com/documentation/foundation/urlcredential",
       "URLAuthenticationChallenge": "https://developer.apple.com/documentation/foundation/urlauthenticationchallenge",
@@ -120,7 +128,10 @@
       "WKHTTPCookieStore": "https://developer.apple.com/documentation/webkit/wkhttpcookiestore",
       "HTTPCookie": "https://developer.apple.com/documentation/foundation/httpcookie",
       "WKUIDelegate": "https://developer.apple.com/documentation/webkit/wkuidelegate",
-      "WKWindowFeatures": "https://developer.apple.com/documentation/webkit/wkwindowfeatures"
+      "WKWindowFeatures": "https://developer.apple.com/documentation/webkit/wkwindowfeatures",
+      "UINavigationController": "https://developer.apple.com/documentation/uikit/uinavigationcontroller",
+      "UIViewController": "https://developer.apple.com/documentation/uikit/uiviewcontroller",
+      "UINavigationBarAppearance": "https://developer.apple.com/documentation/uikit/uinavigationbarappearance"
     }
   },
   "entries": [
@@ -2179,6 +2190,58 @@
         "note": {
           "en": "Always returns nil; without a callback the request is loaded in the same WKWebView.",
           "ja": "常に nil を返します。コールバックがない場合は同じ WKWebView で読み込みます。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedInAppBrowser",
+      "group": "inAppBrowser",
+      "summary": {
+        "en": "A full-screen browser with a toolbar, shown over the Flutter UI. It hosts a WebView created like an AdvancedWebViewController, so loading, JavaScript and page events use the same native calls.",
+        "ja": "Flutter UI の上に表示する、ツールバー付きの全画面ブラウザです。AdvancedWebViewController と同じ方法で作成した WebView を表示するため、読み込み・JavaScript・ページイベントは同じネイティブ API を使います。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["Activity.startActivity(Intent)", "Activity.finish()", "Toolbar"],
+        "note": {
+          "en": "A dedicated InAppBrowserActivity registered in the plugin manifest; the back button goes back in the page first. Needs the host Activity.",
+          "ja": "プラグインの manifest に登録した専用の InAppBrowserActivity を使います。戻るボタンはまずページ履歴を戻ります。ホストの Activity が必要です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "UIViewController.present(_:animated:completion:)",
+          "UIViewController.dismiss(animated:completion:)",
+          "UINavigationController"
+        ],
+        "note": {
+          "en": "Presented modally full screen from the top view controller of the foreground scene.",
+          "ja": "フォアグラウンドのシーンの最前面の view controller からフルスクリーンのモーダルで表示します。"
+        }
+      }
+    },
+    {
+      "dart": "InAppBrowserOptions",
+      "group": "inAppBrowser",
+      "summary": {
+        "en": "Toolbar colour, title, URL and navigation buttons, close button label, and the WebView settings of the browser.",
+        "ja": "ツールバーの色・タイトル・URL 表示・ナビゲーションボタン・閉じるボタンのラベルと、ブラウザ内 WebView の設定です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["Toolbar"],
+        "note": {
+          "en": "Colour, title and subtitle are set on the Toolbar; buttons are text menu items.",
+          "ja": "色・タイトル・サブタイトルは Toolbar に設定し、ボタンはテキストのメニュー項目です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UINavigationBarAppearance", "UINavigationController"],
+        "note": {
+          "en": "Colour is applied through UINavigationBarAppearance; the buttons are in the bottom toolbar.",
+          "ja": "色は UINavigationBarAppearance で設定し、ボタンは下部のツールバーに置きます。"
         }
       }
     }

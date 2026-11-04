@@ -16,6 +16,38 @@ const _baseUrl = 'https://advanced-webview.test/';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  testWidgets('in-app browser opens, runs JavaScript and closes', (
+    tester,
+  ) async {
+    final events = <String>[];
+    final browser = AdvancedInAppBrowser(
+      onOpened: () => events.add('opened'),
+      onClosed: () => events.add('closed'),
+      onPageFinished: (_) => events.add('finished'),
+    );
+    await tester.pumpWidget(const MaterialApp(home: Scaffold()));
+
+    await browser.open(
+      Uri.dataFromString(
+        '<html><head><title>browser</title></head><body></body></html>',
+        mimeType: 'text/html',
+        encoding: utf8,
+      ),
+      options: const InAppBrowserOptions(showUrl: true),
+    );
+    await _pumpUntil(tester, () => events.contains('finished'));
+
+    expect(browser.isOpened, isTrue);
+    expect(await browser.evaluateJavaScript('document.title'), 'browser');
+
+    await browser.close();
+    await _pumpUntil(tester, () => events.contains('closed'));
+
+    expect(browser.isOpened, isFalse);
+    expect(events.first, 'opened');
+    expect(events.where((e) => e == 'closed'), hasLength(1));
+  });
+
   testWidgets('loads HTML, evaluates JS and receives channel messages', (
     tester,
   ) async {

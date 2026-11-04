@@ -88,6 +88,9 @@ class AdvancedWebView(
     private val hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
+
+    /** Called after a page started or finished loading or its title changed, e.g. to refresh a toolbar. */
+    var onPageStateChanged: (() -> Unit)? = null
     private var findQuery: String? = null
     private var pendingFind: CancellableContinuation<FindResultMessage>? = null
 
@@ -469,11 +472,13 @@ class AdvancedWebView(
     private inner class Client : WebViewClient() {
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
             send { flutterApi.onPageStarted(id, url) }
+            onPageStateChanged?.invoke()
         }
 
         override fun onPageFinished(view: WebView, url: String) {
             container.isRefreshing = false
             send { flutterApi.onPageFinished(id, url) }
+            onPageStateChanged?.invoke()
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
@@ -568,6 +573,7 @@ class AdvancedWebView(
 
         override fun onReceivedTitle(view: WebView, title: String?) {
             send { flutterApi.onTitleChanged(id, title) }
+            onPageStateChanged?.invoke()
         }
 
         // Returning false keeps the platform logging (Logcat).
