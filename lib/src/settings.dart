@@ -57,6 +57,7 @@ class AndroidWebViewSettings {
     this.allowFileAccess = false,
     this.allowContentAccess = false,
     this.mixedContentMode = WebViewMixedContentMode.neverAllow,
+    this.geolocationEnabled = true,
   });
 
   /// Lets the user pinch to zoom (`WebSettings.setSupportZoom`).
@@ -91,6 +92,16 @@ class AndroidWebViewSettings {
   /// setting.
   final WebViewMixedContentMode mixedContentMode;
 
+  /// Lets pages use `navigator.geolocation`
+  /// (`WebSettings.setGeolocationEnabled`). On by default, as in earlier
+  /// versions. Turn it off to refuse location requests without asking.
+  ///
+  /// Even when on, the page only gets a location if the app holds the Android
+  /// location permission and the request is granted through
+  /// [AdvancedWebViewController.onPermissionRequest]. On iOS the system decides,
+  /// so there is no setting.
+  final bool geolocationEnabled;
+
   AndroidWebViewSettings copyWith({
     bool? supportZoom,
     bool? passkeysEnabled,
@@ -98,6 +109,7 @@ class AndroidWebViewSettings {
     bool? allowFileAccess,
     bool? allowContentAccess,
     WebViewMixedContentMode? mixedContentMode,
+    bool? geolocationEnabled,
   }) {
     return AndroidWebViewSettings(
       supportZoom: supportZoom ?? this.supportZoom,
@@ -106,6 +118,7 @@ class AndroidWebViewSettings {
       allowFileAccess: allowFileAccess ?? this.allowFileAccess,
       allowContentAccess: allowContentAccess ?? this.allowContentAccess,
       mixedContentMode: mixedContentMode ?? this.mixedContentMode,
+      geolocationEnabled: geolocationEnabled ?? this.geolocationEnabled,
     );
   }
 
@@ -117,7 +130,8 @@ class AndroidWebViewSettings {
       other.domStorageEnabled == domStorageEnabled &&
       other.allowFileAccess == allowFileAccess &&
       other.allowContentAccess == allowContentAccess &&
-      other.mixedContentMode == mixedContentMode;
+      other.mixedContentMode == mixedContentMode &&
+      other.geolocationEnabled == geolocationEnabled;
 
   @override
   int get hashCode => Object.hash(
@@ -127,6 +141,7 @@ class AndroidWebViewSettings {
     allowFileAccess,
     allowContentAccess,
     mixedContentMode,
+    geolocationEnabled,
   );
 }
 
@@ -382,6 +397,7 @@ class WebViewSettings {
         MixedContentModeMessage.values[android.mixedContentMode.index],
     contentMode: ContentModeMessage.values[ios.contentMode.index],
     allowsLinkPreview: ios.allowsLinkPreview,
+    geolocationEnabled: android.geolocationEnabled,
     minimumFontSize: minimumFontSize,
     userAgent: userAgent,
     applicationNameForUserAgent: ios.applicationNameForUserAgent,

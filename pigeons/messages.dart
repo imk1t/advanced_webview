@@ -50,6 +50,7 @@ class WebViewSettingsMessage {
     required this.mixedContentMode,
     required this.contentMode,
     required this.allowsLinkPreview,
+    required this.geolocationEnabled,
     this.minimumFontSize,
     this.userAgent,
     this.applicationNameForUserAgent,
@@ -119,6 +120,9 @@ class WebViewSettingsMessage {
 
   /// iOS only: `WKWebView.allowsLinkPreview`. Ignored on Android.
   bool allowsLinkPreview;
+
+  /// Android: `WebSettings.setGeolocationEnabled`. iOS has no switch.
+  bool geolocationEnabled;
 
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
