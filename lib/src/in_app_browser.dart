@@ -56,7 +56,7 @@ class InAppBrowserOptions {
 /// One instance shows at most one browser at a time; after it closes, [open]
 /// can be called again. The browser creates its own WebView, so cookies and
 /// settings of other [AdvancedWebViewController]s are unaffected (on iOS, set
-/// [WebViewSettings.incognito] to also isolate the website data).
+/// [IOSWebViewSettings.incognito] to also isolate the website data).
 ///
 /// Android: a dedicated `Activity` with an `android.widget.Toolbar` hosting
 /// the `WebView`. iOS: a `UIViewController` with a `WKWebView`, presented
