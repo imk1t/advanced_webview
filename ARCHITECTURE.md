@@ -1,5 +1,9 @@
 # アーキテクチャと設計判断
 
+この文書は、開発者向けに設計の方針と制約をまとめたものです。
+利用方法は[ドキュメントサイト](https://imk1t.github.io/advanced_webview/ja/)、
+開発手順は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+
 ## 方針
 
 - 対象は **Android と iOS のみ**。Web / macOS / Windows / Linux は扱わない。
@@ -14,7 +18,7 @@ lib/
   src/
     controller.dart            AdvancedWebViewController（WebView 1つ = コントローラ 1つ）
     widget.dart                AdvancedWebView（AndroidView / UiKitView）
-    settings.dart              WebViewSettings（不変オブジェクト）
+    settings.dart              共通・Android・iOS の設定（不変オブジェクト）
     navigation.dart            NavigationRequest / WebResourceError / コールバック型
     platform/
       messages.g.dart          Pigeon生成コード（手で編集しない）
@@ -35,33 +39,33 @@ Android と iOS は **同じクラス構成・同じ名前** に揃えている�
    `webViewId` で Registry から既存インスタンスを引き当てるだけ。
 3. `controller.dispose()` で破棄。ウィジェットの破棄では WebView は消えない（画面遷移やタブ切替で状態を保てる）。
 
-`flutter_inappwebview` は PlatformView ごとに MethodChannel を作り、ウィジェットとWebViewの寿命が結びついている。
-本パッケージは「コントローラが寿命を持つ」設計にして、チャネルを1組に固定した。
+HostApi / FlutterApi は全 WebView で1組を共有し、操作とイベントを `webViewId` で振り分ける。
+`WebViewEventDispatcher` がネイティブからのイベントを対応するコントローラへ届ける。
+PlatformView ごとにチャネルを追加したり、ウィジェットにネイティブ WebView の破棄を任せたりしない。
 
-## Pigeon を採用するか
+## Pigeon の採用
 
-**結論: 採用する（pigeon ^29）。**
+Pigeon のバージョンは [pubspec.yaml](pubspec.yaml) で固定している。
+`pigeons/messages.dart` を Dart・Kotlin・Swift 間の契約の唯一の定義元とする。
 
 ### 理由
 
-| 観点 | MethodChannel 手書き（flutter_inappwebview） | Pigeon |
+| 観点 | MethodChannel を手書きする場合 | 本パッケージの Pigeon 利用 |
 | --- | --- | --- |
 | 型安全 | 文字列のメソッド名と `Map<String, dynamic>` の手動変換 | Dart/Kotlin/Swift の型・nullabilityを生成 |
 | 契約の所在 | Dart・Kotlin・Swift の3か所に分散 | `pigeons/messages.dart` の1ファイル |
-| 変更時の不整合 | 実行時にしか気付けない | 再生成でコンパイルエラーになる |
+| 変更時の不整合 | メソッド名やデータ形式の食い違いをテストで確認する必要がある | 生成された型に対する不整合をコンパイル時に検出できる |
 | 非同期 | コールバックを手で管理 | Kotlin `suspend` / Swift `async` で生成 |
-| CI | 不整合の検出手段がない | 再生成して `git diff` で検出（CIで実施） |
+| CI | 契約の一致を独自に検証する必要がある | 再生成して `git diff` で生成漏れを検出（CIで実施） |
 
-`flutter_inappwebview` の保守性の悪さの大部分は、数百のメソッド名文字列と Map 変換が3言語に散らばっている点にある。
-Pigeon はまさにこの部分を自動化するもので、公式の `webview_flutter` も Pigeon を使っている。
+Pigeon によって通信コードの生成を自動化し、手書きコードを機能の実装とプラットフォーム差異の吸収に集中させる。
 
 ### HostApi 方式 と ProxyApi 方式
 
-Pigeon には、ネイティブクラスを1対1で Dart に写す **ProxyApi**（`webview_flutter` の Android/iOS 実装が採用）もある。
-今回は採用せず、**通常の HostApi / FlutterApi + `webViewId` 引数** にした。
+本パッケージでは、ネイティブクラスを直接 Dart に公開する ProxyApi 方式ではなく、
+**通常の HostApi / FlutterApi + `webViewId`** で機能単位の契約を定義している。
 
-- ProxyApi は WKWebView / android.webkit の API 全体を Dart 側にミラーするため、生成コードと Dart 側ラッパーが大きくなり、
-  2プラットフォームの差異吸収を Dart 側で書くことになる。
+- WKWebView / android.webkit のクラス構成を公開 API に持ち込まず、両プラットフォームに共通の操作を公開する。
 - 本パッケージは「Android と iOS で同じ振る舞いを持つ小さな API」が目的なので、差異はネイティブ側で吸収し、
   Dart から見える契約は機能単位（`loadUrl`, `evaluateJavaScript` など）にした方が読みやすく変更しやすい。
 - 将来、細かいネイティブAPIを個別に公開したくなった場合は、その部分だけ ProxyApi を導入できる。
@@ -69,7 +73,7 @@ Pigeon には、ネイティブクラスを1対1で Dart に写す **ProxyApi**�
 ### 注意点
 
 - Pigeon 生成コードはコミットする（利用者は Pigeon を実行しない）。`pigeons/messages.dart` を変更したら
-  `dart run pigeon --input pigeons/messages.dart` を実行する。CI が生成漏れを検出する。
+  `mise exec -- dart run pigeon --input pigeons/messages.dart` を実行する。CI が生成漏れを検出する。
 - フィールド名 `description` は Swift の `NSObject.description` と衝突するため使えない（`message` を使用）。
 - Kotlin の `suspend` API のために `kotlinx-coroutines-android` が必要。
 
@@ -80,14 +84,17 @@ Pigeon には、ネイティブクラスを1対1で Dart に写す **ProxyApi**�
 | ナビゲーション判定 | 同期で答える必要がある | `decisionHandler` で非同期可 | Android はいったんキャンセル→Dartに問い合わせ→許可なら再ロード。両OSとも **メインフレームかつページ起点の遷移のみ** Dart に問い合わせる（`loadUrl` / `loadHtmlString` / reload / 戻る・進む は問い合わせない） |
 | JS チャネル | `addJavascriptInterface` | `WKScriptMessageHandler` | iOS でユーザースクリプトを注入し、両OSとも `window.<name>.postMessage(String)` に統一 |
 | JS 実行結果 | JSON 文字列 | `Any` | iOS 側で JSON 化し、Dart で `jsonDecode`。`undefined` は両OS `null` |
-| 設定の後変更 | ほぼ可能 | 一部は生成時のみ | `WebViewSettings` のドキュメントに "creation only" と明記 |
+| 設定の後変更 | 設定ごとに定義 | 一部は生成時のみ | 生成時のみ有効な項目は各設定クラスの dartdoc に "creation only" と明記 |
 
-## 今後の実装候補（flutter_inappwebview にある主な機能）
+共通設定は `WebViewSettings`、OS 固有の設定は `AndroidWebViewSettings` と `IOSWebViewSettings` に分け、
+それぞれ `WebViewSettings.android` / `ios` に渡す。他方の OS 向け設定は無視する。
+設定の適用時期や既定値は [lib/src/settings.dart](lib/src/settings.dart) と
+[設定ガイド](https://imk1t.github.io/advanced_webview/ja/guide/settings) を参照する。
 
-- Cookie 管理（`CookieManager` / `WKHTTPCookieStore`）
-- 戻り値を返せる JS ハンドラ（`callHandler` 相当、Promise ベース）
-- ユーザースクリプトの追加・削除
-- ダウンロード、ファイル選択（`<input type="file">`）、権限リクエスト（カメラ・マイク）
-- `onCreateWindow`（`target=_blank` / `window.open`）
-- SSL エラー・HTTP認証のハンドリング
-- スクリーンショット、PullToRefresh、検索（find in page）
+## 機能と変更履歴の参照先
+
+- 利用可能な機能と使用例は[ガイド](https://imk1t.github.io/advanced_webview/ja/guide/getting-started)を参照する。
+- Dart API とネイティブ API の対応は [website/data/api-mapping.json](website/data/api-mapping.json) で管理し、
+  [API マッピング](https://imk1t.github.io/advanced_webview/ja/guide/api-mapping)として公開する。
+- 公開 API は [lib/advanced_webview.dart](lib/advanced_webview.dart) の export を基準とし、
+  利用者に影響する変更は [CHANGELOG.md](CHANGELOG.md) に記録する。

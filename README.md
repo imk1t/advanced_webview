@@ -13,7 +13,7 @@ single, centralised platform contract.
 Documentation: https://imk1t.github.io/advanced_webview/
 
 For design decisions (such as why Pigeon was chosen), see
-[doc/architecture.md](doc/architecture.md) (Japanese).
+[ARCHITECTURE.md](ARCHITECTURE.md) (Japanese).
 
 ## Supported platforms
 

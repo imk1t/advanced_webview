@@ -6,7 +6,7 @@ description: Add or change a Dart <-> native API of advanced_webview via pigeons
 # Changing the platform contract
 
 `pigeons/messages.dart` is the only definition of the Dart <-> native contract. Read
-`AGENTS.md` and `doc/architecture.md` first; they take precedence over this skill.
+`AGENTS.md` and `ARCHITECTURE.md` first; they take precedence over this skill.
 
 ## Steps
 
@@ -24,7 +24,7 @@ description: Add or change a Dart <-> native API of advanced_webview via pigeons
    - iOS: `ios/advanced_webview/Sources/advanced_webview/WebViewHostApiImpl.swift`
      (and `AdvancedWebView.swift`).
    - Absorb platform differences natively so Dart sees one behaviour; document any
-     unavoidable difference in dartdoc and `doc/architecture.md`.
+     unavoidable difference in dartdoc and `ARCHITECTURE.md`.
 4. Expose it in Dart through `AdvancedWebViewController` (wrap calls with `_call` so they
    wait for creation and fail after `dispose()`); for native -> Dart events, route them
    through `WebViewEventDispatcher` by `webViewId`.

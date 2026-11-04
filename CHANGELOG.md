@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Align the English and Japanese README introductions and package description with the GitHub repository description.
 
+- Move the design rationale to `ARCHITECTURE.md`, refresh its guidance, and point package documentation
+  to the published guide site.
+
 ## 0.5.0 - 2026-11-02
 
 - Add `AdvancedWebViewController.onConsoleMessage`, which reports the page's `console.debug`, `log`,

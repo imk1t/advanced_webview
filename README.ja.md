@@ -11,7 +11,7 @@
 
 ドキュメント: https://imk1t.github.io/advanced_webview/ja/
 
-設計判断（Pigeon 採用理由など）は [doc/architecture.md](doc/architecture.md) を参照してください。
+設計判断（Pigeon 採用理由など）は [ARCHITECTURE.md](ARCHITECTURE.md) を参照してください。
 
 ## 対応プラットフォーム
 

@@ -9,7 +9,7 @@ rules below are the same, written for agents.
 `advanced_webview` is a Flutter WebView plugin for **Android and iOS only**, built
 on [Pigeon](https://pub.dev/packages/pigeon). It borrows feature ideas from
 `flutter_inappwebview` but optimises for a small public API and maintainability.
-Design rationale (Japanese): [doc/architecture.md](doc/architecture.md). Read it
+Design rationale (Japanese): [ARCHITECTURE.md](ARCHITECTURE.md). Read it
 before changing the architecture.
 
 Do not add Web, macOS, Windows or Linux support.
@@ -134,7 +134,7 @@ claiming the change was verified; CI (`.github/workflows/ci.yaml`) builds both p
 - CI (`kotlin-lint`, `swift-lint` jobs) fails on any ktlint or swift-format violation. Fix
   the code rather than disabling rules; if a rule must be disabled, do it in
   `.editorconfig` / `.swift-format` with a comment explaining why.
-- Code comments and dartdoc in English. Docs under `doc/` may be Japanese.
+- Code comments and dartdoc in English. `ARCHITECTURE.md` may be Japanese.
 - **API mapping.** `website/data/api-mapping.json` maps every public Dart API to the native
   Android and iOS APIs behind it. When you add, rename or remove a public member, or change
   which native API it calls, update that file in the same change (English and Japanese text

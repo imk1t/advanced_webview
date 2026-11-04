@@ -37,7 +37,7 @@ first; it takes precedence over this skill. Do not add Web, macOS, Windows or Li
    the native sources.
 5. **New page?** Add it to both sidebars in `website/.vitepress/config.mts` (`root` and
    `ja` locales) and link it from a related page. The architecture document
-   (`doc/architecture.md`) is intentionally not published on the site.
+   (`ARCHITECTURE.md` at the repository root) is intentionally not published on the site.
 6. **Keep neighbours consistent.** If a user-visible behaviour changed, also check
    `README.md` / `README.ja.md` (keep them in sync), the dartdoc of the affected public
    members, and `CHANGELOG.md`.
