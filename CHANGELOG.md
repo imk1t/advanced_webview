@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AndroidWebViewSettings.geolocationEnabled` (default `true`, as before), which switches
+  `navigator.geolocation` off for the page (`WebSettings.setGeolocationEnabled`). iOS has no
+  equivalent. A location is still only shared when the app holds the location permission and
+  `onPermissionRequest` grants it.
+
 - Add `IOSWebViewSettings.allowsLinkPreview` (default `true`, as before), which turns off the link
   preview shown when the user presses and holds a link (`WKWebView.allowsLinkPreview`). Android has no
   equivalent.

@@ -175,6 +175,7 @@ class AdvancedWebView(
                 MixedContentModeMessage.COMPATIBILITY -> WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 MixedContentModeMessage.ALWAYS_ALLOW -> WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             }
+            setGeolocationEnabled(settings.geolocationEnabled)
             minimumFontSize = settings.minimumFontSize?.toInt() ?: DEFAULT_MINIMUM_FONT_SIZE
             userAgentString = settings.userAgent ?: WebSettings.getDefaultUserAgent(webView.context)
         }

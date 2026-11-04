@@ -189,6 +189,14 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun geolocationSettingCanBeAppliedAtCreationAndOnUpdate() {
+        // WebSettings has no public getter for this flag, so this only checks that applying it works.
+        hostApi.create(params(webViewId = 1, settings = settings(geolocationEnabled = false)))
+
+        hostApi.updateSettings(1, settings(geolocationEnabled = true))
+    }
+
+    @Test
     fun windowAndScrollSettingsAreAppliedAtCreationAndOnUpdate() {
         hostApi.create(params(webViewId = 1, settings = settings()))
         val webView = registry.get(1).webView
@@ -674,6 +682,7 @@ class WebViewHostApiImplTest {
         allowFileAccess: Boolean = false,
         allowContentAccess: Boolean = false,
         mixedContentMode: MixedContentModeMessage = MixedContentModeMessage.NEVER_ALLOW,
+        geolocationEnabled: Boolean = true,
         minimumFontSize: Long? = null,
     ) = WebViewSettingsMessage(
         javaScriptEnabled = javaScriptEnabled,
@@ -697,6 +706,7 @@ class WebViewHostApiImplTest {
         mixedContentMode = mixedContentMode,
         contentMode = ContentModeMessage.RECOMMENDED,
         allowsLinkPreview = true,
+        geolocationEnabled = geolocationEnabled,
         minimumFontSize = minimumFontSize,
         userAgent = userAgent,
     )
