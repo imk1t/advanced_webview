@@ -15,7 +15,7 @@ import './tokens.css'
 import './layout.css'
 import './design-system.css'
 
-// Design system components (see guide/design-system). Registered globally so Markdown pages can
+// Design system components (see README.md in this folder). Registered globally so Markdown pages can
 // use them without imports.
 const components = {
   AwButton,
