@@ -1501,6 +1501,26 @@
       }
     },
     {
+      "dart": "AndroidWebViewSettings.geolocationEnabled",
+      "group": "settings",
+      "summary": {
+        "en": "Lets pages use navigator.geolocation (Android, on by default).",
+        "ja": "ページが navigator.geolocation を使えるようにします（Android、既定は有効）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setGeolocationEnabled(boolean)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "iOS has no switch; location access is decided by the system permission.",
+          "ja": "iOS には切り替えがなく、位置情報へのアクセスはシステムの権限で決まります。"
+        }
+      }
+    },
+    {
       "dart": "IOSWebViewSettings.incognito",
       "group": "settings",
       "summary": {

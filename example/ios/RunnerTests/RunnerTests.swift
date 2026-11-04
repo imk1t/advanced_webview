@@ -452,6 +452,7 @@ final class RunnerTests: XCTestCase {
     mixedContentMode: MixedContentModeMessage = .neverAllow,
     contentMode: ContentModeMessage = .recommended,
     allowsLinkPreview: Bool = true,
+    geolocationEnabled: Bool = true,
     minimumFontSize: Int? = nil,
     userAgent: String? = nil,
     applicationNameForUserAgent: String? = nil
@@ -478,6 +479,7 @@ final class RunnerTests: XCTestCase {
       mixedContentMode: mixedContentMode,
       contentMode: contentMode,
       allowsLinkPreview: allowsLinkPreview,
+      geolocationEnabled: geolocationEnabled,
       minimumFontSize: minimumFontSize.map { Int64($0) },
       userAgent: userAgent,
       applicationNameForUserAgent: applicationNameForUserAgent)

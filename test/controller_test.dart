@@ -165,6 +165,16 @@ void main() {
       );
     });
 
+    test('geolocationEnabled is passed to native', () {
+      expect(const WebViewSettings().toMessage().geolocationEnabled, isTrue);
+      expect(
+        const WebViewSettings(
+          android: AndroidWebViewSettings(geolocationEnabled: false),
+        ).toMessage().geolocationEnabled,
+        isFalse,
+      );
+    });
+
     test('incognito is passed to native', () {
       expect(const WebViewSettings().toMessage().incognito, isFalse);
       expect(

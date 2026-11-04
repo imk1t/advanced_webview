@@ -50,6 +50,7 @@ Passed as `WebViewSettings.android`. iOS ignores all of them.
 | `allowFileAccess` | `false` | Yes | Ignored |
 | `allowContentAccess` | `false` | Yes | Ignored |
 | `mixedContentMode` | `neverAllow` | Yes | Ignored (WebKit blocks it) |
+| `geolocationEnabled` | `true` | Yes | Ignored (system decides) |
 
 ## iOS-only settings
 
