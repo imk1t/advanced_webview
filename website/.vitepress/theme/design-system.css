@@ -90,3 +90,39 @@
 .aw-code-panel .vp-code-group {
   @apply tw:border tw:border-(--aw-panel-line);
 }
+
+/*
+ * Japanese typography. The tight tracking and 1.05 line height tuned for Latin display text make
+ * kanji and kana crowded, so loosen them, and give running text more leading.
+ */
+:lang(ja) .aw-display {
+  letter-spacing: 0 !important;
+  line-height: 1.35 !important;
+  font-weight: 700;
+}
+
+:lang(ja) .aw-lead {
+  line-height: 1.9 !important;
+}
+
+:lang(ja) .vp-doc p,
+:lang(ja) .vp-doc li {
+  line-height: 1.9;
+}
+
+:lang(ja) .vp-doc h1,
+:lang(ja) .vp-doc h2,
+:lang(ja) .vp-doc h3 {
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+:lang(ja) .VPPage p {
+  line-height: 1.85 !important;
+}
+
+@media (min-width: 768px) {
+  :lang(ja) .aw-hero-title {
+    font-size: 3.25rem !important;
+  }
+}

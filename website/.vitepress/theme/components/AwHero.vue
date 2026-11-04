@@ -17,7 +17,7 @@ defineProps<{ eyebrow?: string; title: string; accent?: string; lead?: string }>
         {{ eyebrow }}
       </p>
       <h1
-        class="aw-display tw:mt-4 tw:mb-5 tw:max-w-[52rem] tw:text-[2.5rem] tw:leading-[1.08] tw:font-bold tw:tracking-tight tw:text-(--aw-ink) tw:md:text-[4.25rem]"
+        class="aw-display aw-hero-title tw:mt-4 tw:mb-5 tw:max-w-[52rem] tw:text-[2.5rem] tw:leading-[1.08] tw:font-bold tw:tracking-tight tw:text-(--aw-ink) tw:md:text-[4.25rem]"
       >
         {{ title }}
         <span

@@ -7,7 +7,7 @@ title: advanced_webview
 
 <AwHero
   eyebrow="Flutter · Android · iOS"
-  title="保守しやすさを軸にした、"
+  title="保守しやすい、"
   accent="Flutter 向けの小さな WebView。"
   lead="コントローラ、ウィジェット、不変の設定だけ。Android と iOS で振る舞いが揃った、型付きの Dart API です。"
 >

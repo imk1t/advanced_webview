@@ -85,3 +85,13 @@
   --vp-c-brand-3: #6d76f5;
   --vp-c-brand-soft: rgb(139 147 255 / 0.16);
 }
+
+/*
+ * Japanese: Inter has no kana/kanji, so the browser would pick whatever fallback it likes.
+ * List the system Japanese UI fonts explicitly (Apple, Windows, Android, then Noto).
+ */
+:root:lang(ja) {
+  --vp-font-family-base:
+    'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic',
+    'Noto Sans JP', 'Meiryo', ui-sans-serif, system-ui, sans-serif;
+}
