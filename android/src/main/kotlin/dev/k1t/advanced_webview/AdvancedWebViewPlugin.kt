@@ -1,5 +1,6 @@
 package dev.k1t.advanced_webview
 
+import android.app.Activity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -18,6 +19,7 @@ class AdvancedWebViewPlugin :
     private val permissionRequester = PermissionRequester()
     private var hostApi: WebViewHostApiImpl? = null
     private var scope: CoroutineScope? = null
+    private var activity: Activity? = null
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         val scope = MainScope().also { scope = it }
@@ -30,6 +32,7 @@ class AdvancedWebViewPlugin :
             scope,
             fileChooser,
             permissionRequester,
+            { activity },
         ).also { hostApi = it }
 
         AdvancedWebViewHostApi.setUp(binding.binaryMessenger, hostApi)
@@ -56,11 +59,13 @@ class AdvancedWebViewPlugin :
     override fun onDetachedFromActivity() = detach()
 
     private fun attach(binding: ActivityPluginBinding) {
+        activity = binding.activity
         fileChooser.attach(binding)
         permissionRequester.attach(binding)
     }
 
     private fun detach() {
+        activity = null
         fileChooser.detach()
         permissionRequester.detach()
     }

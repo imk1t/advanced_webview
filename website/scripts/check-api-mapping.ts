@@ -24,8 +24,14 @@ const MEMBER_LEVEL = new Set([
   'AndroidWebViewSettings',
   'IOSWebViewSettings',
 ])
-/** Public members that are plumbing, not API surface. */
-const IGNORED_MEMBERS = new Set(['copyWith', 'toMessage'])
+/** Public members that are plumbing, not API surface (`@internal` ones are used by AdvancedInAppBrowser). */
+const IGNORED_MEMBERS = new Set([
+  'copyWith',
+  'toMessage',
+  'onInAppBrowserClosed',
+  'openInAppBrowser',
+  'closeInAppBrowser',
+])
 
 interface Statement {
   head: string

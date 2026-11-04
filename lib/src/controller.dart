@@ -220,6 +220,21 @@ class AdvancedWebViewController {
   /// Completes once the native WebView exists.
   Future<void> get ready => _created;
 
+  /// Called when the in-app browser showing this WebView is dismissed. Set by
+  /// `AdvancedInAppBrowser`.
+  @internal
+  VoidCallback? onInAppBrowserClosed;
+
+  /// Presents this WebView in the native in-app browser.
+  @internal
+  Future<void> openInAppBrowser(InAppBrowserParamsMessage params) =>
+      _call(() => _hostApi.openInAppBrowser(params));
+
+  /// Dismisses the native in-app browser; a no-op when it is not open.
+  @internal
+  Future<void> closeInAppBrowser() =>
+      _call(() => _hostApi.closeInAppBrowser(webViewId));
+
   WebViewSettings get settings => _settings;
 
   bool get isDisposed => _isDisposed;
@@ -483,6 +498,9 @@ class _EventListener implements WebViewEventListener {
 
   @override
   void onNewWindowRequest(String url) => _controller.onNewWindow?.call(url);
+
+  @override
+  void onInAppBrowserClosed() => _controller.onInAppBrowserClosed?.call();
 
   @override
   void onDownloadStart(DownloadRequestMessage request) =>

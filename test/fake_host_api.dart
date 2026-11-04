@@ -159,4 +159,21 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     calls.add('removeAllUserScripts');
     userScripts.clear();
   }
+
+  final Map<int, InAppBrowserParamsMessage> inAppBrowsers = {};
+  Object? openInAppBrowserError;
+
+  @override
+  Future<void> openInAppBrowser(InAppBrowserParamsMessage params) async {
+    calls.add('openInAppBrowser(${params.webViewId})');
+    final error = openInAppBrowserError;
+    if (error != null) throw error;
+    inAppBrowsers[params.webViewId] = params;
+  }
+
+  @override
+  Future<void> closeInAppBrowser(int webViewId) async {
+    calls.add('closeInAppBrowser($webViewId)');
+    inAppBrowsers.remove(webViewId);
+  }
 }

@@ -1,7 +1,11 @@
 package dev.k1t.advanced_webview
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import io.flutter.Log
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /** Implements the Dart -> native calls by dispatching to [WebViewRegistry]. */
 class WebViewHostApiImpl(
@@ -11,6 +15,7 @@ class WebViewHostApiImpl(
     private val scope: CoroutineScope,
     private val fileChooser: FileChooser = FileChooser(),
     private val permissionRequester: PermissionRequester = PermissionRequester(),
+    private val activityProvider: () -> Activity? = { null },
 ) : AdvancedWebViewHostApi {
     override fun create(params: CreationParamsMessage) {
         registry.add(AdvancedWebView(context, params, flutterApi, scope, fileChooser, permissionRequester))
@@ -82,4 +87,48 @@ class WebViewHostApiImpl(
         registry.get(webViewId).addUserScript(script)
 
     override fun removeAllUserScripts(webViewId: Long) = registry.get(webViewId).removeAllUserScripts()
+
+    override fun openInAppBrowser(params: InAppBrowserParamsMessage) {
+        val webView = registry.get(params.webViewId)
+        val activity = activityProvider() ?: throw FlutterError("not-attached", "No Activity to present from", null)
+        if (InAppBrowserSessions.get(params.webViewId) != null) {
+            throw FlutterError("already-open", "The in-app browser of ${params.webViewId} is already open", null)
+        }
+        InAppBrowserSessions.add(
+            InAppBrowserSession(webView, params) {
+                scope.launch {
+                    try {
+                        flutterApi.onInAppBrowserClosed(params.webViewId)
+                    } catch (e: Throwable) {
+                        Log.w(TAG, "Failed to deliver event to Dart: ${e.message}")
+                    }
+                }
+            },
+        )
+        try {
+            activity.startActivity(
+                Intent(activity, InAppBrowserActivity::class.java)
+                    .putExtra(InAppBrowserActivity.EXTRA_WEB_VIEW_ID, params.webViewId),
+            )
+        } catch (e: RuntimeException) {
+            InAppBrowserSessions.remove(params.webViewId)
+            throw e
+        }
+    }
+
+    override fun closeInAppBrowser(webViewId: Long) {
+        val session = InAppBrowserSessions.get(webViewId) ?: return
+        val activity = session.activity
+        if (activity != null) {
+            activity.finish()
+        } else {
+            // The Activity has not been created yet; it will find no session and finish itself.
+            InAppBrowserSessions.remove(webViewId)
+            session.onClosed()
+        }
+    }
+
+    private companion object {
+        const val TAG = "AdvancedWebView"
+    }
 }

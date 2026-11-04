@@ -1175,6 +1175,80 @@ data class CookieMessage (
     return "CookieMessage(name=$name, value=$value, domain=$domain, path=$path, isSecure=$isSecure, isHttpOnly=$isHttpOnly, expiresMillis=$expiresMillis)"
   }
 }
+
+/**
+ * Chrome of the full-screen in-app browser that hosts an existing WebView.
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class InAppBrowserParamsMessage (
+  /**
+   * The WebView created with `create`; the browser shows it and does not own
+   * its lifetime.
+   */
+  val webViewId: Long,
+  val showUrl: Boolean,
+  val showNavigationButtons: Boolean,
+  /**
+   * Toolbar background as ARGB (`Color.toARGB32`); `null` uses the platform
+   * default.
+   */
+  val toolbarColor: Long? = null,
+  /** Fixed toolbar title; `null` shows the page title. */
+  val toolbarTitle: String? = null,
+  /**
+   * Label of the button that closes the browser; `null` uses a localized
+   * platform default.
+   */
+  val closeButtonLabel: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): InAppBrowserParamsMessage {
+      val webViewId = pigeonVar_list[0] as Long
+      val showUrl = pigeonVar_list[1] as Boolean
+      val showNavigationButtons = pigeonVar_list[2] as Boolean
+      val toolbarColor = pigeonVar_list[3] as Long?
+      val toolbarTitle = pigeonVar_list[4] as String?
+      val closeButtonLabel = pigeonVar_list[5] as String?
+      return InAppBrowserParamsMessage(webViewId, showUrl, showNavigationButtons, toolbarColor, toolbarTitle, closeButtonLabel)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      webViewId,
+      showUrl,
+      showNavigationButtons,
+      toolbarColor,
+      toolbarTitle,
+      closeButtonLabel,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as InAppBrowserParamsMessage
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.showUrl, other.showUrl) && MessagesPigeonUtils.deepEquals(this.showNavigationButtons, other.showNavigationButtons) && MessagesPigeonUtils.deepEquals(this.toolbarColor, other.toolbarColor) && MessagesPigeonUtils.deepEquals(this.toolbarTitle, other.toolbarTitle) && MessagesPigeonUtils.deepEquals(this.closeButtonLabel, other.closeButtonLabel)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.webViewId)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.showUrl)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.showNavigationButtons)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.toolbarColor)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.toolbarTitle)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.closeButtonLabel)
+    return result
+  }
+  override fun toString(): String {
+    return "InAppBrowserParamsMessage(webViewId=$webViewId, showUrl=$showUrl, showNavigationButtons=$showNavigationButtons, toolbarColor=$toolbarColor, toolbarTitle=$toolbarTitle, closeButtonLabel=$closeButtonLabel)"
+  }
+}
 private open class MessagesPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -1293,6 +1367,11 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
           CookieMessage.fromList(it)
         }
       }
+      152.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          InAppBrowserParamsMessage.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -1390,6 +1469,10 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(151)
         writeValue(stream, value.toList())
       }
+      is InAppBrowserParamsMessage -> {
+        stream.write(152)
+        writeValue(stream, value.toList())
+      }
       else -> super.writeValue(stream, value)
     }
   }
@@ -1453,6 +1536,17 @@ interface AdvancedWebViewHostApi {
   /** Registers a script for pages loaded from now on. */
   fun addUserScript(webViewId: Long, script: UserScriptMessage)
   fun removeAllUserScripts(webViewId: Long)
+  /**
+   * Presents the WebView `params.webViewId` full screen with a toolbar. Fails
+   * with `not-attached` when there is no screen to present from and with
+   * `already-open` when it is already presented.
+   */
+  fun openInAppBrowser(params: InAppBrowserParamsMessage)
+  /**
+   * Dismisses the in-app browser; a no-op when it is not open. The WebView
+   * itself stays alive.
+   */
+  fun closeInAppBrowser(webViewId: Long)
 
   companion object {
     /** The codec used by AdvancedWebViewHostApi. */
@@ -1985,6 +2079,42 @@ interface AdvancedWebViewHostApi {
           channel.setMessageHandler(null)
         }
       }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.openInAppBrowser$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val paramsArg = args[0] as InAppBrowserParamsMessage
+            val wrapped: List<Any?> = try {
+              api.openInAppBrowser(paramsArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.closeInAppBrowser$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val wrapped: List<Any?> = try {
+              api.closeInAppBrowser(webViewIdArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
     }
   }
 }
@@ -2320,6 +2450,26 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
       val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onNewWindowRequest$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, urlArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else {
+            continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /** The in-app browser was dismissed, by the user or by `closeInAppBrowser`. */
+  suspend fun onInAppBrowserClosed(webViewIdArg: Long)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInAppBrowserClosed$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg)) {
         if (it is List<*>) {
           if (it.size > 1) {
             continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))

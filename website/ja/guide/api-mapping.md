@@ -44,3 +44,7 @@ aside: false
 ## ユーザースクリプト
 
 <ApiMapping group="userScripts" />
+
+## アプリ内ブラウザ
+
+<ApiMapping group="inAppBrowser" />

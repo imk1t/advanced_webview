@@ -1,10 +1,12 @@
 import Flutter
 import Foundation
+import UIKit
 
 /// Implements the Dart -> native calls by dispatching to `WebViewRegistry`.
 final class WebViewHostApiImpl: AdvancedWebViewHostApi {
   private let registry: WebViewRegistry
   private let flutterApi: AdvancedWebViewFlutterApi
+  private var browsers: [Int64: InAppBrowserViewController] = [:]
 
   init(registry: WebViewRegistry, flutterApi: AdvancedWebViewFlutterApi) {
     self.registry = registry
@@ -144,5 +146,49 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
 
   func removeAllUserScripts(webViewId: Int64) throws {
     try registry.get(webViewId).removeAllUserScripts()
+  }
+
+  func openInAppBrowser(params: InAppBrowserParamsMessage) throws {
+    let browser = try registry.get(params.webViewId)
+    guard browsers[params.webViewId] == nil else {
+      throw PigeonError(
+        code: "already-open", message: "The in-app browser of \(params.webViewId) is already open",
+        details: nil)
+    }
+    guard let presenter = Self.topViewController() else {
+      throw PigeonError(
+        code: "not-attached", message: "No view controller to present from", details: nil)
+    }
+    let api = flutterApi
+    let id = params.webViewId
+    let controller = InAppBrowserViewController(browser: browser, params: params) {
+      [weak self] in
+      self?.browsers.removeValue(forKey: id)
+      Task { @MainActor in
+        do {
+          try await api.onInAppBrowserClosed(webViewId: id)
+        } catch {
+          NSLog("advanced_webview: failed to deliver event to Dart: \(error)")
+        }
+      }
+    }
+    browsers[id] = controller
+    controller.present(from: presenter)
+  }
+
+  func closeInAppBrowser(webViewId: Int64) throws {
+    browsers[webViewId]?.close()
+  }
+
+  /// The view controller on top of the foreground scene, where a modal can be presented.
+  static func topViewController() -> UIViewController? {
+    let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+    let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+    let window = scene?.windows.first { $0.isKeyWindow } ?? scene?.windows.first
+    var top = window?.rootViewController
+    while let presented = top?.presentedViewController, !presented.isBeingDismissed {
+      top = presented
+    }
+    return top
   }
 }

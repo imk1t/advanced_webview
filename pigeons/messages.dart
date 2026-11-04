@@ -365,6 +365,35 @@ class CookieMessage {
   int? expiresMillis;
 }
 
+/// Chrome of the full-screen in-app browser that hosts an existing WebView.
+class InAppBrowserParamsMessage {
+  InAppBrowserParamsMessage({
+    required this.webViewId,
+    required this.showUrl,
+    required this.showNavigationButtons,
+    this.toolbarColor,
+    this.toolbarTitle,
+    this.closeButtonLabel,
+  });
+
+  /// The WebView created with `create`; the browser shows it and does not own
+  /// its lifetime.
+  int webViewId;
+  bool showUrl;
+  bool showNavigationButtons;
+
+  /// Toolbar background as ARGB (`Color.toARGB32`); `null` uses the platform
+  /// default.
+  int? toolbarColor;
+
+  /// Fixed toolbar title; `null` shows the page title.
+  String? toolbarTitle;
+
+  /// Label of the button that closes the browser; `null` uses a localized
+  /// platform default.
+  String? closeButtonLabel;
+}
+
 // ---------------------------------------------------------------------------
 // Dart -> native
 // ---------------------------------------------------------------------------
@@ -449,6 +478,15 @@ abstract class AdvancedWebViewHostApi {
   void addUserScript(int webViewId, UserScriptMessage script);
 
   void removeAllUserScripts(int webViewId);
+
+  /// Presents the WebView `params.webViewId` full screen with a toolbar. Fails
+  /// with `not-attached` when there is no screen to present from and with
+  /// `already-open` when it is already presented.
+  void openInAppBrowser(InAppBrowserParamsMessage params);
+
+  /// Dismisses the in-app browser; a no-op when it is not open. The WebView
+  /// itself stays alive.
+  void closeInAppBrowser(int webViewId);
 }
 
 // ---------------------------------------------------------------------------
@@ -519,4 +557,7 @@ abstract class AdvancedWebViewFlutterApi {
 
   /// The page asked for a new window; the WebView did not load `url` itself.
   void onNewWindowRequest(int webViewId, String url);
+
+  /// The in-app browser was dismissed, by the user or by `closeInAppBrowser`.
+  void onInAppBrowserClosed(int webViewId);
 }
