@@ -5,9 +5,9 @@
 Pod::Spec.new do |s|
   s.name             = 'advanced_webview'
   s.version          = '0.0.1'
-  s.summary          = 'A lean, type-safe WebView plugin for Android and iOS.'
+  s.summary          = 'A simple yet feature-rich WebView plugin for Android and iOS.'
   s.description      = <<-DESC
-A lean, type-safe WebView plugin for Android and iOS.
+A simple yet feature-rich WebView plugin for Android and iOS.
                        DESC
   s.homepage         = 'https://github.com/imk1t/advanced_webview'
   s.license          = { :type => 'MIT', :file => '../LICENSE' }
