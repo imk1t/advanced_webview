@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 import tailwindcss from '@tailwindcss/vite'
 
 const repo = 'https://github.com/imk1t/advanced_webview'
+const pubDev = 'https://pub.dev/packages/advanced_webview'
 
 export default defineConfig({
   title: 'advanced_webview',
@@ -26,6 +27,7 @@ export default defineConfig({
         nav: [
           { text: 'Guide', link: '/guide/getting-started' },
           { text: 'Changelog', link: `${repo}/blob/main/CHANGELOG.md` },
+          { text: 'pub.dev', link: pubDev },
         ],
         sidebar: [
           {
@@ -60,6 +62,7 @@ export default defineConfig({
         nav: [
           { text: 'ガイド', link: '/ja/guide/getting-started' },
           { text: '変更履歴', link: `${repo}/blob/main/CHANGELOG.md` },
+          { text: 'pub.dev', link: pubDev },
         ],
         sidebar: [
           {

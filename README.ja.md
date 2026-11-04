@@ -2,6 +2,7 @@
 
 [English](README.md) | 日本語
 
+[![pub package](https://img.shields.io/pub/v/advanced_webview.svg)](https://pub.dev/packages/advanced_webview)
 [![CI](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml/badge.svg)](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -25,7 +26,13 @@ Flutter の設定（`flutter config --enable-swift-package-manager` /
 
 ## インストール
 
-初回公開前は Git リポジトリから追加してください。pub.dev 公開後は `flutter pub add advanced_webview` を使用できます。
+[pub.dev](https://pub.dev/packages/advanced_webview) から追加します。
+
+```sh
+flutter pub add advanced_webview
+```
+
+最新の `main` を追う場合は Git 依存を使用してください。
 
 ```yaml
 dependencies:
