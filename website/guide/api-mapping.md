@@ -7,6 +7,7 @@ aside: false
 Every public Dart API of `advanced_webview` and the native Android and iOS API it uses.
 Use it to find the underlying behaviour (and its platform quirks) in the official Android and
 Apple documentation, or to see which platform a feature is available on.
+Native class names marked with ↗ link to the official documentation.
 
 | Status | Meaning |
 | --- | --- |

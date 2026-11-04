@@ -19,6 +19,7 @@ const labels = {
     android: 'Android',
     ios: 'iOS',
     dartOnly: 'Dart only',
+    openDocs: 'Open the official documentation',
     status: {
       supported: 'Supported',
       partial: 'Partial',
@@ -31,6 +32,7 @@ const labels = {
     android: 'Android',
     ios: 'iOS',
     dartOnly: 'Dart のみ',
+    openDocs: '公式ドキュメントを開く',
     status: {
       supported: '対応',
       partial: '一部対応',
@@ -42,10 +44,18 @@ const labels = {
 
 const platforms: Platform[] = ['android', 'ios']
 
-// Badge classes carry the `tw:` prefix. Table, cell and code styling lives in layout.css
-// (`.api-map`), because VitePress' own unlayered styles beat Tailwind's layered utilities.
+// Status badge: a dot plus label in the VitePress status colours. Classes carry the `tw:` prefix;
+// layout and spacing live in this template, the look comes from the design tokens (tokens.css).
+// Native class chips. Linked ones look like links (accent border, arrow, hover fill); the rest are
+// plain text. The `!` modifiers beat VitePress' `.vp-doc a` styles.
+const chipBase =
+  'tw:inline-flex tw:items-baseline tw:rounded-md tw:px-2 tw:py-0.5 tw:font-(family-name:--aw-font-mono) tw:text-xs tw:leading-5 tw:[overflow-wrap:anywhere]'
+const chipPlain = 'tw:bg-(--aw-surface-soft) tw:text-(--aw-ink)'
+const chipLink =
+  'tw:border tw:border-(--aw-accent)/30 tw:bg-(--aw-accent-soft) tw:text-(--aw-accent)! tw:no-underline! tw:transition-colors hover:tw:border-(--aw-accent) hover:tw:bg-(--aw-accent)/15'
+
 const badgeBase =
-  'tw:inline-block tw:rounded-[10px] tw:px-2 tw:text-xs tw:leading-5 tw:font-semibold'
+  'tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:px-2.5 tw:py-0.5 tw:text-xs tw:leading-5 tw:font-semibold'
 const badgeTone: Record<Status, string> = {
   supported: 'tw:bg-(--vp-c-success-soft) tw:text-(--vp-c-success-1)',
   partial: 'tw:bg-(--vp-c-warning-soft) tw:text-(--vp-c-warning-1)',
@@ -82,62 +92,88 @@ const rows = computed(() =>
 </script>
 
 <template>
-  <div class="api-map tw:my-4 tw:overflow-x-auto">
-    <table>
-      <thead>
-        <tr>
-          <th class="tw:w-[30%]">{{ labels[locale].dart }}</th>
-          <th class="tw:w-[35%]">{{ labels[locale].android }}</th>
-          <th class="tw:w-[35%]">{{ labels[locale].ios }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="row in rows" :id="anchorFor(row.entry.dart)" :key="row.entry.dart">
-          <td>
-            <code
-              ><template v-for="(part, i) in parts(row.entry.dart)" :key="i"
-                ><wbr v-if="i > 0" />{{ part }}</template
-              ></code
-            >
-            <p>{{ row.entry.summary[locale] }}</p>
-          </td>
-          <td
-            v-if="row.entry.dartOnly"
-            colspan="2"
-            class="api-map-platform tw:text-[13px]! tw:text-(--vp-c-text-3)"
+  <!--
+    Plain div/span markup on purpose: VitePress' `.vp-doc` styles for table, ul, p and code have
+    higher specificity than utilities and would fight the layout.
+    Phones: one column. Tablets: Dart API on top, Android and iOS side by side.
+    Wide screens: three columns under a header strip.
+  -->
+  <div
+    class="tw:my-6 tw:overflow-hidden tw:rounded-(--aw-radius-lg) tw:border tw:border-(--aw-line) tw:bg-(--aw-surface)"
+  >
+    <div
+      class="tw:hidden tw:grid-cols-[1.15fr_1fr_1fr] tw:gap-x-6 tw:border-b tw:border-(--aw-line) tw:bg-(--aw-surface-soft) tw:px-5 tw:py-2.5 tw:text-xs tw:font-semibold tw:tracking-wide tw:text-(--aw-ink-muted) tw:xl:grid"
+      aria-hidden="true"
+    >
+      <span>{{ labels[locale].dart }}</span>
+      <span>{{ labels[locale].android }}</span>
+      <span>{{ labels[locale].ios }}</span>
+    </div>
+    <div
+      v-for="row in rows"
+      :id="anchorFor(row.entry.dart)"
+      :key="row.entry.dart"
+      class="tw:grid tw:scroll-mt-20 tw:grid-cols-1 tw:gap-x-6 tw:gap-y-4 tw:border-t tw:border-(--aw-line) tw:px-5 tw:py-4 tw:first:border-t-0 tw:sm:grid-cols-2 tw:xl:grid-cols-[1.15fr_1fr_1fr]"
+    >
+      <div class="tw:min-w-0 tw:sm:col-span-2 tw:xl:col-span-1">
+        <span
+          class="tw:block tw:font-(family-name:--aw-font-mono) tw:text-[0.8125rem] tw:leading-6 tw:font-semibold tw:text-(--aw-ink)"
+          ><template v-for="(part, i) in parts(row.entry.dart)" :key="i"
+            ><wbr v-if="i > 0" />{{ part }}</template
+          ></span
+        >
+        <span class="tw:mt-1 tw:block tw:text-[0.8125rem] tw:leading-5 tw:text-(--aw-ink-muted)">{{
+          row.entry.summary[locale]
+        }}</span>
+      </div>
+      <div
+        v-if="row.entry.dartOnly"
+        class="tw:text-[0.8125rem] tw:text-(--aw-ink-muted) tw:sm:col-span-2 tw:xl:col-span-2"
+      >
+        {{ labels[locale].dartOnly }}
+      </div>
+      <template v-else>
+        <div v-for="{ platform, side, refs } in row.sides" :key="platform" class="tw:min-w-0">
+          <span
+            class="tw:mb-1.5 tw:block tw:text-xs tw:font-semibold tw:tracking-wide tw:text-(--aw-ink-muted) tw:xl:hidden"
+            >{{ labels[locale][platform] }}</span
           >
-            {{ labels[locale].dartOnly }}
-          </td>
-          <template v-else>
-            <td
-              v-for="{ platform, side, refs } in row.sides"
-              :key="platform"
-              :data-label="labels[locale][platform]"
-              class="api-map-platform"
-            >
-              <template v-if="side">
-                <span :class="[badgeBase, badgeTone[side.status]]">
-                  {{ labels[locale].status[side.status] }}
-                </span>
-                <ul v-if="refs.length">
-                  <li v-for="ref in refs" :key="ref.api">
-                    <code
-                      ><a v-if="ref.href" :href="ref.href" target="_blank" rel="noreferrer">{{
-                        ref.className
-                      }}</a
-                      ><template v-else>{{ ref.className }}</template
-                      ><template v-for="(part, i) in parts(ref.rest)" :key="i"
-                        ><wbr v-if="i > 0" />{{ part }}</template
-                      ></code
-                    >
-                  </li>
-                </ul>
-                <p v-if="side.note">{{ side.note[locale] }}</p>
+          <template v-if="side">
+            <span :class="[badgeBase, badgeTone[side.status]]">
+              <span class="tw:size-1.5 tw:rounded-full tw:bg-current" aria-hidden="true" />
+              {{ labels[locale].status[side.status] }}
+            </span>
+            <div v-if="refs.length" class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-1.5">
+              <template v-for="ref in refs" :key="ref.api">
+                <!-- Linked class: the whole chip is a link, marked with an arrow. -->
+                <a
+                  v-if="ref.href"
+                  :href="ref.href"
+                  target="_blank"
+                  rel="noreferrer"
+                  :title="labels[locale].openDocs"
+                  :class="[chipBase, chipLink]"
+                  ><span class="tw:font-semibold">{{ ref.className }}</span
+                  ><template v-for="(part, i) in parts(ref.rest)" :key="i"
+                    ><wbr v-if="i > 0" />{{ part }}</template
+                  ><span class="tw:ml-1 tw:text-[0.7rem]" aria-hidden="true">↗</span></a
+                >
+                <span v-else :class="[chipBase, chipPlain]"
+                  >{{ ref.className
+                  }}<template v-for="(part, i) in parts(ref.rest)" :key="i"
+                    ><wbr v-if="i > 0" />{{ part }}</template
+                  ></span
+                >
               </template>
-            </td>
+            </div>
+            <span
+              v-if="side.note"
+              class="tw:mt-2 tw:block tw:text-[0.8125rem] tw:leading-5 tw:text-(--aw-ink-muted)"
+              >{{ side.note[locale] }}</span
+            >
           </template>
-        </tr>
-      </tbody>
-    </table>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
