@@ -1,0 +1,97 @@
+/*
+ * Design tokens for the docs site. Every colour, radius and font used by the custom components
+ * (components/Aw*.vue) and the VitePress overrides comes from here, so a visual change means
+ * editing this file. Tokens are mapped onto VitePress' own variables at the bottom, which keeps
+ * the default theme (nav, sidebar, doc content) consistent with the custom pages.
+ *
+ * Naming: --aw-<role>. Use roles (surface, ink, accent), never raw colour names, in components.
+ */
+:root {
+  /* Surfaces and text */
+  --aw-bg: #fafaf7;
+  --aw-surface: #ffffff;
+  --aw-surface-soft: #f3f3ee;
+  --aw-ink: #0d1117;
+  --aw-ink-muted: #5b6472;
+  --aw-line: #e4e4de;
+
+  /* Accent: indigo to cyan */
+  --aw-accent: #4f46e5;
+  --aw-accent-2: #06b6d4;
+  --aw-accent-soft: #eef0ff;
+  --aw-accent-2-soft: #e9fafd;
+  --aw-dot: #cfcfc6;
+  --aw-dot-accent: #cfd0ff;
+  --aw-dot-accent-2: #b5ecf5;
+
+  /* Dark panels (code, CTA) are dark in both colour schemes */
+  --aw-panel: #0d1117;
+  --aw-panel-raised: #1b2330;
+  --aw-panel-line: #222a35;
+  --aw-panel-ink: #d6deeb;
+  --aw-panel-muted: #8b95a5;
+
+  /* Shape and rhythm */
+  --aw-radius-sm: 8px;
+  --aw-radius: 12px;
+  --aw-radius-lg: 20px;
+  --aw-section-y: 4.5rem;
+  --aw-content-w: 1120px;
+
+  --aw-font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+.dark {
+  --aw-bg: #0b0e13;
+  --aw-surface: #12161d;
+  --aw-surface-soft: #171c25;
+  --aw-ink: #eef1f5;
+  --aw-ink-muted: #98a2b3;
+  --aw-line: #232a35;
+  --aw-accent: #8b93ff;
+  --aw-accent-2: #22d3ee;
+  --aw-accent-soft: #1a1d3a;
+  --aw-accent-2-soft: #0f2a31;
+  --aw-dot: #2a313d;
+  --aw-dot-accent: #2c3070;
+  --aw-dot-accent-2: #164c57;
+  --aw-panel: #080a0f;
+  --aw-panel-raised: #151b26;
+  --aw-panel-line: #1e2530;
+}
+
+/* Map the tokens onto VitePress' theme variables. */
+:root {
+  --vp-c-brand-1: #4338ca;
+  --vp-c-brand-2: #4f46e5;
+  --vp-c-brand-3: #4f46e5;
+  --vp-c-brand-soft: rgb(79 70 229 / 0.12);
+  --vp-c-bg: var(--aw-bg);
+  --vp-c-bg-alt: var(--aw-surface-soft);
+  --vp-c-bg-elv: var(--aw-surface);
+  --vp-c-text-1: var(--aw-ink);
+  --vp-c-text-2: var(--aw-ink-muted);
+  --vp-c-divider: var(--aw-line);
+  --vp-c-gutter: var(--aw-line);
+  --vp-font-family-mono: var(--aw-font-mono);
+  --vp-button-brand-bg: var(--aw-ink);
+  --vp-button-brand-hover-bg: var(--aw-ink-muted);
+  --vp-button-brand-text: var(--aw-bg);
+}
+
+.dark {
+  --vp-c-brand-1: #a5abff;
+  --vp-c-brand-2: #8b93ff;
+  --vp-c-brand-3: #6d76f5;
+  --vp-c-brand-soft: rgb(139 147 255 / 0.16);
+}
+
+/*
+ * Japanese: Inter has no kana/kanji, so the browser would pick whatever fallback it likes.
+ * List the system Japanese UI fonts explicitly (Apple, Windows, Android, then Noto).
+ */
+:root:lang(ja) {
+  --vp-font-family-base:
+    'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic',
+    'Noto Sans JP', 'Meiryo', ui-sans-serif, system-ui, sans-serif;
+}
