@@ -696,6 +696,7 @@ class WebViewHostApiImplTest {
         allowContentAccess = allowContentAccess,
         mixedContentMode = mixedContentMode,
         contentMode = ContentModeMessage.RECOMMENDED,
+        allowsLinkPreview = true,
         minimumFontSize = minimumFontSize,
         userAgent = userAgent,
     )

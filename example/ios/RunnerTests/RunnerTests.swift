@@ -135,6 +135,16 @@ final class RunnerTests: XCTestCase {
     XCTAssertEqual(preferences.preferredContentMode, .recommended)
   }
 
+  func testAllowsLinkPreviewIsAppliedAtCreationAndOnUpdate() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, settings: settings()))
+    let webView = try registry.get(1).webView
+    XCTAssertTrue(webView.allowsLinkPreview)
+
+    try hostApi.updateSettings(webViewId: 1, settings: settings(allowsLinkPreview: false))
+    XCTAssertFalse(webView.allowsLinkPreview)
+  }
+
   func testIncognitoUsesANonPersistentDataStore() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1, settings: settings()))
@@ -441,6 +451,7 @@ final class RunnerTests: XCTestCase {
     allowContentAccess: Bool = false,
     mixedContentMode: MixedContentModeMessage = .neverAllow,
     contentMode: ContentModeMessage = .recommended,
+    allowsLinkPreview: Bool = true,
     minimumFontSize: Int? = nil,
     userAgent: String? = nil,
     applicationNameForUserAgent: String? = nil
@@ -466,6 +477,7 @@ final class RunnerTests: XCTestCase {
       allowContentAccess: allowContentAccess,
       mixedContentMode: mixedContentMode,
       contentMode: contentMode,
+      allowsLinkPreview: allowsLinkPreview,
       minimumFontSize: minimumFontSize.map { Int64($0) },
       userAgent: userAgent,
       applicationNameForUserAgent: applicationNameForUserAgent)

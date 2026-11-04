@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `IOSWebViewSettings.allowsLinkPreview` (default `true`, as before), which turns off the link
+  preview shown when the user presses and holds a link (`WKWebView.allowsLinkPreview`). Android has no
+  equivalent.
+
 - Add `IOSWebViewSettings.contentMode` and `WebViewContentMode` (`recommended`, `mobile`, `desktop`),
   which choose the mobile or desktop version of sites on iOS
   (`WKWebpagePreferences.preferredContentMode`). It takes effect on the next navigation. Android has

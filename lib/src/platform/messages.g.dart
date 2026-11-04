@@ -182,6 +182,7 @@ class WebViewSettingsMessage {
     required this.allowContentAccess,
     required this.mixedContentMode,
     required this.contentMode,
+    required this.allowsLinkPreview,
     this.minimumFontSize,
     this.userAgent,
     this.applicationNameForUserAgent,
@@ -251,6 +252,9 @@ class WebViewSettingsMessage {
   /// Android.
   ContentModeMessage contentMode;
 
+  /// iOS only: `WKWebView.allowsLinkPreview`. Ignored on Android.
+  bool allowsLinkPreview;
+
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
   int? minimumFontSize;
@@ -283,6 +287,7 @@ class WebViewSettingsMessage {
       allowContentAccess,
       mixedContentMode,
       contentMode,
+      allowsLinkPreview,
       minimumFontSize,
       userAgent,
       applicationNameForUserAgent,
@@ -315,9 +320,10 @@ class WebViewSettingsMessage {
       allowContentAccess: result[17]! as bool,
       mixedContentMode: result[18]! as MixedContentModeMessage,
       contentMode: result[19]! as ContentModeMessage,
-      minimumFontSize: result[20] as int?,
-      userAgent: result[21] as String?,
-      applicationNameForUserAgent: result[22] as String?,
+      allowsLinkPreview: result[20]! as bool,
+      minimumFontSize: result[21] as int?,
+      userAgent: result[22] as String?,
+      applicationNameForUserAgent: result[23] as String?,
     );
   }
 
@@ -330,7 +336,7 @@ class WebViewSettingsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(incognito, other.incognito) && _deepEquals(javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && _deepEquals(scrollbarsVisible, other.scrollbarsVisible) && _deepEquals(overScrollEnabled, other.overScrollEnabled) && _deepEquals(pullToRefreshEnabled, other.pullToRefreshEnabled) && _deepEquals(domStorageEnabled, other.domStorageEnabled) && _deepEquals(allowFileAccess, other.allowFileAccess) && _deepEquals(allowContentAccess, other.allowContentAccess) && _deepEquals(mixedContentMode, other.mixedContentMode) && _deepEquals(contentMode, other.contentMode) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent) && _deepEquals(applicationNameForUserAgent, other.applicationNameForUserAgent);
+    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(incognito, other.incognito) && _deepEquals(javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && _deepEquals(scrollbarsVisible, other.scrollbarsVisible) && _deepEquals(overScrollEnabled, other.overScrollEnabled) && _deepEquals(pullToRefreshEnabled, other.pullToRefreshEnabled) && _deepEquals(domStorageEnabled, other.domStorageEnabled) && _deepEquals(allowFileAccess, other.allowFileAccess) && _deepEquals(allowContentAccess, other.allowContentAccess) && _deepEquals(mixedContentMode, other.mixedContentMode) && _deepEquals(contentMode, other.contentMode) && _deepEquals(allowsLinkPreview, other.allowsLinkPreview) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent) && _deepEquals(applicationNameForUserAgent, other.applicationNameForUserAgent);
   }
 
   @override
@@ -339,7 +345,7 @@ class WebViewSettingsMessage {
 
   @override
   String toString() {
-    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, cacheMode: $cacheMode, incognito: $incognito, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, scrollbarsVisible: $scrollbarsVisible, overScrollEnabled: $overScrollEnabled, pullToRefreshEnabled: $pullToRefreshEnabled, domStorageEnabled: $domStorageEnabled, allowFileAccess: $allowFileAccess, allowContentAccess: $allowContentAccess, mixedContentMode: $mixedContentMode, contentMode: $contentMode, minimumFontSize: $minimumFontSize, userAgent: $userAgent, applicationNameForUserAgent: $applicationNameForUserAgent)';
+    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, cacheMode: $cacheMode, incognito: $incognito, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, scrollbarsVisible: $scrollbarsVisible, overScrollEnabled: $overScrollEnabled, pullToRefreshEnabled: $pullToRefreshEnabled, domStorageEnabled: $domStorageEnabled, allowFileAccess: $allowFileAccess, allowContentAccess: $allowContentAccess, mixedContentMode: $mixedContentMode, contentMode: $contentMode, allowsLinkPreview: $allowsLinkPreview, minimumFontSize: $minimumFontSize, userAgent: $userAgent, applicationNameForUserAgent: $applicationNameForUserAgent)';
   }
 }
 

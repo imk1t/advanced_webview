@@ -49,6 +49,7 @@ class WebViewSettingsMessage {
     required this.allowContentAccess,
     required this.mixedContentMode,
     required this.contentMode,
+    required this.allowsLinkPreview,
     this.minimumFontSize,
     this.userAgent,
     this.applicationNameForUserAgent,
@@ -115,6 +116,9 @@ class WebViewSettingsMessage {
   /// iOS only: `WKWebpagePreferences.preferredContentMode`. Ignored on
   /// Android.
   ContentModeMessage contentMode;
+
+  /// iOS only: `WKWebView.allowsLinkPreview`. Ignored on Android.
+  bool allowsLinkPreview;
 
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.

@@ -62,6 +62,7 @@ Passed as `WebViewSettings.ios`. Android ignores all of them.
 | `incognito` | `false` | Ignored | Creation only |
 | `applicationNameForUserAgent` | `null` | Ignored | Creation only |
 | `contentMode` | `recommended` | Ignored | Yes |
+| `allowsLinkPreview` | `true` | Ignored | Yes |
 
 "Creation only" settings are applied when the native view is created and ignored by
 `updateSettings` on that platform.
