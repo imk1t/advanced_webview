@@ -23,6 +23,8 @@ import 'package:pigeon/pigeon.dart';
 // ---------------------------------------------------------------------------
 enum CacheModeMessage { normal, preferCache, cacheOnly, noCache }
 
+enum ContentModeMessage { recommended, mobile, desktop }
+
 enum MixedContentModeMessage { neverAllow, compatibility, alwaysAllow }
 
 class WebViewSettingsMessage {
@@ -46,6 +48,7 @@ class WebViewSettingsMessage {
     required this.allowFileAccess,
     required this.allowContentAccess,
     required this.mixedContentMode,
+    required this.contentMode,
     this.minimumFontSize,
     this.userAgent,
     this.applicationNameForUserAgent,
@@ -108,6 +111,10 @@ class WebViewSettingsMessage {
 
   /// Android: `WebSettings.setMixedContentMode`. iOS has no equivalent.
   MixedContentModeMessage mixedContentMode;
+
+  /// iOS only: `WKWebpagePreferences.preferredContentMode`. Ignored on
+  /// Android.
+  ContentModeMessage contentMode;
 
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `IOSWebViewSettings.contentMode` and `WebViewContentMode` (`recommended`, `mobile`, `desktop`),
+  which choose the mobile or desktop version of sites on iOS
+  (`WKWebpagePreferences.preferredContentMode`). It takes effect on the next navigation. Android has
+  no equivalent.
+
 - Add `IOSWebViewSettings.applicationNameForUserAgent` (creation only), which appends a token such as
   `MyApp/1.0` to the default iOS user agent (`WKWebViewConfiguration.applicationNameForUserAgent`)
   without replacing it. Android has no equivalent; use `WebViewSettings.userAgent` there.
