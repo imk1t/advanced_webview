@@ -8,7 +8,7 @@ defineProps<{ title?: string; lead?: string; eyebrow?: string; flush?: boolean }
     <AwContainer>
       <p
         v-if="eyebrow"
-        class="tw:m-0 tw:mb-2 tw:font-(family-name:--aw-font-mono) tw:text-xs tw:font-semibold tw:tracking-[0.12em] tw:text-(--aw-accent) tw:uppercase"
+        class="tw:m-0 tw:mb-2 tw:font-(family-name:--aw-font-mono) tw:text-xs tw:font-semibold tw:tracking-[0.12em] tw:text-(--aw-accent)"
       >
         {{ eyebrow }}
       </p>

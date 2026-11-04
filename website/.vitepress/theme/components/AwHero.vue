@@ -12,7 +12,7 @@ defineProps<{ eyebrow?: string; title: string; accent?: string; lead?: string }>
     <AwContainer class="tw:relative">
       <p
         v-if="eyebrow"
-        class="tw:m-0 tw:font-(family-name:--aw-font-mono) tw:text-xs tw:font-semibold tw:tracking-[0.12em] tw:text-(--aw-accent) tw:uppercase"
+        class="tw:m-0 tw:font-(family-name:--aw-font-mono) tw:text-xs tw:font-semibold tw:tracking-[0.12em] tw:text-(--aw-accent)"
       >
         {{ eyebrow }}
       </p>

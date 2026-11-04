@@ -19,6 +19,7 @@ const labels = {
     android: 'Android',
     ios: 'iOS',
     dartOnly: 'Dart only',
+    openDocs: 'Open the official documentation',
     status: {
       supported: 'Supported',
       partial: 'Partial',
@@ -31,6 +32,7 @@ const labels = {
     android: 'Android',
     ios: 'iOS',
     dartOnly: 'Dart のみ',
+    openDocs: '公式ドキュメントを開く',
     status: {
       supported: '対応',
       partial: '一部対応',
@@ -44,6 +46,14 @@ const platforms: Platform[] = ['android', 'ios']
 
 // Status badge: a dot plus label in the VitePress status colours. Classes carry the `tw:` prefix;
 // layout and spacing live in this template, the look comes from the design tokens (tokens.css).
+// Native class chips. Linked ones look like links (accent border, arrow, hover fill); the rest are
+// plain text. The `!` modifiers beat VitePress' `.vp-doc a` styles.
+const chipBase =
+  'tw:inline-flex tw:items-baseline tw:rounded-md tw:px-2 tw:py-0.5 tw:font-(family-name:--aw-font-mono) tw:text-xs tw:leading-5 tw:[overflow-wrap:anywhere]'
+const chipPlain = 'tw:bg-(--aw-surface-soft) tw:text-(--aw-ink)'
+const chipLink =
+  'tw:border tw:border-(--aw-accent)/30 tw:bg-(--aw-accent-soft) tw:text-(--aw-accent)! tw:no-underline! tw:transition-colors hover:tw:border-(--aw-accent) hover:tw:bg-(--aw-accent)/15'
+
 const badgeBase =
   'tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:px-2.5 tw:py-0.5 tw:text-xs tw:leading-5 tw:font-semibold'
 const badgeTone: Record<Status, string> = {
@@ -92,7 +102,7 @@ const rows = computed(() =>
     class="tw:my-6 tw:overflow-hidden tw:rounded-(--aw-radius-lg) tw:border tw:border-(--aw-line) tw:bg-(--aw-surface)"
   >
     <div
-      class="tw:hidden tw:grid-cols-[1.15fr_1fr_1fr] tw:gap-x-6 tw:border-b tw:border-(--aw-line) tw:bg-(--aw-surface-soft) tw:px-5 tw:py-2.5 tw:text-xs tw:font-semibold tw:tracking-wider tw:text-(--aw-ink-muted) tw:uppercase tw:xl:grid"
+      class="tw:hidden tw:grid-cols-[1.15fr_1fr_1fr] tw:gap-x-6 tw:border-b tw:border-(--aw-line) tw:bg-(--aw-surface-soft) tw:px-5 tw:py-2.5 tw:text-xs tw:font-semibold tw:tracking-wide tw:text-(--aw-ink-muted) tw:xl:grid"
       aria-hidden="true"
     >
       <span>{{ labels[locale].dart }}</span>
@@ -125,7 +135,7 @@ const rows = computed(() =>
       <template v-else>
         <div v-for="{ platform, side, refs } in row.sides" :key="platform" class="tw:min-w-0">
           <span
-            class="tw:mb-1.5 tw:block tw:text-xs tw:font-semibold tw:tracking-wider tw:text-(--aw-ink-muted) tw:uppercase tw:xl:hidden"
+            class="tw:mb-1.5 tw:block tw:text-xs tw:font-semibold tw:tracking-wide tw:text-(--aw-ink-muted) tw:xl:hidden"
             >{{ labels[locale][platform] }}</span
           >
           <template v-if="side">
@@ -134,22 +144,27 @@ const rows = computed(() =>
               {{ labels[locale].status[side.status] }}
             </span>
             <div v-if="refs.length" class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-1.5">
-              <span
-                v-for="ref in refs"
-                :key="ref.api"
-                class="tw:rounded-md tw:bg-(--aw-surface-soft) tw:px-2 tw:py-0.5 tw:font-(family-name:--aw-font-mono) tw:text-xs tw:leading-5 tw:text-(--aw-ink) tw:[overflow-wrap:anywhere]"
-                ><a
+              <template v-for="ref in refs" :key="ref.api">
+                <!-- Linked class: the whole chip is a link, marked with an arrow. -->
+                <a
                   v-if="ref.href"
                   :href="ref.href"
                   target="_blank"
                   rel="noreferrer"
-                  class="tw:font-semibold! tw:text-(--aw-accent)! tw:no-underline! hover:tw:underline!"
-                  >{{ ref.className }}</a
-                ><template v-else>{{ ref.className }}</template
-                ><template v-for="(part, i) in parts(ref.rest)" :key="i"
-                  ><wbr v-if="i > 0" />{{ part }}</template
-                ></span
-              >
+                  :title="labels[locale].openDocs"
+                  :class="[chipBase, chipLink]"
+                  ><span class="tw:font-semibold">{{ ref.className }}</span
+                  ><template v-for="(part, i) in parts(ref.rest)" :key="i"
+                    ><wbr v-if="i > 0" />{{ part }}</template
+                  ><span class="tw:ml-1 tw:text-[0.7rem]" aria-hidden="true">↗</span></a
+                >
+                <span v-else :class="[chipBase, chipPlain]"
+                  >{{ ref.className
+                  }}<template v-for="(part, i) in parts(ref.rest)" :key="i"
+                    ><wbr v-if="i > 0" />{{ part }}</template
+                  ></span
+                >
+              </template>
             </div>
             <span
               v-if="side.note"
