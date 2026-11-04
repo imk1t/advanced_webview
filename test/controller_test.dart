@@ -142,6 +142,19 @@ void main() {
       );
     });
 
+    test('contentMode is passed to native', () {
+      expect(
+        const WebViewSettings().toMessage().contentMode,
+        ContentModeMessage.recommended,
+      );
+      expect(
+        const WebViewSettings(
+          ios: IOSWebViewSettings(contentMode: WebViewContentMode.desktop),
+        ).toMessage().contentMode,
+        ContentModeMessage.desktop,
+      );
+    });
+
     test('incognito is passed to native', () {
       expect(const WebViewSettings().toMessage().incognito, isFalse);
       expect(

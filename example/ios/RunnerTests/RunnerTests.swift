@@ -121,6 +121,20 @@ final class RunnerTests: XCTestCase {
       try registry.get(2).webView.configuration.applicationNameForUserAgent, "MyApp/1.0")
   }
 
+  func testContentModeIsAppliedAtCreationAndOnUpdate() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, settings: settings(contentMode: .desktop)))
+    let preferences: WKWebpagePreferences =
+      try registry.get(1).webView.configuration.defaultWebpagePreferences
+    XCTAssertEqual(preferences.preferredContentMode, .desktop)
+
+    try hostApi.updateSettings(webViewId: 1, settings: settings(contentMode: .mobile))
+    XCTAssertEqual(preferences.preferredContentMode, .mobile)
+
+    try hostApi.updateSettings(webViewId: 1, settings: settings())
+    XCTAssertEqual(preferences.preferredContentMode, .recommended)
+  }
+
   func testIncognitoUsesANonPersistentDataStore() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1, settings: settings()))
@@ -426,6 +440,7 @@ final class RunnerTests: XCTestCase {
     allowFileAccess: Bool = false,
     allowContentAccess: Bool = false,
     mixedContentMode: MixedContentModeMessage = .neverAllow,
+    contentMode: ContentModeMessage = .recommended,
     minimumFontSize: Int? = nil,
     userAgent: String? = nil,
     applicationNameForUserAgent: String? = nil
@@ -450,6 +465,7 @@ final class RunnerTests: XCTestCase {
       allowFileAccess: allowFileAccess,
       allowContentAccess: allowContentAccess,
       mixedContentMode: mixedContentMode,
+      contentMode: contentMode,
       minimumFontSize: minimumFontSize.map { Int64($0) },
       userAgent: userAgent,
       applicationNameForUserAgent: applicationNameForUserAgent)
