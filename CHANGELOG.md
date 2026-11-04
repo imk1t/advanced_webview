@@ -6,9 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- Reword the package description and README introductions around the product ("simple yet feature-rich", one typed Dart API with the same behaviour on both platforms) instead of implementation details.
-
 ## 0.6.0 - 2026-11-05
+
+- Reword the package description and README introductions around the product ("simple yet feature-rich", one typed Dart API with the same behaviour on both platforms) instead of implementation details.
 
 - Add `AndroidWebViewSettings.geolocationEnabled` (default `true`, as before), which switches
   `navigator.geolocation` off for the page (`WebSettings.setGeolocationEnabled`). iOS has no
