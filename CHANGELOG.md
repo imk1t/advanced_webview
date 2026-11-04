@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add a pub.dev badge and install instructions to the READMEs, and a pub.dev link to the docs site navigation.
+
 ## 0.6.0 - 2026-11-05
 
 - Reword the package description and README introductions around the product ("simple yet feature-rich", one typed Dart API with the same behaviour on both platforms) instead of implementation details.
