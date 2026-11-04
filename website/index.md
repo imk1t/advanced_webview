@@ -7,9 +7,9 @@ title: advanced_webview
 
 <AwHero
   eyebrow="Flutter · Android · iOS"
-  title="A lean WebView for Flutter,"
-  accent="built to stay maintainable."
-  lead="One controller, one widget, immutable settings. A typed Dart API with identical behaviour on Android and iOS."
+  title="One WebView for Flutter,"
+  accent="the same on Android and iOS."
+  lead="Navigation, JavaScript, cookies and more through one typed Dart API. Write it once and it behaves the same on both platforms."
 >
   <template #actions>
     <AwButton href="/guide/getting-started">Get started</AwButton>
@@ -77,7 +77,7 @@ final controller = AdvancedWebViewController(
   </AwGrid>
 </AwSection>
 
-<AwCta title="Ship a WebView you can maintain" lead="Add advanced_webview to your app in a minute.">
+<AwCta title="Add a WebView to your Flutter app" lead="Install advanced_webview and show your first page in a minute.">
   <template #actions>
     <AwButton href="/guide/getting-started" variant="inverse">Get started</AwButton>
     <AwButton href="https://pub.dev/packages/advanced_webview" variant="inverse-outline">pub.dev</AwButton>

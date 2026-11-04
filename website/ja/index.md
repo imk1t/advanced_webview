@@ -7,9 +7,9 @@ title: advanced_webview
 
 <AwHero
   eyebrow="Flutter · Android · iOS"
-  title="保守しやすい、"
-  accent="Flutter 向けの小さな WebView。"
-  lead="コントローラ、ウィジェット、不変の設定だけ。Android と iOS で振る舞いが揃った、型付きの Dart API です。"
+  title="Android でも iOS でも、"
+  accent="同じように動く WebView。"
+  lead="ナビゲーション、JavaScript、Cookie などを、型付きの Dart API ひとつで扱えます。一度書けば、両方のプラットフォームで同じ動きになります。"
 >
   <template #actions>
     <AwButton href="/ja/guide/getting-started">はじめる</AwButton>
@@ -77,7 +77,7 @@ final controller = AdvancedWebViewController(
   </AwGrid>
 </AwSection>
 
-<AwCta title="保守できる WebView を、アプリへ" lead="advanced_webview は、1分でアプリに追加できます。">
+<AwCta title="Flutter アプリに WebView を追加する" lead="advanced_webview を入れて、1分で最初のページを表示できます。">
   <template #actions>
     <AwButton href="/ja/guide/getting-started" variant="inverse">はじめる</AwButton>
     <AwButton href="https://pub.dev/packages/advanced_webview" variant="inverse-outline">pub.dev</AwButton>
