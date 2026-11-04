@@ -5,8 +5,9 @@
 [![CI](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml/badge.svg)](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Android と iOS に絞った、Pigeon ベースの型安全な Flutter WebView プラグインです。
-`flutter_inappwebview` の機能設計を参考にしつつ、小さな公開APIと1か所に集約したプラットフォーム契約で保守性を優先しています。
+小さな公開 API を備えた、Pigeon ベースの軽量で型安全な Android・iOS 向け Flutter WebView プラグインです。
+
+`flutter_inappwebview` の機能設計を参考にしつつ、プラットフォーム契約を1か所に集約して保守性を優先しています。
 
 ドキュメント: https://imk1t.github.io/advanced_webview/ja/
 

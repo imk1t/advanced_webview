@@ -5,9 +5,10 @@ English | [日本語](README.ja.md)
 [![CI](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml/badge.svg)](https://github.com/imk1t/advanced_webview/actions/workflows/ci.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A type-safe Flutter WebView plugin for Android and iOS only, built on Pigeon.
+A lean, type-safe Flutter WebView plugin for Android and iOS, built on Pigeon with a small public API.
+
 It borrows feature ideas from `flutter_inappwebview`, but favours maintainability with a
-small public API and a single, centralised platform contract.
+single, centralised platform contract.
 
 Documentation: https://imk1t.github.io/advanced_webview/
 

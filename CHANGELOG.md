@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `MyApp/1.0` to the default iOS user agent (`WKWebViewConfiguration.applicationNameForUserAgent`)
   without replacing it. Android has no equivalent; use `WebViewSettings.userAgent` there.
 
+- Align the English and Japanese README introductions and package description with the GitHub repository description.
+
 ## 0.5.0 - 2026-11-02
 
 - Add `AdvancedWebViewController.onConsoleMessage`, which reports the page's `console.debug`, `log`,
