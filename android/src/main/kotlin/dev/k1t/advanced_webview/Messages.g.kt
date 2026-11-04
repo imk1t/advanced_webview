@@ -356,7 +356,12 @@ data class WebViewSettingsMessage (
    * `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
    */
   val minimumFontSize: Long? = null,
-  val userAgent: String? = null
+  val userAgent: String? = null,
+  /**
+   * iOS only, creation only: `WKWebViewConfiguration.applicationNameForUserAgent`.
+   * Ignored on Android. `null` uses the platform default.
+   */
+  val applicationNameForUserAgent: String? = null
 )
  {
   companion object {
@@ -382,7 +387,8 @@ data class WebViewSettingsMessage (
       val mixedContentMode = pigeonVar_list[18] as MixedContentModeMessage
       val minimumFontSize = pigeonVar_list[19] as Long?
       val userAgent = pigeonVar_list[20] as String?
-      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, transparentBackground, passkeysEnabled, allowsBackForwardNavigationGestures, inspectable, textZoom, cacheMode, incognito, javaScriptCanOpenWindowsAutomatically, scrollbarsVisible, overScrollEnabled, pullToRefreshEnabled, domStorageEnabled, allowFileAccess, allowContentAccess, mixedContentMode, minimumFontSize, userAgent)
+      val applicationNameForUserAgent = pigeonVar_list[21] as String?
+      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, transparentBackground, passkeysEnabled, allowsBackForwardNavigationGestures, inspectable, textZoom, cacheMode, incognito, javaScriptCanOpenWindowsAutomatically, scrollbarsVisible, overScrollEnabled, pullToRefreshEnabled, domStorageEnabled, allowFileAccess, allowContentAccess, mixedContentMode, minimumFontSize, userAgent, applicationNameForUserAgent)
     }
   }
   fun toList(): List<Any?> {
@@ -408,6 +414,7 @@ data class WebViewSettingsMessage (
       mixedContentMode,
       minimumFontSize,
       userAgent,
+      applicationNameForUserAgent,
     )
   }
   override fun equals(other: Any?): Boolean {
@@ -418,7 +425,7 @@ data class WebViewSettingsMessage (
       return true
     }
     val other = other as WebViewSettingsMessage
-    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && MessagesPigeonUtils.deepEquals(this.inspectable, other.inspectable) && MessagesPigeonUtils.deepEquals(this.textZoom, other.textZoom) && MessagesPigeonUtils.deepEquals(this.cacheMode, other.cacheMode) && MessagesPigeonUtils.deepEquals(this.incognito, other.incognito) && MessagesPigeonUtils.deepEquals(this.javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonUtils.deepEquals(this.scrollbarsVisible, other.scrollbarsVisible) && MessagesPigeonUtils.deepEquals(this.overScrollEnabled, other.overScrollEnabled) && MessagesPigeonUtils.deepEquals(this.pullToRefreshEnabled, other.pullToRefreshEnabled) && MessagesPigeonUtils.deepEquals(this.domStorageEnabled, other.domStorageEnabled) && MessagesPigeonUtils.deepEquals(this.allowFileAccess, other.allowFileAccess) && MessagesPigeonUtils.deepEquals(this.allowContentAccess, other.allowContentAccess) && MessagesPigeonUtils.deepEquals(this.mixedContentMode, other.mixedContentMode) && MessagesPigeonUtils.deepEquals(this.minimumFontSize, other.minimumFontSize) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent)
+    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && MessagesPigeonUtils.deepEquals(this.inspectable, other.inspectable) && MessagesPigeonUtils.deepEquals(this.textZoom, other.textZoom) && MessagesPigeonUtils.deepEquals(this.cacheMode, other.cacheMode) && MessagesPigeonUtils.deepEquals(this.incognito, other.incognito) && MessagesPigeonUtils.deepEquals(this.javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonUtils.deepEquals(this.scrollbarsVisible, other.scrollbarsVisible) && MessagesPigeonUtils.deepEquals(this.overScrollEnabled, other.overScrollEnabled) && MessagesPigeonUtils.deepEquals(this.pullToRefreshEnabled, other.pullToRefreshEnabled) && MessagesPigeonUtils.deepEquals(this.domStorageEnabled, other.domStorageEnabled) && MessagesPigeonUtils.deepEquals(this.allowFileAccess, other.allowFileAccess) && MessagesPigeonUtils.deepEquals(this.allowContentAccess, other.allowContentAccess) && MessagesPigeonUtils.deepEquals(this.mixedContentMode, other.mixedContentMode) && MessagesPigeonUtils.deepEquals(this.minimumFontSize, other.minimumFontSize) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent) && MessagesPigeonUtils.deepEquals(this.applicationNameForUserAgent, other.applicationNameForUserAgent)
   }
 
   override fun hashCode(): Int {
@@ -444,10 +451,11 @@ data class WebViewSettingsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.mixedContentMode)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.minimumFontSize)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userAgent)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.applicationNameForUserAgent)
     return result
   }
   override fun toString(): String {
-    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, allowsBackForwardNavigationGestures=$allowsBackForwardNavigationGestures, inspectable=$inspectable, textZoom=$textZoom, cacheMode=$cacheMode, incognito=$incognito, javaScriptCanOpenWindowsAutomatically=$javaScriptCanOpenWindowsAutomatically, scrollbarsVisible=$scrollbarsVisible, overScrollEnabled=$overScrollEnabled, pullToRefreshEnabled=$pullToRefreshEnabled, domStorageEnabled=$domStorageEnabled, allowFileAccess=$allowFileAccess, allowContentAccess=$allowContentAccess, mixedContentMode=$mixedContentMode, minimumFontSize=$minimumFontSize, userAgent=$userAgent)"
+    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, allowsBackForwardNavigationGestures=$allowsBackForwardNavigationGestures, inspectable=$inspectable, textZoom=$textZoom, cacheMode=$cacheMode, incognito=$incognito, javaScriptCanOpenWindowsAutomatically=$javaScriptCanOpenWindowsAutomatically, scrollbarsVisible=$scrollbarsVisible, overScrollEnabled=$overScrollEnabled, pullToRefreshEnabled=$pullToRefreshEnabled, domStorageEnabled=$domStorageEnabled, allowFileAccess=$allowFileAccess, allowContentAccess=$allowContentAccess, mixedContentMode=$mixedContentMode, minimumFontSize=$minimumFontSize, userAgent=$userAgent, applicationNameForUserAgent=$applicationNameForUserAgent)"
   }
 }
 

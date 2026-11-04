@@ -48,6 +48,7 @@ class WebViewSettingsMessage {
     required this.mixedContentMode,
     this.minimumFontSize,
     this.userAgent,
+    this.applicationNameForUserAgent,
   });
 
   bool javaScriptEnabled;
@@ -112,6 +113,10 @@ class WebViewSettingsMessage {
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
   int? minimumFontSize;
   String? userAgent;
+
+  /// iOS only, creation only: `WKWebViewConfiguration.applicationNameForUserAgent`.
+  /// Ignored on Android. `null` uses the platform default.
+  String? applicationNameForUserAgent;
 }
 
 enum ConsoleMessageLevelMessage { debug, log, info, warning, error }

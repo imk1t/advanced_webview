@@ -108,6 +108,19 @@ final class RunnerTests: XCTestCase {
     XCTAssertFalse(webView.scrollView.bounces)
   }
 
+  func testApplicationNameForUserAgentIsAppliedAtCreation() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, settings: settings()))
+    try hostApi.create(
+      params: params(
+        webViewId: 2, settings: settings(applicationNameForUserAgent: "MyApp/1.0")))
+
+    XCTAssertNotEqual(
+      try registry.get(1).webView.configuration.applicationNameForUserAgent, "MyApp/1.0")
+    XCTAssertEqual(
+      try registry.get(2).webView.configuration.applicationNameForUserAgent, "MyApp/1.0")
+  }
+
   func testIncognitoUsesANonPersistentDataStore() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1, settings: settings()))
@@ -414,7 +427,8 @@ final class RunnerTests: XCTestCase {
     allowContentAccess: Bool = false,
     mixedContentMode: MixedContentModeMessage = .neverAllow,
     minimumFontSize: Int? = nil,
-    userAgent: String? = nil
+    userAgent: String? = nil,
+    applicationNameForUserAgent: String? = nil
   ) -> WebViewSettingsMessage {
     return WebViewSettingsMessage(
       javaScriptEnabled: javaScriptEnabled,
@@ -437,7 +451,8 @@ final class RunnerTests: XCTestCase {
       allowContentAccess: allowContentAccess,
       mixedContentMode: mixedContentMode,
       minimumFontSize: minimumFontSize.map { Int64($0) },
-      userAgent: userAgent)
+      userAgent: userAgent,
+      applicationNameForUserAgent: applicationNameForUserAgent)
   }
 }
 

@@ -43,6 +43,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     configuration.allowsInlineMediaPlayback = params.settings.allowsInlineMediaPlayback
     configuration.mediaTypesRequiringUserActionForPlayback =
       params.settings.mediaPlaybackRequiresUserGesture ? .all : []
+    configuration.applicationNameForUserAgent = params.settings.applicationNameForUserAgent
     if params.settings.incognito {
       configuration.websiteDataStore = .nonPersistent()
     }
