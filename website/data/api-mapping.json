@@ -1573,6 +1573,26 @@
       }
     },
     {
+      "dart": "IOSWebViewSettings.allowsLinkPreview",
+      "group": "settings",
+      "summary": {
+        "en": "Shows the link preview when the user presses and holds a link (iOS).",
+        "ja": "リンクを長押ししたときのプレビューを表示するかどうかを切り替えます（iOS）。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Android has no equivalent.",
+          "ja": "Android には該当する設定がありません。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.allowsLinkPreview"]
+      }
+    },
+    {
       "dart": "WebViewSettings.cacheMode",
       "group": "settings",
       "summary": {
