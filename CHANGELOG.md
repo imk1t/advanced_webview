@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.onFaviconChanged`: the favicon URL of each page after it loads, read from the page's markup on both platforms (WebKit has no favicon API).
+- Add `onEnterFullscreen` and `onExitFullscreen`. Android now supports fullscreen video and `requestFullscreen()` (it used to ignore them): the plugin covers the Activity window, hides the system bars and exits on back, without changing the orientation. iOS reports WebKit's `fullscreenState` and enables the element fullscreen API.
+
 - Add `AdvancedWebViewController.onFindResult` and `FindResultCallback`: live find progress (active match index, match count, done flag). Android reports every update while WebView counts; iOS reports one final update per `findText`. On iOS `FindResult.matchCount` and `activeMatchIndex` are now filled in too, as a best-effort count of the page text.
 
 - Add `AdvancedWebViewController.createPdf`: render the current page to PDF bytes. Android paginates on A4 with print styles; iOS returns one page as tall as the content.

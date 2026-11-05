@@ -62,6 +62,9 @@ class WebResourceError {
 typedef PageEventCallback = void Function(String url);
 typedef ProgressCallback = void Function(int progress);
 typedef TitleChangedCallback = void Function(String? title);
+
+/// Reports the favicon URL of a page, or `null` when it has none.
+typedef FaviconChangedCallback = void Function(String? url);
 typedef LongPressCallback = void Function(Offset offset);
 typedef ScrollChangedCallback = void Function(Offset offset);
 typedef WebResourceErrorCallback = void Function(WebResourceError error);

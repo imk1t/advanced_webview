@@ -186,6 +186,28 @@ AdvancedWebViewController(
 );
 ```
 
+## ファビコンと全画面表示 {#favicon-and-fullscreen}
+
+```dart
+AdvancedWebViewController(
+  onFaviconChanged: (url) {}, // ページの読み込み完了ごとに通知。String?
+  onEnterFullscreen: () {},   // アプリ側のクロームを隠す
+  onExitFullscreen: () {},
+);
+```
+
+`onFaviconChanged` はページの `<link rel="icon">` の URL を通知します。ページが宣言していない場合はオリジンの
+`/favicon.ico`（存在しないことがあります）、HTTP 以外のページでは `null` です。WebKit には公開のファビコン API がなく、
+Android はデコード済みのビットマップしか渡さないため、どちらもページのマークアップを読み取り、同じ結果になるようにしています。
+画像の読み込みはアプリ側で行ってください（例: `Image.network`）。ページの読み込み完了後にスクリプトが追加したアイコンは
+通知されません。
+
+全画面表示はプラットフォームが行い、コールバックは通知するだけです。動画の全画面ボタンも `element.requestFullscreen()` も
+使えます。Android ではプラグインが Activity のウィンドウをコンテンツで覆い、システムバーを隠し、戻る操作で全画面を終了します。
+画面の回転は行わないため、横向きにしたい場合は `onEnterFullscreen` でアプリ側が向きを設定してください。
+このリリース以前の Android は全画面表示自体に対応していませんでした。iOS は WebKit 独自の全画面ビューを表示し、
+プラグインはそのために要素の全画面 API を有効にします。
+
 ## ファイルのアップロード {#file-uploads}
 
 `<input type="file">` は、Dart 側のコードなしで両プラットフォームで動作します。

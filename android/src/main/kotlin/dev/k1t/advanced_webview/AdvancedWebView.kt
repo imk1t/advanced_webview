@@ -12,6 +12,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.net.Uri
 import android.net.http.SslError
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.os.Message
@@ -19,6 +20,7 @@ import android.os.Parcel
 import android.print.PdfExporter
 import android.print.PrintAttributes
 import android.print.PrintManager
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +43,9 @@ import android.webkit.WebSettings
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
@@ -54,6 +59,7 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
@@ -107,6 +113,9 @@ class AdvancedWebView(
     private val hasJsDialogDelegate = params.hasJsDialogDelegate
     private val hasHttpErrorDelegate = params.hasHttpErrorDelegate
     private val hasFindDelegate = params.hasFindDelegate
+    private val hasFaviconDelegate = params.hasFaviconDelegate
+    private val hasFullscreenDelegate = params.hasFullscreenDelegate
+    private var fullscreen: Fullscreen? = null
     private val interceptSchemes = params.interceptSchemes.map { it.lowercase(Locale.ROOT) }.toSet()
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
@@ -539,8 +548,88 @@ class AdvancedWebView(
         // platform view, so the WebView survives re-attachment.
     }
 
+    /** Reads the favicon URL from the page's markup, the same way on both platforms. */
+    private fun reportFavicon() {
+        webView.evaluateJavascript(FAVICON_SCRIPT) { result ->
+            // The result is a JSON string, or "null".
+            val url = if (result == null || result == "null") null else JSONArray("[$result]").getString(0)
+            send { flutterApi.onFaviconChanged(id, url) }
+        }
+    }
+
+    /** What the page is showing fullscreen, and how to put the Activity back. */
+    private class Fullscreen(
+        val host: FrameLayout,
+        val callback: WebChromeClient.CustomViewCallback,
+        val activity: Activity,
+        val previousFlags: Int,
+        val backCallback: Any?,
+    )
+
+    /**
+     * Covers the Activity with the view the page wants fullscreen (WebView's video or element fullscreen).
+     * Without an Activity there is nowhere to show it, so the request is refused.
+     */
+    private fun enterFullscreen(view: View, callback: WebChromeClient.CustomViewCallback) {
+        var current: Context? = contextWrapper.baseContext
+        while (current is ContextWrapper && current !is Activity) current = current.baseContext
+        val activity = current as? Activity
+        if (activity == null || fullscreen != null) {
+            callback.onCustomViewHidden()
+            return
+        }
+        val host = FrameLayout(activity).apply {
+            setBackgroundColor(Color.BLACK)
+            addView(view, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+            isFocusableInTouchMode = true
+            // Back leaves fullscreen. Key events cover older Android; newer ones route back through a dispatcher.
+            setOnKeyListener { _, keyCode, event ->
+                (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP).also {
+                    if (it) exitFullscreen()
+                }
+            }
+        }
+        val decor = activity.window.decorView as ViewGroup
+        decor.addView(host, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        host.requestFocus()
+        @Suppress("DEPRECATION")
+        val previousFlags = decor.systemUiVisibility
+        @Suppress("DEPRECATION")
+        decor.systemUiVisibility = FULLSCREEN_FLAGS
+        val backCallback = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            OnBackInvokedCallback { exitFullscreen() }.also {
+                activity.onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_OVERLAY,
+                    it,
+                )
+            }
+        } else {
+            null
+        }
+        fullscreen = Fullscreen(host, callback, activity, previousFlags, backCallback)
+        if (hasFullscreenDelegate) send { flutterApi.onEnterFullscreen(id) }
+    }
+
+    private fun exitFullscreen() {
+        val state = fullscreen ?: return
+        fullscreen = null
+        val decor = state.activity.window.decorView as ViewGroup
+        decor.removeView(state.host)
+        state.host.removeAllViews()
+        @Suppress("DEPRECATION")
+        decor.systemUiVisibility = state.previousFlags
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            (state.backCallback as? OnBackInvokedCallback)?.let {
+                state.activity.onBackInvokedDispatcher.unregisterOnBackInvokedCallback(it)
+            }
+        }
+        state.callback.onCustomViewHidden()
+        if (hasFullscreenDelegate) send { flutterApi.onExitFullscreen(id) }
+    }
+
     fun destroy() {
         if (isDestroyed) return
+        exitFullscreen()
         isDestroyed = true
         webView.stopLoading()
         webView.destroy()
@@ -601,6 +690,7 @@ class AdvancedWebView(
 
         override fun onPageFinished(view: WebView, url: String) {
             container.isRefreshing = false
+            if (hasFaviconDelegate) reportFavicon()
             send { flutterApi.onPageFinished(id, url) }
             onPageStateChanged?.invoke()
         }
@@ -761,6 +851,10 @@ class AdvancedWebView(
             return true
         }
 
+        override fun onShowCustomView(view: View, callback: CustomViewCallback) = enterFullscreen(view, callback)
+
+        override fun onHideCustomView() = exitFullscreen()
+
         override fun onProgressChanged(view: WebView, newProgress: Int) {
             send { flutterApi.onProgressChanged(id, newProgress.toLong()) }
         }
@@ -903,6 +997,25 @@ class AdvancedWebView(
 
     companion object {
         private const val TAG = "AdvancedWebView"
+        private const val MATCH_PARENT = ViewGroup.LayoutParams.MATCH_PARENT
+
+        @Suppress("DEPRECATION")
+        private const val FULLSCREEN_FLAGS = View.SYSTEM_UI_FLAG_FULLSCREEN or
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+
+        // Declared <link rel="icon"> (including "shortcut icon"), else the touch icon, else /favicon.ico.
+        private val FAVICON_SCRIPT = """
+            (function() {
+              if (!/^https?:$/.test(location.protocol)) return null;
+              var link = document.querySelector('link[rel~="icon" i][href]') ||
+                document.querySelector('link[rel~="apple-touch-icon" i][href]');
+              return link ? link.href : location.origin + '/favicon.ico';
+            })()
+        """.trimIndent()
         private const val INTERCEPT_TIMEOUT_MILLIS = 10_000L
 
         /** Virtual host that serves the app's assets, so pages can load them without `allowFileAccess`. */

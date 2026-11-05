@@ -681,6 +681,13 @@ data class CreationParamsMessage (
   val hasHttpErrorDelegate: Boolean,
   /** When false, find progress is never reported to Dart. */
   val hasFindDelegate: Boolean,
+  /** When false, the favicon is never looked up or reported. */
+  val hasFaviconDelegate: Boolean,
+  /**
+   * When false, fullscreen changes are still shown natively but never
+   * reported to Dart.
+   */
+  val hasFullscreenDelegate: Boolean,
   /**
    * Lower-case URL schemes whose requests are answered by Dart through
    * `onInterceptRequest`. Empty when the app has no intercept callback.
@@ -709,9 +716,11 @@ data class CreationParamsMessage (
       val hasJsDialogDelegate = pigeonVar_list[14] as Boolean
       val hasHttpErrorDelegate = pigeonVar_list[15] as Boolean
       val hasFindDelegate = pigeonVar_list[16] as Boolean
-      val interceptSchemes = pigeonVar_list[17] as List<String>
-      val userScripts = pigeonVar_list[18] as List<UserScriptMessage>
-      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, hasDownloadDelegate, hasSslErrorDelegate, hasHttpAuthDelegate, hasScrollDelegate, hasLongPressDelegate, hasConsoleMessageDelegate, hasJsDialogDelegate, hasHttpErrorDelegate, hasFindDelegate, interceptSchemes, userScripts)
+      val hasFaviconDelegate = pigeonVar_list[17] as Boolean
+      val hasFullscreenDelegate = pigeonVar_list[18] as Boolean
+      val interceptSchemes = pigeonVar_list[19] as List<String>
+      val userScripts = pigeonVar_list[20] as List<UserScriptMessage>
+      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, hasDownloadDelegate, hasSslErrorDelegate, hasHttpAuthDelegate, hasScrollDelegate, hasLongPressDelegate, hasConsoleMessageDelegate, hasJsDialogDelegate, hasHttpErrorDelegate, hasFindDelegate, hasFaviconDelegate, hasFullscreenDelegate, interceptSchemes, userScripts)
     }
   }
   fun toList(): List<Any?> {
@@ -733,6 +742,8 @@ data class CreationParamsMessage (
       hasJsDialogDelegate,
       hasHttpErrorDelegate,
       hasFindDelegate,
+      hasFaviconDelegate,
+      hasFullscreenDelegate,
       interceptSchemes,
       userScripts,
     )
@@ -745,7 +756,7 @@ data class CreationParamsMessage (
       return true
     }
     val other = other as CreationParamsMessage
-    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.hasDownloadDelegate, other.hasDownloadDelegate) && MessagesPigeonUtils.deepEquals(this.hasSslErrorDelegate, other.hasSslErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpAuthDelegate, other.hasHttpAuthDelegate) && MessagesPigeonUtils.deepEquals(this.hasScrollDelegate, other.hasScrollDelegate) && MessagesPigeonUtils.deepEquals(this.hasLongPressDelegate, other.hasLongPressDelegate) && MessagesPigeonUtils.deepEquals(this.hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && MessagesPigeonUtils.deepEquals(this.hasJsDialogDelegate, other.hasJsDialogDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpErrorDelegate, other.hasHttpErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasFindDelegate, other.hasFindDelegate) && MessagesPigeonUtils.deepEquals(this.interceptSchemes, other.interceptSchemes) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.hasDownloadDelegate, other.hasDownloadDelegate) && MessagesPigeonUtils.deepEquals(this.hasSslErrorDelegate, other.hasSslErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpAuthDelegate, other.hasHttpAuthDelegate) && MessagesPigeonUtils.deepEquals(this.hasScrollDelegate, other.hasScrollDelegate) && MessagesPigeonUtils.deepEquals(this.hasLongPressDelegate, other.hasLongPressDelegate) && MessagesPigeonUtils.deepEquals(this.hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && MessagesPigeonUtils.deepEquals(this.hasJsDialogDelegate, other.hasJsDialogDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpErrorDelegate, other.hasHttpErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasFindDelegate, other.hasFindDelegate) && MessagesPigeonUtils.deepEquals(this.hasFaviconDelegate, other.hasFaviconDelegate) && MessagesPigeonUtils.deepEquals(this.hasFullscreenDelegate, other.hasFullscreenDelegate) && MessagesPigeonUtils.deepEquals(this.interceptSchemes, other.interceptSchemes) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
   }
 
   override fun hashCode(): Int {
@@ -767,12 +778,14 @@ data class CreationParamsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasJsDialogDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasHttpErrorDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasFindDelegate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.hasFaviconDelegate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.hasFullscreenDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.interceptSchemes)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userScripts)
     return result
   }
   override fun toString(): String {
-    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, hasDownloadDelegate=$hasDownloadDelegate, hasSslErrorDelegate=$hasSslErrorDelegate, hasHttpAuthDelegate=$hasHttpAuthDelegate, hasScrollDelegate=$hasScrollDelegate, hasLongPressDelegate=$hasLongPressDelegate, hasConsoleMessageDelegate=$hasConsoleMessageDelegate, hasJsDialogDelegate=$hasJsDialogDelegate, hasHttpErrorDelegate=$hasHttpErrorDelegate, hasFindDelegate=$hasFindDelegate, interceptSchemes=$interceptSchemes, userScripts=$userScripts)"
+    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, hasDownloadDelegate=$hasDownloadDelegate, hasSslErrorDelegate=$hasSslErrorDelegate, hasHttpAuthDelegate=$hasHttpAuthDelegate, hasScrollDelegate=$hasScrollDelegate, hasLongPressDelegate=$hasLongPressDelegate, hasConsoleMessageDelegate=$hasConsoleMessageDelegate, hasJsDialogDelegate=$hasJsDialogDelegate, hasHttpErrorDelegate=$hasHttpErrorDelegate, hasFindDelegate=$hasFindDelegate, hasFaviconDelegate=$hasFaviconDelegate, hasFullscreenDelegate=$hasFullscreenDelegate, interceptSchemes=$interceptSchemes, userScripts=$userScripts)"
   }
 }
 
@@ -2768,6 +2781,76 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
       val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onFindResult$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, activeMatchIndexArg, numberOfMatchesArg, isDoneArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else {
+            continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /**
+   * The favicon URL of the page that just finished loading, or null when it
+   * has none. Only sent when the controller was created with
+   * `hasFaviconDelegate`.
+   */
+  suspend fun onFaviconChanged(webViewIdArg: Long, urlArg: String?)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onFaviconChanged$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg, urlArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else {
+            continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /**
+   * The page (a video or any element) entered fullscreen. Only sent when the
+   * controller was created with `hasFullscreenDelegate`.
+   */
+  suspend fun onEnterFullscreen(webViewIdArg: Long)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onEnterFullscreen$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else {
+            continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /**
+   * The page left fullscreen. Only sent when the controller was created with
+   * `hasFullscreenDelegate`.
+   */
+  suspend fun onExitFullscreen(webViewIdArg: Long)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onExitFullscreen$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg)) {
         if (it is List<*>) {
           if (it.size > 1) {
             continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
