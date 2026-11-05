@@ -32,6 +32,7 @@ void main() {
     NavigationRequestCallback? onNavigationRequest,
     NewWindowCallback? onNewWindow,
     PermissionRequestCallback? onPermissionRequest,
+    JsDialogCallback? onJsDialog,
     DownloadStartCallback? onDownloadStart,
     SslErrorCallback? onSslError,
     HttpAuthCallback? onHttpAuthRequest,
@@ -51,6 +52,7 @@ void main() {
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
       onPermissionRequest: onPermissionRequest,
+      onJsDialog: onJsDialog,
       onDownloadStart: onDownloadStart,
       onSslError: onSslError,
       onHttpAuthRequest: onHttpAuthRequest,
@@ -781,6 +783,80 @@ void main() {
         await dispatcher.onPermissionRequest(disposed.webViewId, request),
         PermissionDecisionMessage.deny,
       );
+    });
+  });
+
+  group('JavaScript dialogs', () {
+    JsDialogRequestMessage prompt() => JsDialogRequestMessage(
+      type: JsDialogTypeMessage.prompt,
+      message: 'Name?',
+      url: 'https://example.com/',
+      defaultText: 'Ann',
+    );
+
+    test('are only delegated when a callback is set', () async {
+      final without = createController();
+      final withCallback = createController(
+        onJsDialog: (_) => const JsDialogResponse.dismiss(),
+      );
+      await without.ready;
+      await withCallback.ready;
+
+      expect(hostApi.created[without.webViewId]!.hasJsDialogDelegate, false);
+      expect(
+        hostApi.created[withCallback.webViewId]!.hasJsDialogDelegate,
+        true,
+      );
+    });
+
+    test('map the request and an accepted answer', () async {
+      JsDialogRequest? seen;
+      final controller = createController(
+        onJsDialog: (request) async {
+          seen = request;
+          return const JsDialogResponse.accept(text: 'Bob');
+        },
+      );
+
+      final result = await dispatcher.onJsDialog(
+        controller.webViewId,
+        prompt(),
+      );
+
+      expect(result.accepted, true);
+      expect(result.text, 'Bob');
+      expect(seen!.type, JsDialogType.prompt);
+      expect(seen!.message, 'Name?');
+      expect(seen!.url, 'https://example.com/');
+      expect(seen!.defaultText, 'Ann');
+    });
+
+    test('a dismissal carries no text', () async {
+      final controller = createController(
+        onJsDialog: (_) => const JsDialogResponse.dismiss(),
+      );
+
+      final result = await dispatcher.onJsDialog(
+        controller.webViewId,
+        prompt(),
+      );
+
+      expect(result.accepted, false);
+      expect(result.text, isNull);
+    });
+
+    test('are dismissed after dispose', () async {
+      final controller = createController(
+        onJsDialog: (_) => const JsDialogResponse.accept(),
+      );
+      await controller.dispose();
+
+      final result = await dispatcher.onJsDialog(
+        controller.webViewId,
+        prompt(),
+      );
+
+      expect(result.accepted, false);
     });
   });
 

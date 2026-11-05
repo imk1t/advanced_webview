@@ -9,6 +9,7 @@ import 'cookie.dart';
 import 'download.dart';
 import 'find.dart';
 import 'hit_test.dart';
+import 'js_dialog.dart';
 import 'navigation.dart';
 import 'permission.dart';
 import 'platform/event_dispatcher.dart';
@@ -40,6 +41,7 @@ class AdvancedWebViewController {
     this.onNavigationRequest,
     this.onNewWindow,
     this.onPermissionRequest,
+    this.onJsDialog,
     this.onDownloadStart,
     this.onSslError,
     this.onHttpAuthRequest,
@@ -75,6 +77,7 @@ class AdvancedWebViewController {
         hasScrollDelegate: onScrollChanged != null,
         hasLongPressDelegate: onLongPress != null,
         hasConsoleMessageDelegate: onConsoleMessage != null,
+        hasJsDialogDelegate: onJsDialog != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
@@ -216,6 +219,21 @@ class AdvancedWebViewController {
   /// `onGeolocationPermissionsShowPrompt(String, GeolocationPermissions.Callback)`.
   /// iOS: `WKUIDelegate.webView(_:requestMediaCapturePermissionFor:initiatedByFrame:type:decisionHandler:)`.
   final PermissionRequestCallback? onPermissionRequest;
+
+  /// Called when the page opens a JavaScript dialog (`alert`, `confirm` or
+  /// `prompt`). The page is blocked until the returned future completes, so
+  /// answer promptly.
+  ///
+  /// Without a callback the platform shows its default dialog (on iOS the
+  /// plugin presents a native alert). Errors in the
+  /// callback dismiss the dialog (`confirm` returns `false`, `prompt` returns
+  /// `null`). Dialogs from `beforeunload` are not reported.
+  ///
+  /// Android: `WebChromeClient.onJsAlert`, `onJsConfirm` and `onJsPrompt`.
+  /// iOS: `WKUIDelegate.webView(_:runJavaScriptAlertPanelWithMessage:...)`,
+  /// `runJavaScriptConfirmPanelWithMessage` and
+  /// `runJavaScriptTextInputPanelWithPrompt`.
+  final JsDialogCallback? onJsDialog;
 
   /// Completes once the native WebView exists.
   Future<void> get ready => _created;
@@ -568,6 +586,30 @@ class _EventListener implements WebViewEventListener {
       PermissionDecision.grant => PermissionDecisionMessage.grant,
       PermissionDecision.deny => PermissionDecisionMessage.deny,
     };
+  }
+
+  @override
+  Future<JsDialogResultMessage> onJsDialog(
+    JsDialogRequestMessage request,
+  ) async {
+    final callback = _controller.onJsDialog;
+    if (callback == null) return JsDialogResultMessage(accepted: false);
+    final response = await callback(
+      JsDialogRequest(
+        type: switch (request.type) {
+          JsDialogTypeMessage.alert => JsDialogType.alert,
+          JsDialogTypeMessage.confirm => JsDialogType.confirm,
+          JsDialogTypeMessage.prompt => JsDialogType.prompt,
+        },
+        message: request.message,
+        url: request.url,
+        defaultText: request.defaultText,
+      ),
+    );
+    return JsDialogResultMessage(
+      accepted: response.accepted,
+      text: response.accepted ? response.text : null,
+    );
   }
 
   @override

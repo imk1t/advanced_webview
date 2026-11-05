@@ -259,6 +259,7 @@ class InAppBrowserTest {
         hasScrollDelegate = false,
         hasLongPressDelegate = false,
         hasConsoleMessageDelegate = false,
+        hasJsDialogDelegate = false,
         userScripts = emptyList(),
     )
 

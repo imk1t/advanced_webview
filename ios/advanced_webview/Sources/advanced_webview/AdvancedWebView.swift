@@ -15,6 +15,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasSslErrorDelegate: Bool
   private let hasHttpAuthDelegate: Bool
   private let hasConsoleMessageDelegate: Bool
+  private let hasJsDialogDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private let hasJavaScriptHandlers: Bool
   private let handlerObjectName: String
@@ -35,6 +36,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.hasSslErrorDelegate = params.hasSslErrorDelegate
     self.hasHttpAuthDelegate = params.hasHttpAuthDelegate
     self.hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
+    self.hasJsDialogDelegate = params.hasJsDialogDelegate
     self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
     self.handlerObjectName = params.javaScriptHandlerObjectName
 
@@ -660,6 +662,96 @@ extension AdvancedWebView: WKUIDelegate {
       webView.load(navigationAction.request)
     }
     return nil
+  }
+
+  /// `alert`, `confirm` and `prompt`. WebKit answers them itself (dismissing silently) when this
+  /// delegate is missing, so without a Dart delegate a native alert is presented, like the platform
+  /// default dialog on Android.
+  func webView(
+    _ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
+    initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void
+  ) {
+    runJsDialog(.alert, message: message, defaultText: nil, frame: frame) { _ in completionHandler()
+    }
+  }
+
+  func webView(
+    _ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String,
+    initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void
+  ) {
+    runJsDialog(.confirm, message: message, defaultText: nil, frame: frame) {
+      completionHandler($0.accepted)
+    }
+  }
+
+  func webView(
+    _ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String,
+    defaultText: String?, initiatedByFrame frame: WKFrameInfo,
+    completionHandler: @escaping (String?) -> Void
+  ) {
+    runJsDialog(.prompt, message: prompt, defaultText: defaultText, frame: frame) {
+      completionHandler($0.accepted ? ($0.text ?? defaultText ?? "") : nil)
+    }
+  }
+
+  private func runJsDialog(
+    _ type: JsDialogTypeMessage, message: String, defaultText: String?, frame: WKFrameInfo,
+    completion: @escaping (JsDialogResultMessage) -> Void
+  ) {
+    let url = frame.request.url
+    guard hasJsDialogDelegate else {
+      presentNativeDialog(
+        type, title: url?.host, message: message, defaultText: defaultText, completion: completion)
+      return
+    }
+    let request = JsDialogRequestMessage(
+      type: type, message: message, url: url?.absoluteString ?? "", defaultText: defaultText)
+    let api = flutterApi
+    let id = self.id
+    Task { @MainActor in
+      let result: JsDialogResultMessage
+      do {
+        result = try await api.onJsDialog(webViewId: id, request: request)
+      } catch {
+        NSLog("AdvancedWebView: JavaScript dialog delegate failed, dismissing: \(error)")
+        result = JsDialogResultMessage(accepted: false)
+      }
+      completion(result)
+    }
+  }
+
+  private func presentNativeDialog(
+    _ type: JsDialogTypeMessage, title: String?, message: String, defaultText: String?,
+    completion: @escaping (JsDialogResultMessage) -> Void
+  ) {
+    guard let presenter = WebViewHostApiImpl.topViewController() else {
+      completion(JsDialogResultMessage(accepted: false))
+      return
+    }
+    let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    var field: UITextField?
+    if type == .prompt {
+      alert.addTextField {
+        $0.text = defaultText
+        field = $0
+      }
+    }
+    // UIKit's own localized strings, so the buttons match the device language.
+    let uiKit = Bundle(for: UIButton.self)
+    alert.addAction(
+      UIAlertAction(
+        title: uiKit.localizedString(forKey: "OK", value: "OK", table: nil), style: .default
+      ) { _ in
+        completion(JsDialogResultMessage(accepted: true, text: field?.text))
+      })
+    if type != .alert {
+      alert.addAction(
+        UIAlertAction(
+          title: uiKit.localizedString(forKey: "Cancel", value: "Cancel", table: nil),
+          style: .cancel
+        ) { _ in completion(JsDialogResultMessage(accepted: false)) })
+    }
+    presenter.present(alert, animated: true)
   }
 
   /// Camera and microphone. Without a Dart delegate the request is denied, like Android.

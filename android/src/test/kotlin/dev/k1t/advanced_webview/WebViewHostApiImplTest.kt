@@ -8,6 +8,8 @@ import android.view.View
 import android.webkit.ConsoleMessage
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
+import android.webkit.JsPromptResult
+import android.webkit.JsResult
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.WebResourceRequest
@@ -427,6 +429,38 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun javaScriptDialogsAreForwardedToDartWhenThereIsADelegate() {
+        hostApi.create(params(webViewId = 1, hasJsDialogDelegate = true))
+        val client = registry.get(1).webView.webChromeClient!!
+
+        val handled = client.onJsAlert(registry.get(1).webView, "https://a.test/", "hi", mock(JsResult::class.java))
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertTrue(handled)
+        verify(messenger).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJsDialog"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun javaScriptDialogsUseThePlatformDefaultWithoutADelegate() {
+        hostApi.create(params(webViewId = 1))
+        val webView = registry.get(1).webView
+        val client = webView.webChromeClient!!
+
+        assertFalse(client.onJsAlert(webView, "https://a.test/", "hi", mock(JsResult::class.java)))
+        assertFalse(client.onJsConfirm(webView, "https://a.test/", "ok?", mock(JsResult::class.java)))
+        assertFalse(client.onJsPrompt(webView, "https://a.test/", "name?", "x", mock(JsPromptResult::class.java)))
+        verify(messenger, never()).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJsDialog"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
     fun consoleMessagesAreNotForwardedWithoutADelegate() {
         hostApi.create(params(webViewId = 1))
         val message = ConsoleMessage("quiet", "", 1, ConsoleMessage.MessageLevel.LOG)
@@ -645,6 +679,7 @@ class WebViewHostApiImplTest {
         hasScrollDelegate: Boolean = false,
         hasLongPressDelegate: Boolean = false,
         hasConsoleMessageDelegate: Boolean = false,
+        hasJsDialogDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
         webViewId,
@@ -661,6 +696,7 @@ class WebViewHostApiImplTest {
         hasScrollDelegate,
         hasLongPressDelegate,
         hasConsoleMessageDelegate,
+        hasJsDialogDelegate,
         userScripts,
     )
 

@@ -25,6 +25,8 @@ import android.webkit.CookieManager
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.JavascriptInterface
+import android.webkit.JsPromptResult
+import android.webkit.JsResult
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
@@ -87,6 +89,7 @@ class AdvancedWebView(
     private val hasSslErrorDelegate = params.hasSslErrorDelegate
     private val hasHttpAuthDelegate = params.hasHttpAuthDelegate
     private val hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
+    private val hasJsDialogDelegate = params.hasJsDialogDelegate
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
 
@@ -589,7 +592,58 @@ class AdvancedWebView(
         }
     }
 
+    /**
+     * Asks Dart to answer a JavaScript dialog. Errors count as a dismissal, so the page is never left
+     * blocked.
+     */
+    private fun askJsDialog(
+        type: JsDialogTypeMessage,
+        url: String,
+        message: String,
+        defaultText: String?,
+        onAnswer: (JsDialogResultMessage) -> Unit,
+    ) {
+        scope.launch {
+            val answer = try {
+                flutterApi.onJsDialog(id, JsDialogRequestMessage(type, message, url, defaultText))
+            } catch (e: Throwable) {
+                Log.w(TAG, "JavaScript dialog delegate failed, dismissing: ${e.message}")
+                JsDialogResultMessage(accepted = false)
+            }
+            if (!isDestroyed) onAnswer(answer)
+        }
+    }
+
     private inner class ChromeClient : WebChromeClient() {
+        // Returning false shows the platform's default dialog.
+        override fun onJsAlert(view: WebView, url: String, message: String, result: JsResult): Boolean {
+            if (!hasJsDialogDelegate) return false
+            askJsDialog(JsDialogTypeMessage.ALERT, url, message, null) { result.confirm() }
+            return true
+        }
+
+        override fun onJsConfirm(view: WebView, url: String, message: String, result: JsResult): Boolean {
+            if (!hasJsDialogDelegate) return false
+            askJsDialog(JsDialogTypeMessage.CONFIRM, url, message, null) {
+                if (it.accepted) result.confirm() else result.cancel()
+            }
+            return true
+        }
+
+        override fun onJsPrompt(
+            view: WebView,
+            url: String,
+            message: String,
+            defaultValue: String?,
+            result: JsPromptResult,
+        ): Boolean {
+            if (!hasJsDialogDelegate) return false
+            askJsDialog(JsDialogTypeMessage.PROMPT, url, message, defaultValue) {
+                if (it.accepted) result.confirm(it.text ?: defaultValue.orEmpty()) else result.cancel()
+            }
+            return true
+        }
+
         override fun onProgressChanged(view: WebView, newProgress: Int) {
             send { flutterApi.onProgressChanged(id, newProgress.toLong()) }
         }

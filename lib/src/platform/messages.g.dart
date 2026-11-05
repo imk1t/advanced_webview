@@ -160,6 +160,12 @@ enum PermissionDecisionMessage {
   deny;
 }
 
+enum JsDialogTypeMessage {
+  alert,
+  confirm,
+  prompt;
+}
+
 class WebViewSettingsMessage {
   WebViewSettingsMessage({
     required this.javaScriptEnabled,
@@ -488,6 +494,7 @@ class CreationParamsMessage {
     required this.hasScrollDelegate,
     required this.hasLongPressDelegate,
     required this.hasConsoleMessageDelegate,
+    required this.hasJsDialogDelegate,
     required this.userScripts,
   });
 
@@ -539,6 +546,10 @@ class CreationParamsMessage {
   /// `console` wrapper script is not injected).
   bool hasConsoleMessageDelegate;
 
+  /// When false, `alert`, `confirm` and `prompt` use the platform's default
+  /// dialog and never round-trip to Dart.
+  bool hasJsDialogDelegate;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 
@@ -558,6 +569,7 @@ class CreationParamsMessage {
       hasScrollDelegate,
       hasLongPressDelegate,
       hasConsoleMessageDelegate,
+      hasJsDialogDelegate,
       userScripts,
     ];
   }
@@ -582,7 +594,8 @@ class CreationParamsMessage {
       hasScrollDelegate: result[11]! as bool,
       hasLongPressDelegate: result[12]! as bool,
       hasConsoleMessageDelegate: result[13]! as bool,
-      userScripts: (result[14]! as List<Object?>).cast<UserScriptMessage>(),
+      hasJsDialogDelegate: result[14]! as bool,
+      userScripts: (result[15]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -595,7 +608,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -604,7 +617,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, userScripts: $userScripts)';
   }
 }
 
@@ -985,6 +998,120 @@ class PermissionRequestMessage {
   }
 }
 
+class JsDialogRequestMessage {
+  JsDialogRequestMessage({
+    required this.type,
+    required this.message,
+    required this.url,
+    this.defaultText,
+  });
+
+  JsDialogTypeMessage type;
+
+  String message;
+
+  /// URL of the page that opened the dialog.
+  String url;
+
+  /// Initial text of a `prompt`; null for the other types.
+  String? defaultText;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      type,
+      message,
+      url,
+      defaultText,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static JsDialogRequestMessage decode(Object result) {
+    result as List<Object?>;
+    return JsDialogRequestMessage(
+      type: result[0]! as JsDialogTypeMessage,
+      message: result[1]! as String,
+      url: result[2]! as String,
+      defaultText: result[3] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! JsDialogRequestMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(type, other.type) && _deepEquals(message, other.message) && _deepEquals(url, other.url) && _deepEquals(defaultText, other.defaultText);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'JsDialogRequestMessage(type: $type, message: $message, url: $url, defaultText: $defaultText)';
+  }
+}
+
+class JsDialogResultMessage {
+  JsDialogResultMessage({
+    required this.accepted,
+    this.text,
+  });
+
+  /// OK was pressed. Always true for an `alert`.
+  bool accepted;
+
+  /// Text entered in a `prompt`; null when not accepted or for other types.
+  String? text;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      accepted,
+      text,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static JsDialogResultMessage decode(Object result) {
+    result as List<Object?>;
+    return JsDialogResultMessage(
+      accepted: result[0]! as bool,
+      text: result[1] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! JsDialogResultMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(accepted, other.accepted) && _deepEquals(text, other.text);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'JsDialogResultMessage(accepted: $accepted, text: $text)';
+  }
+}
+
 class FindResultMessage {
   FindResultMessage({
     required this.found,
@@ -1283,50 +1410,59 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is PermissionDecisionMessage) {
       buffer.putUint8(137);
       writeValue(buffer, value.index);
-    }    else if (value is WebViewSettingsMessage) {
+    }    else if (value is JsDialogTypeMessage) {
       buffer.putUint8(138);
-      writeValue(buffer, value.encode());
-    }    else if (value is ConsoleMessageMessage) {
+      writeValue(buffer, value.index);
+    }    else if (value is WebViewSettingsMessage) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    }    else if (value is UserScriptMessage) {
+    }    else if (value is ConsoleMessageMessage) {
       buffer.putUint8(140);
       writeValue(buffer, value.encode());
-    }    else if (value is CreationParamsMessage) {
+    }    else if (value is UserScriptMessage) {
       buffer.putUint8(141);
       writeValue(buffer, value.encode());
-    }    else if (value is NavigationRequestMessage) {
+    }    else if (value is CreationParamsMessage) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    }    else if (value is WebResourceErrorMessage) {
+    }    else if (value is NavigationRequestMessage) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    }    else if (value is SslErrorMessage) {
+    }    else if (value is WebResourceErrorMessage) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthRequestMessage) {
+    }    else if (value is SslErrorMessage) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthCredentialsMessage) {
+    }    else if (value is HttpAuthRequestMessage) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    }    else if (value is DownloadRequestMessage) {
+    }    else if (value is HttpAuthCredentialsMessage) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    }    else if (value is PermissionRequestMessage) {
+    }    else if (value is DownloadRequestMessage) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    }    else if (value is FindResultMessage) {
+    }    else if (value is PermissionRequestMessage) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    }    else if (value is ScrollPositionMessage) {
+    }    else if (value is JsDialogRequestMessage) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is JsDialogResultMessage) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    }    else if (value is InAppBrowserParamsMessage) {
+    }    else if (value is FindResultMessage) {
       buffer.putUint8(152);
+      writeValue(buffer, value.encode());
+    }    else if (value is ScrollPositionMessage) {
+      buffer.putUint8(153);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(154);
+      writeValue(buffer, value.encode());
+    }    else if (value is InAppBrowserParamsMessage) {
+      buffer.putUint8(155);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1364,34 +1500,41 @@ class _PigeonCodec extends StandardMessageCodec {
         final value = readValue(buffer) as int?;
         return value == null ? null : PermissionDecisionMessage.values[value];
       case 138:
-        return WebViewSettingsMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : JsDialogTypeMessage.values[value];
       case 139:
-        return ConsoleMessageMessage.decode(readValue(buffer)!);
+        return WebViewSettingsMessage.decode(readValue(buffer)!);
       case 140:
-        return UserScriptMessage.decode(readValue(buffer)!);
+        return ConsoleMessageMessage.decode(readValue(buffer)!);
       case 141:
-        return CreationParamsMessage.decode(readValue(buffer)!);
+        return UserScriptMessage.decode(readValue(buffer)!);
       case 142:
-        return NavigationRequestMessage.decode(readValue(buffer)!);
+        return CreationParamsMessage.decode(readValue(buffer)!);
       case 143:
-        return WebResourceErrorMessage.decode(readValue(buffer)!);
+        return NavigationRequestMessage.decode(readValue(buffer)!);
       case 144:
-        return SslErrorMessage.decode(readValue(buffer)!);
+        return WebResourceErrorMessage.decode(readValue(buffer)!);
       case 145:
-        return HttpAuthRequestMessage.decode(readValue(buffer)!);
+        return SslErrorMessage.decode(readValue(buffer)!);
       case 146:
-        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
+        return HttpAuthRequestMessage.decode(readValue(buffer)!);
       case 147:
-        return DownloadRequestMessage.decode(readValue(buffer)!);
+        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
       case 148:
-        return PermissionRequestMessage.decode(readValue(buffer)!);
+        return DownloadRequestMessage.decode(readValue(buffer)!);
       case 149:
-        return FindResultMessage.decode(readValue(buffer)!);
+        return PermissionRequestMessage.decode(readValue(buffer)!);
       case 150:
-        return ScrollPositionMessage.decode(readValue(buffer)!);
+        return JsDialogRequestMessage.decode(readValue(buffer)!);
       case 151:
-        return CookieMessage.decode(readValue(buffer)!);
+        return JsDialogResultMessage.decode(readValue(buffer)!);
       case 152:
+        return FindResultMessage.decode(readValue(buffer)!);
+      case 153:
+        return ScrollPositionMessage.decode(readValue(buffer)!);
+      case 154:
+        return CookieMessage.decode(readValue(buffer)!);
+      case 155:
         return InAppBrowserParamsMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2030,6 +2173,10 @@ abstract class AdvancedWebViewFlutterApi {
   /// The page asked for camera, microphone or location access.
   Future<PermissionDecisionMessage> onPermissionRequest(int webViewId, PermissionRequestMessage request);
 
+  /// The page opened a JavaScript dialog (`alert`, `confirm` or `prompt`).
+  /// The page is blocked until this completes.
+  Future<JsDialogResultMessage> onJsDialog(int webViewId, JsDialogRequestMessage request);
+
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
   /// argument list; the result is the JSON-encoded return value. Throwing
   /// rejects the page's promise.
@@ -2349,6 +2496,28 @@ abstract class AdvancedWebViewFlutterApi {
           final PermissionRequestMessage arg_request = args[1]! as PermissionRequestMessage;
           try {
             final PermissionDecisionMessage output = await api.onPermissionRequest(arg_webViewId, arg_request);
+            return wrapResponse(result: output);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJsDialog$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final JsDialogRequestMessage arg_request = args[1]! as JsDialogRequestMessage;
+          try {
+            final JsDialogResultMessage output = await api.onJsDialog(arg_webViewId, arg_request);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

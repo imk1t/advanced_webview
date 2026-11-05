@@ -78,6 +78,8 @@
       "WebViewCompat": "https://developer.android.com/reference/androidx/webkit/WebViewCompat",
       "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler",
       "PermissionRequest": "https://developer.android.com/reference/android/webkit/PermissionRequest",
+      "JsResult": "https://developer.android.com/reference/android/webkit/JsResult",
+      "JsPromptResult": "https://developer.android.com/reference/android/webkit/JsPromptResult",
       "GeolocationPermissions": "https://developer.android.com/reference/android/webkit/GeolocationPermissions",
       "DownloadListener": "https://developer.android.com/reference/android/webkit/DownloadListener",
       "URLUtil": "https://developer.android.com/reference/android/webkit/URLUtil",
@@ -128,6 +130,7 @@
       "WKHTTPCookieStore": "https://developer.apple.com/documentation/webkit/wkhttpcookiestore",
       "HTTPCookie": "https://developer.apple.com/documentation/foundation/httpcookie",
       "WKUIDelegate": "https://developer.apple.com/documentation/webkit/wkuidelegate",
+      "WKFrameInfo": "https://developer.apple.com/documentation/webkit/wkframeinfo",
       "WKWindowFeatures": "https://developer.apple.com/documentation/webkit/wkwindowfeatures",
       "UINavigationController": "https://developer.apple.com/documentation/uikit/uinavigationcontroller",
       "UIViewController": "https://developer.apple.com/documentation/uikit/uiviewcontroller",
@@ -1972,6 +1975,86 @@
           "en": "Camera and microphone only. WebKit has no delegate for geolocation, so it asks the user itself and the callback is never called for it.",
           "ja": "カメラとマイクのみです。WebKit には位置情報用のデリゲートがなく、WebKit 自身がユーザーに確認するため、位置情報ではコールバックは呼ばれません。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onJsDialog",
+      "group": "events",
+      "summary": {
+        "en": "Answers JavaScript alert, confirm and prompt dialogs. Without a callback the platform default is shown.",
+        "ja": "JavaScript の alert・confirm・prompt ダイアログに応答します。コールバックがない場合はプラットフォームの標準ダイアログを表示します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebChromeClient.onJsAlert(WebView, String, String, JsResult)",
+          "WebChromeClient.onJsConfirm(WebView, String, String, JsResult)",
+          "WebChromeClient.onJsPrompt(WebView, String, String, String, JsPromptResult)"
+        ],
+        "note": {
+          "en": "Without a callback the callbacks return false and the system WebView shows its own dialog.",
+          "ja": "コールバックがない場合は false を返し、システム WebView が標準のダイアログを表示します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKUIDelegate.webView(_:runJavaScriptAlertPanelWithMessage:initiatedByFrame:completionHandler:)",
+          "WKUIDelegate.webView(_:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:)",
+          "WKUIDelegate.webView(_:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:)"
+        ],
+        "note": {
+          "en": "WebKit dismisses dialogs silently without this delegate, so without a callback the plugin presents a UIAlertController.",
+          "ja": "このデリゲートがないと WebKit はダイアログを黙って閉じるため、コールバックがない場合はプラグインが UIAlertController を表示します。"
+        }
+      }
+    },
+    {
+      "dart": "JsDialogRequest",
+      "group": "events",
+      "summary": {
+        "en": "The kind, message, page URL and default text of a JavaScript dialog.",
+        "ja": "JavaScript ダイアログの種類、メッセージ、ページの URL、初期値です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onJsPrompt(WebView, String, String, String, JsPromptResult)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKFrameInfo"]
+      }
+    },
+    {
+      "dart": "JsDialogResponse",
+      "group": "events",
+      "summary": {
+        "en": "How the app answered a JavaScript dialog: accept (with prompt text) or dismiss.",
+        "ja": "JavaScript ダイアログへの応答です。許可（prompt の入力テキスト付き）または拒否を表します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["JsResult.confirm()", "JsResult.cancel()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKUIDelegate"]
+      }
+    },
+    {
+      "dart": "JsDialogType",
+      "group": "events",
+      "summary": {
+        "en": "Whether the dialog is an alert, a confirm or a prompt.",
+        "ja": "ダイアログが alert、confirm、prompt のどれかを示します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["JsResult"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKUIDelegate"]
       }
     },
     {
