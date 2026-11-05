@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.os.Message
 import android.os.Parcel
+import android.print.PdfExporter
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.view.MotionEvent
@@ -57,6 +58,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -64,6 +66,7 @@ import java.util.TimeZone
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.math.roundToInt
 
 /** One native WebView plus the clients that forward its callbacks to Dart. */
@@ -281,6 +284,31 @@ class AdvancedWebView(
         val name = jobName ?: webView.title ?: "Document"
         val printManager = activity.getSystemService(Context.PRINT_SERVICE) as PrintManager
         printManager.print(name, webView.createPrintDocumentAdapter(name), PrintAttributes.Builder().build())
+    }
+
+    /**
+     * Renders the page to A4 PDF pages through the print framework, via a temporary file because
+     * [android.print.PrintDocumentAdapter] only writes to file descriptors.
+     */
+    suspend fun createPdf(): ByteArray = suspendCancellableCoroutine { cont ->
+        val file = File.createTempFile("advanced_webview_", ".pdf", webView.context.cacheDir)
+        try {
+            val adapter = webView.createPrintDocumentAdapter("document")
+            PdfExporter.export(adapter, file) { error ->
+                val result = if (error == null) runCatching { file.readBytes() } else Result.failure(error)
+                file.delete()
+                result.fold(
+                    { if (cont.isActive) cont.resume(it) },
+                    {
+                        if (cont.isActive) cont.resumeWithException(FlutterError("pdf-failed", it.message, null))
+                    },
+                )
+            }
+        } catch (e: Exception) {
+            file.delete()
+            if (cont.isActive) cont.resumeWithException(FlutterError("pdf-failed", e.message, null))
+        }
+        cont.invokeOnCancellation { file.delete() }
     }
 
     private val density: Double get() = webView.resources.displayMetrics.density.toDouble()

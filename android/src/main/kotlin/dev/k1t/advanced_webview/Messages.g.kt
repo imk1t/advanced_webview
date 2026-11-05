@@ -1877,6 +1877,12 @@ interface AdvancedWebViewHostApi {
    */
   suspend fun takeScreenshot(webViewId: Long): ByteArray?
   /**
+   * Renders the current page to a PDF. Android lays it out on A4 pages; iOS
+   * produces one page as tall as the content. Fails with `pdf-failed` when
+   * WebKit or the print framework cannot render it.
+   */
+  suspend fun createPdf(webViewId: Long): ByteArray
+  /**
    * Finds `query` in the page and highlights a match. A new query starts at
    * the first match; repeating the same query moves to the next or previous.
    */
@@ -2239,6 +2245,25 @@ interface AdvancedWebViewHostApi {
             CoroutineScope(Dispatchers.Main).launch {
               val wrapped: List<Any?> = try {
                 listOf(api.takeScreenshot(webViewIdArg))
+              } catch (exception: Throwable) {
+                MessagesPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.createPdf$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.createPdf(webViewIdArg))
               } catch (exception: Throwable) {
                 MessagesPigeonUtils.wrapError(exception)
               }

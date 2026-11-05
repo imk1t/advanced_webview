@@ -540,6 +540,12 @@ abstract class AdvancedWebViewHostApi {
   @async
   Uint8List? takeScreenshot(int webViewId);
 
+  /// Renders the current page to a PDF. Android lays it out on A4 pages; iOS
+  /// produces one page as tall as the content. Fails with `pdf-failed` when
+  /// WebKit or the print framework cannot render it.
+  @async
+  Uint8List createPdf(int webViewId);
+
   /// Finds `query` in the page and highlights a match. A new query starts at
   /// the first match; repeating the same query moves to the next or previous.
   @async

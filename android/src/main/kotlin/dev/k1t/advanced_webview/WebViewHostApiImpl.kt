@@ -92,6 +92,8 @@ class WebViewHostApiImpl(
 
     override suspend fun takeScreenshot(webViewId: Long): ByteArray? = registry.get(webViewId).takeScreenshot()
 
+    override suspend fun createPdf(webViewId: Long): ByteArray = registry.get(webViewId).createPdf()
+
     override suspend fun findText(webViewId: Long, query: String, forward: Boolean): FindResultMessage =
         registry.get(webViewId).find(query, forward)
 

@@ -131,6 +131,14 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
 
   Uint8List? nextScreenshot;
 
+  Uint8List pdf = Uint8List.fromList([0x25, 0x50, 0x44, 0x46]);
+
+  @override
+  Future<Uint8List> createPdf(int webViewId) async {
+    calls.add('createPdf');
+    return pdf;
+  }
+
   @override
   Future<Uint8List?> takeScreenshot(int webViewId) async {
     calls.add('takeScreenshot');

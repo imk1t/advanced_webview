@@ -311,6 +311,15 @@ void main() {
       },
     );
 
+    test('createPdf returns the PDF bytes from native', () async {
+      final controller = createController();
+
+      expect(await controller.createPdf(), hostApi.pdf);
+      expect(hostApi.calls, contains('createPdf'));
+      await controller.dispose();
+      expect(controller.createPdf(), throwsStateError);
+    });
+
     test('takeScreenshot returns the PNG bytes from native', () async {
       final controller = createController();
       final bytes = Uint8List.fromList([0x89, 0x50, 0x4e, 0x47]);
