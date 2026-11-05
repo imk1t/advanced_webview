@@ -18,7 +18,8 @@ public class AdvancedWebViewPlugin: NSObject, FlutterPlugin {
     let registry = WebViewRegistry()
     let hostApi = WebViewHostApiImpl(
       registry: registry,
-      flutterApi: AdvancedWebViewFlutterApi(binaryMessenger: messenger)
+      flutterApi: AdvancedWebViewFlutterApi(binaryMessenger: messenger),
+      assetPath: { registrar.lookupKey(forAsset: $0) }
     )
     AdvancedWebViewHostApiSetup.setUp(binaryMessenger: messenger, api: hostApi)
     registrar.register(AdvancedWebViewFactory(registry: registry), withId: viewType)

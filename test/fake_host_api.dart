@@ -33,6 +33,23 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
   ) async => calls.add('loadHtmlString($baseUrl)');
 
   @override
+  Future<void> loadRequest(
+    int webViewId,
+    String url,
+    HttpMethodMessage method,
+    Map<String, String> headers,
+    Uint8List? body,
+  ) async => calls.add('loadRequest($method $url, $headers, ${body?.length})');
+
+  @override
+  Future<void> loadFlutterAsset(int webViewId, String key) async =>
+      calls.add('loadFlutterAsset($key)');
+
+  @override
+  Future<void> loadFile(int webViewId, String path) async =>
+      calls.add('loadFile($path)');
+
+  @override
   Future<void> reload(int webViewId) async => calls.add('reload');
 
   @override

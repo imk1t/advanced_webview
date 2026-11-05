@@ -9,6 +9,7 @@ export 'src/find.dart';
 export 'src/hit_test.dart' show WebViewHitTestResult, WebViewHitTestType;
 export 'src/in_app_browser.dart';
 export 'src/js_dialog.dart';
+export 'src/load_request.dart';
 export 'src/navigation.dart';
 export 'src/permission.dart';
 export 'src/security.dart';

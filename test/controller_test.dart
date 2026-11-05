@@ -80,6 +80,39 @@ void main() {
     });
   });
 
+  group('loading', () {
+    test('loadRequest, loadFlutterAsset and loadFile forward', () async {
+      final controller = createController();
+      await controller.loadRequest(
+        'https://a.dev/form',
+        method: WebViewHttpMethod.post,
+        body: Uint8List.fromList([1, 2, 3]),
+      );
+      await controller.loadRequest('https://a.dev', headers: {'X': '1'});
+      await controller.loadFlutterAsset('assets/a.html');
+      await controller.loadFile('/tmp/a.html');
+
+      expect(hostApi.calls.skip(1), [
+        'loadRequest(HttpMethodMessage.post https://a.dev/form, {}, 3)',
+        'loadRequest(HttpMethodMessage.get https://a.dev, {X: 1}, null)',
+        'loadFlutterAsset(assets/a.html)',
+        'loadFile(/tmp/a.html)',
+      ]);
+    });
+
+    test('a body needs POST', () {
+      final controller = createController();
+
+      expect(
+        () => controller.loadRequest(
+          'https://a.dev',
+          body: Uint8List.fromList([1]),
+        ),
+        throwsArgumentError,
+      );
+    });
+  });
+
   group('commands', () {
     test('forward to the host API', () async {
       final controller = createController();

@@ -43,6 +43,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import io.flutter.Log
@@ -84,6 +85,11 @@ class AdvancedWebView(
         isEnabled = false
         setOnRefreshListener { webView.reload() }
     }
+
+    private val assetLoader = WebViewAssetLoader.Builder()
+        .setDomain(ASSET_DOMAIN)
+        .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context.applicationContext))
+        .build()
 
     private val hasNavigationDelegate = params.hasNavigationDelegate
     private val hasNewWindowDelegate = params.hasNewWindowDelegate
@@ -532,6 +538,10 @@ class AdvancedWebView(
             send { flutterApi.onReceivedError(id, message) }
         }
 
+        // Serves Flutter assets loaded with `loadFlutterAsset`; every other request goes to the network.
+        override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
+            assetLoader.shouldInterceptRequest(request.url)
+
         override fun onReceivedHttpError(
             view: WebView,
             request: WebResourceRequest,
@@ -814,6 +824,10 @@ class AdvancedWebView(
 
     companion object {
         private const val TAG = "AdvancedWebView"
+
+        /** Virtual host that serves the app's assets, so pages can load them without `allowFileAccess`. */
+        private const val ASSET_DOMAIN = "appassets.androidplatform.net"
+        const val ASSET_BASE_URL = "https://$ASSET_DOMAIN/assets/"
 
         // WebSettings.getMinimumFontSize() default.
         private const val DEFAULT_MINIMUM_FONT_SIZE = 8

@@ -24,6 +24,19 @@ await controller.dispose();
 await controller.loadUrl('https://example.com', headers: {'X-Token': 'abc'});
 await controller.loadHtmlString('<h1>Hello</h1>', baseUrl: 'https://example.com');
 
+// pubspec.yaml の `flutter: assets:` に宣言した Flutter アセット
+await controller.loadFlutterAsset('assets/web/index.html');
+
+// 端末上のファイル
+await controller.loadFile('/path/to/page.html');
+
+// POST リクエスト
+await controller.loadRequest(
+  'https://example.com/login',
+  method: WebViewHttpMethod.post,
+  body: Uint8List.fromList(utf8.encode('user=a&pass=b')),
+);
+
 await controller.reload();
 await controller.stopLoading();
 if (await controller.canGoBack()) await controller.goBack();
@@ -32,6 +45,18 @@ if (await controller.canGoForward()) await controller.goForward();
 final url = await controller.currentUrl();
 final title = await controller.title();
 ```
+
+新しい 3 つの読み込みのプラットフォーム別の注意点です。
+
+- `loadFlutterAsset`: 相対リンクは同じフォルダのアセットに解決されます。Android は
+  `https://appassets.androidplatform.net/assets/flutter_assets/...` で配信し、`allowFileAccess` は不要です。
+  存在しないアセットは 404 として読み込まれます（`onHttpError` を参照）。iOS はアプリバンドルのファイルを、
+  そのフォルダへの読み取り権限付きで読み込み、存在しないアセットは `not-found` を投げます。
+- `loadFile`: Android は `AndroidWebViewSettings.allowFileAccess`（既定は無効）が必要で、無効の場合は
+  `file-access-disabled` を投げます。iOS は存在しないファイルに `not-found` を投げます。
+- `loadRequest`: Android は POST の body を `application/x-www-form-urlencoded` で送り、POST にヘッダーを
+  付けられません（渡すと `unsupported` を投げます）。iOS はヘッダーと body をそのまま送ります。
+  `body` は `WebViewHttpMethod.post` のときだけ指定できます。
 
 ## スクリーンショット
 

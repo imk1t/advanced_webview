@@ -3,9 +3,11 @@ package dev.k1t.advanced_webview
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import io.flutter.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.File
 
 /** Implements the Dart -> native calls by dispatching to [WebViewRegistry]. */
 class WebViewHostApiImpl(
@@ -16,6 +18,8 @@ class WebViewHostApiImpl(
     private val fileChooser: FileChooser = FileChooser(),
     private val permissionRequester: PermissionRequester = PermissionRequester(),
     private val activityProvider: () -> Activity? = { null },
+    /** Maps a Flutter asset key to its path in the APK assets (`flutter_assets/<key>` unless overridden). */
+    private val flutterAssetPath: (String) -> String = { "flutter_assets/$it" },
 ) : AdvancedWebViewHostApi {
     override fun create(params: CreationParamsMessage) {
         registry.add(AdvancedWebView(context, params, flutterApi, scope, fileChooser, permissionRequester))
@@ -34,6 +38,38 @@ class WebViewHostApiImpl(
 
     override fun loadHtmlString(webViewId: Long, html: String, baseUrl: String?) =
         registry.get(webViewId).webView.loadDataWithBaseURL(baseUrl, html, "text/html", "UTF-8", null)
+
+    override fun loadRequest(
+        webViewId: Long,
+        url: String,
+        method: HttpMethodMessage,
+        headers: Map<String, String>,
+        body: ByteArray?,
+    ) {
+        val webView = registry.get(webViewId).webView
+        when (method) {
+            HttpMethodMessage.GET -> webView.loadUrl(url, headers)
+
+            HttpMethodMessage.POST -> {
+                // WebView.postUrl cannot carry custom headers.
+                if (headers.isNotEmpty()) {
+                    throw FlutterError("unsupported", "Android cannot send custom headers with a POST request", null)
+                }
+                webView.postUrl(url, body ?: ByteArray(0))
+            }
+        }
+    }
+
+    override fun loadFlutterAsset(webViewId: Long, key: String) =
+        registry.get(webViewId).webView.loadUrl(AdvancedWebView.ASSET_BASE_URL + flutterAssetPath(key))
+
+    override fun loadFile(webViewId: Long, path: String) {
+        val webView = registry.get(webViewId).webView
+        if (!webView.settings.allowFileAccess) {
+            throw FlutterError("file-access-disabled", "Set AndroidWebViewSettings.allowFileAccess to load files", null)
+        }
+        webView.loadUrl(Uri.fromFile(File(path)).toString())
+    }
 
     override fun reload(webViewId: Long) = registry.get(webViewId).webView.reload()
 

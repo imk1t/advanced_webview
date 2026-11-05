@@ -253,6 +253,11 @@ enum WebsiteDataTypeMessage: Int, CaseIterable {
   case indexedDb = 2
 }
 
+enum HttpMethodMessage: Int, CaseIterable {
+  case get = 0
+  case post = 1
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   var javaScriptEnabled: Bool
@@ -1414,40 +1419,46 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
       }
       return nil
     case 140:
-      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return HttpMethodMessage(rawValue: enumResultAsInt)
+      }
+      return nil
     case 141:
-      return ConsoleMessageMessage.fromList(self.readValue() as! [Any?])
+      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
     case 142:
-      return UserScriptMessage.fromList(self.readValue() as! [Any?])
+      return ConsoleMessageMessage.fromList(self.readValue() as! [Any?])
     case 143:
-      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
+      return UserScriptMessage.fromList(self.readValue() as! [Any?])
     case 144:
-      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
+      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
     case 145:
-      return HttpErrorMessage.fromList(self.readValue() as! [Any?])
+      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
     case 146:
-      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+      return HttpErrorMessage.fromList(self.readValue() as! [Any?])
     case 147:
-      return SslErrorMessage.fromList(self.readValue() as! [Any?])
+      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
     case 148:
-      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
+      return SslErrorMessage.fromList(self.readValue() as! [Any?])
     case 149:
-      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
     case 150:
-      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
     case 151:
-      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
+      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
     case 152:
-      return JsDialogRequestMessage.fromList(self.readValue() as! [Any?])
+      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
     case 153:
-      return JsDialogResultMessage.fromList(self.readValue() as! [Any?])
+      return JsDialogRequestMessage.fromList(self.readValue() as! [Any?])
     case 154:
-      return FindResultMessage.fromList(self.readValue() as! [Any?])
+      return JsDialogResultMessage.fromList(self.readValue() as! [Any?])
     case 155:
-      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+      return FindResultMessage.fromList(self.readValue() as! [Any?])
     case 156:
-      return CookieMessage.fromList(self.readValue() as! [Any?])
+      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
     case 157:
+      return CookieMessage.fromList(self.readValue() as! [Any?])
+    case 158:
       return InAppBrowserParamsMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1490,59 +1501,62 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? WebsiteDataTypeMessage {
       super.writeByte(139)
       super.writeValue(value.rawValue)
-    } else if let value = value as? WebViewSettingsMessage {
+    } else if let value = value as? HttpMethodMessage {
       super.writeByte(140)
-      super.writeValue(value.toList())
-    } else if let value = value as? ConsoleMessageMessage {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? WebViewSettingsMessage {
       super.writeByte(141)
       super.writeValue(value.toList())
-    } else if let value = value as? UserScriptMessage {
+    } else if let value = value as? ConsoleMessageMessage {
       super.writeByte(142)
       super.writeValue(value.toList())
-    } else if let value = value as? CreationParamsMessage {
+    } else if let value = value as? UserScriptMessage {
       super.writeByte(143)
       super.writeValue(value.toList())
-    } else if let value = value as? NavigationRequestMessage {
+    } else if let value = value as? CreationParamsMessage {
       super.writeByte(144)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpErrorMessage {
+    } else if let value = value as? NavigationRequestMessage {
       super.writeByte(145)
       super.writeValue(value.toList())
-    } else if let value = value as? WebResourceErrorMessage {
+    } else if let value = value as? HttpErrorMessage {
       super.writeByte(146)
       super.writeValue(value.toList())
-    } else if let value = value as? SslErrorMessage {
+    } else if let value = value as? WebResourceErrorMessage {
       super.writeByte(147)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthRequestMessage {
+    } else if let value = value as? SslErrorMessage {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthCredentialsMessage {
+    } else if let value = value as? HttpAuthRequestMessage {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? DownloadRequestMessage {
+    } else if let value = value as? HttpAuthCredentialsMessage {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? PermissionRequestMessage {
+    } else if let value = value as? DownloadRequestMessage {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? JsDialogRequestMessage {
+    } else if let value = value as? PermissionRequestMessage {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? JsDialogResultMessage {
+    } else if let value = value as? JsDialogRequestMessage {
       super.writeByte(153)
       super.writeValue(value.toList())
-    } else if let value = value as? FindResultMessage {
+    } else if let value = value as? JsDialogResultMessage {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? ScrollPositionMessage {
+    } else if let value = value as? FindResultMessage {
       super.writeByte(155)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? ScrollPositionMessage {
       super.writeByte(156)
       super.writeValue(value.toList())
-    } else if let value = value as? InAppBrowserParamsMessage {
+    } else if let value = value as? CookieMessage {
       super.writeByte(157)
+      super.writeValue(value.toList())
+    } else if let value = value as? InAppBrowserParamsMessage {
+      super.writeByte(158)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1573,6 +1587,12 @@ protocol AdvancedWebViewHostApi {
   func dispose(webViewId: Int64) throws
   func loadUrl(webViewId: Int64, url: String, headers: [String: String]) throws
   func loadHtmlString(webViewId: Int64, html: String, baseUrl: String?) throws
+  /// Loads `url` with an explicit method. A `body` is only sent with POST.
+  func loadRequest(webViewId: Int64, url: String, method: HttpMethodMessage, headers: [String: String], body: FlutterStandardTypedData?) throws
+  /// Loads a Flutter asset declared in the app's `pubspec.yaml`.
+  func loadFlutterAsset(webViewId: Int64, key: String) throws
+  /// Loads a file from the device's file system by absolute path.
+  func loadFile(webViewId: Int64, path: String) throws
   func reload(webViewId: Int64) throws
   func stopLoading(webViewId: Int64) throws
   func goBack(webViewId: Int64) throws
@@ -1695,6 +1715,60 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       loadHtmlStringChannel.setMessageHandler(nil)
+    }
+    /// Loads `url` with an explicit method. A `body` is only sent with POST.
+    let loadRequestChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadRequest\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      loadRequestChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let urlArg = args[1] as! String
+        let methodArg = args[2] as! HttpMethodMessage
+        let headersArg = args[3] as! [String: String]
+        let bodyArg: FlutterStandardTypedData? = nilOrValue(args[4])
+        do {
+          try api.loadRequest(webViewId: webViewIdArg, url: urlArg, method: methodArg, headers: headersArg, body: bodyArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      loadRequestChannel.setMessageHandler(nil)
+    }
+    /// Loads a Flutter asset declared in the app's `pubspec.yaml`.
+    let loadFlutterAssetChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadFlutterAsset\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      loadFlutterAssetChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let keyArg = args[1] as! String
+        do {
+          try api.loadFlutterAsset(webViewId: webViewIdArg, key: keyArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      loadFlutterAssetChannel.setMessageHandler(nil)
+    }
+    /// Loads a file from the device's file system by absolute path.
+    let loadFileChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadFile\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      loadFileChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let pathArg = args[1] as! String
+        do {
+          try api.loadFile(webViewId: webViewIdArg, path: pathArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      loadFileChannel.setMessageHandler(nil)
     }
     let reloadChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.reload\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

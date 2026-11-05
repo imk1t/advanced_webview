@@ -55,6 +55,30 @@ final class RunnerTests: XCTestCase {
     }
   }
 
+  func testLoadFileAndAssetReportMissingFiles() throws {
+    let (hostApi, _, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+
+    XCTAssertThrowsError(try hostApi.loadFile(webViewId: 1, path: "/does/not/exist.html")) {
+      XCTAssertEqual(($0 as? PigeonError)?.code, "not-found")
+    }
+    // The default host API has no asset resolver.
+    XCTAssertThrowsError(try hostApi.loadFlutterAsset(webViewId: 1, key: "assets/a.html")) {
+      XCTAssertEqual(($0 as? PigeonError)?.code, "not-found")
+    }
+  }
+
+  func testLoadRequestRejectsAnInvalidUrl() throws {
+    let (hostApi, _, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+
+    XCTAssertThrowsError(
+      try hostApi.loadRequest(webViewId: 1, url: "", method: .post, headers: [:], body: nil)
+    ) {
+      XCTAssertEqual(($0 as? PigeonError)?.code, "invalid-url")
+    }
+  }
+
   func testSettingsAreAppliedAtCreationAndOnUpdate() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(
