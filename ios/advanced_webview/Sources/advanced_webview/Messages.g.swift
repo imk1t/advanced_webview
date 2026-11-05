@@ -581,6 +581,8 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
   var hasJsDialogDelegate: Bool
   /// When false, HTTP error statuses are never reported to Dart.
   var hasHttpErrorDelegate: Bool
+  /// When false, find progress is never reported to Dart.
+  var hasFindDelegate: Bool
   /// Lower-case URL schemes whose requests are answered by Dart through
   /// `onInterceptRequest`. Empty when the app has no intercept callback.
   var interceptSchemes: [String]
@@ -606,8 +608,9 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     let hasConsoleMessageDelegate = pigeonVar_list[13] as! Bool
     let hasJsDialogDelegate = pigeonVar_list[14] as! Bool
     let hasHttpErrorDelegate = pigeonVar_list[15] as! Bool
-    let interceptSchemes = pigeonVar_list[16] as! [String]
-    let userScripts = pigeonVar_list[17] as! [UserScriptMessage]
+    let hasFindDelegate = pigeonVar_list[16] as! Bool
+    let interceptSchemes = pigeonVar_list[17] as! [String]
+    let userScripts = pigeonVar_list[18] as! [UserScriptMessage]
 
     return CreationParamsMessage(
       webViewId: webViewId,
@@ -626,6 +629,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       hasConsoleMessageDelegate: hasConsoleMessageDelegate,
       hasJsDialogDelegate: hasJsDialogDelegate,
       hasHttpErrorDelegate: hasHttpErrorDelegate,
+      hasFindDelegate: hasFindDelegate,
       interceptSchemes: interceptSchemes,
       userScripts: userScripts
     )
@@ -648,6 +652,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       hasConsoleMessageDelegate,
       hasJsDialogDelegate,
       hasHttpErrorDelegate,
+      hasFindDelegate,
       interceptSchemes,
       userScripts,
     ]
@@ -656,7 +661,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasDownloadDelegate, rhs.hasDownloadDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasSslErrorDelegate, rhs.hasSslErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpAuthDelegate, rhs.hasHttpAuthDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasScrollDelegate, rhs.hasScrollDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasLongPressDelegate, rhs.hasLongPressDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasConsoleMessageDelegate, rhs.hasConsoleMessageDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasJsDialogDelegate, rhs.hasJsDialogDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpErrorDelegate, rhs.hasHttpErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.interceptSchemes, rhs.interceptSchemes) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
+    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasDownloadDelegate, rhs.hasDownloadDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasSslErrorDelegate, rhs.hasSslErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpAuthDelegate, rhs.hasHttpAuthDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasScrollDelegate, rhs.hasScrollDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasLongPressDelegate, rhs.hasLongPressDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasConsoleMessageDelegate, rhs.hasConsoleMessageDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasJsDialogDelegate, rhs.hasJsDialogDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpErrorDelegate, rhs.hasHttpErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasFindDelegate, rhs.hasFindDelegate) && MessagesPigeonInternal.deepEquals(lhs.interceptSchemes, rhs.interceptSchemes) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -677,12 +682,13 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: hasConsoleMessageDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasJsDialogDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasHttpErrorDelegate, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: hasFindDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: interceptSchemes, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userScripts, hasher: &hasher)
   }
 
   public var description: String {
-    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), hasDownloadDelegate: \(String(describing: hasDownloadDelegate)), hasSslErrorDelegate: \(String(describing: hasSslErrorDelegate)), hasHttpAuthDelegate: \(String(describing: hasHttpAuthDelegate)), hasScrollDelegate: \(String(describing: hasScrollDelegate)), hasLongPressDelegate: \(String(describing: hasLongPressDelegate)), hasConsoleMessageDelegate: \(String(describing: hasConsoleMessageDelegate)), hasJsDialogDelegate: \(String(describing: hasJsDialogDelegate)), hasHttpErrorDelegate: \(String(describing: hasHttpErrorDelegate)), interceptSchemes: \(String(describing: interceptSchemes)), userScripts: \(String(describing: userScripts)))"
+    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), hasDownloadDelegate: \(String(describing: hasDownloadDelegate)), hasSslErrorDelegate: \(String(describing: hasSslErrorDelegate)), hasHttpAuthDelegate: \(String(describing: hasHttpAuthDelegate)), hasScrollDelegate: \(String(describing: hasScrollDelegate)), hasLongPressDelegate: \(String(describing: hasLongPressDelegate)), hasConsoleMessageDelegate: \(String(describing: hasConsoleMessageDelegate)), hasJsDialogDelegate: \(String(describing: hasJsDialogDelegate)), hasHttpErrorDelegate: \(String(describing: hasHttpErrorDelegate)), hasFindDelegate: \(String(describing: hasFindDelegate)), interceptSchemes: \(String(describing: interceptSchemes)), userScripts: \(String(describing: userScripts)))"
   }
 }
 
@@ -1236,9 +1242,9 @@ struct InterceptResponseMessage: Hashable, CustomStringConvertible {
 /// Generated class from Pigeon that represents data sent in messages.
 struct FindResultMessage: Hashable, CustomStringConvertible {
   var found: Bool
-  /// Total matches on the page. Null on iOS, which does not report a count.
+  /// Total matches on the page. A best-effort count on iOS.
   var matchCount: Int64? = nil
-  /// Zero-based index of the highlighted match. Null on iOS.
+  /// Zero-based index of the highlighted match. Tracked best-effort on iOS.
   var activeMatchIndex: Int64? = nil
 
 
@@ -2384,6 +2390,10 @@ protocol AdvancedWebViewFlutterApiProtocol {
   /// A `console.*` call made by the page. Only sent when the controller was
   /// created with `hasConsoleMessageDelegate`.
   @MainActor func onConsoleMessage(webViewId webViewIdArg: Int64, message messageArg: ConsoleMessageMessage) async throws
+  /// Find progress. Only sent when the controller was created with
+  /// `hasFindDelegate`. Android sends it as WebView counts (`isDone` false
+  /// until it has finished); iOS sends one final update per `findText`.
+  @MainActor func onFindResult(webViewId webViewIdArg: Int64, activeMatchIndex activeMatchIndexArg: Int64, numberOfMatches numberOfMatchesArg: Int64, isDone isDoneArg: Bool) async throws
   @MainActor func onReceivedError(webViewId webViewIdArg: Int64, error errorArg: WebResourceErrorMessage) async throws
   /// A server answered with a status of 400 or more.
   @MainActor func onReceivedHttpError(webViewId webViewIdArg: Int64, error errorArg: HttpErrorMessage) async throws
@@ -2554,6 +2564,29 @@ class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
       let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onConsoleMessage\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg, messageArg] as [Any?]) { response in
+        guard let listResponse = response as? [Any?] else {
+          continuation.resume(throwing: createConnectionError(withChannelName: channelName))
+          return
+        }
+        if listResponse.count > 1 {
+          let code: String = listResponse[0] as! String
+          let message: String? = nilOrValue(listResponse[1])
+          let details: String? = nilOrValue(listResponse[2])
+          continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
+        } else {
+          continuation.resume()
+        }
+      }
+    }
+  }
+  /// Find progress. Only sent when the controller was created with
+  /// `hasFindDelegate`. Android sends it as WebView counts (`isDone` false
+  /// until it has finished); iOS sends one final update per `findText`.
+  @MainActor func onFindResult(webViewId webViewIdArg: Int64, activeMatchIndex activeMatchIndexArg: Int64, numberOfMatches numberOfMatchesArg: Int64, isDone isDoneArg: Bool) async throws {
+    return try await withCheckedThrowingContinuation { continuation in
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onFindResult\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([webViewIdArg, activeMatchIndexArg, numberOfMatchesArg, isDoneArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
           continuation.resume(throwing: createConnectionError(withChannelName: channelName))
           return

@@ -146,13 +146,27 @@ AdvancedWebViewController(
 
 ```dart
 final result = await controller.findText('flutter');
-// result.found。Android では result.matchCount と result.activeMatchIndex も入ります。
+// result.found、result.matchCount、result.activeMatchIndex
 await controller.findText('flutter');                 // 同じ検索語: 次の一致へ
 await controller.findText('flutter', forward: false); // 前の一致へ
 await controller.clearMatches();                      // ハイライトを消す
 ```
 
-iOS は一致の有無だけを返すため、`matchCount` と `activeMatchIndex` は `null` になります。
+「3 / 12」のような表示を同期するには、コンストラクタに `onFindResult` を渡します。現在の一致の位置、これまでの一致数、
+カウントが確定したかどうかが届きます。
+
+```dart
+AdvancedWebViewController(
+  onFindResult: (activeMatchIndex, numberOfMatches, isDone) {
+    setState(() => label = '${activeMatchIndex + 1} / $numberOfMatches');
+  },
+);
+```
+
+Android は WebView がカウントする間、更新のたびに通知します（最後の更新まで `isDone` は `false`）。iOS は
+`findText` の呼び出しごとに最終の更新を1回送ります。WebKit は一致数も位置も返さないため、iOS ではプラグインが
+ページのテキスト中のクエリ数を数え、検索方向に沿って位置を保持します。どちらも best-effort で、iframe 内など
+WebKit が別の方法で検索するテキストではハイライトと食い違うことがあります。
 
 ## コールバック
 

@@ -241,6 +241,22 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun findProgressIsForwardedToDartOnlyWithADelegate() {
+        hostApi.create(params(webViewId = 1))
+        hostApi.create(params(webViewId = 2, hasFindDelegate = true))
+        val channel = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onFindResult"
+
+        registry.get(1).onFindResult(0, 3, true)
+        shadowOf(Looper.getMainLooper()).idle()
+        verify(messenger, never()).send(eq(channel), any(), any())
+
+        registry.get(2).onFindResult(0, 1, false)
+        registry.get(2).onFindResult(1, 3, true)
+        shadowOf(Looper.getMainLooper()).idle()
+        verify(messenger, org.mockito.Mockito.times(2)).send(eq(channel), any(), any())
+    }
+
+    @Test
     fun emptyFindQueryClearsAndReportsNoMatch() = runBlocking(Dispatchers.Unconfined) {
         hostApi.create(params(webViewId = 1))
 
@@ -816,6 +832,7 @@ class WebViewHostApiImplTest {
         hasConsoleMessageDelegate: Boolean = false,
         hasJsDialogDelegate: Boolean = false,
         hasHttpErrorDelegate: Boolean = false,
+        hasFindDelegate: Boolean = false,
         interceptSchemes: List<String> = emptyList(),
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
@@ -835,6 +852,7 @@ class WebViewHostApiImplTest {
         hasConsoleMessageDelegate,
         hasJsDialogDelegate,
         hasHttpErrorDelegate,
+        hasFindDelegate,
         interceptSchemes,
         userScripts,
     )

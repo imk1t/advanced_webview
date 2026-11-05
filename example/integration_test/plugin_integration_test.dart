@@ -648,7 +648,10 @@ void main() {
   testWidgets('findText finds text and clearMatches removes the highlight', (
     tester,
   ) async {
-    final harness = _Harness();
+    final updates = <(int, int, bool)>[];
+    final harness = _Harness(
+      onFindResult: (index, count, done) => updates.add((index, count, done)),
+    );
     addTearDown(harness.dispose);
 
     await harness.show(tester);
@@ -659,7 +662,11 @@ void main() {
     await harness.controller.clearMatches();
 
     expect(hit.found, isTrue);
+    expect(hit.matchCount, 2);
+    expect(hit.activeMatchIndex, 0);
     expect(miss.found, isFalse);
+    // Both platforms end with a final update for the hit.
+    expect(updates.where((u) => u.$3 && u.$2 == 2), isNotEmpty);
   });
 
   testWidgets('hitTest finds the link and image under a point', (tester) async {
@@ -737,6 +744,7 @@ class _Harness {
     ConsoleMessageCallback? onConsoleMessage,
     JsDialogCallback? onJsDialog,
     HttpErrorCallback? onHttpError,
+    FindResultCallback? onFindResult,
     List<String> interceptSchemes = const [],
     InterceptRequestCallback? onInterceptRequest,
     WebViewSettings settings = const WebViewSettings(),
@@ -752,6 +760,7 @@ class _Harness {
       onConsoleMessage: onConsoleMessage,
       onJsDialog: onJsDialog,
       onHttpError: onHttpError,
+      onFindResult: onFindResult,
       interceptSchemes: interceptSchemes,
       onInterceptRequest: onInterceptRequest,
       onPageStarted: startedUrls.add,

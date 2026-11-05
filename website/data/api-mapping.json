@@ -573,8 +573,35 @@
         "status": "partial",
         "apis": ["WKWebView.find(_:configuration:)", "WKFindConfiguration"],
         "note": {
-          "en": "Only reports whether a match was found; matchCount and activeMatchIndex are null.",
-          "ja": "一致の有無のみ返します。matchCount と activeMatchIndex は null です。"
+          "en": "WebKit only reports whether a match was found, so matchCount counts the query in the page text (callAsyncJavaScript) and activeMatchIndex follows the search direction. Both are best-effort.",
+          "ja": "WebKit は一致の有無しか返さないため、matchCount はページのテキスト中のクエリ数（callAsyncJavaScript）、activeMatchIndex は検索方向に沿って数えます。どちらも best-effort です。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onFindResult",
+      "group": "events",
+      "summary": {
+        "en": "Reports find progress: the active match index, the match count so far and whether counting is done.",
+        "ja": "検索の進捗を通知します。現在の一致の位置、これまでの一致数、カウントが完了したかどうかです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.setFindListener(FindListener)"],
+        "note": {
+          "en": "Called for every update while WebView counts; isDone is false until the last one.",
+          "ja": "WebView がカウントする間、更新のたびに呼ばれます。最後の更新まで isDone は false です。"
+        }
+      },
+      "ios": {
+        "status": "partial",
+        "apis": [
+          "WKWebView.find(_:configuration:)",
+          "WKWebView.callAsyncJavaScript(_:arguments:in:contentWorld:)"
+        ],
+        "note": {
+          "en": "One final update (isDone is always true) per findText call. The count and index are best-effort because WebKit does not report them.",
+          "ja": "findText の呼び出しごとに最終の更新が1回（isDone は常に true）届きます。WebKit は一致数と位置を返さないため、どちらも best-effort です。"
         }
       }
     },

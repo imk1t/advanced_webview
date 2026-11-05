@@ -106,6 +106,7 @@ class AdvancedWebView(
     private val hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     private val hasJsDialogDelegate = params.hasJsDialogDelegate
     private val hasHttpErrorDelegate = params.hasHttpErrorDelegate
+    private val hasFindDelegate = params.hasFindDelegate
     private val interceptSchemes = params.interceptSchemes.map { it.lowercase(Locale.ROOT) }.toSet()
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
@@ -128,6 +129,7 @@ class AdvancedWebView(
         params.userScripts.forEach(::addUserScript)
         if (params.hasDownloadDelegate) webView.setDownloadListener(::onDownload)
         if (params.hasLongPressDelegate) installLongPress()
+        if (hasFindDelegate) webView.setFindListener(::onFindResult)
         if (params.hasScrollDelegate) {
             webView.setOnScrollChangeListener { _, x, y, _, _ ->
                 send { flutterApi.onScrollChanged(id, x / density, y / density) }
@@ -364,6 +366,11 @@ class AdvancedWebView(
     }
 
     internal fun onFindResult(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
+        if (hasFindDelegate) {
+            send {
+                flutterApi.onFindResult(id, activeMatchOrdinal.toLong(), numberOfMatches.toLong(), isDoneCounting)
+            }
+        }
         if (!isDoneCounting) return
         val cont = pendingFind ?: return
         pendingFind = null
