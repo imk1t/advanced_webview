@@ -6,14 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- Add `AdvancedWebViewController.loadFlutterAsset`, `loadFile` and `loadRequest` (with `WebViewHttpMethod`): load a Flutter asset or a local file, and send a POST request with a body. Android needs `allowFileAccess` for `loadFile` and cannot add headers to a POST.
+## 0.8.0 - 2026-11-05
 
-- Add `AdvancedWebViewController.onHttpError` and `HttpError`: be told when a server answers with an HTTP status of 400 or more. Android also reports sub-resources; iOS reports the main page and iframes.
-
-- Add `AdvancedWebViewController.clearWebsiteData` and `WebsiteDataType`: clear the HTTP cache, `localStorage` / `sessionStorage` and IndexedDB. Android clears all DOM storage when either storage type is selected.
-
-- Fix Android: permission prompts and the file chooser opened from an `AdvancedInAppBrowser` now appear over the browser instead of behind it.
 - Add `AdvancedWebViewController.onJsDialog`, `JsDialogRequest`, `JsDialogResponse` and `JsDialogType`: answer JavaScript `alert`, `confirm` and `prompt` dialogs from Dart. Without a callback Android keeps the system WebView's dialog and iOS now shows a native alert (WebKit used to dismiss them silently).
+- Add `AdvancedWebViewController.clearWebsiteData` and `WebsiteDataType`: clear the HTTP cache, `localStorage` / `sessionStorage` and IndexedDB. Android clears all DOM storage when either storage type is selected.
+- Add `AdvancedWebViewController.onHttpError` and `HttpError`: be told when a server answers with an HTTP status of 400 or more. Android also reports sub-resources; iOS reports the main page and iframes.
+- Add `AdvancedWebViewController.loadFlutterAsset`, `loadFile` and `loadRequest` (with `WebViewHttpMethod`): load a Flutter asset or a local file, and send a POST request with a body. Android needs `allowFileAccess` for `loadFile` and cannot add headers to a POST.
+- Fix Android: permission prompts and the file chooser opened from an `AdvancedInAppBrowser` now appear over the browser instead of behind it.
 
 ## 0.7.0 - 2026-11-05
 
