@@ -10,9 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart' show immutable, protected, visibleForTesting;
 
 Object? _extractReplyValueOrThrow(
-  List<Object?>? replyList,
-  String channelName, {
-  required bool isNullValid,
+    List<Object?>? replyList,
+    String channelName, {
+    required bool isNullValid,
 }) {
   if (replyList == null) {
     throw PlatformException(
@@ -34,11 +34,8 @@ Object? _extractReplyValueOrThrow(
   return replyList.firstOrNull;
 }
 
-List<Object?> wrapResponse({
-  Object? result,
-  PlatformException? error,
-  bool empty = false,
-}) {
+
+List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
   if (empty) {
     return <Object?>[];
   }
@@ -47,7 +44,6 @@ List<Object?> wrapResponse({
   }
   return <Object?>[error.code, error.message, error.details];
 }
-
 bool _deepEquals(Object? a, Object? b) {
   if (identical(a, b)) {
     return true;
@@ -60,9 +56,8 @@ bool _deepEquals(Object? a, Object? b) {
   }
   if (a is List && b is List) {
     return a.length == b.length &&
-        a.indexed.every(
-          ((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]),
-        );
+        a.indexed
+            .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
   }
   if (a is Map && b is Map) {
     if (a.length != b.length) {
@@ -111,29 +106,76 @@ int _deepHash(Object? value) {
   return value.hashCode;
 }
 
-enum CacheModeMessage { normal, preferCache, cacheOnly, noCache }
 
-enum ContentModeMessage { recommended, mobile, desktop }
+enum CacheModeMessage {
+  normal,
+  preferCache,
+  cacheOnly,
+  noCache;
+}
 
-enum MixedContentModeMessage { neverAllow, compatibility, alwaysAllow }
+enum ContentModeMessage {
+  recommended,
+  mobile,
+  desktop;
+}
 
-enum ConsoleMessageLevelMessage { debug, log, info, warning, error }
+enum MixedContentModeMessage {
+  neverAllow,
+  compatibility,
+  alwaysAllow;
+}
 
-enum UserScriptInjectionTimeMessage { atDocumentStart, atDocumentEnd }
+enum ConsoleMessageLevelMessage {
+  debug,
+  log,
+  info,
+  warning,
+  error;
+}
 
-enum NavigationDecisionMessage { navigate, prevent }
+enum UserScriptInjectionTimeMessage {
+  atDocumentStart,
+  atDocumentEnd;
+}
 
-enum SslErrorDecisionMessage { proceed, cancel }
+enum NavigationDecisionMessage {
+  navigate,
+  prevent;
+}
 
-enum PermissionResourceMessage { camera, microphone, geolocation }
+enum SslErrorDecisionMessage {
+  proceed,
+  cancel;
+}
 
-enum PermissionDecisionMessage { grant, deny }
+enum PermissionResourceMessage {
+  camera,
+  microphone,
+  geolocation;
+}
 
-enum JsDialogTypeMessage { alert, confirm, prompt }
+enum PermissionDecisionMessage {
+  grant,
+  deny;
+}
 
-enum WebsiteDataTypeMessage { cache, localStorage, indexedDb }
+enum JsDialogTypeMessage {
+  alert,
+  confirm,
+  prompt;
+}
 
-enum HttpMethodMessage { get, post }
+enum WebsiteDataTypeMessage {
+  cache,
+  localStorage,
+  indexedDb;
+}
+
+enum HttpMethodMessage {
+  get,
+  post;
+}
 
 class WebViewSettingsMessage {
   WebViewSettingsMessage({
@@ -275,8 +317,7 @@ class WebViewSettingsMessage {
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static WebViewSettingsMessage decode(Object result) {
     result as List<Object?>;
@@ -318,46 +359,7 @@ class WebViewSettingsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) &&
-        _deepEquals(
-          mediaPlaybackRequiresUserGesture,
-          other.mediaPlaybackRequiresUserGesture,
-        ) &&
-        _deepEquals(
-          allowsInlineMediaPlayback,
-          other.allowsInlineMediaPlayback,
-        ) &&
-        _deepEquals(supportZoom, other.supportZoom) &&
-        _deepEquals(transparentBackground, other.transparentBackground) &&
-        _deepEquals(passkeysEnabled, other.passkeysEnabled) &&
-        _deepEquals(
-          allowsBackForwardNavigationGestures,
-          other.allowsBackForwardNavigationGestures,
-        ) &&
-        _deepEquals(inspectable, other.inspectable) &&
-        _deepEquals(textZoom, other.textZoom) &&
-        _deepEquals(cacheMode, other.cacheMode) &&
-        _deepEquals(incognito, other.incognito) &&
-        _deepEquals(
-          javaScriptCanOpenWindowsAutomatically,
-          other.javaScriptCanOpenWindowsAutomatically,
-        ) &&
-        _deepEquals(scrollbarsVisible, other.scrollbarsVisible) &&
-        _deepEquals(overScrollEnabled, other.overScrollEnabled) &&
-        _deepEquals(pullToRefreshEnabled, other.pullToRefreshEnabled) &&
-        _deepEquals(domStorageEnabled, other.domStorageEnabled) &&
-        _deepEquals(allowFileAccess, other.allowFileAccess) &&
-        _deepEquals(allowContentAccess, other.allowContentAccess) &&
-        _deepEquals(mixedContentMode, other.mixedContentMode) &&
-        _deepEquals(contentMode, other.contentMode) &&
-        _deepEquals(allowsLinkPreview, other.allowsLinkPreview) &&
-        _deepEquals(geolocationEnabled, other.geolocationEnabled) &&
-        _deepEquals(minimumFontSize, other.minimumFontSize) &&
-        _deepEquals(userAgent, other.userAgent) &&
-        _deepEquals(
-          applicationNameForUserAgent,
-          other.applicationNameForUserAgent,
-        );
+    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(incognito, other.incognito) && _deepEquals(javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && _deepEquals(scrollbarsVisible, other.scrollbarsVisible) && _deepEquals(overScrollEnabled, other.overScrollEnabled) && _deepEquals(pullToRefreshEnabled, other.pullToRefreshEnabled) && _deepEquals(domStorageEnabled, other.domStorageEnabled) && _deepEquals(allowFileAccess, other.allowFileAccess) && _deepEquals(allowContentAccess, other.allowContentAccess) && _deepEquals(mixedContentMode, other.mixedContentMode) && _deepEquals(contentMode, other.contentMode) && _deepEquals(allowsLinkPreview, other.allowsLinkPreview) && _deepEquals(geolocationEnabled, other.geolocationEnabled) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent) && _deepEquals(applicationNameForUserAgent, other.applicationNameForUserAgent);
   }
 
   @override
@@ -389,12 +391,16 @@ class ConsoleMessageMessage {
   int? lineNumber;
 
   List<Object?> _toList() {
-    return <Object?>[level, message, sourceUrl, lineNumber];
+    return <Object?>[
+      level,
+      message,
+      sourceUrl,
+      lineNumber,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static ConsoleMessageMessage decode(Object result) {
     result as List<Object?>;
@@ -415,10 +421,7 @@ class ConsoleMessageMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(level, other.level) &&
-        _deepEquals(message, other.message) &&
-        _deepEquals(sourceUrl, other.sourceUrl) &&
-        _deepEquals(lineNumber, other.lineNumber);
+    return _deepEquals(level, other.level) && _deepEquals(message, other.message) && _deepEquals(sourceUrl, other.sourceUrl) && _deepEquals(lineNumber, other.lineNumber);
   }
 
   @override
@@ -445,12 +448,15 @@ class UserScriptMessage {
   bool mainFrameOnly;
 
   List<Object?> _toList() {
-    return <Object?>[source, injectionTime, mainFrameOnly];
+    return <Object?>[
+      source,
+      injectionTime,
+      mainFrameOnly,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static UserScriptMessage decode(Object result) {
     result as List<Object?>;
@@ -470,9 +476,7 @@ class UserScriptMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(source, other.source) &&
-        _deepEquals(injectionTime, other.injectionTime) &&
-        _deepEquals(mainFrameOnly, other.mainFrameOnly);
+    return _deepEquals(source, other.source) && _deepEquals(injectionTime, other.injectionTime) && _deepEquals(mainFrameOnly, other.mainFrameOnly);
   }
 
   @override
@@ -593,8 +597,7 @@ class CreationParamsMessage {
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static CreationParamsMessage decode(Object result) {
     result as List<Object?>;
@@ -629,30 +632,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) &&
-        _deepEquals(settings, other.settings) &&
-        _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) &&
-        _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) &&
-        _deepEquals(
-          javaScriptHandlerObjectName,
-          other.javaScriptHandlerObjectName,
-        ) &&
-        _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) &&
-        _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) &&
-        _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) &&
-        _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) &&
-        _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) &&
-        _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) &&
-        _deepEquals(hasScrollDelegate, other.hasScrollDelegate) &&
-        _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) &&
-        _deepEquals(
-          hasConsoleMessageDelegate,
-          other.hasConsoleMessageDelegate,
-        ) &&
-        _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) &&
-        _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) &&
-        _deepEquals(interceptSchemes, other.interceptSchemes) &&
-        _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(interceptSchemes, other.interceptSchemes) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -666,19 +646,24 @@ class CreationParamsMessage {
 }
 
 class NavigationRequestMessage {
-  NavigationRequestMessage({required this.url, required this.isMainFrame});
+  NavigationRequestMessage({
+    required this.url,
+    required this.isMainFrame,
+  });
 
   String url;
 
   bool isMainFrame;
 
   List<Object?> _toList() {
-    return <Object?>[url, isMainFrame];
+    return <Object?>[
+      url,
+      isMainFrame,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static NavigationRequestMessage decode(Object result) {
     result as List<Object?>;
@@ -691,15 +676,13 @@ class NavigationRequestMessage {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! NavigationRequestMessage ||
-        other.runtimeType != runtimeType) {
+    if (other is! NavigationRequestMessage || other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(url, other.url) &&
-        _deepEquals(isMainFrame, other.isMainFrame);
+    return _deepEquals(url, other.url) && _deepEquals(isMainFrame, other.isMainFrame);
   }
 
   @override
@@ -726,12 +709,15 @@ class HttpErrorMessage {
   bool isMainFrame;
 
   List<Object?> _toList() {
-    return <Object?>[url, statusCode, isMainFrame];
+    return <Object?>[
+      url,
+      statusCode,
+      isMainFrame,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static HttpErrorMessage decode(Object result) {
     result as List<Object?>;
@@ -751,9 +737,7 @@ class HttpErrorMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(url, other.url) &&
-        _deepEquals(statusCode, other.statusCode) &&
-        _deepEquals(isMainFrame, other.isMainFrame);
+    return _deepEquals(url, other.url) && _deepEquals(statusCode, other.statusCode) && _deepEquals(isMainFrame, other.isMainFrame);
   }
 
   @override
@@ -783,12 +767,16 @@ class WebResourceErrorMessage {
   String? url;
 
   List<Object?> _toList() {
-    return <Object?>[errorCode, message, isMainFrame, url];
+    return <Object?>[
+      errorCode,
+      message,
+      isMainFrame,
+      url,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static WebResourceErrorMessage decode(Object result) {
     result as List<Object?>;
@@ -809,10 +797,7 @@ class WebResourceErrorMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(errorCode, other.errorCode) &&
-        _deepEquals(message, other.message) &&
-        _deepEquals(isMainFrame, other.isMainFrame) &&
-        _deepEquals(url, other.url);
+    return _deepEquals(errorCode, other.errorCode) && _deepEquals(message, other.message) && _deepEquals(isMainFrame, other.isMainFrame) && _deepEquals(url, other.url);
   }
 
   @override
@@ -839,12 +824,15 @@ class SslErrorMessage {
   String message;
 
   List<Object?> _toList() {
-    return <Object?>[url, host, message];
+    return <Object?>[
+      url,
+      host,
+      message,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static SslErrorMessage decode(Object result) {
     result as List<Object?>;
@@ -864,9 +852,7 @@ class SslErrorMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(url, other.url) &&
-        _deepEquals(host, other.host) &&
-        _deepEquals(message, other.message);
+    return _deepEquals(url, other.url) && _deepEquals(host, other.host) && _deepEquals(message, other.message);
   }
 
   @override
@@ -880,19 +866,24 @@ class SslErrorMessage {
 }
 
 class HttpAuthRequestMessage {
-  HttpAuthRequestMessage({required this.host, this.realm});
+  HttpAuthRequestMessage({
+    required this.host,
+    this.realm,
+  });
 
   String host;
 
   String? realm;
 
   List<Object?> _toList() {
-    return <Object?>[host, realm];
+    return <Object?>[
+      host,
+      realm,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static HttpAuthRequestMessage decode(Object result) {
     result as List<Object?>;
@@ -925,19 +916,24 @@ class HttpAuthRequestMessage {
 }
 
 class HttpAuthCredentialsMessage {
-  HttpAuthCredentialsMessage({required this.username, required this.password});
+  HttpAuthCredentialsMessage({
+    required this.username,
+    required this.password,
+  });
 
   String username;
 
   String password;
 
   List<Object?> _toList() {
-    return <Object?>[username, password];
+    return <Object?>[
+      username,
+      password,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static HttpAuthCredentialsMessage decode(Object result) {
     result as List<Object?>;
@@ -950,15 +946,13 @@ class HttpAuthCredentialsMessage {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! HttpAuthCredentialsMessage ||
-        other.runtimeType != runtimeType) {
+    if (other is! HttpAuthCredentialsMessage || other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(username, other.username) &&
-        _deepEquals(password, other.password);
+    return _deepEquals(username, other.username) && _deepEquals(password, other.password);
   }
 
   @override
@@ -989,12 +983,16 @@ class DownloadRequestMessage {
   int? contentLength;
 
   List<Object?> _toList() {
-    return <Object?>[url, suggestedFilename, mimeType, contentLength];
+    return <Object?>[
+      url,
+      suggestedFilename,
+      mimeType,
+      contentLength,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static DownloadRequestMessage decode(Object result) {
     result as List<Object?>;
@@ -1015,10 +1013,7 @@ class DownloadRequestMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(url, other.url) &&
-        _deepEquals(suggestedFilename, other.suggestedFilename) &&
-        _deepEquals(mimeType, other.mimeType) &&
-        _deepEquals(contentLength, other.contentLength);
+    return _deepEquals(url, other.url) && _deepEquals(suggestedFilename, other.suggestedFilename) && _deepEquals(mimeType, other.mimeType) && _deepEquals(contentLength, other.contentLength);
   }
 
   @override
@@ -1032,7 +1027,10 @@ class DownloadRequestMessage {
 }
 
 class PermissionRequestMessage {
-  PermissionRequestMessage({required this.origin, required this.resources});
+  PermissionRequestMessage({
+    required this.origin,
+    required this.resources,
+  });
 
   /// Origin of the requesting page, e.g. `https://example.com`.
   String origin;
@@ -1040,34 +1038,33 @@ class PermissionRequestMessage {
   List<PermissionResourceMessage> resources;
 
   List<Object?> _toList() {
-    return <Object?>[origin, resources];
+    return <Object?>[
+      origin,
+      resources,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static PermissionRequestMessage decode(Object result) {
     result as List<Object?>;
     return PermissionRequestMessage(
       origin: result[0]! as String,
-      resources: (result[1]! as List<Object?>)
-          .cast<PermissionResourceMessage>(),
+      resources: (result[1]! as List<Object?>).cast<PermissionResourceMessage>(),
     );
   }
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! PermissionRequestMessage ||
-        other.runtimeType != runtimeType) {
+    if (other is! PermissionRequestMessage || other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(origin, other.origin) &&
-        _deepEquals(resources, other.resources);
+    return _deepEquals(origin, other.origin) && _deepEquals(resources, other.resources);
   }
 
   @override
@@ -1099,12 +1096,16 @@ class JsDialogRequestMessage {
   String? defaultText;
 
   List<Object?> _toList() {
-    return <Object?>[type, message, url, defaultText];
+    return <Object?>[
+      type,
+      message,
+      url,
+      defaultText,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static JsDialogRequestMessage decode(Object result) {
     result as List<Object?>;
@@ -1125,10 +1126,7 @@ class JsDialogRequestMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(type, other.type) &&
-        _deepEquals(message, other.message) &&
-        _deepEquals(url, other.url) &&
-        _deepEquals(defaultText, other.defaultText);
+    return _deepEquals(type, other.type) && _deepEquals(message, other.message) && _deepEquals(url, other.url) && _deepEquals(defaultText, other.defaultText);
   }
 
   @override
@@ -1142,7 +1140,10 @@ class JsDialogRequestMessage {
 }
 
 class JsDialogResultMessage {
-  JsDialogResultMessage({required this.accepted, this.text});
+  JsDialogResultMessage({
+    required this.accepted,
+    this.text,
+  });
 
   /// OK was pressed. Always true for an `alert`.
   bool accepted;
@@ -1151,12 +1152,14 @@ class JsDialogResultMessage {
   String? text;
 
   List<Object?> _toList() {
-    return <Object?>[accepted, text];
+    return <Object?>[
+      accepted,
+      text,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static JsDialogResultMessage decode(Object result) {
     result as List<Object?>;
@@ -1175,8 +1178,7 @@ class JsDialogResultMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(accepted, other.accepted) &&
-        _deepEquals(text, other.text);
+    return _deepEquals(accepted, other.accepted) && _deepEquals(text, other.text);
   }
 
   @override
@@ -1206,12 +1208,16 @@ class InterceptRequestMessage {
   bool isMainFrame;
 
   List<Object?> _toList() {
-    return <Object?>[url, method, headers, isMainFrame];
+    return <Object?>[
+      url,
+      method,
+      headers,
+      isMainFrame,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static InterceptRequestMessage decode(Object result) {
     result as List<Object?>;
@@ -1232,10 +1238,7 @@ class InterceptRequestMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(url, other.url) &&
-        _deepEquals(method, other.method) &&
-        _deepEquals(headers, other.headers) &&
-        _deepEquals(isMainFrame, other.isMainFrame);
+    return _deepEquals(url, other.url) && _deepEquals(method, other.method) && _deepEquals(headers, other.headers) && _deepEquals(isMainFrame, other.isMainFrame);
   }
 
   @override
@@ -1266,12 +1269,16 @@ class InterceptResponseMessage {
   Uint8List body;
 
   List<Object?> _toList() {
-    return <Object?>[statusCode, mimeType, headers, body];
+    return <Object?>[
+      statusCode,
+      mimeType,
+      headers,
+      body,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static InterceptResponseMessage decode(Object result) {
     result as List<Object?>;
@@ -1286,17 +1293,13 @@ class InterceptResponseMessage {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! InterceptResponseMessage ||
-        other.runtimeType != runtimeType) {
+    if (other is! InterceptResponseMessage || other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(statusCode, other.statusCode) &&
-        _deepEquals(mimeType, other.mimeType) &&
-        _deepEquals(headers, other.headers) &&
-        _deepEquals(body, other.body);
+    return _deepEquals(statusCode, other.statusCode) && _deepEquals(mimeType, other.mimeType) && _deepEquals(headers, other.headers) && _deepEquals(body, other.body);
   }
 
   @override
@@ -1325,12 +1328,15 @@ class FindResultMessage {
   int? activeMatchIndex;
 
   List<Object?> _toList() {
-    return <Object?>[found, matchCount, activeMatchIndex];
+    return <Object?>[
+      found,
+      matchCount,
+      activeMatchIndex,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static FindResultMessage decode(Object result) {
     result as List<Object?>;
@@ -1350,9 +1356,7 @@ class FindResultMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(found, other.found) &&
-        _deepEquals(matchCount, other.matchCount) &&
-        _deepEquals(activeMatchIndex, other.activeMatchIndex);
+    return _deepEquals(found, other.found) && _deepEquals(matchCount, other.matchCount) && _deepEquals(activeMatchIndex, other.activeMatchIndex);
   }
 
   @override
@@ -1366,7 +1370,10 @@ class FindResultMessage {
 }
 
 class ScrollPositionMessage {
-  ScrollPositionMessage({required this.x, required this.y});
+  ScrollPositionMessage({
+    required this.x,
+    required this.y,
+  });
 
   /// Horizontal offset in logical pixels.
   double x;
@@ -1375,12 +1382,14 @@ class ScrollPositionMessage {
   double y;
 
   List<Object?> _toList() {
-    return <Object?>[x, y];
+    return <Object?>[
+      x,
+      y,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static ScrollPositionMessage decode(Object result) {
     result as List<Object?>;
@@ -1451,8 +1460,7 @@ class CookieMessage {
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static CookieMessage decode(Object result) {
     result as List<Object?>;
@@ -1476,13 +1484,7 @@ class CookieMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(name, other.name) &&
-        _deepEquals(value, other.value) &&
-        _deepEquals(domain, other.domain) &&
-        _deepEquals(path, other.path) &&
-        _deepEquals(isSecure, other.isSecure) &&
-        _deepEquals(isHttpOnly, other.isHttpOnly) &&
-        _deepEquals(expiresMillis, other.expiresMillis);
+    return _deepEquals(name, other.name) && _deepEquals(value, other.value) && _deepEquals(domain, other.domain) && _deepEquals(path, other.path) && _deepEquals(isSecure, other.isSecure) && _deepEquals(isHttpOnly, other.isHttpOnly) && _deepEquals(expiresMillis, other.expiresMillis);
   }
 
   @override
@@ -1537,8 +1539,7 @@ class InAppBrowserParamsMessage {
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static InAppBrowserParamsMessage decode(Object result) {
     result as List<Object?>;
@@ -1555,19 +1556,13 @@ class InAppBrowserParamsMessage {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! InAppBrowserParamsMessage ||
-        other.runtimeType != runtimeType) {
+    if (other is! InAppBrowserParamsMessage || other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) &&
-        _deepEquals(showUrl, other.showUrl) &&
-        _deepEquals(showNavigationButtons, other.showNavigationButtons) &&
-        _deepEquals(toolbarColor, other.toolbarColor) &&
-        _deepEquals(toolbarTitle, other.toolbarTitle) &&
-        _deepEquals(closeButtonLabel, other.closeButtonLabel);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(showUrl, other.showUrl) && _deepEquals(showNavigationButtons, other.showNavigationButtons) && _deepEquals(toolbarColor, other.toolbarColor) && _deepEquals(toolbarTitle, other.toolbarTitle) && _deepEquals(closeButtonLabel, other.closeButtonLabel);
   }
 
   @override
@@ -1580,6 +1575,7 @@ class InAppBrowserParamsMessage {
   }
 }
 
+
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -1587,100 +1583,100 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    } else if (value is CacheModeMessage) {
+    }    else if (value is CacheModeMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    } else if (value is ContentModeMessage) {
+    }    else if (value is ContentModeMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    } else if (value is MixedContentModeMessage) {
+    }    else if (value is MixedContentModeMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.index);
-    } else if (value is ConsoleMessageLevelMessage) {
+    }    else if (value is ConsoleMessageLevelMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.index);
-    } else if (value is UserScriptInjectionTimeMessage) {
+    }    else if (value is UserScriptInjectionTimeMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.index);
-    } else if (value is NavigationDecisionMessage) {
+    }    else if (value is NavigationDecisionMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.index);
-    } else if (value is SslErrorDecisionMessage) {
+    }    else if (value is SslErrorDecisionMessage) {
       buffer.putUint8(135);
       writeValue(buffer, value.index);
-    } else if (value is PermissionResourceMessage) {
+    }    else if (value is PermissionResourceMessage) {
       buffer.putUint8(136);
       writeValue(buffer, value.index);
-    } else if (value is PermissionDecisionMessage) {
+    }    else if (value is PermissionDecisionMessage) {
       buffer.putUint8(137);
       writeValue(buffer, value.index);
-    } else if (value is JsDialogTypeMessage) {
+    }    else if (value is JsDialogTypeMessage) {
       buffer.putUint8(138);
       writeValue(buffer, value.index);
-    } else if (value is WebsiteDataTypeMessage) {
+    }    else if (value is WebsiteDataTypeMessage) {
       buffer.putUint8(139);
       writeValue(buffer, value.index);
-    } else if (value is HttpMethodMessage) {
+    }    else if (value is HttpMethodMessage) {
       buffer.putUint8(140);
       writeValue(buffer, value.index);
-    } else if (value is WebViewSettingsMessage) {
+    }    else if (value is WebViewSettingsMessage) {
       buffer.putUint8(141);
       writeValue(buffer, value.encode());
-    } else if (value is ConsoleMessageMessage) {
+    }    else if (value is ConsoleMessageMessage) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    } else if (value is UserScriptMessage) {
+    }    else if (value is UserScriptMessage) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    } else if (value is CreationParamsMessage) {
+    }    else if (value is CreationParamsMessage) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    } else if (value is NavigationRequestMessage) {
+    }    else if (value is NavigationRequestMessage) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    } else if (value is HttpErrorMessage) {
+    }    else if (value is HttpErrorMessage) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    } else if (value is WebResourceErrorMessage) {
+    }    else if (value is WebResourceErrorMessage) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    } else if (value is SslErrorMessage) {
+    }    else if (value is SslErrorMessage) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    } else if (value is HttpAuthRequestMessage) {
+    }    else if (value is HttpAuthRequestMessage) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    } else if (value is HttpAuthCredentialsMessage) {
+    }    else if (value is HttpAuthCredentialsMessage) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    } else if (value is DownloadRequestMessage) {
+    }    else if (value is DownloadRequestMessage) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    } else if (value is PermissionRequestMessage) {
+    }    else if (value is PermissionRequestMessage) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    } else if (value is JsDialogRequestMessage) {
+    }    else if (value is JsDialogRequestMessage) {
       buffer.putUint8(153);
       writeValue(buffer, value.encode());
-    } else if (value is JsDialogResultMessage) {
+    }    else if (value is JsDialogResultMessage) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    } else if (value is InterceptRequestMessage) {
+    }    else if (value is InterceptRequestMessage) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    } else if (value is InterceptResponseMessage) {
+    }    else if (value is InterceptResponseMessage) {
       buffer.putUint8(156);
       writeValue(buffer, value.encode());
-    } else if (value is FindResultMessage) {
+    }    else if (value is FindResultMessage) {
       buffer.putUint8(157);
       writeValue(buffer, value.encode());
-    } else if (value is ScrollPositionMessage) {
+    }    else if (value is ScrollPositionMessage) {
       buffer.putUint8(158);
       writeValue(buffer, value.encode());
-    } else if (value is CookieMessage) {
+    }    else if (value is CookieMessage) {
       buffer.putUint8(159);
       writeValue(buffer, value.encode());
-    } else if (value is InAppBrowserParamsMessage) {
+    }    else if (value is InAppBrowserParamsMessage) {
       buffer.putUint8(160);
       writeValue(buffer, value.encode());
     } else {
@@ -1705,9 +1701,7 @@ class _PigeonCodec extends StandardMessageCodec {
         return value == null ? null : ConsoleMessageLevelMessage.values[value];
       case 133:
         final value = readValue(buffer) as int?;
-        return value == null
-            ? null
-            : UserScriptInjectionTimeMessage.values[value];
+        return value == null ? null : UserScriptInjectionTimeMessage.values[value];
       case 134:
         final value = readValue(buffer) as int?;
         return value == null ? null : NavigationDecisionMessage.values[value];
@@ -1780,758 +1774,666 @@ class AdvancedWebViewHostApi {
   /// available for dependency injection. If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
   AdvancedWebViewHostApi({
-    BinaryMessenger? binaryMessenger,
-    String messageChannelSuffix = '',
-  }) : pigeonVar_binaryMessenger = binaryMessenger,
-       pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty
-           ? '.$messageChannelSuffix'
-           : '';
+      BinaryMessenger? binaryMessenger, 
+      String messageChannelSuffix = '', 
+      })
+      : pigeonVar_binaryMessenger = binaryMessenger,
+        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
 
   final BinaryMessenger? pigeonVar_binaryMessenger;
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
   final String pigeonVar_messageChannelSuffix;
 
+
   /// Creates the native WebView. Must be called before the platform view with
   /// the same `webViewId` is attached.
   Future<void> create(CreationParamsMessage params) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.create$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.create$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[params],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[params]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> dispose(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.dispose$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.dispose$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
-  Future<void> loadUrl(
-    int webViewId,
-    String url,
-    Map<String, String> headers,
-  ) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadUrl$pigeonVar_messageChannelSuffix';
+  Future<void> loadUrl(int webViewId, String url, Map<String, String> headers) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadUrl$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, url, headers],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, url, headers]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
-  Future<void> loadHtmlString(
-    int webViewId,
-    String html,
-    String? baseUrl,
-  ) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadHtmlString$pigeonVar_messageChannelSuffix';
+  Future<void> loadHtmlString(int webViewId, String html, String? baseUrl) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadHtmlString$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, html, baseUrl],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, html, baseUrl]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// Loads `url` with an explicit method. A `body` is only sent with POST.
-  Future<void> loadRequest(
-    int webViewId,
-    String url,
-    HttpMethodMessage method,
-    Map<String, String> headers,
-    Uint8List? body,
-  ) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadRequest$pigeonVar_messageChannelSuffix';
+  Future<void> loadRequest(int webViewId, String url, HttpMethodMessage method, Map<String, String> headers, Uint8List? body) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadRequest$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, url, method, headers, body],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, url, method, headers, body]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// Loads a Flutter asset declared in the app's `pubspec.yaml`.
   Future<void> loadFlutterAsset(int webViewId, String key) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadFlutterAsset$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadFlutterAsset$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, key],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, key]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// Loads a file from the device's file system by absolute path.
   Future<void> loadFile(int webViewId, String path) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadFile$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadFile$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, path],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, path]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> reload(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.reload$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.reload$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> stopLoading(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.stopLoading$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.stopLoading$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> goBack(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.goBack$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.goBack$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> goForward(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.goForward$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.goForward$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<bool> canGoBack(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.canGoBack$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.canGoBack$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return pigeonVar_replyValue! as bool;
   }
 
   Future<bool> canGoForward(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.canGoForward$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.canGoForward$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return pigeonVar_replyValue! as bool;
   }
 
   Future<String?> getUrl(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getUrl$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getUrl$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
     return pigeonVar_replyValue as String?;
   }
 
   Future<String?> getTitle(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getTitle$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getTitle$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
     return pigeonVar_replyValue as String?;
   }
 
   /// Returns the evaluation result encoded as JSON (or null).
   Future<String?> evaluateJavaScript(int webViewId, String source) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.evaluateJavaScript$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.evaluateJavaScript$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, source],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, source]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
     return pigeonVar_replyValue as String?;
   }
 
   /// Returns a PNG of the visible area, or null when it cannot be captured
   /// (for example when the view has no size yet).
   Future<Uint8List?> takeScreenshot(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.takeScreenshot$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.takeScreenshot$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
     return pigeonVar_replyValue as Uint8List?;
   }
 
   /// Finds `query` in the page and highlights a match. A new query starts at
   /// the first match; repeating the same query moves to the next or previous.
-  Future<FindResultMessage> findText(
-    int webViewId,
-    String query,
-    bool forward,
-  ) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.findText$pigeonVar_messageChannelSuffix';
+  Future<FindResultMessage> findText(int webViewId, String query, bool forward) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.findText$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, query, forward],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, query, forward]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return pigeonVar_replyValue! as FindResultMessage;
   }
 
   /// Removes the highlights left by `findText`.
   Future<void> clearMatches(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearMatches$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearMatches$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// Scrolls the page to `x`, `y` (logical pixels) without animation.
   Future<void> scrollTo(int webViewId, double x, double y) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.scrollTo$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.scrollTo$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, x, y],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, x, y]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// Scrolls the page by `dx`, `dy` (logical pixels) without animation.
   Future<void> scrollBy(int webViewId, double dx, double dy) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.scrollBy$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.scrollBy$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, dx, dy],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, dx, dy]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<ScrollPositionMessage> getScrollPosition(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getScrollPosition$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getScrollPosition$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return pigeonVar_replyValue! as ScrollPositionMessage;
   }
 
   /// Opaque snapshot of the back/forward list and scroll position, or null
   /// when there is nothing to save. Only valid on the same platform.
   Future<Uint8List?> saveState(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.saveState$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.saveState$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
     return pigeonVar_replyValue as Uint8List?;
   }
 
   /// Restores a snapshot from `saveState`. Returns false when it cannot be read.
   Future<bool> restoreState(int webViewId, Uint8List state) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.restoreState$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.restoreState$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, state],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, state]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return pigeonVar_replyValue! as bool;
   }
 
   /// Opens the system print dialog for the current page. Fails with
   /// `not-attached` when the WebView is not shown in a window.
   Future<void> printPage(int webViewId, String? jobName) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.printPage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.printPage$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, jobName],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, jobName]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
-  Future<void> updateSettings(
-    int webViewId,
-    WebViewSettingsMessage settings,
-  ) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.updateSettings$pigeonVar_messageChannelSuffix';
+  Future<void> updateSettings(int webViewId, WebViewSettingsMessage settings) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.updateSettings$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, settings],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, settings]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> setCookie(int webViewId, CookieMessage cookie) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setCookie$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setCookie$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, cookie],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, cookie]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// Returns the cookies the WebView would send to `url`.
   Future<List<CookieMessage>> getCookies(int webViewId, String url) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getCookies$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getCookies$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, url],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, url]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return (pigeonVar_replyValue! as List<Object?>).cast<CookieMessage>();
   }
 
   Future<void> clearCookies(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearCookies$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearCookies$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// Removes the given kinds of website data. Cookies are not included; see
   /// `clearCookies`.
-  Future<void> clearWebsiteData(
-    int webViewId,
-    List<WebsiteDataTypeMessage> types,
-  ) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearWebsiteData$pigeonVar_messageChannelSuffix';
+  Future<void> clearWebsiteData(int webViewId, List<WebsiteDataTypeMessage> types) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearWebsiteData$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, types],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, types]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// Registers a script for pages loaded from now on.
   Future<void> addUserScript(int webViewId, UserScriptMessage script) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.addUserScript$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.addUserScript$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId, script],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, script]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> removeAllUserScripts(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.removeAllUserScripts$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.removeAllUserScripts$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// Presents the WebView `params.webViewId` full screen with a toolbar. Fails
   /// with `not-attached` when there is no screen to present from and with
   /// `already-open` when it is already presented.
   Future<void> openInAppBrowser(InAppBrowserParamsMessage params) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.openInAppBrowser$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.openInAppBrowser$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[params],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[params]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// Dismisses the in-app browser; a no-op when it is not open. The WebView
   /// itself stays alive.
   Future<void> closeInAppBrowser(int webViewId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.closeInAppBrowser$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.closeInAppBrowser$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[webViewId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 }
 
@@ -2562,58 +2464,36 @@ abstract class AdvancedWebViewFlutterApi {
   /// A server answered with a status of 400 or more.
   void onReceivedHttpError(int webViewId, HttpErrorMessage error);
 
-  Future<NavigationDecisionMessage> shouldOverrideUrlLoading(
-    int webViewId,
-    NavigationRequestMessage request,
-  );
+  Future<NavigationDecisionMessage> shouldOverrideUrlLoading(int webViewId, NavigationRequestMessage request);
 
   void onJavaScriptMessage(int webViewId, String channelName, String message);
 
   /// The WebView found a certificate problem. Cancelling refuses the load.
-  Future<SslErrorDecisionMessage> onSslError(
-    int webViewId,
-    SslErrorMessage error,
-  );
+  Future<SslErrorDecisionMessage> onSslError(int webViewId, SslErrorMessage error);
 
   /// A server asked for credentials. Null cancels the request.
-  Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(
-    int webViewId,
-    HttpAuthRequestMessage request,
-  );
+  Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(int webViewId, HttpAuthRequestMessage request);
 
   /// The page started a download. The WebView does not save the file.
   void onDownloadStart(int webViewId, DownloadRequestMessage request);
 
   /// The page asked for camera, microphone or location access.
-  Future<PermissionDecisionMessage> onPermissionRequest(
-    int webViewId,
-    PermissionRequestMessage request,
-  );
+  Future<PermissionDecisionMessage> onPermissionRequest(int webViewId, PermissionRequestMessage request);
 
   /// The page opened a JavaScript dialog (`alert`, `confirm` or `prompt`).
   /// The page is blocked until this completes.
-  Future<JsDialogResultMessage> onJsDialog(
-    int webViewId,
-    JsDialogRequestMessage request,
-  );
+  Future<JsDialogResultMessage> onJsDialog(int webViewId, JsDialogRequestMessage request);
 
   /// A request to a scheme listed in `interceptSchemes`. Null lets the
   /// request through (Android) or fails it (iOS, where custom schemes have no
   /// network fallback). Android blocks a WebView IO thread, not the main
   /// thread, until this completes.
-  Future<InterceptResponseMessage?> onInterceptRequest(
-    int webViewId,
-    InterceptRequestMessage request,
-  );
+  Future<InterceptResponseMessage?> onInterceptRequest(int webViewId, InterceptRequestMessage request);
 
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
   /// argument list; the result is the JSON-encoded return value. Throwing
   /// rejects the page's promise.
-  Future<String> onJavaScriptHandlerCall(
-    int webViewId,
-    String handlerName,
-    String argsJson,
-  );
+  Future<String> onJavaScriptHandlerCall(int webViewId, String handlerName, String argsJson);
 
   /// The page asked for a new window; the WebView did not load `url` itself.
   void onNewWindowRequest(int webViewId, String url);
@@ -2621,20 +2501,16 @@ abstract class AdvancedWebViewFlutterApi {
   /// The in-app browser was dismissed, by the user or by `closeInAppBrowser`.
   void onInAppBrowserClosed(int webViewId);
 
-  static void setUp(
-    AdvancedWebViewFlutterApi? api, {
-    BinaryMessenger? binaryMessenger,
+  static void setUp(AdvancedWebViewFlutterApi? api, {
+    BinaryMessenger? binaryMessenger, 
     String messageChannelSuffix = '',
-  }) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty
-        ? '.$messageChannelSuffix'
-        : '';
+  }) 
+{
+    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPageStarted$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPageStarted$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2647,20 +2523,16 @@ abstract class AdvancedWebViewFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPageFinished$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPageFinished$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2673,20 +2545,16 @@ abstract class AdvancedWebViewFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onProgressChanged$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onProgressChanged$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2699,20 +2567,16 @@ abstract class AdvancedWebViewFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onTitleChanged$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onTitleChanged$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2725,20 +2589,16 @@ abstract class AdvancedWebViewFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onScrollChanged$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onScrollChanged$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2752,20 +2612,16 @@ abstract class AdvancedWebViewFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onLongPress$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onLongPress$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2779,74 +2635,60 @@ abstract class AdvancedWebViewFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onConsoleMessage$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onConsoleMessage$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           final List<Object?> args = message! as List<Object?>;
           final int arg_webViewId = args[0]! as int;
-          final ConsoleMessageMessage arg_message =
-              args[1]! as ConsoleMessageMessage;
+          final ConsoleMessageMessage arg_message = args[1]! as ConsoleMessageMessage;
           try {
             api.onConsoleMessage(arg_webViewId, arg_message);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onReceivedError$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onReceivedError$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           final List<Object?> args = message! as List<Object?>;
           final int arg_webViewId = args[0]! as int;
-          final WebResourceErrorMessage arg_error =
-              args[1]! as WebResourceErrorMessage;
+          final WebResourceErrorMessage arg_error = args[1]! as WebResourceErrorMessage;
           try {
             api.onReceivedError(arg_webViewId, arg_error);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onReceivedHttpError$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onReceivedHttpError$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2859,48 +2701,38 @@ abstract class AdvancedWebViewFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.shouldOverrideUrlLoading$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.shouldOverrideUrlLoading$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           final List<Object?> args = message! as List<Object?>;
           final int arg_webViewId = args[0]! as int;
-          final NavigationRequestMessage arg_request =
-              args[1]! as NavigationRequestMessage;
+          final NavigationRequestMessage arg_request = args[1]! as NavigationRequestMessage;
           try {
-            final NavigationDecisionMessage output = await api
-                .shouldOverrideUrlLoading(arg_webViewId, arg_request);
+            final NavigationDecisionMessage output = await api.shouldOverrideUrlLoading(arg_webViewId, arg_request);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptMessage$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptMessage$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2910,28 +2742,20 @@ abstract class AdvancedWebViewFlutterApi {
           final String arg_channelName = args[1]! as String;
           final String arg_message = args[2]! as String;
           try {
-            api.onJavaScriptMessage(
-              arg_webViewId,
-              arg_channelName,
-              arg_message,
-            );
+            api.onJavaScriptMessage(arg_webViewId, arg_channelName, arg_message);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onSslError$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onSslError$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2940,168 +2764,130 @@ abstract class AdvancedWebViewFlutterApi {
           final int arg_webViewId = args[0]! as int;
           final SslErrorMessage arg_error = args[1]! as SslErrorMessage;
           try {
-            final SslErrorDecisionMessage output = await api.onSslError(
-              arg_webViewId,
-              arg_error,
-            );
+            final SslErrorDecisionMessage output = await api.onSslError(arg_webViewId, arg_error);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onHttpAuthRequest$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onHttpAuthRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           final List<Object?> args = message! as List<Object?>;
           final int arg_webViewId = args[0]! as int;
-          final HttpAuthRequestMessage arg_request =
-              args[1]! as HttpAuthRequestMessage;
+          final HttpAuthRequestMessage arg_request = args[1]! as HttpAuthRequestMessage;
           try {
-            final HttpAuthCredentialsMessage? output = await api
-                .onHttpAuthRequest(arg_webViewId, arg_request);
+            final HttpAuthCredentialsMessage? output = await api.onHttpAuthRequest(arg_webViewId, arg_request);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onDownloadStart$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onDownloadStart$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           final List<Object?> args = message! as List<Object?>;
           final int arg_webViewId = args[0]! as int;
-          final DownloadRequestMessage arg_request =
-              args[1]! as DownloadRequestMessage;
+          final DownloadRequestMessage arg_request = args[1]! as DownloadRequestMessage;
           try {
             api.onDownloadStart(arg_webViewId, arg_request);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPermissionRequest$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onPermissionRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           final List<Object?> args = message! as List<Object?>;
           final int arg_webViewId = args[0]! as int;
-          final PermissionRequestMessage arg_request =
-              args[1]! as PermissionRequestMessage;
+          final PermissionRequestMessage arg_request = args[1]! as PermissionRequestMessage;
           try {
-            final PermissionDecisionMessage output = await api
-                .onPermissionRequest(arg_webViewId, arg_request);
+            final PermissionDecisionMessage output = await api.onPermissionRequest(arg_webViewId, arg_request);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJsDialog$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJsDialog$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           final List<Object?> args = message! as List<Object?>;
           final int arg_webViewId = args[0]! as int;
-          final JsDialogRequestMessage arg_request =
-              args[1]! as JsDialogRequestMessage;
+          final JsDialogRequestMessage arg_request = args[1]! as JsDialogRequestMessage;
           try {
-            final JsDialogResultMessage output = await api.onJsDialog(
-              arg_webViewId,
-              arg_request,
-            );
+            final JsDialogResultMessage output = await api.onJsDialog(arg_webViewId, arg_request);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInterceptRequest$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInterceptRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           final List<Object?> args = message! as List<Object?>;
           final int arg_webViewId = args[0]! as int;
-          final InterceptRequestMessage arg_request =
-              args[1]! as InterceptRequestMessage;
+          final InterceptRequestMessage arg_request = args[1]! as InterceptRequestMessage;
           try {
-            final InterceptResponseMessage? output = await api
-                .onInterceptRequest(arg_webViewId, arg_request);
+            final InterceptResponseMessage? output = await api.onInterceptRequest(arg_webViewId, arg_request);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptHandlerCall$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJavaScriptHandlerCall$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -3111,28 +2897,20 @@ abstract class AdvancedWebViewFlutterApi {
           final String arg_handlerName = args[1]! as String;
           final String arg_argsJson = args[2]! as String;
           try {
-            final String output = await api.onJavaScriptHandlerCall(
-              arg_webViewId,
-              arg_handlerName,
-              arg_argsJson,
-            );
+            final String output = await api.onJavaScriptHandlerCall(arg_webViewId, arg_handlerName, arg_argsJson);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onNewWindowRequest$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onNewWindowRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -3145,20 +2923,16 @@ abstract class AdvancedWebViewFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInAppBrowserClosed$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInAppBrowserClosed$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -3170,10 +2944,8 @@ abstract class AdvancedWebViewFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
