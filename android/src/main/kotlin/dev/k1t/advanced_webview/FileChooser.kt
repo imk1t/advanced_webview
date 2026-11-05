@@ -17,6 +17,7 @@ import io.flutter.plugin.common.PluginRegistry
 class FileChooser : PluginRegistry.ActivityResultListener {
     private var binding: ActivityPluginBinding? = null
     private var pending: ValueCallback<Array<Uri>>? = null
+    private var pendingHost: Activity? = null
 
     fun attach(binding: ActivityPluginBinding) {
         this.binding = binding
@@ -29,14 +30,19 @@ class FileChooser : PluginRegistry.ActivityResultListener {
         cancelPending()
     }
 
-    /** Returns false, without touching [callback], when no picker can be shown. */
-    fun show(callback: ValueCallback<Array<Uri>>, params: FileChooserParams): Boolean {
-        val activity = binding?.activity ?: return false
+    /**
+     * Returns false, without touching [callback], when no picker can be shown. The picker starts from
+     * [host] (for example the in-app browser Activity, so it is not hidden behind it) or, when `null`,
+     * from the Flutter Activity. A [host] must forward its results to [onActivityResult].
+     */
+    fun show(callback: ValueCallback<Array<Uri>>, params: FileChooserParams, host: Activity? = null): Boolean {
+        val activity = host ?: binding?.activity ?: return false
         // The WebView needs an answer for every request, so a new request cancels the old one.
         cancelPending()
         return try {
             activity.startActivityForResult(params.createIntent(), REQUEST_CODE)
             pending = callback
+            pendingHost = host
             true
         } catch (e: ActivityNotFoundException) {
             false
@@ -47,15 +53,22 @@ class FileChooser : PluginRegistry.ActivityResultListener {
         if (requestCode != REQUEST_CODE) return false
         val callback = pending ?: return true
         pending = null
+        pendingHost = null
         // A cancelled picker answers null, which the WebView treats as "no file chosen".
         val uris = if (resultCode == Activity.RESULT_OK) FileChooserParams.parseResult(resultCode, data) else null
         callback.onReceiveValue(uris)
         return true
     }
 
+    /** Answers a request shown from [host] with "no file chosen" because [host] is going away. */
+    fun release(host: Activity) {
+        if (pendingHost === host) cancelPending()
+    }
+
     private fun cancelPending() {
         pending?.onReceiveValue(null)
         pending = null
+        pendingHost = null
     }
 
     private companion object {

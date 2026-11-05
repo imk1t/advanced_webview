@@ -47,8 +47,8 @@ await browser.close();
 ## Differences
 
 - Android shows a dedicated `Activity`. The back button goes back in the page first and closes the
-  browser when there is nothing to go back to. Permission prompts and file choosers are handled by
-  the main Activity, so they may appear behind the browser on some devices.
+  browser when there is nothing to go back to. Permission prompts and file choosers are shown over
+  the browser.
 - iOS presents a `UINavigationController` modally. The back, forward and reload buttons are in a
   bottom toolbar, and the close button is on the left of the navigation bar.
 - Cookies are shared with other WebViews on Android. On iOS, set `WebViewSettings.incognito` to

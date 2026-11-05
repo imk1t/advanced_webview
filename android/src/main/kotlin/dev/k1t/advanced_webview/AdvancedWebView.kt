@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.content.MutableContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -152,6 +153,28 @@ class AdvancedWebView(
         // A re-created platform view reuses this WebView; detach it from the
         // previous container so it can be added to the new one.
         (container.parent as? ViewGroup)?.removeView(container)
+    }
+
+    // Dialogs started by the page (file picker, permission prompts) must appear over the Activity the
+    // WebView is shown in. The in-app browser is a separate Activity that covers the Flutter one.
+    private fun browserActivity(): InAppBrowserActivity? {
+        var current: Context? = contextWrapper.baseContext
+        while (current is ContextWrapper && current !is Activity) current = current.baseContext
+        return current as? InAppBrowserActivity
+    }
+
+    /** Result of a file picker started from the in-app browser Activity. */
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean =
+        fileChooser.onActivityResult(requestCode, resultCode, data)
+
+    /** Result of a permission dialog shown over the in-app browser Activity. */
+    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray): Boolean =
+        permissionRequester.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+    /** Answers pending page dialogs that [host] showed, because it is going away. */
+    fun releaseHost(host: Activity) {
+        fileChooser.release(host)
+        permissionRequester.release(host)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -599,7 +622,7 @@ class AdvancedWebView(
             webView: WebView,
             filePathCallback: ValueCallback<Array<Uri>>,
             fileChooserParams: FileChooserParams,
-        ): Boolean = fileChooser.show(filePathCallback, fileChooserParams)
+        ): Boolean = fileChooser.show(filePathCallback, fileChooserParams, browserActivity())
 
         override fun onPermissionRequest(request: PermissionRequest) {
             // Resources without a Dart equivalent (protected media, MIDI) are never granted.
@@ -624,7 +647,7 @@ class AdvancedWebView(
                     return@askDart
                 }
                 // The page may only use what the user also allowed the app to use.
-                permissionRequester.request(mapped.map { it.third }) { held ->
+                permissionRequester.request(mapped.map { it.third }, browserActivity()) { held ->
                     val granted = mapped.filter { it.third in held }.map { it.first }
                     if (granted.size == mapped.size) request.grant(granted.toTypedArray()) else request.deny()
                 }
@@ -641,7 +664,10 @@ class AdvancedWebView(
                     callback.invoke(origin, false, false)
                     return@askDart
                 }
-                permissionRequester.request(listOf(Manifest.permission.ACCESS_FINE_LOCATION)) { held ->
+                permissionRequester.request(
+                    listOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    browserActivity(),
+                ) { held ->
                     callback.invoke(origin, Manifest.permission.ACCESS_FINE_LOCATION in held, false)
                 }
             }
