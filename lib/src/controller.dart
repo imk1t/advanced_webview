@@ -17,6 +17,7 @@ import 'platform/messages.g.dart';
 import 'security.dart';
 import 'settings.dart';
 import 'user_script.dart';
+import 'website_data.dart';
 
 /// Controls one native WebView.
 ///
@@ -426,6 +427,38 @@ class AdvancedWebViewController {
   /// Android: `CookieManager.removeAllCookies(ValueCallback)`.
   /// iOS: `WKHTTPCookieStore.allCookies()` and `deleteCookie(_:)` for each cookie.
   Future<void> clearCookies() => _call(() => _hostApi.clearCookies(webViewId));
+
+  /// Removes website data of the given [types] (all of them by default).
+  /// Cookies are not included; use [clearCookies].
+  ///
+  /// The data is shared, not per controller: it is cleared for every WebView
+  /// of the app on Android, and for every WebView that uses the same data store
+  /// on iOS (the default one, unless [IOSWebViewSettings.incognito] is set).
+  ///
+  /// Android has no way to clear `localStorage` and IndexedDB separately, so
+  /// selecting [WebsiteDataType.localStorage] or [WebsiteDataType.indexedDb]
+  /// clears all DOM storage of the app (including WebSQL and the Cache API).
+  /// iOS clears exactly the selected types.
+  ///
+  /// Android: `WebView.clearCache(true)` and `WebStorage.deleteAllData()`.
+  /// iOS: `WKWebsiteDataStore.removeData(ofTypes:modifiedSince:)`.
+  Future<void> clearWebsiteData({
+    Set<WebsiteDataType> types = const {
+      WebsiteDataType.cache,
+      WebsiteDataType.localStorage,
+      WebsiteDataType.indexedDb,
+    },
+  }) => _call(
+    () => _hostApi.clearWebsiteData(webViewId, [
+      for (final type in WebsiteDataType.values)
+        if (types.contains(type))
+          switch (type) {
+            WebsiteDataType.cache => WebsiteDataTypeMessage.cache,
+            WebsiteDataType.localStorage => WebsiteDataTypeMessage.localStorage,
+            WebsiteDataType.indexedDb => WebsiteDataTypeMessage.indexedDb,
+          },
+    ]),
+  );
 
   /// Destroys the native WebView. The controller cannot be used afterwards.
   Future<void> dispose() async {

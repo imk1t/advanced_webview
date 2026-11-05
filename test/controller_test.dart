@@ -530,6 +530,20 @@ void main() {
       );
     });
 
+    test('clears website data, everything by default', () async {
+      final controller = createController();
+
+      await controller.clearWebsiteData();
+      await controller.clearWebsiteData(types: {WebsiteDataType.indexedDb});
+      await controller.clearWebsiteData(types: {});
+
+      expect(hostApi.clearedWebsiteData, [
+        WebsiteDataTypeMessage.values,
+        [WebsiteDataTypeMessage.indexedDb],
+        isEmpty,
+      ]);
+    });
+
     test('session cookies have no expiry', () async {
       final controller = createController();
       await controller.setCookie(

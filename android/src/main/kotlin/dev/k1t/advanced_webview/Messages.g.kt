@@ -320,6 +320,18 @@ enum class JsDialogTypeMessage(val raw: Int) {
   }
 }
 
+enum class WebsiteDataTypeMessage(val raw: Int) {
+  CACHE(0),
+  LOCAL_STORAGE(1),
+  INDEXED_DB(2);
+
+  companion object {
+    fun ofRaw(raw: Int): WebsiteDataTypeMessage? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class WebViewSettingsMessage (
   val javaScriptEnabled: Boolean,
@@ -1417,86 +1429,91 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         }
       }
       139.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          WebViewSettingsMessage.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          WebsiteDataTypeMessage.ofRaw(it.toInt())
         }
       }
       140.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ConsoleMessageMessage.fromList(it)
+          WebViewSettingsMessage.fromList(it)
         }
       }
       141.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UserScriptMessage.fromList(it)
+          ConsoleMessageMessage.fromList(it)
         }
       }
       142.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CreationParamsMessage.fromList(it)
+          UserScriptMessage.fromList(it)
         }
       }
       143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          NavigationRequestMessage.fromList(it)
+          CreationParamsMessage.fromList(it)
         }
       }
       144.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          WebResourceErrorMessage.fromList(it)
+          NavigationRequestMessage.fromList(it)
         }
       }
       145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SslErrorMessage.fromList(it)
+          WebResourceErrorMessage.fromList(it)
         }
       }
       146.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthRequestMessage.fromList(it)
+          SslErrorMessage.fromList(it)
         }
       }
       147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthCredentialsMessage.fromList(it)
+          HttpAuthRequestMessage.fromList(it)
         }
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DownloadRequestMessage.fromList(it)
+          HttpAuthCredentialsMessage.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PermissionRequestMessage.fromList(it)
+          DownloadRequestMessage.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogRequestMessage.fromList(it)
+          PermissionRequestMessage.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogResultMessage.fromList(it)
+          JsDialogRequestMessage.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          FindResultMessage.fromList(it)
+          JsDialogResultMessage.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ScrollPositionMessage.fromList(it)
+          FindResultMessage.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CookieMessage.fromList(it)
+          ScrollPositionMessage.fromList(it)
         }
       }
       155.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CookieMessage.fromList(it)
+        }
+      }
+      156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           InAppBrowserParamsMessage.fromList(it)
         }
@@ -1546,72 +1563,76 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(138)
         writeValue(stream, value.raw.toLong())
       }
-      is WebViewSettingsMessage -> {
+      is WebsiteDataTypeMessage -> {
         stream.write(139)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is ConsoleMessageMessage -> {
+      is WebViewSettingsMessage -> {
         stream.write(140)
         writeValue(stream, value.toList())
       }
-      is UserScriptMessage -> {
+      is ConsoleMessageMessage -> {
         stream.write(141)
         writeValue(stream, value.toList())
       }
-      is CreationParamsMessage -> {
+      is UserScriptMessage -> {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is NavigationRequestMessage -> {
+      is CreationParamsMessage -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
-      is WebResourceErrorMessage -> {
+      is NavigationRequestMessage -> {
         stream.write(144)
         writeValue(stream, value.toList())
       }
-      is SslErrorMessage -> {
+      is WebResourceErrorMessage -> {
         stream.write(145)
         writeValue(stream, value.toList())
       }
-      is HttpAuthRequestMessage -> {
+      is SslErrorMessage -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
-      is HttpAuthCredentialsMessage -> {
+      is HttpAuthRequestMessage -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is DownloadRequestMessage -> {
+      is HttpAuthCredentialsMessage -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is PermissionRequestMessage -> {
+      is DownloadRequestMessage -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is JsDialogRequestMessage -> {
+      is PermissionRequestMessage -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is JsDialogResultMessage -> {
+      is JsDialogRequestMessage -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is FindResultMessage -> {
+      is JsDialogResultMessage -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is ScrollPositionMessage -> {
+      is FindResultMessage -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is ScrollPositionMessage -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is InAppBrowserParamsMessage -> {
+      is CookieMessage -> {
         stream.write(155)
+        writeValue(stream, value.toList())
+      }
+      is InAppBrowserParamsMessage -> {
+        stream.write(156)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1674,6 +1695,11 @@ interface AdvancedWebViewHostApi {
   /** Returns the cookies the WebView would send to `url`. */
   suspend fun getCookies(webViewId: Long, url: String): List<CookieMessage>
   suspend fun clearCookies(webViewId: Long)
+  /**
+   * Removes the given kinds of website data. Cookies are not included; see
+   * `clearCookies`.
+   */
+  suspend fun clearWebsiteData(webViewId: Long, types: List<WebsiteDataTypeMessage>)
   /** Registers a script for pages loaded from now on. */
   fun addUserScript(webViewId: Long, script: UserScriptMessage)
   fun removeAllUserScripts(webViewId: Long)
@@ -2172,6 +2198,27 @@ interface AdvancedWebViewHostApi {
             CoroutineScope(Dispatchers.Main).launch {
               val wrapped: List<Any?> = try {
                 api.clearCookies(webViewIdArg)
+                listOf(null)
+              } catch (exception: Throwable) {
+                MessagesPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearWebsiteData$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val typesArg = args[1] as List<WebsiteDataTypeMessage>
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                api.clearWebsiteData(webViewIdArg, typesArg)
                 listOf(null)
               } catch (exception: Throwable) {
                 MessagesPigeonUtils.wrapError(exception)

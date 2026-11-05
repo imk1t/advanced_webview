@@ -35,6 +35,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
+import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -397,6 +398,17 @@ class AdvancedWebView(
                 isSecure = false,
                 isHttpOnly = false,
             )
+        }
+    }
+
+    /**
+     * Android cannot clear localStorage and IndexedDB separately: either one clears all DOM storage
+     * of the app, like [WebStorage.deleteAllData].
+     */
+    fun clearWebsiteData(types: List<WebsiteDataTypeMessage>) {
+        if (WebsiteDataTypeMessage.CACHE in types) webView.clearCache(true)
+        if (WebsiteDataTypeMessage.LOCAL_STORAGE in types || WebsiteDataTypeMessage.INDEXED_DB in types) {
+            WebStorage.getInstance().deleteAllData()
         }
     }
 

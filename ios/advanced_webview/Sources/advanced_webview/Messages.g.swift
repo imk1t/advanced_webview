@@ -247,6 +247,12 @@ enum JsDialogTypeMessage: Int, CaseIterable {
   case prompt = 2
 }
 
+enum WebsiteDataTypeMessage: Int, CaseIterable {
+  case cache = 0
+  case localStorage = 1
+  case indexedDb = 2
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   var javaScriptEnabled: Bool
@@ -1351,38 +1357,44 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
       }
       return nil
     case 139:
-      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return WebsiteDataTypeMessage(rawValue: enumResultAsInt)
+      }
+      return nil
     case 140:
-      return ConsoleMessageMessage.fromList(self.readValue() as! [Any?])
+      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
     case 141:
-      return UserScriptMessage.fromList(self.readValue() as! [Any?])
+      return ConsoleMessageMessage.fromList(self.readValue() as! [Any?])
     case 142:
-      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
+      return UserScriptMessage.fromList(self.readValue() as! [Any?])
     case 143:
-      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
+      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
     case 144:
-      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
     case 145:
-      return SslErrorMessage.fromList(self.readValue() as! [Any?])
+      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
     case 146:
-      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
+      return SslErrorMessage.fromList(self.readValue() as! [Any?])
     case 147:
-      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
     case 148:
-      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
     case 149:
-      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
+      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
     case 150:
-      return JsDialogRequestMessage.fromList(self.readValue() as! [Any?])
+      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
     case 151:
-      return JsDialogResultMessage.fromList(self.readValue() as! [Any?])
+      return JsDialogRequestMessage.fromList(self.readValue() as! [Any?])
     case 152:
-      return FindResultMessage.fromList(self.readValue() as! [Any?])
+      return JsDialogResultMessage.fromList(self.readValue() as! [Any?])
     case 153:
-      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+      return FindResultMessage.fromList(self.readValue() as! [Any?])
     case 154:
-      return CookieMessage.fromList(self.readValue() as! [Any?])
+      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
     case 155:
+      return CookieMessage.fromList(self.readValue() as! [Any?])
+    case 156:
       return InAppBrowserParamsMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1422,56 +1434,59 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? JsDialogTypeMessage {
       super.writeByte(138)
       super.writeValue(value.rawValue)
-    } else if let value = value as? WebViewSettingsMessage {
+    } else if let value = value as? WebsiteDataTypeMessage {
       super.writeByte(139)
-      super.writeValue(value.toList())
-    } else if let value = value as? ConsoleMessageMessage {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? WebViewSettingsMessage {
       super.writeByte(140)
       super.writeValue(value.toList())
-    } else if let value = value as? UserScriptMessage {
+    } else if let value = value as? ConsoleMessageMessage {
       super.writeByte(141)
       super.writeValue(value.toList())
-    } else if let value = value as? CreationParamsMessage {
+    } else if let value = value as? UserScriptMessage {
       super.writeByte(142)
       super.writeValue(value.toList())
-    } else if let value = value as? NavigationRequestMessage {
+    } else if let value = value as? CreationParamsMessage {
       super.writeByte(143)
       super.writeValue(value.toList())
-    } else if let value = value as? WebResourceErrorMessage {
+    } else if let value = value as? NavigationRequestMessage {
       super.writeByte(144)
       super.writeValue(value.toList())
-    } else if let value = value as? SslErrorMessage {
+    } else if let value = value as? WebResourceErrorMessage {
       super.writeByte(145)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthRequestMessage {
+    } else if let value = value as? SslErrorMessage {
       super.writeByte(146)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthCredentialsMessage {
+    } else if let value = value as? HttpAuthRequestMessage {
       super.writeByte(147)
       super.writeValue(value.toList())
-    } else if let value = value as? DownloadRequestMessage {
+    } else if let value = value as? HttpAuthCredentialsMessage {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? PermissionRequestMessage {
+    } else if let value = value as? DownloadRequestMessage {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? JsDialogRequestMessage {
+    } else if let value = value as? PermissionRequestMessage {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? JsDialogResultMessage {
+    } else if let value = value as? JsDialogRequestMessage {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? FindResultMessage {
+    } else if let value = value as? JsDialogResultMessage {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? ScrollPositionMessage {
+    } else if let value = value as? FindResultMessage {
       super.writeByte(153)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? ScrollPositionMessage {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? InAppBrowserParamsMessage {
+    } else if let value = value as? CookieMessage {
       super.writeByte(155)
+      super.writeValue(value.toList())
+    } else if let value = value as? InAppBrowserParamsMessage {
+      super.writeByte(156)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1538,6 +1553,9 @@ protocol AdvancedWebViewHostApi {
   /// Returns the cookies the WebView would send to `url`.
   func getCookies(webViewId: Int64, url: String) async throws -> [CookieMessage]
   func clearCookies(webViewId: Int64) async throws
+  /// Removes the given kinds of website data. Cookies are not included; see
+  /// `clearCookies`.
+  func clearWebsiteData(webViewId: Int64, types: [WebsiteDataTypeMessage]) async throws
   /// Registers a script for pages loaded from now on.
   func addUserScript(webViewId: Int64, script: UserScriptMessage) throws
   func removeAllUserScripts(webViewId: Int64) throws
@@ -1989,6 +2007,26 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       clearCookiesChannel.setMessageHandler(nil)
+    }
+    /// Removes the given kinds of website data. Cookies are not included; see
+    /// `clearCookies`.
+    let clearWebsiteDataChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearWebsiteData\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      clearWebsiteDataChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let typesArg = args[1] as! [WebsiteDataTypeMessage]
+        Task { @MainActor in
+          do {
+            try await api.clearWebsiteData(webViewId: webViewIdArg, types: typesArg)
+            reply(wrapResult(nil))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      clearWebsiteDataChannel.setMessageHandler(nil)
     }
     /// Registers a script for pages loaded from now on.
     let addUserScriptChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.addUserScript\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)

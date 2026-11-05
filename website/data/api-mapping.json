@@ -78,6 +78,7 @@
       "WebViewCompat": "https://developer.android.com/reference/androidx/webkit/WebViewCompat",
       "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler",
       "PermissionRequest": "https://developer.android.com/reference/android/webkit/PermissionRequest",
+      "WebStorage": "https://developer.android.com/reference/android/webkit/WebStorage",
       "JsResult": "https://developer.android.com/reference/android/webkit/JsResult",
       "JsPromptResult": "https://developer.android.com/reference/android/webkit/JsPromptResult",
       "GeolocationPermissions": "https://developer.android.com/reference/android/webkit/GeolocationPermissions",
@@ -1854,6 +1855,46 @@
       "ios": {
         "status": "supported",
         "apis": ["WKHTTPCookieStore.allCookies()", "WKHTTPCookieStore.deleteCookie(_:)"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.clearWebsiteData",
+      "group": "cookies",
+      "summary": {
+        "en": "Clears the HTTP cache, local and session storage and IndexedDB. Cookies are not included.",
+        "ja": "HTTP キャッシュ、localStorage / sessionStorage、IndexedDB を削除します。Cookie は含みません。"
+      },
+      "android": {
+        "status": "partial",
+        "apis": ["WebView.clearCache(boolean)", "WebStorage.deleteAllData()"],
+        "note": {
+          "en": "localStorage and IndexedDB cannot be cleared separately: either one clears all DOM storage of the app.",
+          "ja": "localStorage と IndexedDB は個別に削除できず、どちらを選んでもアプリの DOM ストレージをすべて削除します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebsiteDataStore.removeData(ofTypes:modifiedSince:)"]
+      }
+    },
+    {
+      "dart": "WebsiteDataType",
+      "group": "cookies",
+      "summary": {
+        "en": "The kind of website data to clear: cache, localStorage or IndexedDB.",
+        "ja": "削除するデータの種類（キャッシュ、localStorage、IndexedDB）です。"
+      },
+      "android": {
+        "status": "partial",
+        "apis": ["WebStorage.deleteAllData()"],
+        "note": {
+          "en": "localStorage and indexedDb both map to WebStorage.deleteAllData(), which clears all DOM storage.",
+          "ja": "localStorage と indexedDb はどちらも WebStorage.deleteAllData() に対応し、DOM ストレージをすべて削除します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebsiteDataStore.removeData(ofTypes:modifiedSince:)"]
       }
     },
     {

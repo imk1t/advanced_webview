@@ -301,6 +301,25 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     }
   }
 
+  /// Removes the selected kinds of data from the data store this WebView uses.
+  @MainActor
+  func clearWebsiteData(_ types: [WebsiteDataTypeMessage]) async {
+    var wanted = Set<String>()
+    for type in types {
+      switch type {
+      case .cache:
+        wanted.formUnion([WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache])
+      case .localStorage:
+        wanted.formUnion([WKWebsiteDataTypeLocalStorage, WKWebsiteDataTypeSessionStorage])
+      case .indexedDb:
+        wanted.insert(WKWebsiteDataTypeIndexedDBDatabases)
+      }
+    }
+    guard !wanted.isEmpty else { return }
+    await webView.configuration.websiteDataStore.removeData(
+      ofTypes: wanted, modifiedSince: .distantPast)
+  }
+
   func destroy() {
     guard !isDestroyed else { return }
     isDestroyed = true
