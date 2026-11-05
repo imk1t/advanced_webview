@@ -34,6 +34,8 @@ void main() {
     NewWindowCallback? onNewWindow,
     PermissionRequestCallback? onPermissionRequest,
     JsDialogCallback? onJsDialog,
+    List<String> interceptSchemes = const [],
+    InterceptRequestCallback? onInterceptRequest,
     DownloadStartCallback? onDownloadStart,
     SslErrorCallback? onSslError,
     HttpAuthCallback? onHttpAuthRequest,
@@ -55,6 +57,8 @@ void main() {
       onNewWindow: onNewWindow,
       onPermissionRequest: onPermissionRequest,
       onJsDialog: onJsDialog,
+      interceptSchemes: interceptSchemes,
+      onInterceptRequest: onInterceptRequest,
       onDownloadStart: onDownloadStart,
       onSslError: onSslError,
       onHttpAuthRequest: onHttpAuthRequest,
@@ -832,6 +836,95 @@ void main() {
         await dispatcher.onPermissionRequest(disposed.webViewId, request),
         PermissionDecisionMessage.deny,
       );
+    });
+  });
+
+  group('request interception', () {
+    InterceptRequestMessage request() => InterceptRequestMessage(
+      url: 'app://index.html',
+      method: 'GET',
+      headers: {'Accept': '*/*'},
+      isMainFrame: true,
+    );
+
+    test('registers the lower-cased schemes at creation', () async {
+      final without = createController();
+      final with_ = createController(
+        interceptSchemes: ['App', 'app', 'asset'],
+        onInterceptRequest: (_) => null,
+      );
+      await without.ready;
+      await with_.ready;
+
+      expect(hostApi.created[without.webViewId]!.interceptSchemes, isEmpty);
+      expect(hostApi.created[with_.webViewId]!.interceptSchemes, [
+        'app',
+        'asset',
+      ]);
+      expect(with_.interceptSchemes, ['app', 'asset']);
+    });
+
+    test('needs the callback and the schemes together', () {
+      expect(
+        () => createController(interceptSchemes: ['app']),
+        throwsArgumentError,
+      );
+      expect(
+        () => createController(onInterceptRequest: (_) => null),
+        throwsArgumentError,
+      );
+      expect(
+        () => createController(
+          interceptSchemes: ['not a scheme'],
+          onInterceptRequest: (_) => null,
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test('maps the request and the response', () async {
+      InterceptedRequest? seen;
+      final controller = createController(
+        interceptSchemes: ['app'],
+        onInterceptRequest: (r) {
+          seen = r;
+          return InterceptResponse.text(
+            '<p>hi</p>',
+            statusCode: 201,
+            headers: {'X-A': 'b'},
+          );
+        },
+      );
+
+      final result = await dispatcher.onInterceptRequest(
+        controller.webViewId,
+        request(),
+      );
+
+      expect(seen!.url, 'app://index.html');
+      expect(seen!.method, 'GET');
+      expect(seen!.headers, {'Accept': '*/*'});
+      expect(seen!.isMainFrame, true);
+      expect(result!.statusCode, 201);
+      expect(result.mimeType, 'text/html; charset=utf-8');
+      expect(result.headers, {'X-A': 'b'});
+      expect(utf8.decode(result.body), '<p>hi</p>');
+    });
+
+    test('null lets the request through', () async {
+      final controller = createController(
+        interceptSchemes: ['app'],
+        onInterceptRequest: (_) async => null,
+      );
+
+      expect(
+        await dispatcher.onInterceptRequest(controller.webViewId, request()),
+        isNull,
+      );
+    });
+
+    test('an unknown WebView gets no response', () async {
+      expect(await dispatcher.onInterceptRequest(9999, request()), isNull);
     });
   });
 

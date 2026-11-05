@@ -28,6 +28,9 @@ abstract interface class WebViewEventListener {
     PermissionRequestMessage request,
   );
   Future<JsDialogResultMessage> onJsDialog(JsDialogRequestMessage request);
+  Future<InterceptResponseMessage?> onInterceptRequest(
+    InterceptRequestMessage request,
+  );
   Future<String> onJavaScriptHandlerCall(String handlerName, String argsJson);
 }
 
@@ -139,6 +142,12 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
     if (listener == null) return PermissionDecisionMessage.deny;
     return listener.onPermissionRequest(request);
   }
+
+  @override
+  Future<InterceptResponseMessage?> onInterceptRequest(
+    int webViewId,
+    InterceptRequestMessage request,
+  ) async => _listeners[webViewId]?.onInterceptRequest(request);
 
   @override
   Future<JsDialogResultMessage> onJsDialog(

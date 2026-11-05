@@ -231,6 +231,36 @@ void main() {
     expect(await harness.controller.title(), 'POST a=1&b=2');
   });
 
+  testWidgets('custom scheme requests are answered by the app', (tester) async {
+    final requests = <String>[];
+    final harness = _Harness(
+      interceptSchemes: ['app'],
+      onInterceptRequest: (request) {
+        requests.add(request.url);
+        if (request.url.endsWith('/data.txt')) {
+          return InterceptResponse.text('from dart', mimeType: 'text/plain');
+        }
+        return InterceptResponse.text(
+          '<html><body><script>'
+          'fetch("app://host/data.txt").then(r => r.text())'
+          '.then(t => document.title = t);'
+          '</script></body></html>',
+        );
+      },
+    );
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.controller.loadUrl('app://host/index.html');
+    await _pumpUntilAsync(
+      tester,
+      () async => await harness.controller.title() == 'from dart',
+    );
+
+    expect(await harness.controller.title(), 'from dart');
+    expect(requests, ['app://host/index.html', 'app://host/data.txt']);
+  });
+
   testWidgets('console output is reported with its level', (tester) async {
     final messages = <WebViewConsoleMessage>[];
     final harness = _Harness(onConsoleMessage: messages.add);
@@ -694,6 +724,8 @@ class _Harness {
     ConsoleMessageCallback? onConsoleMessage,
     JsDialogCallback? onJsDialog,
     HttpErrorCallback? onHttpError,
+    List<String> interceptSchemes = const [],
+    InterceptRequestCallback? onInterceptRequest,
     WebViewSettings settings = const WebViewSettings(),
   }) {
     controller = AdvancedWebViewController(
@@ -707,6 +739,8 @@ class _Harness {
       onConsoleMessage: onConsoleMessage,
       onJsDialog: onJsDialog,
       onHttpError: onHttpError,
+      interceptSchemes: interceptSchemes,
+      onInterceptRequest: onInterceptRequest,
       onPageStarted: startedUrls.add,
       onPageFinished: (url) {
         _pageFinished?.complete();

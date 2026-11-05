@@ -9,6 +9,7 @@ import 'cookie.dart';
 import 'download.dart';
 import 'find.dart';
 import 'hit_test.dart';
+import 'intercept.dart';
 import 'js_dialog.dart';
 import 'load_request.dart';
 import 'navigation.dart';
@@ -32,6 +33,8 @@ class AdvancedWebViewController {
     Map<String, JavaScriptHandler> javaScriptHandlers = const {},
     String javaScriptHandlerObjectName = 'advanced_webview',
     List<UserScript> userScripts = const [],
+    List<String> interceptSchemes = const [],
+    this.onInterceptRequest,
     this.onPageStarted,
     this.onPageFinished,
     this.onProgress,
@@ -56,6 +59,7 @@ class AdvancedWebViewController {
        _javaScriptHandlers = Map.unmodifiable(javaScriptHandlers),
        _hostApi = hostApi ?? AdvancedWebViewHostApi(),
        _dispatcher = dispatcher ?? WebViewEventDispatcher.instance {
+    final schemes = _normalizeSchemes(interceptSchemes, onInterceptRequest);
     if (!_identifier.hasMatch(javaScriptHandlerObjectName)) {
       throw ArgumentError.value(
         javaScriptHandlerObjectName,
@@ -63,6 +67,7 @@ class AdvancedWebViewController {
         'must be a valid JavaScript identifier',
       );
     }
+    _interceptSchemes = schemes;
     _dispatcher.register(webViewId, _EventListener(this));
     _created = _hostApi.create(
       CreationParamsMessage(
@@ -82,12 +87,37 @@ class AdvancedWebViewController {
         hasConsoleMessageDelegate: onConsoleMessage != null,
         hasJsDialogDelegate: onJsDialog != null,
         hasHttpErrorDelegate: onHttpError != null,
+        interceptSchemes: schemes,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
   }
 
   static int _nextWebViewId = 0;
+
+  static final _scheme = RegExp(r'^[a-z][a-z0-9+.-]*$');
+
+  static List<String> _normalizeSchemes(
+    List<String> schemes,
+    InterceptRequestCallback? callback,
+  ) {
+    if ((callback == null) != schemes.isEmpty) {
+      throw ArgumentError(
+        'onInterceptRequest and interceptSchemes must be given together',
+      );
+    }
+    final result = {for (final scheme in schemes) scheme.toLowerCase()};
+    for (final scheme in result) {
+      if (!_scheme.hasMatch(scheme)) {
+        throw ArgumentError.value(
+          scheme,
+          'interceptSchemes',
+          'must be a valid URL scheme',
+        );
+      }
+    }
+    return result.toList();
+  }
 
   static final _identifier = RegExp(r'^[A-Za-z_$][A-Za-z0-9_$]*$');
 
@@ -254,6 +284,33 @@ class AdvancedWebViewController {
   /// `runJavaScriptConfirmPanelWithMessage` and
   /// `runJavaScriptTextInputPanelWithPrompt`.
   final JsDialogCallback? onJsDialog;
+
+  /// The URL schemes whose requests are passed to [onInterceptRequest], for
+  /// example `['app']` to serve `app://index.html` from Dart. Matched
+  /// case-insensitively; give it together with [onInterceptRequest].
+  ///
+  /// iOS can only intercept custom schemes, because WebKit does not let apps
+  /// handle `http`, `https`, `file`, `data` and other built-in schemes; those
+  /// entries are ignored there. Android intercepts any scheme, including
+  /// `http` and `https`.
+  List<String> get interceptSchemes => List.unmodifiable(_interceptSchemes);
+  late final List<String> _interceptSchemes;
+
+  /// Called for every request to one of [interceptSchemes], including the
+  /// sub-resources of pages loaded from it. Return an [InterceptResponse] to
+  /// answer the request yourself, or `null` to let it through.
+  ///
+  /// On iOS a custom scheme has no network behind it, so `null` (and an
+  /// error) fails the request with an unsupported-URL error. On Android
+  /// `null` loads the request from the network as usual. Requests are
+  /// answered asynchronously without blocking the UI thread; Android waits at
+  /// most about 10 seconds before letting the request through. Request bodies
+  /// are not available.
+  ///
+  /// Android: `WebViewClient.shouldInterceptRequest`.
+  /// iOS: `WKURLSchemeHandler` registered with
+  /// `WKWebViewConfiguration.setURLSchemeHandler(_:forURLScheme:)`.
+  final InterceptRequestCallback? onInterceptRequest;
 
   /// Completes once the native WebView exists.
   Future<void> get ready => _created;
@@ -707,6 +764,29 @@ class _EventListener implements WebViewEventListener {
       PermissionDecision.grant => PermissionDecisionMessage.grant,
       PermissionDecision.deny => PermissionDecisionMessage.deny,
     };
+  }
+
+  @override
+  Future<InterceptResponseMessage?> onInterceptRequest(
+    InterceptRequestMessage request,
+  ) async {
+    final callback = _controller.onInterceptRequest;
+    if (callback == null) return null;
+    final response = await callback(
+      InterceptedRequest(
+        url: request.url,
+        method: request.method,
+        headers: request.headers,
+        isMainFrame: request.isMainFrame,
+      ),
+    );
+    if (response == null) return null;
+    return InterceptResponseMessage(
+      statusCode: response.statusCode,
+      mimeType: response.mimeType,
+      headers: response.headers,
+      body: response.body,
+    );
   }
 
   @override

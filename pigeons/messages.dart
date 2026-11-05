@@ -186,6 +186,7 @@ class CreationParamsMessage {
     required this.hasConsoleMessageDelegate,
     required this.hasJsDialogDelegate,
     required this.hasHttpErrorDelegate,
+    required this.interceptSchemes,
     required this.userScripts,
   });
 
@@ -242,6 +243,10 @@ class CreationParamsMessage {
 
   /// When false, HTTP error statuses are never reported to Dart.
   bool hasHttpErrorDelegate;
+
+  /// Lower-case URL schemes whose requests are answered by Dart through
+  /// `onInterceptRequest`. Empty when the app has no intercept callback.
+  List<String> interceptSchemes;
 
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
@@ -366,6 +371,36 @@ class JsDialogResultMessage {
 
   /// Text entered in a `prompt`; null when not accepted or for other types.
   String? text;
+}
+
+class InterceptRequestMessage {
+  InterceptRequestMessage({
+    required this.url,
+    required this.method,
+    required this.headers,
+    required this.isMainFrame,
+  });
+
+  String url;
+  String method;
+  Map<String, String> headers;
+  bool isMainFrame;
+}
+
+class InterceptResponseMessage {
+  InterceptResponseMessage({
+    required this.statusCode,
+    required this.mimeType,
+    required this.headers,
+    required this.body,
+  });
+
+  int statusCode;
+
+  /// May carry a charset parameter, e.g. `text/html; charset=utf-8`.
+  String mimeType;
+  Map<String, String> headers;
+  Uint8List body;
 }
 
 class FindResultMessage {
@@ -629,6 +664,16 @@ abstract class AdvancedWebViewFlutterApi {
   JsDialogResultMessage onJsDialog(
     int webViewId,
     JsDialogRequestMessage request,
+  );
+
+  /// A request to a scheme listed in `interceptSchemes`. Null lets the
+  /// request through (Android) or fails it (iOS, where custom schemes have no
+  /// network fallback). Android blocks a WebView IO thread, not the main
+  /// thread, until this completes.
+  @async
+  InterceptResponseMessage? onInterceptRequest(
+    int webViewId,
+    InterceptRequestMessage request,
   );
 
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded

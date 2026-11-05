@@ -518,6 +518,7 @@ final class RunnerTests: XCTestCase {
     hasConsoleMessageDelegate: Bool = false,
     hasJsDialogDelegate: Bool = false,
     hasHttpErrorDelegate: Bool = false,
+    interceptSchemes: [String] = [],
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
     return CreationParamsMessage(
@@ -537,6 +538,7 @@ final class RunnerTests: XCTestCase {
       hasConsoleMessageDelegate: hasConsoleMessageDelegate,
       hasJsDialogDelegate: hasJsDialogDelegate,
       hasHttpErrorDelegate: hasHttpErrorDelegate,
+      interceptSchemes: interceptSchemes,
       userScripts: userScripts)
   }
 
