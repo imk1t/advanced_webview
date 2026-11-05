@@ -27,6 +27,24 @@ Android has to answer synchronously, so the plugin cancels the navigation, asks 
 re-issues it if it is allowed. The re-issued request is a GET, so the original redirect flow and request metadata may change.
 :::
 
+## Load errors and HTTP errors
+
+`onWebResourceError` reports loads that failed (no connection, bad host, TLS failure). A server that
+answers with a 404 or 503 is not a failed load: the WebView shows the page the server sent. Use
+`onHttpError` to find out about those:
+
+```dart
+final controller = AdvancedWebViewController(
+  onHttpError: (error) {
+    if (error.isMainFrame && error.statusCode >= 500) showRetryBanner(error.url);
+  },
+);
+```
+
+It is called for statuses of 400 and more. Android also reports sub-resources such as images and
+scripts (`isMainFrame` is `false`). iOS reports the main page and iframes only, because WebKit does
+not expose the status of sub-resources.
+
 ## New windows
 
 `window.open` and links with `target="_blank"` ask for a new window. Handle them with

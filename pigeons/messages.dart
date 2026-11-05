@@ -185,6 +185,7 @@ class CreationParamsMessage {
     required this.hasLongPressDelegate,
     required this.hasConsoleMessageDelegate,
     required this.hasJsDialogDelegate,
+    required this.hasHttpErrorDelegate,
     required this.userScripts,
   });
 
@@ -239,6 +240,9 @@ class CreationParamsMessage {
   /// dialog and never round-trip to Dart.
   bool hasJsDialogDelegate;
 
+  /// When false, HTTP error statuses are never reported to Dart.
+  bool hasHttpErrorDelegate;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 }
@@ -251,6 +255,18 @@ class NavigationRequestMessage {
 }
 
 enum NavigationDecisionMessage { navigate, prevent }
+
+class HttpErrorMessage {
+  HttpErrorMessage({
+    required this.url,
+    required this.statusCode,
+    required this.isMainFrame,
+  });
+
+  String url;
+  int statusCode;
+  bool isMainFrame;
+}
 
 class WebResourceErrorMessage {
   WebResourceErrorMessage({
@@ -557,6 +573,9 @@ abstract class AdvancedWebViewFlutterApi {
   void onConsoleMessage(int webViewId, ConsoleMessageMessage message);
 
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
+
+  /// A server answered with a status of 400 or more.
+  void onReceivedHttpError(int webViewId, HttpErrorMessage error);
 
   @async
   NavigationDecisionMessage shouldOverrideUrlLoading(

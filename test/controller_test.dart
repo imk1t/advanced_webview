@@ -29,6 +29,7 @@ void main() {
     LongPressCallback? onLongPress,
     ConsoleMessageCallback? onConsoleMessage,
     WebResourceErrorCallback? onWebResourceError,
+    HttpErrorCallback? onHttpError,
     NavigationRequestCallback? onNavigationRequest,
     NewWindowCallback? onNewWindow,
     PermissionRequestCallback? onPermissionRequest,
@@ -49,6 +50,7 @@ void main() {
       onLongPress: onLongPress,
       onConsoleMessage: onConsoleMessage,
       onWebResourceError: onWebResourceError,
+      onHttpError: onHttpError,
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
       onPermissionRequest: onPermissionRequest,
@@ -797,6 +799,41 @@ void main() {
         await dispatcher.onPermissionRequest(disposed.webViewId, request),
         PermissionDecisionMessage.deny,
       );
+    });
+  });
+
+  group('HTTP errors', () {
+    test('are only delegated when a callback is set', () async {
+      final without = createController();
+      final withCallback = createController(onHttpError: (_) {});
+      await without.ready;
+      await withCallback.ready;
+
+      expect(hostApi.created[without.webViewId]!.hasHttpErrorDelegate, false);
+      expect(
+        hostApi.created[withCallback.webViewId]!.hasHttpErrorDelegate,
+        true,
+      );
+    });
+
+    test('are mapped and routed by webViewId', () async {
+      HttpError? error;
+      final controller = createController(onHttpError: (e) => error = e);
+      final other = createController(onHttpError: (_) => fail('wrong view'));
+      addTearDown(other.dispose);
+
+      dispatcher.onReceivedHttpError(
+        controller.webViewId,
+        HttpErrorMessage(
+          url: 'https://example.com/missing',
+          statusCode: 404,
+          isMainFrame: true,
+        ),
+      );
+
+      expect(error?.statusCode, 404);
+      expect(error?.url, 'https://example.com/missing');
+      expect(error?.isMainFrame, true);
     });
   });
 

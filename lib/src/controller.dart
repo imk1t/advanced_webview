@@ -39,6 +39,7 @@ class AdvancedWebViewController {
     this.onLongPress,
     this.onConsoleMessage,
     this.onWebResourceError,
+    this.onHttpError,
     this.onNavigationRequest,
     this.onNewWindow,
     this.onPermissionRequest,
@@ -79,6 +80,7 @@ class AdvancedWebViewController {
         hasLongPressDelegate: onLongPress != null,
         hasConsoleMessageDelegate: onConsoleMessage != null,
         hasJsDialogDelegate: onJsDialog != null,
+        hasHttpErrorDelegate: onHttpError != null,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
     );
@@ -135,6 +137,22 @@ class AdvancedWebViewController {
   /// `WKScriptMessageHandler`; the source URL and line number are `null`.
   final ConsoleMessageCallback? onConsoleMessage;
   final WebResourceErrorCallback? onWebResourceError;
+
+  /// Called when a server answers with an HTTP status of 400 or more. The
+  /// WebView still shows the page the server sent; [onWebResourceError] is not
+  /// called for these.
+  ///
+  /// Android reports the main page, frames and sub-resources
+  /// (`HttpError.isMainFrame` tells them apart). iOS reports the main page and
+  /// iframes only, because WebKit does not expose the status of sub-resources.
+  /// Only set at construction: leaving it `null` keeps these events off the
+  /// platform channel.
+  ///
+  /// Android: `WebViewClient.onReceivedHttpError(WebView, WebResourceRequest,
+  /// WebResourceResponse)`. iOS:
+  /// `WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)` for
+  /// navigation responses, reading `HTTPURLResponse.statusCode`.
+  final HttpErrorCallback? onHttpError;
 
   /// Called for main-frame navigations started by the page (links, forms,
   /// `window.location`, redirects). Android does not report POST requests.
@@ -514,6 +532,16 @@ class _EventListener implements WebViewEventListener {
           message: message.message,
           sourceUrl: message.sourceUrl,
           lineNumber: message.lineNumber,
+        ),
+      );
+
+  @override
+  void onReceivedHttpError(HttpErrorMessage error) =>
+      _controller.onHttpError?.call(
+        HttpError(
+          url: error.url,
+          statusCode: error.statusCode,
+          isMainFrame: error.isMainFrame,
         ),
       );
 

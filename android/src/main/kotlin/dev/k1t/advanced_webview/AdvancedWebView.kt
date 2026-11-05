@@ -34,6 +34,7 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebStorage
 import android.webkit.WebView
@@ -91,6 +92,7 @@ class AdvancedWebView(
     private val hasHttpAuthDelegate = params.hasHttpAuthDelegate
     private val hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     private val hasJsDialogDelegate = params.hasJsDialogDelegate
+    private val hasHttpErrorDelegate = params.hasHttpErrorDelegate
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
 
@@ -528,6 +530,20 @@ class AdvancedWebView(
                 url = request.url.toString(),
             )
             send { flutterApi.onReceivedError(id, message) }
+        }
+
+        override fun onReceivedHttpError(
+            view: WebView,
+            request: WebResourceRequest,
+            errorResponse: WebResourceResponse,
+        ) {
+            if (!hasHttpErrorDelegate) return
+            val message = HttpErrorMessage(
+                url = request.url.toString(),
+                statusCode = errorResponse.statusCode.toLong(),
+                isMainFrame = request.isForMainFrame,
+            )
+            send { flutterApi.onReceivedHttpError(id, message) }
         }
 
         override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {

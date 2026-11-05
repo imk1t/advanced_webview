@@ -14,6 +14,31 @@ class NavigationRequest {
 
 enum NavigationDecision { navigate, prevent }
 
+/// A server answered a request with an HTTP error status (400 or more).
+///
+/// Unlike a [WebResourceError], the load itself worked: the WebView shows
+/// whatever page the server sent with the error.
+@immutable
+class HttpError {
+  const HttpError({
+    required this.url,
+    required this.statusCode,
+    required this.isMainFrame,
+  });
+
+  final String url;
+
+  /// The HTTP status code, for example 404 or 503.
+  final int statusCode;
+
+  /// Whether the response is for the page itself rather than a frame or (on
+  /// Android) a sub-resource.
+  final bool isMainFrame;
+
+  @override
+  String toString() => 'HttpError($statusCode, $url, mainFrame: $isMainFrame)';
+}
+
 /// A load error reported by the native WebView.
 @immutable
 class WebResourceError {
@@ -40,6 +65,7 @@ typedef TitleChangedCallback = void Function(String? title);
 typedef LongPressCallback = void Function(Offset offset);
 typedef ScrollChangedCallback = void Function(Offset offset);
 typedef WebResourceErrorCallback = void Function(WebResourceError error);
+typedef HttpErrorCallback = void Function(HttpError error);
 typedef NavigationRequestCallback = FutureOr<NavigationDecision> Function(
   NavigationRequest request,
 );

@@ -4,6 +4,7 @@
 // place to pin down behaviour that must match on Android and iOS.
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:advanced_webview/advanced_webview.dart';
 import 'package:flutter/material.dart';
@@ -136,6 +137,38 @@ void main() {
     await harness.controller.clearWebsiteData();
     await harness.loadHtml('<html><body></body></html>');
     expect((await read() as List)[0], isNull);
+  });
+
+  testWidgets('HTTP error statuses of the main page are reported', (
+    tester,
+  ) async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    server.listen((request) {
+      request.response
+        ..statusCode = request.uri.path == '/ok' ? 200 : 404
+        ..headers.contentType = ContentType.html
+        ..write('<html><body>${request.uri.path}</body></html>')
+        ..close();
+    });
+    final base = 'http://127.0.0.1:${server.port}';
+    final errors = <HttpError>[];
+    final harness = _Harness(onHttpError: errors.add);
+    addTearDown(harness.dispose);
+    await harness.show(tester);
+
+    // Android also reports sub-resources (the favicon request 404s here).
+    List<HttpError> mainFrame() => errors.where((e) => e.isMainFrame).toList();
+
+    await harness.controller.loadUrl('$base/ok');
+    await Future<void>.delayed(const Duration(seconds: 2));
+    expect(mainFrame(), isEmpty);
+
+    await harness.controller.loadUrl('$base/missing');
+    await _pumpUntil(tester, () => mainFrame().isNotEmpty);
+
+    expect(mainFrame().single.statusCode, 404);
+    expect(mainFrame().single.url, '$base/missing');
   });
 
   testWidgets('console output is reported with its level', (tester) async {
@@ -600,6 +633,7 @@ class _Harness {
     DownloadStartCallback? onDownloadStart,
     ConsoleMessageCallback? onConsoleMessage,
     JsDialogCallback? onJsDialog,
+    HttpErrorCallback? onHttpError,
   }) {
     controller = AdvancedWebViewController(
       javaScriptChannels: javaScriptChannels,
@@ -610,6 +644,7 @@ class _Harness {
       onDownloadStart: onDownloadStart,
       onConsoleMessage: onConsoleMessage,
       onJsDialog: onJsDialog,
+      onHttpError: onHttpError,
       onPageStarted: startedUrls.add,
       onPageFinished: (url) {
         _pageFinished?.complete();

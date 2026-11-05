@@ -79,6 +79,7 @@
       "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler",
       "PermissionRequest": "https://developer.android.com/reference/android/webkit/PermissionRequest",
       "WebStorage": "https://developer.android.com/reference/android/webkit/WebStorage",
+      "WebResourceResponse": "https://developer.android.com/reference/android/webkit/WebResourceResponse",
       "JsResult": "https://developer.android.com/reference/android/webkit/JsResult",
       "JsPromptResult": "https://developer.android.com/reference/android/webkit/JsPromptResult",
       "GeolocationPermissions": "https://developer.android.com/reference/android/webkit/GeolocationPermissions",
@@ -132,6 +133,7 @@
       "HTTPCookie": "https://developer.apple.com/documentation/foundation/httpcookie",
       "WKUIDelegate": "https://developer.apple.com/documentation/webkit/wkuidelegate",
       "WKFrameInfo": "https://developer.apple.com/documentation/webkit/wkframeinfo",
+      "HTTPURLResponse": "https://developer.apple.com/documentation/foundation/httpurlresponse",
       "WKWindowFeatures": "https://developer.apple.com/documentation/webkit/wkwindowfeatures",
       "UINavigationController": "https://developer.apple.com/documentation/uikit/uinavigationcontroller",
       "UIViewController": "https://developer.apple.com/documentation/uikit/uiviewcontroller",
@@ -1067,6 +1069,51 @@
           "en": "navigate is .allow, prevent is .cancel.",
           "ja": "navigate は .allow、prevent は .cancel です。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onHttpError",
+      "group": "events",
+      "summary": {
+        "en": "A server answered with an HTTP status of 400 or more.",
+        "ja": "サーバーが 400 以上の HTTP ステータスを返しました。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewClient.onReceivedHttpError(WebView, WebResourceRequest, WebResourceResponse)"
+        ],
+        "note": {
+          "en": "Also reports sub-resources (isMainFrame is false).",
+          "ja": "サブリソースも通知します（isMainFrame は false）。"
+        }
+      },
+      "ios": {
+        "status": "partial",
+        "apis": [
+          "WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)",
+          "HTTPURLResponse.statusCode"
+        ],
+        "note": {
+          "en": "Main page and iframes only; WebKit does not expose the status of sub-resources.",
+          "ja": "メインページと iframe のみです。WebKit はサブリソースのステータスを公開しません。"
+        }
+      }
+    },
+    {
+      "dart": "HttpError",
+      "group": "events",
+      "summary": {
+        "en": "The URL, status code and frame of an HTTP error response.",
+        "ja": "HTTP エラー応答の URL、ステータスコード、フレームです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebResourceResponse.getStatusCode()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["HTTPURLResponse.statusCode", "WKNavigationResponse.isForMainFrame"]
       }
     },
     {

@@ -16,6 +16,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasHttpAuthDelegate: Bool
   private let hasConsoleMessageDelegate: Bool
   private let hasJsDialogDelegate: Bool
+  private let hasHttpErrorDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private let hasJavaScriptHandlers: Bool
   private let handlerObjectName: String
@@ -37,6 +38,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.hasHttpAuthDelegate = params.hasHttpAuthDelegate
     self.hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     self.hasJsDialogDelegate = params.hasJsDialogDelegate
+    self.hasHttpErrorDelegate = params.hasHttpErrorDelegate
     self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
     self.handlerObjectName = params.javaScriptHandlerObjectName
 
@@ -593,6 +595,15 @@ extension AdvancedWebView: WKNavigationDelegate {
     _ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
     decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
   ) {
+    // Error statuses of the main page and of iframes (not of sub-resources: WebKit does not say).
+    if hasHttpErrorDelegate, let http = navigationResponse.response as? HTTPURLResponse,
+      http.statusCode >= 400, let url = http.url
+    {
+      let error = HttpErrorMessage(
+        url: url.absoluteString, statusCode: Int64(http.statusCode),
+        isMainFrame: navigationResponse.isForMainFrame)
+      send { api, id in try await api.onReceivedHttpError(webViewId: id, error: error) }
+    }
     guard hasDownloadDelegate, let url = navigationResponse.response.url else {
       decisionHandler(.allow)
       return

@@ -25,6 +25,23 @@ Android は同期的に答える必要があるため、いったん遷移をキ
 読み込み直します。読み込み直しは GET になるため、元のリダイレクトの流れやリクエスト情報が変わる場合があります。
 :::
 
+## 読み込みエラーと HTTP エラー
+
+`onWebResourceError` は読み込みの失敗（接続なし、ホスト不正、TLS エラーなど）を通知します。サーバーが 404 や 503
+を返した場合は読み込みの失敗ではなく、WebView はサーバーが返したページを表示します。こうした応答は
+`onHttpError` で受け取れます。
+
+```dart
+final controller = AdvancedWebViewController(
+  onHttpError: (error) {
+    if (error.isMainFrame && error.statusCode >= 500) showRetryBanner(error.url);
+  },
+);
+```
+
+ステータスが 400 以上のときに呼ばれます。Android は画像やスクリプトなどのサブリソースも通知します
+（`isMainFrame` は `false`）。iOS は、WebKit がサブリソースのステータスを公開しないため、メインページと iframe のみ通知します。
+
 ## 新しいウィンドウ
 
 `window.open` や `target="_blank"` のリンクは新しいウィンドウを要求します。`onNewWindow` で処理します。
