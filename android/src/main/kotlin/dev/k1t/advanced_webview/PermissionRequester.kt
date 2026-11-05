@@ -1,5 +1,6 @@
 package dev.k1t.advanced_webview
 
+import android.app.Activity
 import android.content.pm.PackageManager
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.PluginRegistry
@@ -10,7 +11,7 @@ import io.flutter.plugin.common.PluginRegistry
  * plugin only has between `onAttachedToActivity` and `onDetachedFromActivity`.
  */
 class PermissionRequester : PluginRegistry.RequestPermissionsResultListener {
-    private class Pending(val permissions: List<String>, val onResult: (Set<String>) -> Unit)
+    private class Pending(val permissions: List<String>, val host: Activity, val onResult: (Set<String>) -> Unit)
 
     private var binding: ActivityPluginBinding? = null
     private var pending: Pending? = null
@@ -29,9 +30,13 @@ class PermissionRequester : PluginRegistry.RequestPermissionsResultListener {
     /**
      * Calls [onResult] exactly once with the subset of [permissions] the app holds afterwards.
      * Without an Activity nothing can be asked, so only permissions already granted count.
+     *
+     * The system dialog is shown over [host] (for example the in-app browser Activity, so it is not
+     * hidden behind it) or, when `null`, over the Flutter Activity. A [host] must forward its results
+     * to [onRequestPermissionsResult].
      */
-    fun request(permissions: List<String>, onResult: (Set<String>) -> Unit) {
-        val activity = binding?.activity
+    fun request(permissions: List<String>, host: Activity? = null, onResult: (Set<String>) -> Unit) {
+        val activity = host ?: binding?.activity
         if (activity == null) {
             onResult(emptySet())
             return
@@ -43,7 +48,7 @@ class PermissionRequester : PluginRegistry.RequestPermissionsResultListener {
         }
         // Only one system dialog at a time: a new request settles the old one with what is held now.
         finishPending()
-        pending = Pending(permissions, onResult)
+        pending = Pending(permissions, activity, onResult)
         activity.requestPermissions(missing.toTypedArray(), REQUEST_CODE)
     }
 
@@ -60,13 +65,17 @@ class PermissionRequester : PluginRegistry.RequestPermissionsResultListener {
     private fun finishPending() {
         val request = pending ?: return
         pending = null
-        val activity = binding?.activity
-        val held = if (activity == null) {
-            emptySet()
-        } else {
-            request.permissions.filter { activity.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED }.toSet()
-        }
-        request.onResult(held)
+        val activity = request.host
+        request.onResult(
+            request.permissions.filter {
+                activity.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED
+            }.toSet(),
+        )
+    }
+
+    /** Settles a request shown over [host] with what is held now because [host] is going away. */
+    fun release(host: Activity) {
+        if (pending?.host === host) finishPending()
     }
 
     private companion object {

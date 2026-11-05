@@ -47,7 +47,7 @@ await browser.close();
 ## 違い
 
 - Android は専用の `Activity` を表示します。戻るボタンはまずページ履歴を戻り、戻れないときにブラウザを閉じます。
-  権限ダイアログとファイル選択はメインの Activity が扱うため、端末によってはブラウザの背面に出ることがあります。
+  権限ダイアログとファイル選択はブラウザの前面に表示されます。
 - iOS は `UINavigationController` をモーダルで表示します。戻る・進む・再読み込みは下部のツールバー、
   閉じるボタンはナビゲーションバーの左側にあります。
 - Android では Cookie が他の WebView と共有されます。iOS では `WebViewSettings.incognito` で

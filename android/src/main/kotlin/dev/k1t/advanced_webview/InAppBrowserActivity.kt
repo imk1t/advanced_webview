@@ -1,6 +1,7 @@
 package dev.k1t.advanced_webview
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
@@ -154,10 +155,25 @@ class InAppBrowserActivity : Activity() {
         }
     }
 
+    // Page dialogs (file picker, permission prompts) are started from this Activity so they appear over
+    // the browser; their results come back here and belong to the WebView's requesters.
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
+        session?.webView?.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        session?.webView?.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         val session = session ?: return
         this.session = null
+        session.webView.releaseHost(this)
         session.webView.onPageStateChanged = null
         // The WebView belongs to Dart and may be shown again; take it out of this Activity's views.
         (session.webView.container.parent as? ViewGroup)?.removeView(session.webView.container)
