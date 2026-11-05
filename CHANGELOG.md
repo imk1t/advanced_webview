@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 - Fix Android: permission prompts and the file chooser opened from an `AdvancedInAppBrowser` now appear over the browser instead of behind it.
+- Add `AdvancedWebViewController.onJsDialog`, `JsDialogRequest`, `JsDialogResponse` and `JsDialogType`: answer JavaScript `alert`, `confirm` and `prompt` dialogs from Dart. Without a callback Android keeps the system WebView's dialog and iOS now shows a native alert (WebKit used to dismiss them silently).
 
 ## 0.7.0 - 2026-11-05
 

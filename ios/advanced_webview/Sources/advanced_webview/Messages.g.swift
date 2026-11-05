@@ -241,6 +241,12 @@ enum PermissionDecisionMessage: Int, CaseIterable {
   case deny = 1
 }
 
+enum JsDialogTypeMessage: Int, CaseIterable {
+  case alert = 0
+  case confirm = 1
+  case prompt = 2
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   var javaScriptEnabled: Bool
@@ -559,6 +565,9 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
   /// When false, console output is never reported to Dart (and, on iOS, the
   /// `console` wrapper script is not injected).
   var hasConsoleMessageDelegate: Bool
+  /// When false, `alert`, `confirm` and `prompt` use the platform's default
+  /// dialog and never round-trip to Dart.
+  var hasJsDialogDelegate: Bool
   /// Scripts injected into every page loaded after creation.
   var userScripts: [UserScriptMessage]
 
@@ -579,7 +588,8 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     let hasScrollDelegate = pigeonVar_list[11] as! Bool
     let hasLongPressDelegate = pigeonVar_list[12] as! Bool
     let hasConsoleMessageDelegate = pigeonVar_list[13] as! Bool
-    let userScripts = pigeonVar_list[14] as! [UserScriptMessage]
+    let hasJsDialogDelegate = pigeonVar_list[14] as! Bool
+    let userScripts = pigeonVar_list[15] as! [UserScriptMessage]
 
     return CreationParamsMessage(
       webViewId: webViewId,
@@ -596,6 +606,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       hasScrollDelegate: hasScrollDelegate,
       hasLongPressDelegate: hasLongPressDelegate,
       hasConsoleMessageDelegate: hasConsoleMessageDelegate,
+      hasJsDialogDelegate: hasJsDialogDelegate,
       userScripts: userScripts
     )
   }
@@ -615,6 +626,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       hasScrollDelegate,
       hasLongPressDelegate,
       hasConsoleMessageDelegate,
+      hasJsDialogDelegate,
       userScripts,
     ]
   }
@@ -622,7 +634,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasDownloadDelegate, rhs.hasDownloadDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasSslErrorDelegate, rhs.hasSslErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpAuthDelegate, rhs.hasHttpAuthDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasScrollDelegate, rhs.hasScrollDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasLongPressDelegate, rhs.hasLongPressDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasConsoleMessageDelegate, rhs.hasConsoleMessageDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
+    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasDownloadDelegate, rhs.hasDownloadDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasSslErrorDelegate, rhs.hasSslErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpAuthDelegate, rhs.hasHttpAuthDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasScrollDelegate, rhs.hasScrollDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasLongPressDelegate, rhs.hasLongPressDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasConsoleMessageDelegate, rhs.hasConsoleMessageDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasJsDialogDelegate, rhs.hasJsDialogDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -641,11 +653,12 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: hasScrollDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasLongPressDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasConsoleMessageDelegate, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: hasJsDialogDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userScripts, hasher: &hasher)
   }
 
   public var description: String {
-    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), hasDownloadDelegate: \(String(describing: hasDownloadDelegate)), hasSslErrorDelegate: \(String(describing: hasSslErrorDelegate)), hasHttpAuthDelegate: \(String(describing: hasHttpAuthDelegate)), hasScrollDelegate: \(String(describing: hasScrollDelegate)), hasLongPressDelegate: \(String(describing: hasLongPressDelegate)), hasConsoleMessageDelegate: \(String(describing: hasConsoleMessageDelegate)), userScripts: \(String(describing: userScripts)))"
+    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), hasDownloadDelegate: \(String(describing: hasDownloadDelegate)), hasSslErrorDelegate: \(String(describing: hasSslErrorDelegate)), hasHttpAuthDelegate: \(String(describing: hasHttpAuthDelegate)), hasScrollDelegate: \(String(describing: hasScrollDelegate)), hasLongPressDelegate: \(String(describing: hasLongPressDelegate)), hasConsoleMessageDelegate: \(String(describing: hasConsoleMessageDelegate)), hasJsDialogDelegate: \(String(describing: hasJsDialogDelegate)), userScripts: \(String(describing: userScripts)))"
   }
 }
 
@@ -957,6 +970,100 @@ struct PermissionRequestMessage: Hashable, CustomStringConvertible {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct JsDialogRequestMessage: Hashable, CustomStringConvertible {
+  var type: JsDialogTypeMessage
+  var message: String
+  /// URL of the page that opened the dialog.
+  var url: String
+  /// Initial text of a `prompt`; null for the other types.
+  var defaultText: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> JsDialogRequestMessage? {
+    let type = pigeonVar_list[0] as! JsDialogTypeMessage
+    let message = pigeonVar_list[1] as! String
+    let url = pigeonVar_list[2] as! String
+    let defaultText: String? = nilOrValue(pigeonVar_list[3])
+
+    return JsDialogRequestMessage(
+      type: type,
+      message: message,
+      url: url,
+      defaultText: defaultText
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      type,
+      message,
+      url,
+      defaultText,
+    ]
+  }
+  static func == (lhs: JsDialogRequestMessage, rhs: JsDialogRequestMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.type, rhs.type) && MessagesPigeonInternal.deepEquals(lhs.message, rhs.message) && MessagesPigeonInternal.deepEquals(lhs.url, rhs.url) && MessagesPigeonInternal.deepEquals(lhs.defaultText, rhs.defaultText)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("JsDialogRequestMessage")
+    MessagesPigeonInternal.deepHash(value: type, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: message, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: url, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: defaultText, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "JsDialogRequestMessage(type: \(String(describing: type)), message: \(String(describing: message)), url: \(String(describing: url)), defaultText: \(String(describing: defaultText)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct JsDialogResultMessage: Hashable, CustomStringConvertible {
+  /// OK was pressed. Always true for an `alert`.
+  var accepted: Bool
+  /// Text entered in a `prompt`; null when not accepted or for other types.
+  var text: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> JsDialogResultMessage? {
+    let accepted = pigeonVar_list[0] as! Bool
+    let text: String? = nilOrValue(pigeonVar_list[1])
+
+    return JsDialogResultMessage(
+      accepted: accepted,
+      text: text
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      accepted,
+      text,
+    ]
+  }
+  static func == (lhs: JsDialogResultMessage, rhs: JsDialogResultMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.accepted, rhs.accepted) && MessagesPigeonInternal.deepEquals(lhs.text, rhs.text)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("JsDialogResultMessage")
+    MessagesPigeonInternal.deepHash(value: accepted, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: text, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "JsDialogResultMessage(accepted: \(String(describing: accepted)), text: \(String(describing: text)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct FindResultMessage: Hashable, CustomStringConvertible {
   var found: Bool
   /// Total matches on the page. Null on iOS, which does not report a count.
@@ -1238,34 +1345,44 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
       }
       return nil
     case 138:
-      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return JsDialogTypeMessage(rawValue: enumResultAsInt)
+      }
+      return nil
     case 139:
-      return ConsoleMessageMessage.fromList(self.readValue() as! [Any?])
+      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
     case 140:
-      return UserScriptMessage.fromList(self.readValue() as! [Any?])
+      return ConsoleMessageMessage.fromList(self.readValue() as! [Any?])
     case 141:
-      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
+      return UserScriptMessage.fromList(self.readValue() as! [Any?])
     case 142:
-      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
+      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
     case 143:
-      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
     case 144:
-      return SslErrorMessage.fromList(self.readValue() as! [Any?])
+      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
     case 145:
-      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
+      return SslErrorMessage.fromList(self.readValue() as! [Any?])
     case 146:
-      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
     case 147:
-      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
     case 148:
-      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
+      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
     case 149:
-      return FindResultMessage.fromList(self.readValue() as! [Any?])
+      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
     case 150:
-      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+      return JsDialogRequestMessage.fromList(self.readValue() as! [Any?])
     case 151:
-      return CookieMessage.fromList(self.readValue() as! [Any?])
+      return JsDialogResultMessage.fromList(self.readValue() as! [Any?])
     case 152:
+      return FindResultMessage.fromList(self.readValue() as! [Any?])
+    case 153:
+      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+    case 154:
+      return CookieMessage.fromList(self.readValue() as! [Any?])
+    case 155:
       return InAppBrowserParamsMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1302,50 +1419,59 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? PermissionDecisionMessage {
       super.writeByte(137)
       super.writeValue(value.rawValue)
-    } else if let value = value as? WebViewSettingsMessage {
+    } else if let value = value as? JsDialogTypeMessage {
       super.writeByte(138)
-      super.writeValue(value.toList())
-    } else if let value = value as? ConsoleMessageMessage {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? WebViewSettingsMessage {
       super.writeByte(139)
       super.writeValue(value.toList())
-    } else if let value = value as? UserScriptMessage {
+    } else if let value = value as? ConsoleMessageMessage {
       super.writeByte(140)
       super.writeValue(value.toList())
-    } else if let value = value as? CreationParamsMessage {
+    } else if let value = value as? UserScriptMessage {
       super.writeByte(141)
       super.writeValue(value.toList())
-    } else if let value = value as? NavigationRequestMessage {
+    } else if let value = value as? CreationParamsMessage {
       super.writeByte(142)
       super.writeValue(value.toList())
-    } else if let value = value as? WebResourceErrorMessage {
+    } else if let value = value as? NavigationRequestMessage {
       super.writeByte(143)
       super.writeValue(value.toList())
-    } else if let value = value as? SslErrorMessage {
+    } else if let value = value as? WebResourceErrorMessage {
       super.writeByte(144)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthRequestMessage {
+    } else if let value = value as? SslErrorMessage {
       super.writeByte(145)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthCredentialsMessage {
+    } else if let value = value as? HttpAuthRequestMessage {
       super.writeByte(146)
       super.writeValue(value.toList())
-    } else if let value = value as? DownloadRequestMessage {
+    } else if let value = value as? HttpAuthCredentialsMessage {
       super.writeByte(147)
       super.writeValue(value.toList())
-    } else if let value = value as? PermissionRequestMessage {
+    } else if let value = value as? DownloadRequestMessage {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? FindResultMessage {
+    } else if let value = value as? PermissionRequestMessage {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? ScrollPositionMessage {
+    } else if let value = value as? JsDialogRequestMessage {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? JsDialogResultMessage {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? InAppBrowserParamsMessage {
+    } else if let value = value as? FindResultMessage {
       super.writeByte(152)
+      super.writeValue(value.toList())
+    } else if let value = value as? ScrollPositionMessage {
+      super.writeByte(153)
+      super.writeValue(value.toList())
+    } else if let value = value as? CookieMessage {
+      super.writeByte(154)
+      super.writeValue(value.toList())
+    } else if let value = value as? InAppBrowserParamsMessage {
+      super.writeByte(155)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1959,6 +2085,9 @@ protocol AdvancedWebViewFlutterApiProtocol {
   @MainActor func onDownloadStart(webViewId webViewIdArg: Int64, request requestArg: DownloadRequestMessage) async throws
   /// The page asked for camera, microphone or location access.
   @MainActor func onPermissionRequest(webViewId webViewIdArg: Int64, request requestArg: PermissionRequestMessage) async throws -> PermissionDecisionMessage
+  /// The page opened a JavaScript dialog (`alert`, `confirm` or `prompt`).
+  /// The page is blocked until this completes.
+  @MainActor func onJsDialog(webViewId webViewIdArg: Int64, request requestArg: JsDialogRequestMessage) async throws -> JsDialogResultMessage
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
   /// argument list; the result is the JSON-encoded return value. Throwing
   /// rejects the page's promise.
@@ -2272,6 +2401,31 @@ class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
           continuation.resume(throwing: PigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: ""))
         } else {
           let result = listResponse[0] as! PermissionDecisionMessage
+          continuation.resume(returning: result)
+        }
+      }
+    }
+  }
+  /// The page opened a JavaScript dialog (`alert`, `confirm` or `prompt`).
+  /// The page is blocked until this completes.
+  @MainActor func onJsDialog(webViewId webViewIdArg: Int64, request requestArg: JsDialogRequestMessage) async throws -> JsDialogResultMessage {
+    return try await withCheckedThrowingContinuation { continuation in
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onJsDialog\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([webViewIdArg, requestArg] as [Any?]) { response in
+        guard let listResponse = response as? [Any?] else {
+          continuation.resume(throwing: createConnectionError(withChannelName: channelName))
+          return
+        }
+        if listResponse.count > 1 {
+          let code: String = listResponse[0] as! String
+          let message: String? = nilOrValue(listResponse[1])
+          let details: String? = nilOrValue(listResponse[2])
+          continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
+        } else if MessagesPigeonInternal.isNullish(listResponse[0]) {
+          continuation.resume(throwing: PigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: ""))
+        } else {
+          let result = listResponse[0] as! JsDialogResultMessage
           continuation.resume(returning: result)
         }
       }

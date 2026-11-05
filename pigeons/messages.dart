@@ -184,6 +184,7 @@ class CreationParamsMessage {
     required this.hasScrollDelegate,
     required this.hasLongPressDelegate,
     required this.hasConsoleMessageDelegate,
+    required this.hasJsDialogDelegate,
     required this.userScripts,
   });
 
@@ -233,6 +234,10 @@ class CreationParamsMessage {
   /// When false, console output is never reported to Dart (and, on iOS, the
   /// `console` wrapper script is not injected).
   bool hasConsoleMessageDelegate;
+
+  /// When false, `alert`, `confirm` and `prompt` use the platform's default
+  /// dialog and never round-trip to Dart.
+  bool hasJsDialogDelegate;
 
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
@@ -316,6 +321,36 @@ class PermissionRequestMessage {
 }
 
 enum PermissionDecisionMessage { grant, deny }
+
+enum JsDialogTypeMessage { alert, confirm, prompt }
+
+class JsDialogRequestMessage {
+  JsDialogRequestMessage({
+    required this.type,
+    required this.message,
+    required this.url,
+    this.defaultText,
+  });
+
+  JsDialogTypeMessage type;
+  String message;
+
+  /// URL of the page that opened the dialog.
+  String url;
+
+  /// Initial text of a `prompt`; null for the other types.
+  String? defaultText;
+}
+
+class JsDialogResultMessage {
+  JsDialogResultMessage({required this.accepted, this.text});
+
+  /// OK was pressed. Always true for an `alert`.
+  bool accepted;
+
+  /// Text entered in a `prompt`; null when not accepted or for other types.
+  String? text;
+}
 
 class FindResultMessage {
   FindResultMessage({
@@ -543,6 +578,14 @@ abstract class AdvancedWebViewFlutterApi {
   PermissionDecisionMessage onPermissionRequest(
     int webViewId,
     PermissionRequestMessage request,
+  );
+
+  /// The page opened a JavaScript dialog (`alert`, `confirm` or `prompt`).
+  /// The page is blocked until this completes.
+  @async
+  JsDialogResultMessage onJsDialog(
+    int webViewId,
+    JsDialogRequestMessage request,
   );
 
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded

@@ -86,6 +86,35 @@ void main() {
     expect(messages, ['hi']);
   });
 
+  testWidgets('JavaScript dialogs are answered by the app', (tester) async {
+    final seen = <JsDialogRequest>[];
+    final harness = _Harness(
+      onJsDialog: (request) {
+        seen.add(request);
+        return switch (request.type) {
+          JsDialogType.alert => const JsDialogResponse.accept(),
+          JsDialogType.confirm => const JsDialogResponse.dismiss(),
+          JsDialogType.prompt => const JsDialogResponse.accept(text: 'Bob'),
+        };
+      },
+    );
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body></body></html>');
+
+    expect(
+      await harness.controller.runJavaScriptReturningResult(
+        '(alert("a"), [confirm("c"), prompt("p", "Ann")])',
+      ),
+      [false, 'Bob'],
+    );
+    expect(seen.map((r) => r.type), JsDialogType.values);
+    expect(seen.map((r) => r.message), ['a', 'c', 'p']);
+    expect(seen.last.defaultText, 'Ann');
+    expect(seen.first.defaultText, isNull);
+  });
+
   testWidgets('console output is reported with its level', (tester) async {
     final messages = <WebViewConsoleMessage>[];
     final harness = _Harness(onConsoleMessage: messages.add);
@@ -547,6 +576,7 @@ class _Harness {
     NewWindowCallback? onNewWindow,
     DownloadStartCallback? onDownloadStart,
     ConsoleMessageCallback? onConsoleMessage,
+    JsDialogCallback? onJsDialog,
   }) {
     controller = AdvancedWebViewController(
       javaScriptChannels: javaScriptChannels,
@@ -556,6 +586,7 @@ class _Harness {
       onNewWindow: onNewWindow,
       onDownloadStart: onDownloadStart,
       onConsoleMessage: onConsoleMessage,
+      onJsDialog: onJsDialog,
       onPageStarted: startedUrls.add,
       onPageFinished: (url) {
         _pageFinished?.complete();

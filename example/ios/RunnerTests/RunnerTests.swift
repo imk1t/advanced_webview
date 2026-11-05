@@ -492,6 +492,7 @@ final class RunnerTests: XCTestCase {
     hasScrollDelegate: Bool = false,
     hasLongPressDelegate: Bool = false,
     hasConsoleMessageDelegate: Bool = false,
+    hasJsDialogDelegate: Bool = false,
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
     return CreationParamsMessage(
@@ -509,6 +510,7 @@ final class RunnerTests: XCTestCase {
       hasScrollDelegate: hasScrollDelegate,
       hasLongPressDelegate: hasLongPressDelegate,
       hasConsoleMessageDelegate: hasConsoleMessageDelegate,
+      hasJsDialogDelegate: hasJsDialogDelegate,
       userScripts: userScripts)
   }
 

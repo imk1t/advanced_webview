@@ -64,6 +64,37 @@ AdvancedWebViewController(
 Android では `WEB_MESSAGE_LISTENER` と `DOCUMENT_START_SCRIPT` に対応した WebView が必要です（現行端末のシステム WebView は対応しています）。
 対応していない場合、コントローラの作成が失敗します。
 
+## JavaScript ダイアログ
+
+`alert`、`confirm`、`prompt` は応答があるまでページを止めます。`onJsDialog` を渡すと、テーマに合わせた
+ダイアログなどを自分で表示できます。
+
+```dart
+final controller = AdvancedWebViewController(
+  onJsDialog: (request) async {
+    switch (request.type) {
+      case JsDialogType.alert:
+        await showAlert(request.message);
+        return const JsDialogResponse.accept();
+      case JsDialogType.confirm:
+        return await askYesNo(request.message)
+            ? const JsDialogResponse.accept()
+            : const JsDialogResponse.dismiss();
+      case JsDialogType.prompt:
+        final text = await askText(request.message, request.defaultText);
+        return text == null
+            ? const JsDialogResponse.dismiss()
+            : JsDialogResponse.accept(text: text);
+    }
+  },
+);
+```
+
+`accept` では `confirm` が `true` を、`prompt` が入力テキスト（指定しない場合は初期値）を返します。
+`dismiss` では `confirm` が `false` を、`prompt` が `null` を返します。コールバックでエラーが起きた場合は
+`dismiss` として扱います。`onJsDialog` がない場合はプラットフォームの標準動作になり、Android はシステム WebView の
+ダイアログを表示し、iOS ではプラグインがネイティブのアラートを表示します。`beforeunload` のダイアログは通知されません。
+
 ## ユーザースクリプト
 
 ユーザースクリプトは、WebView が読み込むすべてのページに、DOM の解析前または解析後に注入されます。

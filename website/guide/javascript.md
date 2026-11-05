@@ -65,6 +65,37 @@ AdvancedWebViewController(
 Android needs a WebView that supports `WEB_MESSAGE_LISTENER` and `DOCUMENT_START_SCRIPT` (the system
 WebView on current devices does). Creating the controller fails otherwise.
 
+## JavaScript dialogs
+
+`alert`, `confirm` and `prompt` block the page until they are answered. Pass `onJsDialog` to show them
+yourself, for example in a themed dialog:
+
+```dart
+final controller = AdvancedWebViewController(
+  onJsDialog: (request) async {
+    switch (request.type) {
+      case JsDialogType.alert:
+        await showAlert(request.message);
+        return const JsDialogResponse.accept();
+      case JsDialogType.confirm:
+        return await askYesNo(request.message)
+            ? const JsDialogResponse.accept()
+            : const JsDialogResponse.dismiss();
+      case JsDialogType.prompt:
+        final text = await askText(request.message, request.defaultText);
+        return text == null
+            ? const JsDialogResponse.dismiss()
+            : JsDialogResponse.accept(text: text);
+    }
+  },
+);
+```
+
+Accepting makes `confirm` return `true` and `prompt` return the text (the default text when you pass
+none). Dismissing makes `confirm` return `false` and `prompt` return `null`. An error in the callback
+counts as a dismissal. Without `onJsDialog` the platform default applies: Android shows the system
+WebView's dialog and the plugin presents a native alert on iOS. `beforeunload` dialogs are not reported.
+
 ## User scripts
 
 User scripts are injected into every page the WebView loads, before or after the DOM is parsed.
