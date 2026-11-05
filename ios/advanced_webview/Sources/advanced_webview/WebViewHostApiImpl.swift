@@ -119,6 +119,11 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
   }
 
   @MainActor
+  func createPdf(webViewId: Int64) async throws -> FlutterStandardTypedData {
+    return try await registry.get(webViewId).createPdf()
+  }
+
+  @MainActor
   func findText(webViewId: Int64, query: String, forward: Bool) async throws -> FindResultMessage {
     return try await registry.get(webViewId).find(query, forward: forward)
   }

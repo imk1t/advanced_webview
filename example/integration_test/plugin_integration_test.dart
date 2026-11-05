@@ -632,6 +632,19 @@ void main() {
     expect(png!.sublist(0, 4), [0x89, 0x50, 0x4e, 0x47]);
   });
 
+  testWidgets('createPdf renders the page to a PDF', (tester) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml('<html><body><h1>pdf</h1></body></html>');
+    await harness.waitForSize(tester);
+    final pdf = await harness.controller.createPdf();
+
+    expect(String.fromCharCodes(pdf.sublist(0, 5)), '%PDF-');
+    expect(pdf.length, greaterThan(500));
+  });
+
   testWidgets('findText finds text and clearMatches removes the highlight', (
     tester,
   ) async {

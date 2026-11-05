@@ -63,6 +63,7 @@
       "SwipeRefreshLayout": "https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout",
       "Bitmap": "https://developer.android.com/reference/android/graphics/Bitmap",
       "PrintManager": "https://developer.android.com/reference/android/print/PrintManager",
+      "PrintDocumentAdapter": "https://developer.android.com/reference/android/print/PrintDocumentAdapter",
       "Bundle": "https://developer.android.com/reference/android/os/Bundle",
       "Parcel": "https://developer.android.com/reference/android/os/Parcel",
       "View": "https://developer.android.com/reference/android/view/View",
@@ -133,6 +134,7 @@
       "WKHTTPCookieStore": "https://developer.apple.com/documentation/webkit/wkhttpcookiestore",
       "HTTPCookie": "https://developer.apple.com/documentation/foundation/httpcookie",
       "WKUIDelegate": "https://developer.apple.com/documentation/webkit/wkuidelegate",
+      "WKPDFConfiguration": "https://developer.apple.com/documentation/webkit/wkpdfconfiguration",
       "WKFrameInfo": "https://developer.apple.com/documentation/webkit/wkframeinfo",
       "WKURLSchemeHandler": "https://developer.apple.com/documentation/webkit/wkurlschemehandler",
       "WKURLSchemeTask": "https://developer.apple.com/documentation/webkit/wkurlschemetask",
@@ -522,6 +524,34 @@
       "ios": {
         "status": "supported",
         "apis": ["WKWebView.takeSnapshot(configuration:)", "UIImage.pngData()"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.createPdf",
+      "group": "loading",
+      "summary": {
+        "en": "Renders the current page to a PDF and returns its bytes.",
+        "ja": "現在のページを PDF にレンダリングし、そのバイト列を返します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebView.createPrintDocumentAdapter(String)",
+          "PrintDocumentAdapter.onLayout(PrintAttributes, PrintAttributes, CancellationSignal, PrintDocumentAdapter.LayoutResultCallback, Bundle)",
+          "PrintDocumentAdapter.onWrite(PageRange[], ParcelFileDescriptor, CancellationSignal, PrintDocumentAdapter.WriteResultCallback)"
+        ],
+        "note": {
+          "en": "Laid out on A4 pages with the page's print styles, written to a temporary file. The helper lives in the android.print package because the callback constructors are package-private.",
+          "ja": "ページの印刷用スタイルで A4 ページにレイアウトし、一時ファイルに書き出します。コールバックのコンストラクタがパッケージプライベートなため、補助クラスは android.print パッケージにあります。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.pdf(configuration:)", "WKPDFConfiguration.rect"],
+        "note": {
+          "en": "One page as tall as the whole content, with the screen styles.",
+          "ja": "画面用スタイルのまま、コンテンツ全体の高さを持つ1ページです。"
+        }
       }
     },
     {

@@ -1724,6 +1724,10 @@ protocol AdvancedWebViewHostApi {
   /// Returns a PNG of the visible area, or null when it cannot be captured
   /// (for example when the view has no size yet).
   func takeScreenshot(webViewId: Int64) async throws -> FlutterStandardTypedData?
+  /// Renders the current page to a PDF. Android lays it out on A4 pages; iOS
+  /// produces one page as tall as the content. Fails with `pdf-failed` when
+  /// WebKit or the print framework cannot render it.
+  func createPdf(webViewId: Int64) async throws -> FlutterStandardTypedData
   /// Finds `query` in the page and highlights a match. A new query starts at
   /// the first match; repeating the same query moves to the next or previous.
   func findText(webViewId: Int64, query: String, forward: Bool) async throws -> FindResultMessage
@@ -2045,6 +2049,26 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       takeScreenshotChannel.setMessageHandler(nil)
+    }
+    /// Renders the current page to a PDF. Android lays it out on A4 pages; iOS
+    /// produces one page as tall as the content. Fails with `pdf-failed` when
+    /// WebKit or the print framework cannot render it.
+    let createPdfChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.createPdf\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      createPdfChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        Task { @MainActor in
+          do {
+            let result = try await api.createPdf(webViewId: webViewIdArg)
+            reply(wrapResult(result))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      createPdfChannel.setMessageHandler(nil)
     }
     /// Finds `query` in the page and highlights a match. A new query starts at
     /// the first match; repeating the same query moves to the next or previous.

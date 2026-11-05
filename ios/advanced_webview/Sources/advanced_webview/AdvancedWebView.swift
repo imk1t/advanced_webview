@@ -193,6 +193,22 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     return image.pngData().map { FlutterStandardTypedData(bytes: $0) }
   }
 
+  /// One page as tall as the content. `WKPDFConfiguration` captures only the visible frame by
+  /// default, so the rectangle is the whole scrollable content.
+  @MainActor
+  func createPdf() async throws -> FlutterStandardTypedData {
+    let configuration = WKPDFConfiguration()
+    let size = webView.scrollView.contentSize
+    if size.width > 0, size.height > 0 {
+      configuration.rect = CGRect(origin: .zero, size: size)
+    }
+    do {
+      return FlutterStandardTypedData(bytes: try await webView.pdf(configuration: configuration))
+    } catch {
+      throw PigeonError(code: "pdf-failed", message: error.localizedDescription, details: nil)
+    }
+  }
+
   /// Like Android, repeating the same query moves to the next match. WebKit
   /// searches from the current selection, so no query state is needed here.
   @MainActor

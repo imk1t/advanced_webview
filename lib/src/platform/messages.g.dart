@@ -2106,6 +2106,28 @@ class AdvancedWebViewHostApi {
     return pigeonVar_replyValue as Uint8List?;
   }
 
+  /// Renders the current page to a PDF. Android lays it out on A4 pages; iOS
+  /// produces one page as tall as the content. Fails with `pdf-failed` when
+  /// WebKit or the print framework cannot render it.
+  Future<Uint8List> createPdf(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.createPdf$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return pigeonVar_replyValue! as Uint8List;
+  }
+
   /// Finds `query` in the page and highlights a match. A new query starts at
   /// the first match; repeating the same query moves to the next or previous.
   Future<FindResultMessage> findText(int webViewId, String query, bool forward) async {

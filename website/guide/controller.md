@@ -67,6 +67,16 @@ final png = await controller.takeScreenshot(); // Uint8List? (PNG)
 
 Captures only the visible area, not the whole page. Returns `null` while the view has no size.
 
+## PDF export
+
+```dart
+final pdf = await controller.createPdf(); // Uint8List (PDF bytes)
+```
+
+Wait for the page to finish loading first. Android lays the content out on A4 pages the way printing
+does, so the page's print styles apply. iOS returns a single page as tall as the whole content with the
+screen styles. A failure throws a `PlatformException` with code `pdf-failed`.
+
 ## Scrolling
 
 ```dart

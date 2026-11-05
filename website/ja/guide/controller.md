@@ -66,6 +66,16 @@ final png = await controller.takeScreenshot(); // Uint8List?（PNG）
 
 ページ全体ではなく、表示されている領域だけを取得します。ビューのサイズが 0 の間は `null` を返します。
 
+## PDF の書き出し
+
+```dart
+final pdf = await controller.createPdf(); // Uint8List（PDF のバイト列）
+```
+
+先にページの読み込み完了を待ってください。Android は印刷と同じように A4 ページへレイアウトするため、ページの印刷用スタイルが
+適用されます。iOS は画面用スタイルのまま、コンテンツ全体の高さを持つ1ページを返します。失敗時はコード `pdf-failed` の
+`PlatformException` を投げます。
+
 ## スクロール
 
 ```dart
