@@ -508,6 +508,8 @@ class CreationParamsMessage {
     required this.hasJsDialogDelegate,
     required this.hasHttpErrorDelegate,
     required this.hasFindDelegate,
+    required this.hasFaviconDelegate,
+    required this.hasFullscreenDelegate,
     required this.interceptSchemes,
     required this.userScripts,
   });
@@ -570,6 +572,13 @@ class CreationParamsMessage {
   /// When false, find progress is never reported to Dart.
   bool hasFindDelegate;
 
+  /// When false, the favicon is never looked up or reported.
+  bool hasFaviconDelegate;
+
+  /// When false, fullscreen changes are still shown natively but never
+  /// reported to Dart.
+  bool hasFullscreenDelegate;
+
   /// Lower-case URL schemes whose requests are answered by Dart through
   /// `onInterceptRequest`. Empty when the app has no intercept callback.
   List<String> interceptSchemes;
@@ -596,6 +605,8 @@ class CreationParamsMessage {
       hasJsDialogDelegate,
       hasHttpErrorDelegate,
       hasFindDelegate,
+      hasFaviconDelegate,
+      hasFullscreenDelegate,
       interceptSchemes,
       userScripts,
     ];
@@ -624,8 +635,10 @@ class CreationParamsMessage {
       hasJsDialogDelegate: result[14]! as bool,
       hasHttpErrorDelegate: result[15]! as bool,
       hasFindDelegate: result[16]! as bool,
-      interceptSchemes: (result[17]! as List<Object?>).cast<String>(),
-      userScripts: (result[18]! as List<Object?>).cast<UserScriptMessage>(),
+      hasFaviconDelegate: result[17]! as bool,
+      hasFullscreenDelegate: result[18]! as bool,
+      interceptSchemes: (result[19]! as List<Object?>).cast<String>(),
+      userScripts: (result[20]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -638,7 +651,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(hasFindDelegate, other.hasFindDelegate) && _deepEquals(interceptSchemes, other.interceptSchemes) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(hasFindDelegate, other.hasFindDelegate) && _deepEquals(hasFaviconDelegate, other.hasFaviconDelegate) && _deepEquals(hasFullscreenDelegate, other.hasFullscreenDelegate) && _deepEquals(interceptSchemes, other.interceptSchemes) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -647,7 +660,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, hasHttpErrorDelegate: $hasHttpErrorDelegate, hasFindDelegate: $hasFindDelegate, interceptSchemes: $interceptSchemes, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, hasHttpErrorDelegate: $hasHttpErrorDelegate, hasFindDelegate: $hasFindDelegate, hasFaviconDelegate: $hasFaviconDelegate, hasFullscreenDelegate: $hasFullscreenDelegate, interceptSchemes: $interceptSchemes, userScripts: $userScripts)';
   }
 }
 
@@ -2492,6 +2505,19 @@ abstract class AdvancedWebViewFlutterApi {
   /// until it has finished); iOS sends one final update per `findText`.
   void onFindResult(int webViewId, int activeMatchIndex, int numberOfMatches, bool isDone);
 
+  /// The favicon URL of the page that just finished loading, or null when it
+  /// has none. Only sent when the controller was created with
+  /// `hasFaviconDelegate`.
+  void onFaviconChanged(int webViewId, String? url);
+
+  /// The page (a video or any element) entered fullscreen. Only sent when the
+  /// controller was created with `hasFullscreenDelegate`.
+  void onEnterFullscreen(int webViewId);
+
+  /// The page left fullscreen. Only sent when the controller was created with
+  /// `hasFullscreenDelegate`.
+  void onExitFullscreen(int webViewId);
+
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 
   /// A server answered with a status of 400 or more.
@@ -2711,6 +2737,70 @@ abstract class AdvancedWebViewFlutterApi {
           final bool arg_isDone = args[3]! as bool;
           try {
             api.onFindResult(arg_webViewId, arg_activeMatchIndex, arg_numberOfMatches, arg_isDone);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onFaviconChanged$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final String? arg_url = args[1] as String?;
+          try {
+            api.onFaviconChanged(arg_webViewId, arg_url);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onEnterFullscreen$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          try {
+            api.onEnterFullscreen(arg_webViewId);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onExitFullscreen$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          try {
+            api.onExitFullscreen(arg_webViewId);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

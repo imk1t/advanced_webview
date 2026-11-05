@@ -1,10 +1,12 @@
 package dev.k1t.advanced_webview
 
+import android.app.Activity
 import android.graphics.Color
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Looper
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.ConsoleMessage
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
@@ -12,6 +14,7 @@ import android.webkit.JsPromptResult
 import android.webkit.JsResult
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
@@ -39,6 +42,7 @@ import org.mockito.Mockito.mockStatic
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
@@ -254,6 +258,68 @@ class WebViewHostApiImplTest {
         registry.get(2).onFindResult(1, 3, true)
         shadowOf(Looper.getMainLooper()).idle()
         verify(messenger, org.mockito.Mockito.times(2)).send(eq(channel), any(), any())
+    }
+
+    @Test
+    fun fullscreenCoversTheActivityAndIsReportedOnlyWithADelegate() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        hostApi.create(params(webViewId = 1, hasFullscreenDelegate = true))
+        val view = registry.get(1)
+        view.attachToContext(activity)
+        val decor = activity.window.decorView as ViewGroup
+        val before = decor.childCount
+        val video = View(activity)
+        val callback = mock(WebChromeClient.CustomViewCallback::class.java)
+        val enter = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onEnterFullscreen"
+        val exit = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onExitFullscreen"
+
+        view.webView.webChromeClient!!.onShowCustomView(video, callback)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(before + 1, decor.childCount)
+        assertSame(decor, (video.parent as View).parent)
+        verify(messenger).send(eq(enter), any(), any())
+
+        view.webView.webChromeClient!!.onHideCustomView()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(before, decor.childCount)
+        verify(callback).onCustomViewHidden()
+        verify(messenger).send(eq(exit), any(), any())
+    }
+
+    @Test
+    fun fullscreenIsRefusedWithoutAnActivityAndNotReportedWithoutADelegate() {
+        hostApi.create(params(webViewId = 1))
+        val callback = mock(WebChromeClient.CustomViewCallback::class.java)
+
+        registry.get(1).webView.webChromeClient!!.onShowCustomView(View(RuntimeEnvironment.getApplication()), callback)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(callback).onCustomViewHidden()
+        verify(messenger, never()).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onEnterFullscreen"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun theFaviconIsOnlyLookedUpWithADelegate() {
+        hostApi.create(params(webViewId = 1))
+        hostApi.create(params(webViewId = 2, hasFaviconDelegate = true))
+
+        // No JavaScript runs in Robolectric, so only the absence of a reply from a view without a delegate
+        // can be checked here; the page markup lookup is covered by the integration test.
+        registry.get(1).webView.webViewClient.onPageFinished(registry.get(1).webView, "https://a.test/")
+        registry.get(2).webView.webViewClient.onPageFinished(registry.get(2).webView, "https://a.test/")
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(messenger, never()).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onFaviconChanged"),
+            any(),
+            any(),
+        )
     }
 
     @Test
@@ -833,6 +899,8 @@ class WebViewHostApiImplTest {
         hasJsDialogDelegate: Boolean = false,
         hasHttpErrorDelegate: Boolean = false,
         hasFindDelegate: Boolean = false,
+        hasFaviconDelegate: Boolean = false,
+        hasFullscreenDelegate: Boolean = false,
         interceptSchemes: List<String> = emptyList(),
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
@@ -853,6 +921,8 @@ class WebViewHostApiImplTest {
         hasJsDialogDelegate,
         hasHttpErrorDelegate,
         hasFindDelegate,
+        hasFaviconDelegate,
+        hasFullscreenDelegate,
         interceptSchemes,
         userScripts,
     )

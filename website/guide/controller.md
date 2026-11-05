@@ -188,6 +188,28 @@ AdvancedWebViewController(
 );
 ```
 
+## Favicon and fullscreen
+
+```dart
+AdvancedWebViewController(
+  onFaviconChanged: (url) {}, // after each page finishes loading; String?
+  onEnterFullscreen: () {},   // hide your own chrome
+  onExitFullscreen: () {},
+);
+```
+
+`onFaviconChanged` gives the URL of the page's `<link rel="icon">` (or `/favicon.ico` on its origin when the page
+declares none, which may not exist) and `null` for non-HTTP pages. WebKit has no public favicon API and Android only
+hands over decoded bitmaps, so both platforms read the page's markup, which gives the same answer on each. Load the
+image yourself, for example with `Image.network`. Icons added by a script after the page finished loading are not
+reported.
+
+Fullscreen is shown by the platform; the callbacks only report it. A video's fullscreen button and
+`element.requestFullscreen()` both work. On Android the plugin covers the Activity's window with the content, hides
+the system bars and leaves fullscreen when the user presses back. It does not rotate the screen, so set the
+orientation yourself in `onEnterFullscreen` if you want landscape. Before this release Android did not offer
+fullscreen at all. iOS presents WebKit's own fullscreen view and the plugin enables the element fullscreen API for it.
+
 ## File uploads
 
 `<input type="file">` works on both platforms without any Dart code.

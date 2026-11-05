@@ -18,6 +18,8 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasJsDialogDelegate: Bool
   private let hasHttpErrorDelegate: Bool
   private let hasFindDelegate: Bool
+  private let hasFaviconDelegate: Bool
+  private let hasFullscreenDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private let hasJavaScriptHandlers: Bool
   private let handlerObjectName: String
@@ -44,6 +46,8 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.hasJsDialogDelegate = params.hasJsDialogDelegate
     self.hasHttpErrorDelegate = params.hasHttpErrorDelegate
     self.hasFindDelegate = params.hasFindDelegate
+    self.hasFaviconDelegate = params.hasFaviconDelegate
+    self.hasFullscreenDelegate = params.hasFullscreenDelegate
     self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
     self.handlerObjectName = params.javaScriptHandlerObjectName
 
@@ -53,6 +57,8 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     configuration.mediaTypesRequiringUserActionForPlayback =
       params.settings.mediaPlaybackRequiresUserGesture ? .all : []
     configuration.applicationNameForUserAgent = params.settings.applicationNameForUserAgent
+    // Lets any element (not only a video) go fullscreen, like Android's WebView.
+    configuration.preferences.isElementFullscreenEnabled = true
     if params.settings.incognito {
       configuration.websiteDataStore = .nonPersistent()
     }
@@ -522,6 +528,20 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
         self?.send { api, id in try await api.onTitleChanged(webViewId: id, title: title) }
       },
     ]
+    if hasFullscreenDelegate {
+      observations.append(
+        webView.observe(\.fullscreenState, options: [.new]) { [weak self] webView, _ in
+          // The transitional states are reported once they settle.
+          switch webView.fullscreenState {
+          case .inFullscreen:
+            self?.send { api, id in try await api.onEnterFullscreen(webViewId: id) }
+          case .notInFullscreen:
+            self?.send { api, id in try await api.onExitFullscreen(webViewId: id) }
+          default:
+            break
+          }
+        })
+    }
   }
 
   @objc private func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
@@ -573,6 +593,23 @@ extension AdvancedWebView: WKNavigationDelegate {
     webView.scrollView.refreshControl?.endRefreshing()
     let url = webView.url?.absoluteString ?? ""
     send { api, id in try await api.onPageFinished(webViewId: id, url: url) }
+    if hasFaviconDelegate { reportFavicon() }
+  }
+
+  /// Reads the favicon URL from the page's markup, the same way on both platforms.
+  private func reportFavicon() {
+    let script = """
+      (function() {
+        if (!/^https?:$/.test(location.protocol)) return null;
+        var link = document.querySelector('link[rel~="icon" i][href]') ||
+          document.querySelector('link[rel~="apple-touch-icon" i][href]');
+        return link ? link.href : location.origin + '/favicon.ico';
+      })()
+      """
+    webView.evaluateJavaScript(script) { [weak self] result, _ in
+      let url = result as? String
+      self?.send { api, id in try await api.onFaviconChanged(webViewId: id, url: url) }
+    }
   }
 
   func webView(

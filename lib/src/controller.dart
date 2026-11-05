@@ -45,6 +45,9 @@ class AdvancedWebViewController {
     this.onWebResourceError,
     this.onHttpError,
     this.onFindResult,
+    this.onFaviconChanged,
+    this.onEnterFullscreen,
+    this.onExitFullscreen,
     this.onNavigationRequest,
     this.onNewWindow,
     this.onPermissionRequest,
@@ -89,6 +92,9 @@ class AdvancedWebViewController {
         hasJsDialogDelegate: onJsDialog != null,
         hasHttpErrorDelegate: onHttpError != null,
         hasFindDelegate: onFindResult != null,
+        hasFaviconDelegate: onFaviconChanged != null,
+        hasFullscreenDelegate:
+            onEnterFullscreen != null || onExitFullscreen != null,
         interceptSchemes: schemes,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
@@ -138,6 +144,41 @@ class AdvancedWebViewController {
   final PageEventCallback? onPageFinished;
   final ProgressCallback? onProgress;
   final TitleChangedCallback? onTitleChanged;
+
+  /// Called after each page finishes loading with the URL of its favicon, or
+  /// `null` when there is none. Load the image yourself, for example with
+  /// `Image.network`.
+  ///
+  /// The URL comes from the page's `<link rel="icon">` (or `shortcut icon`);
+  /// pages without one report `/favicon.ico` on their origin, which may not
+  /// exist, and non-HTTP pages report `null`. WebKit has no public favicon API
+  /// and Android only hands over decoded bitmaps, so both platforms read the
+  /// page's markup instead, which gives the same answer on each. Icons that a
+  /// script adds after the page finished loading are not reported.
+  ///
+  /// Android: `WebView.evaluateJavascript` after `WebViewClient.onPageFinished`.
+  /// iOS: `WKWebView.evaluateJavaScript(_:completionHandler:)` after
+  /// `WKNavigationDelegate.webView(_:didFinish:)`.
+  final FaviconChangedCallback? onFaviconChanged;
+
+  /// Called when the page enters fullscreen, for example when the user taps the
+  /// fullscreen button of a `<video>` or the page calls
+  /// `element.requestFullscreen()`. Hide your own chrome here.
+  ///
+  /// Both platforms show the fullscreen content themselves; these callbacks
+  /// only report it. On Android the plugin covers the Activity's window with
+  /// the content, hides the system bars and leaves fullscreen on back; it does
+  /// not change the screen orientation, so rotate the app yourself if you want
+  /// landscape. Without an Activity to show it in, Android refuses the
+  /// request. iOS presents WebKit's fullscreen view (iOS enables the
+  /// element fullscreen API for this).
+  ///
+  /// Android: `WebChromeClient.onShowCustomView`.
+  /// iOS: key-value observing of `WKWebView.fullscreenState`.
+  final VoidCallback? onEnterFullscreen;
+
+  /// Called when the page leaves fullscreen. See [onEnterFullscreen].
+  final VoidCallback? onExitFullscreen;
 
   /// Called whenever the page scrolls, with the new offset in logical pixels.
   ///
@@ -796,6 +837,15 @@ class _EventListener implements WebViewEventListener {
       PermissionDecision.deny => PermissionDecisionMessage.deny,
     };
   }
+
+  @override
+  void onFaviconChanged(String? url) => _controller.onFaviconChanged?.call(url);
+
+  @override
+  void onEnterFullscreen() => _controller.onEnterFullscreen?.call();
+
+  @override
+  void onExitFullscreen() => _controller.onExitFullscreen?.call();
 
   @override
   void onFindResult(int activeMatchIndex, int numberOfMatches, bool isDone) =>

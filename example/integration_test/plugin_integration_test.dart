@@ -632,6 +632,36 @@ void main() {
     expect(png!.sublist(0, 4), [0x89, 0x50, 0x4e, 0x47]);
   });
 
+  testWidgets('the favicon URL is read from the page', (tester) async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    server.listen((request) {
+      request.response
+        ..headers.contentType = ContentType.html
+        ..write(
+          request.uri.path == '/icon'
+              ? '<html><head><link rel="shortcut icon" href="/custom.png">'
+                    '</head><body>x</body></html>'
+              : '<html><body>no icon</body></html>',
+        )
+        ..close();
+    });
+    final base = 'http://127.0.0.1:${server.port}';
+    final icons = <String?>[];
+    final harness = _Harness(onFaviconChanged: icons.add);
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.controller.loadUrl('$base/icon');
+    await _pumpUntil(tester, () => icons.isNotEmpty);
+    expect(icons.last, '$base/custom.png');
+
+    icons.clear();
+    await harness.controller.loadUrl('$base/plain');
+    await _pumpUntil(tester, () => icons.isNotEmpty);
+    expect(icons.last, '$base/favicon.ico');
+  });
+
   testWidgets('createPdf renders the page to a PDF', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);
@@ -745,6 +775,7 @@ class _Harness {
     JsDialogCallback? onJsDialog,
     HttpErrorCallback? onHttpError,
     FindResultCallback? onFindResult,
+    FaviconChangedCallback? onFaviconChanged,
     List<String> interceptSchemes = const [],
     InterceptRequestCallback? onInterceptRequest,
     WebViewSettings settings = const WebViewSettings(),
@@ -761,6 +792,7 @@ class _Harness {
       onJsDialog: onJsDialog,
       onHttpError: onHttpError,
       onFindResult: onFindResult,
+      onFaviconChanged: onFaviconChanged,
       interceptSchemes: interceptSchemes,
       onInterceptRequest: onInterceptRequest,
       onPageStarted: startedUrls.add,

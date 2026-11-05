@@ -528,6 +528,8 @@ final class RunnerTests: XCTestCase {
     hasJsDialogDelegate: Bool = false,
     hasHttpErrorDelegate: Bool = false,
     hasFindDelegate: Bool = false,
+    hasFaviconDelegate: Bool = false,
+    hasFullscreenDelegate: Bool = false,
     interceptSchemes: [String] = [],
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
@@ -549,6 +551,8 @@ final class RunnerTests: XCTestCase {
       hasJsDialogDelegate: hasJsDialogDelegate,
       hasHttpErrorDelegate: hasHttpErrorDelegate,
       hasFindDelegate: hasFindDelegate,
+      hasFaviconDelegate: hasFaviconDelegate,
+      hasFullscreenDelegate: hasFullscreenDelegate,
       interceptSchemes: interceptSchemes,
       userScripts: userScripts)
   }

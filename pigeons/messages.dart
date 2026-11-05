@@ -187,6 +187,8 @@ class CreationParamsMessage {
     required this.hasJsDialogDelegate,
     required this.hasHttpErrorDelegate,
     required this.hasFindDelegate,
+    required this.hasFaviconDelegate,
+    required this.hasFullscreenDelegate,
     required this.interceptSchemes,
     required this.userScripts,
   });
@@ -247,6 +249,13 @@ class CreationParamsMessage {
 
   /// When false, find progress is never reported to Dart.
   bool hasFindDelegate;
+
+  /// When false, the favicon is never looked up or reported.
+  bool hasFaviconDelegate;
+
+  /// When false, fullscreen changes are still shown natively but never
+  /// reported to Dart.
+  bool hasFullscreenDelegate;
 
   /// Lower-case URL schemes whose requests are answered by Dart through
   /// `onInterceptRequest`. Empty when the app has no intercept callback.
@@ -643,6 +652,19 @@ abstract class AdvancedWebViewFlutterApi {
     int numberOfMatches,
     bool isDone,
   );
+
+  /// The favicon URL of the page that just finished loading, or null when it
+  /// has none. Only sent when the controller was created with
+  /// `hasFaviconDelegate`.
+  void onFaviconChanged(int webViewId, String? url);
+
+  /// The page (a video or any element) entered fullscreen. Only sent when the
+  /// controller was created with `hasFullscreenDelegate`.
+  void onEnterFullscreen(int webViewId);
+
+  /// The page left fullscreen. Only sent when the controller was created with
+  /// `hasFullscreenDelegate`.
+  void onExitFullscreen(int webViewId);
 
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 

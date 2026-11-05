@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:advanced_webview/advanced_webview.dart';
 import 'package:advanced_webview/src/platform/event_dispatcher.dart';
 import 'package:advanced_webview/src/platform/messages.g.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fake_host_api.dart';
@@ -31,6 +31,9 @@ void main() {
     WebResourceErrorCallback? onWebResourceError,
     HttpErrorCallback? onHttpError,
     FindResultCallback? onFindResult,
+    FaviconChangedCallback? onFaviconChanged,
+    VoidCallback? onEnterFullscreen,
+    VoidCallback? onExitFullscreen,
     NavigationRequestCallback? onNavigationRequest,
     NewWindowCallback? onNewWindow,
     PermissionRequestCallback? onPermissionRequest,
@@ -55,6 +58,9 @@ void main() {
       onWebResourceError: onWebResourceError,
       onHttpError: onHttpError,
       onFindResult: onFindResult,
+      onFaviconChanged: onFaviconChanged,
+      onEnterFullscreen: onEnterFullscreen,
+      onExitFullscreen: onExitFullscreen,
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
       onPermissionRequest: onPermissionRequest,
@@ -936,6 +942,46 @@ void main() {
 
     test('an unknown WebView gets no response', () async {
       expect(await dispatcher.onInterceptRequest(9999, request()), isNull);
+    });
+  });
+
+  group('favicon and fullscreen', () {
+    test('are only delegated when a callback is set', () async {
+      final without = createController();
+      final withCallbacks = createController(
+        onFaviconChanged: (_) {},
+        onExitFullscreen: () {},
+      );
+      await without.ready;
+      await withCallbacks.ready;
+
+      final off = hostApi.created[without.webViewId]!;
+      final on = hostApi.created[withCallbacks.webViewId]!;
+      expect(off.hasFaviconDelegate, false);
+      expect(off.hasFullscreenDelegate, false);
+      expect(on.hasFaviconDelegate, true);
+      expect(on.hasFullscreenDelegate, true);
+    });
+
+    test('events are routed by webViewId', () async {
+      final log = <String>[];
+      final controller = createController(
+        onFaviconChanged: (url) => log.add('icon $url'),
+        onEnterFullscreen: () => log.add('enter'),
+        onExitFullscreen: () => log.add('exit'),
+      );
+      final other = createController(
+        onFaviconChanged: (_) => fail('wrong view'),
+        onEnterFullscreen: () => fail('wrong view'),
+      );
+      addTearDown(other.dispose);
+
+      dispatcher.onFaviconChanged(controller.webViewId, 'https://a/i.ico');
+      dispatcher.onFaviconChanged(controller.webViewId, null);
+      dispatcher.onEnterFullscreen(controller.webViewId);
+      dispatcher.onExitFullscreen(controller.webViewId);
+
+      expect(log, ['icon https://a/i.ico', 'icon null', 'enter', 'exit']);
     });
   });
 

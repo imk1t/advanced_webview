@@ -952,6 +952,76 @@
       }
     },
     {
+      "dart": "AdvancedWebViewController.onFaviconChanged",
+      "group": "events",
+      "summary": {
+        "en": "Reports the favicon URL of each page after it finishes loading.",
+        "ja": "各ページの読み込み完了後に、そのファビコンの URL を通知します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebView.evaluateJavascript(String, ValueCallback)",
+          "WebViewClient.onPageFinished(WebView, String)"
+        ],
+        "note": {
+          "en": "WebChromeClient.onReceivedIcon only delivers a decoded bitmap, not a URL, so the plugin reads the page's link rel=icon markup instead, which matches iOS.",
+          "ja": "WebChromeClient.onReceivedIcon が渡すのはデコード済みのビットマップで URL ではないため、iOS と揃えるようにページの link rel=icon を読み取ります。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKWebView.evaluateJavaScript(_:completionHandler:)",
+          "WKNavigationDelegate.webView(_:didFinish:)"
+        ],
+        "note": {
+          "en": "WebKit has no public favicon API, so the plugin reads the page's link rel=icon markup.",
+          "ja": "WebKit には公開のファビコン API がないため、ページの link rel=icon を読み取ります。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onEnterFullscreen",
+      "group": "events",
+      "summary": {
+        "en": "The page (a video or any element) entered fullscreen.",
+        "ja": "ページ（動画などの要素）が全画面表示に入りました。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onShowCustomView(View, WebChromeClient.CustomViewCallback)"],
+        "note": {
+          "en": "The plugin covers the Activity's window with the view, hides the system bars and leaves fullscreen on back. It does not change the screen orientation. Without an Activity the request is refused.",
+          "ja": "プラグインがそのビューで Activity のウィンドウを覆い、システムバーを隠し、戻る操作で全画面を終了します。画面の向きは変更しません。Activity がない場合は要求を拒否します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.fullscreenState", "WKPreferences.isElementFullscreenEnabled"],
+        "note": {
+          "en": "WebKit presents its own fullscreen view; the plugin observes fullscreenState with KVO and enables the element fullscreen API.",
+          "ja": "WebKit が独自の全画面ビューを表示します。プラグインは fullscreenState を KVO で監視し、要素の全画面 API を有効にします。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onExitFullscreen",
+      "group": "events",
+      "summary": {
+        "en": "The page left fullscreen.",
+        "ja": "ページが全画面表示を終了しました。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebChromeClient.onHideCustomView()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.fullscreenState"]
+      }
+    },
+    {
       "dart": "AdvancedWebViewController.onTitleChanged",
       "group": "events",
       "summary": {
