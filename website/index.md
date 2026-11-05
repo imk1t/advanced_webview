@@ -21,7 +21,7 @@ title: advanced_webview
   <AwGrid>
     <AwFeature title="Android and iOS only">No Web or desktop targets. Two platforms, kept behaviourally identical.</AwFeature>
     <AwFeature title="Small public API">A controller, a widget and immutable settings. The controller owns the WebView, so it survives widget rebuilds.</AwFeature>
-    <AwFeature title="Practical features">JavaScript channels, navigation control, cookies, user scripts, popups and file selection.</AwFeature>
+    <AwFeature title="Practical features">JavaScript channels, navigation control, request interception, cookies, user scripts, popups, PDF export and file selection.</AwFeature>
   </AwGrid>
 </AwSection>
 

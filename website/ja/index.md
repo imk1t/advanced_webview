@@ -21,7 +21,7 @@ title: advanced_webview
   <AwGrid>
     <AwFeature title="Android と iOS のみ">Web やデスクトップは対象外。2つのプラットフォームの振る舞いを揃えることに集中しています。</AwFeature>
     <AwFeature title="小さな公開 API">コントローラ、ウィジェット、不変の設定だけ。WebView の寿命はコントローラが持つので、ウィジェットを作り直しても状態が残ります。</AwFeature>
-    <AwFeature title="実用的な機能">JavaScript チャンネル、ナビゲーション制御、Cookie、ユーザースクリプト、ポップアップ、ファイル選択。</AwFeature>
+    <AwFeature title="実用的な機能">JavaScript チャンネル、ナビゲーション制御、リクエストのインターセプト、Cookie、ユーザースクリプト、ポップアップ、PDF 書き出し、ファイル選択。</AwFeature>
   </AwGrid>
 </AwSection>
 
