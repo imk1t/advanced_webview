@@ -91,6 +91,8 @@ On both platforms, JavaScript can call `window.Bridge.postMessage('hello')`.
 - Full-screen in-app browser with a toolbar (`AdvancedInAppBrowser`)
 - Certificate error and HTTP authentication callbacks
 - Navigation decisions (main frame)
+- Request interception: answer custom-scheme requests (and, on Android, `https`) from Dart
+- PDF export, live find-in-page match count, favicon URL and fullscreen video callbacks
 - Callbacks: page started / finished, progress, title changed, load errors
 - Settings: JavaScript enabled, User-Agent, media autoplay, inline playback (iOS),
   zoom (Android), transparent background
