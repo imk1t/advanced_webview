@@ -12,6 +12,7 @@ abstract interface class WebViewEventListener {
   void onLongPress(double x, double y);
   void onConsoleMessage(ConsoleMessageMessage message);
   void onReceivedError(WebResourceErrorMessage error);
+  void onReceivedHttpError(HttpErrorMessage error);
   Future<NavigationDecisionMessage> shouldOverrideUrlLoading(
     NavigationRequestMessage request,
   );
@@ -78,6 +79,10 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   @override
   void onConsoleMessage(int webViewId, ConsoleMessageMessage message) =>
       _listeners[webViewId]?.onConsoleMessage(message);
+
+  @override
+  void onReceivedHttpError(int webViewId, HttpErrorMessage error) =>
+      _listeners[webViewId]?.onReceivedHttpError(error);
 
   @override
   void onReceivedError(int webViewId, WebResourceErrorMessage error) =>

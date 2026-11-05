@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.onHttpError` and `HttpError`: be told when a server answers with an HTTP status of 400 or more. Android also reports sub-resources; iOS reports the main page and iframes.
+
 - Add `AdvancedWebViewController.clearWebsiteData` and `WebsiteDataType`: clear the HTTP cache, `localStorage` / `sessionStorage` and IndexedDB. Android clears all DOM storage when either storage type is selected.
 
 - Fix Android: permission prompts and the file chooser opened from an `AdvancedInAppBrowser` now appear over the browser instead of behind it.

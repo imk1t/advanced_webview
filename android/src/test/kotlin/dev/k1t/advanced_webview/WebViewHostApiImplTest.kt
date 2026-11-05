@@ -13,6 +13,7 @@ import android.webkit.JsResult
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.FrameLayout
@@ -429,6 +430,32 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun httpErrorsAreForwardedToDartOnlyWithADelegate() {
+        val response = WebResourceResponse("text/html", "utf-8", 503, "Unavailable", emptyMap(), null)
+        val request = mock(WebResourceRequest::class.java)
+        org.mockito.Mockito.`when`(request.url).thenReturn(Uri.parse("https://a.test/"))
+        org.mockito.Mockito.`when`(request.isForMainFrame).thenReturn(true)
+        hostApi.create(params(webViewId = 1))
+        hostApi.create(params(webViewId = 2, hasHttpErrorDelegate = true))
+
+        registry.get(1).webView.webViewClient.onReceivedHttpError(registry.get(1).webView, request, response)
+        shadowOf(Looper.getMainLooper()).idle()
+        verify(messenger, never()).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onReceivedHttpError"),
+            any(),
+            any(),
+        )
+
+        registry.get(2).webView.webViewClient.onReceivedHttpError(registry.get(2).webView, request, response)
+        shadowOf(Looper.getMainLooper()).idle()
+        verify(messenger).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onReceivedHttpError"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
     fun javaScriptDialogsAreForwardedToDartWhenThereIsADelegate() {
         hostApi.create(params(webViewId = 1, hasJsDialogDelegate = true))
         val client = registry.get(1).webView.webChromeClient!!
@@ -680,6 +707,7 @@ class WebViewHostApiImplTest {
         hasLongPressDelegate: Boolean = false,
         hasConsoleMessageDelegate: Boolean = false,
         hasJsDialogDelegate: Boolean = false,
+        hasHttpErrorDelegate: Boolean = false,
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
         webViewId,
@@ -697,6 +725,7 @@ class WebViewHostApiImplTest {
         hasLongPressDelegate,
         hasConsoleMessageDelegate,
         hasJsDialogDelegate,
+        hasHttpErrorDelegate,
         userScripts,
     )
 
