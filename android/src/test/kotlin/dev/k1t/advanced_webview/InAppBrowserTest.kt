@@ -261,6 +261,7 @@ class InAppBrowserTest {
         hasConsoleMessageDelegate = false,
         hasJsDialogDelegate = false,
         hasHttpErrorDelegate = false,
+        hasFindDelegate = false,
         interceptSchemes = emptyList(),
         userScripts = emptyList(),
     )

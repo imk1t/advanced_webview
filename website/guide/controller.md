@@ -148,13 +148,27 @@ so a script injected at document start wraps the `console` methods). Android may
 
 ```dart
 final result = await controller.findText('flutter');
-// result.found; on Android also result.matchCount and result.activeMatchIndex.
+// result.found, result.matchCount and result.activeMatchIndex.
 await controller.findText('flutter');                 // same query: next match
 await controller.findText('flutter', forward: false); // previous match
 await controller.clearMatches();                      // remove the highlights
 ```
 
-iOS reports only whether a match was found; `matchCount` and `activeMatchIndex` are `null` there.
+To keep a "3 of 12" label in sync, pass `onFindResult` to the constructor. It receives the active match
+index, the number of matches so far and whether the count is final:
+
+```dart
+AdvancedWebViewController(
+  onFindResult: (activeMatchIndex, numberOfMatches, isDone) {
+    setState(() => label = '${activeMatchIndex + 1} / $numberOfMatches');
+  },
+);
+```
+
+Android reports every update while WebView counts (`isDone` is `false` until the last one). iOS sends one final
+update per `findText` call. WebKit does not report a count or a position, so on iOS the plugin counts the
+query in the page text and follows the search direction to keep the index. Both are best-effort and can
+differ from the highlights for text WebKit searches differently, for example inside iframes.
 
 ## Callbacks
 

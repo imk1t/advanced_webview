@@ -17,6 +17,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasConsoleMessageDelegate: Bool
   private let hasJsDialogDelegate: Bool
   private let hasHttpErrorDelegate: Bool
+  private let hasFindDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private let hasJavaScriptHandlers: Bool
   private let handlerObjectName: String
@@ -26,6 +27,9 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   /// whose policy decision has not arrived yet.
   private var pendingAppInitiatedURL: String?
   private var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
+  /// The query of the running search and the index WebKit is probably at. WebKit reports neither.
+  private var findQuery: String?
+  private var findIndex = 0
 
   init(params: CreationParamsMessage, flutterApi: AdvancedWebViewFlutterApi) {
     self.id = params.webViewId
@@ -39,6 +43,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     self.hasJsDialogDelegate = params.hasJsDialogDelegate
     self.hasHttpErrorDelegate = params.hasHttpErrorDelegate
+    self.hasFindDelegate = params.hasFindDelegate
     self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
     self.handlerObjectName = params.javaScriptHandlerObjectName
 
@@ -221,10 +226,51 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     configuration.backwards = !forward
     configuration.wraps = true
     let result = try await webView.find(query, configuration: configuration)
-    return FindResultMessage(found: result.matchFound)
+    // WebKit only says whether something matched, so count in the page text and follow the
+    // search direction to keep an index. Best-effort, as documented in Dart.
+    let count = result.matchFound ? await countMatches(query) : 0
+    guard result.matchFound, count > 0 else {
+      findQuery = query
+      findIndex = 0
+      report(index: 0, count: 0)
+      return FindResultMessage(found: result.matchFound, matchCount: 0)
+    }
+    if query == findQuery {
+      findIndex = ((forward ? findIndex + 1 : findIndex - 1) % count + count) % count
+    } else {
+      findQuery = query
+      findIndex = forward ? 0 : count - 1
+    }
+    report(index: findIndex, count: count)
+    return FindResultMessage(
+      found: true, matchCount: Int64(count), activeMatchIndex: Int64(findIndex))
+  }
+
+  /// Case-insensitive occurrences of `query` in the visible page text, like `WKFindConfiguration`.
+  private func countMatches(_ query: String) async -> Int {
+    let script = """
+      const text = (document.body ? document.body.innerText : '').toLowerCase();
+      const needle = q.toLowerCase();
+      let count = 0;
+      for (let i = text.indexOf(needle); i !== -1; i = text.indexOf(needle, i + needle.length)) count++;
+      return count;
+      """
+    let value = try? await webView.callAsyncJavaScript(
+      script, arguments: ["q": query], in: nil, contentWorld: .page)
+    return (value as? NSNumber)?.intValue ?? 0
+  }
+
+  private func report(index: Int, count: Int) {
+    guard hasFindDelegate else { return }
+    send { api, id in
+      try await api.onFindResult(
+        webViewId: id, activeMatchIndex: Int64(index), numberOfMatches: Int64(count), isDone: true)
+    }
   }
 
   func clearMatches() {
+    findQuery = nil
+    findIndex = 0
     webView.evaluateJavaScript("window.getSelection().removeAllRanges()", completionHandler: nil)
   }
 

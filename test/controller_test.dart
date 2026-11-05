@@ -30,6 +30,7 @@ void main() {
     ConsoleMessageCallback? onConsoleMessage,
     WebResourceErrorCallback? onWebResourceError,
     HttpErrorCallback? onHttpError,
+    FindResultCallback? onFindResult,
     NavigationRequestCallback? onNavigationRequest,
     NewWindowCallback? onNewWindow,
     PermissionRequestCallback? onPermissionRequest,
@@ -53,6 +54,7 @@ void main() {
       onConsoleMessage: onConsoleMessage,
       onWebResourceError: onWebResourceError,
       onHttpError: onHttpError,
+      onFindResult: onFindResult,
       onNavigationRequest: onNavigationRequest,
       onNewWindow: onNewWindow,
       onPermissionRequest: onPermissionRequest,
@@ -934,6 +936,34 @@ void main() {
 
     test('an unknown WebView gets no response', () async {
       expect(await dispatcher.onInterceptRequest(9999, request()), isNull);
+    });
+  });
+
+  group('find progress', () {
+    test('is only delegated when a callback is set', () async {
+      final without = createController();
+      final withCallback = createController(onFindResult: (_, _, _) {});
+      await without.ready;
+      await withCallback.ready;
+
+      expect(hostApi.created[without.webViewId]!.hasFindDelegate, false);
+      expect(hostApi.created[withCallback.webViewId]!.hasFindDelegate, true);
+    });
+
+    test('is routed by webViewId', () async {
+      final updates = <(int, int, bool)>[];
+      final controller = createController(
+        onFindResult: (index, count, done) => updates.add((index, count, done)),
+      );
+      final other = createController(
+        onFindResult: (_, _, _) => fail('wrong view'),
+      );
+      addTearDown(other.dispose);
+
+      dispatcher.onFindResult(controller.webViewId, 1, 3, false);
+      dispatcher.onFindResult(controller.webViewId, 2, 3, true);
+
+      expect(updates, [(1, 3, false), (2, 3, true)]);
     });
   });
 

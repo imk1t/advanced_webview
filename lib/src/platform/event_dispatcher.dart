@@ -11,6 +11,7 @@ abstract interface class WebViewEventListener {
   void onScrollChanged(double x, double y);
   void onLongPress(double x, double y);
   void onConsoleMessage(ConsoleMessageMessage message);
+  void onFindResult(int activeMatchIndex, int numberOfMatches, bool isDone);
   void onReceivedError(WebResourceErrorMessage error);
   void onReceivedHttpError(HttpErrorMessage error);
   Future<NavigationDecisionMessage> shouldOverrideUrlLoading(
@@ -74,6 +75,18 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   @override
   void onScrollChanged(int webViewId, double x, double y) =>
       _listeners[webViewId]?.onScrollChanged(x, y);
+
+  @override
+  void onFindResult(
+    int webViewId,
+    int activeMatchIndex,
+    int numberOfMatches,
+    bool isDone,
+  ) => _listeners[webViewId]?.onFindResult(
+    activeMatchIndex,
+    numberOfMatches,
+    isDone,
+  );
 
   @override
   void onLongPress(int webViewId, double x, double y) =>

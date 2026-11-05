@@ -507,6 +507,7 @@ class CreationParamsMessage {
     required this.hasConsoleMessageDelegate,
     required this.hasJsDialogDelegate,
     required this.hasHttpErrorDelegate,
+    required this.hasFindDelegate,
     required this.interceptSchemes,
     required this.userScripts,
   });
@@ -566,6 +567,9 @@ class CreationParamsMessage {
   /// When false, HTTP error statuses are never reported to Dart.
   bool hasHttpErrorDelegate;
 
+  /// When false, find progress is never reported to Dart.
+  bool hasFindDelegate;
+
   /// Lower-case URL schemes whose requests are answered by Dart through
   /// `onInterceptRequest`. Empty when the app has no intercept callback.
   List<String> interceptSchemes;
@@ -591,6 +595,7 @@ class CreationParamsMessage {
       hasConsoleMessageDelegate,
       hasJsDialogDelegate,
       hasHttpErrorDelegate,
+      hasFindDelegate,
       interceptSchemes,
       userScripts,
     ];
@@ -618,8 +623,9 @@ class CreationParamsMessage {
       hasConsoleMessageDelegate: result[13]! as bool,
       hasJsDialogDelegate: result[14]! as bool,
       hasHttpErrorDelegate: result[15]! as bool,
-      interceptSchemes: (result[16]! as List<Object?>).cast<String>(),
-      userScripts: (result[17]! as List<Object?>).cast<UserScriptMessage>(),
+      hasFindDelegate: result[16]! as bool,
+      interceptSchemes: (result[17]! as List<Object?>).cast<String>(),
+      userScripts: (result[18]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -632,7 +638,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(interceptSchemes, other.interceptSchemes) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(hasFindDelegate, other.hasFindDelegate) && _deepEquals(interceptSchemes, other.interceptSchemes) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -641,7 +647,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, hasHttpErrorDelegate: $hasHttpErrorDelegate, interceptSchemes: $interceptSchemes, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, hasHttpErrorDelegate: $hasHttpErrorDelegate, hasFindDelegate: $hasFindDelegate, interceptSchemes: $interceptSchemes, userScripts: $userScripts)';
   }
 }
 
@@ -1321,10 +1327,10 @@ class FindResultMessage {
 
   bool found;
 
-  /// Total matches on the page. Null on iOS, which does not report a count.
+  /// Total matches on the page. A best-effort count on iOS.
   int? matchCount;
 
-  /// Zero-based index of the highlighted match. Null on iOS.
+  /// Zero-based index of the highlighted match. Tracked best-effort on iOS.
   int? activeMatchIndex;
 
   List<Object?> _toList() {
@@ -2481,6 +2487,11 @@ abstract class AdvancedWebViewFlutterApi {
   /// created with `hasConsoleMessageDelegate`.
   void onConsoleMessage(int webViewId, ConsoleMessageMessage message);
 
+  /// Find progress. Only sent when the controller was created with
+  /// `hasFindDelegate`. Android sends it as WebView counts (`isDone` false
+  /// until it has finished); iOS sends one final update per `findText`.
+  void onFindResult(int webViewId, int activeMatchIndex, int numberOfMatches, bool isDone);
+
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 
   /// A server answered with a status of 400 or more.
@@ -2676,6 +2687,30 @@ abstract class AdvancedWebViewFlutterApi {
           final ConsoleMessageMessage arg_message = args[1]! as ConsoleMessageMessage;
           try {
             api.onConsoleMessage(arg_webViewId, arg_message);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onFindResult$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final int arg_activeMatchIndex = args[1]! as int;
+          final int arg_numberOfMatches = args[2]! as int;
+          final bool arg_isDone = args[3]! as bool;
+          try {
+            api.onFindResult(arg_webViewId, arg_activeMatchIndex, arg_numberOfMatches, arg_isDone);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

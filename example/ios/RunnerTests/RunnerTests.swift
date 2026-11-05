@@ -302,9 +302,18 @@ final class RunnerTests: XCTestCase {
     let empty = try await hostApi.findText(webViewId: 1, query: "", forward: true)
 
     XCTAssertTrue(hit.found)
-    XCTAssertNil(hit.matchCount)
+    XCTAssertEqual(hit.matchCount, 2)
+    XCTAssertEqual(hit.activeMatchIndex, 0)
     XCTAssertFalse(miss.found)
+    XCTAssertEqual(miss.matchCount, 0)
     XCTAssertFalse(empty.found)
+
+    // The same query moves on and wraps; the best-effort index follows.
+    let first = try await hostApi.findText(webViewId: 1, query: "alpha", forward: true)
+    let second = try await hostApi.findText(webViewId: 1, query: "alpha", forward: true)
+    let back = try await hostApi.findText(webViewId: 1, query: "alpha", forward: false)
+    XCTAssertEqual(
+      [first.activeMatchIndex, second.activeMatchIndex, back.activeMatchIndex], [0, 1, 0])
   }
 
   @MainActor
@@ -518,6 +527,7 @@ final class RunnerTests: XCTestCase {
     hasConsoleMessageDelegate: Bool = false,
     hasJsDialogDelegate: Bool = false,
     hasHttpErrorDelegate: Bool = false,
+    hasFindDelegate: Bool = false,
     interceptSchemes: [String] = [],
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
@@ -538,6 +548,7 @@ final class RunnerTests: XCTestCase {
       hasConsoleMessageDelegate: hasConsoleMessageDelegate,
       hasJsDialogDelegate: hasJsDialogDelegate,
       hasHttpErrorDelegate: hasHttpErrorDelegate,
+      hasFindDelegate: hasFindDelegate,
       interceptSchemes: interceptSchemes,
       userScripts: userScripts)
   }

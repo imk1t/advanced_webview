@@ -2,6 +2,14 @@ import 'package:flutter/foundation.dart';
 
 import 'platform/messages.g.dart';
 
+/// Reports find progress: the zero-based index of the highlighted match, the
+/// number of matches found so far and whether the count is final.
+typedef FindResultCallback = void Function(
+  int activeMatchIndex,
+  int numberOfMatches,
+  bool isDone,
+);
+
 /// The outcome of [AdvancedWebViewController.findText].
 @immutable
 class FindResult {
@@ -14,10 +22,12 @@ class FindResult {
   /// Whether the page contains the query.
   final bool found;
 
-  /// How many matches the page has. `null` on iOS, which does not count.
+  /// How many matches the page has. Best-effort on iOS, see
+  /// [AdvancedWebViewController.onFindResult].
   final int? matchCount;
 
-  /// Zero-based index of the highlighted match. `null` on iOS.
+  /// Zero-based index of the highlighted match; `null` when there is none.
+  /// Best-effort on iOS.
   final int? activeMatchIndex;
 
   @internal

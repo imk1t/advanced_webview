@@ -186,6 +186,7 @@ class CreationParamsMessage {
     required this.hasConsoleMessageDelegate,
     required this.hasJsDialogDelegate,
     required this.hasHttpErrorDelegate,
+    required this.hasFindDelegate,
     required this.interceptSchemes,
     required this.userScripts,
   });
@@ -243,6 +244,9 @@ class CreationParamsMessage {
 
   /// When false, HTTP error statuses are never reported to Dart.
   bool hasHttpErrorDelegate;
+
+  /// When false, find progress is never reported to Dart.
+  bool hasFindDelegate;
 
   /// Lower-case URL schemes whose requests are answered by Dart through
   /// `onInterceptRequest`. Empty when the app has no intercept callback.
@@ -412,10 +416,10 @@ class FindResultMessage {
 
   bool found;
 
-  /// Total matches on the page. Null on iOS, which does not report a count.
+  /// Total matches on the page. A best-effort count on iOS.
   int? matchCount;
 
-  /// Zero-based index of the highlighted match. Null on iOS.
+  /// Zero-based index of the highlighted match. Tracked best-effort on iOS.
   int? activeMatchIndex;
 }
 
@@ -629,6 +633,16 @@ abstract class AdvancedWebViewFlutterApi {
   /// A `console.*` call made by the page. Only sent when the controller was
   /// created with `hasConsoleMessageDelegate`.
   void onConsoleMessage(int webViewId, ConsoleMessageMessage message);
+
+  /// Find progress. Only sent when the controller was created with
+  /// `hasFindDelegate`. Android sends it as WebView counts (`isDone` false
+  /// until it has finished); iOS sends one final update per `findText`.
+  void onFindResult(
+    int webViewId,
+    int activeMatchIndex,
+    int numberOfMatches,
+    bool isDone,
+  );
 
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 

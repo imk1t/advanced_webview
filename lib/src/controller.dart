@@ -44,6 +44,7 @@ class AdvancedWebViewController {
     this.onConsoleMessage,
     this.onWebResourceError,
     this.onHttpError,
+    this.onFindResult,
     this.onNavigationRequest,
     this.onNewWindow,
     this.onPermissionRequest,
@@ -87,6 +88,7 @@ class AdvancedWebViewController {
         hasConsoleMessageDelegate: onConsoleMessage != null,
         hasJsDialogDelegate: onJsDialog != null,
         hasHttpErrorDelegate: onHttpError != null,
+        hasFindDelegate: onFindResult != null,
         interceptSchemes: schemes,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
@@ -428,6 +430,23 @@ class AdvancedWebViewController {
   Future<void> runJavaScript(String source) =>
       _call(() => _hostApi.evaluateJavaScript(webViewId, source));
 
+  /// Called as a search started by [findText] makes progress, with the
+  /// zero-based index of the highlighted match, the number of matches found so
+  /// far and whether the count is final. Use it to keep a "3 of 12" label in
+  /// sync.
+  ///
+  /// Android reports every update while WebView counts, so `isDone` is `false`
+  /// until the last one. iOS reports one final update per [findText] call
+  /// (`isDone` is always `true`); WebKit does not report counts, so the plugin
+  /// counts occurrences of the query in the page text and tracks the active
+  /// index itself. That count can differ from the highlights for text WebKit
+  /// searches differently (for example inside iframes), and the index follows
+  /// the search direction only.
+  ///
+  /// Android: `WebView.setFindListener`.
+  /// iOS: `WKWebView.find(_:configuration:)` plus a page-text count.
+  final FindResultCallback? onFindResult;
+
   /// Finds [query] in the page and highlights a match.
   ///
   /// A new [query] starts at the first match; calling again with the same
@@ -435,9 +454,9 @@ class AdvancedWebViewController {
   /// `false`, wrapping around at the ends. An empty [query] clears the
   /// highlights. Call [clearMatches] when the user closes the search UI.
   ///
-  /// iOS reports only whether a match was found; [FindResult.matchCount] and
-  /// [FindResult.activeMatchIndex] are `null` there. Needs iOS 16 or later,
-  /// which this package already requires.
+  /// On iOS [FindResult.matchCount] and [FindResult.activeMatchIndex] are
+  /// best-effort; see [onFindResult]. Needs iOS 16 or later, which this
+  /// package already requires.
   Future<FindResult> findText(String query, {bool forward = true}) async {
     final message = await _call(
       () => _hostApi.findText(webViewId, query, forward),
@@ -777,6 +796,10 @@ class _EventListener implements WebViewEventListener {
       PermissionDecision.deny => PermissionDecisionMessage.deny,
     };
   }
+
+  @override
+  void onFindResult(int activeMatchIndex, int numberOfMatches, bool isDone) =>
+      _controller.onFindResult?.call(activeMatchIndex, numberOfMatches, isDone);
 
   @override
   Future<InterceptResponseMessage?> onInterceptRequest(
