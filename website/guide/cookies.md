@@ -21,6 +21,21 @@ await controller.clearCookies();
 
 Load or reload a page after `setCookie` for the cookie to be sent.
 
+## Clearing website data
+
+Cookies are one kind of website data. To clear the HTTP cache, `localStorage` / `sessionStorage` and
+IndexedDB, use `clearWebsiteData`:
+
+```dart
+await controller.clearWebsiteData(); // cache, local storage and IndexedDB
+await controller.clearWebsiteData(types: {WebsiteDataType.cache});
+```
+
+It does not remove cookies; call `clearCookies` for those. The data is shared, so it is cleared for
+every WebView of the app on Android and for every WebView on the same data store on iOS. Android
+cannot clear `localStorage` and IndexedDB separately: selecting either one clears all DOM storage of
+the app. Pages that are already loaded keep what they hold in memory until they reload.
+
 ## Platform differences
 
 - The cookie store is shared by all WebViews of the app on Android, and by all WebViews that use

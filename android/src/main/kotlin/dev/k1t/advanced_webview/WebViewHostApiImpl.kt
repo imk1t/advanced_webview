@@ -83,6 +83,9 @@ class WebViewHostApiImpl(
 
     override suspend fun clearCookies(webViewId: Long) = registry.get(webViewId).clearCookies()
 
+    override suspend fun clearWebsiteData(webViewId: Long, types: List<WebsiteDataTypeMessage>) =
+        registry.get(webViewId).clearWebsiteData(types)
+
     override fun addUserScript(webViewId: Long, script: UserScriptMessage) =
         registry.get(webViewId).addUserScript(script)
 

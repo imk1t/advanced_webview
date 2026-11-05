@@ -21,6 +21,21 @@ await controller.clearCookies();
 
 `setCookie` の後にページを読み込む（または再読み込みする）と、その Cookie が送信されます。
 
+## ウェブサイトデータの削除
+
+Cookie はウェブサイトデータの一種です。HTTP キャッシュ、`localStorage` / `sessionStorage`、IndexedDB を
+削除するには `clearWebsiteData` を使います。
+
+```dart
+await controller.clearWebsiteData(); // キャッシュ、ローカルストレージ、IndexedDB
+await controller.clearWebsiteData(types: {WebsiteDataType.cache});
+```
+
+Cookie は削除されないため、削除するには `clearCookies` を呼びます。データは共有されているため、Android では
+アプリ内のすべての WebView、iOS では同じデータストアを使うすべての WebView から削除されます。Android は
+`localStorage` と IndexedDB を個別に削除できず、どちらを選んでもアプリの DOM ストレージをすべて削除します。
+読み込み済みのページは、再読み込みするまでメモリ上の内容を保持します。
+
 ## プラットフォーム差
 
 - Cookie ストアは、Android ではアプリ内のすべての WebView で、iOS ではデフォルトのデータストアを

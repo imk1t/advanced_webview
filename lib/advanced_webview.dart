@@ -14,4 +14,5 @@ export 'src/permission.dart';
 export 'src/security.dart';
 export 'src/settings.dart';
 export 'src/user_script.dart';
+export 'src/website_data.dart';
 export 'src/widget.dart';

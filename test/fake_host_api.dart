@@ -140,6 +140,17 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     return cookies.values.toList();
   }
 
+  final List<List<WebsiteDataTypeMessage>> clearedWebsiteData = [];
+
+  @override
+  Future<void> clearWebsiteData(
+    int webViewId,
+    List<WebsiteDataTypeMessage> types,
+  ) async {
+    calls.add('clearWebsiteData');
+    clearedWebsiteData.add(types);
+  }
+
   @override
   Future<void> clearCookies(int webViewId) async {
     calls.add('clearCookies');

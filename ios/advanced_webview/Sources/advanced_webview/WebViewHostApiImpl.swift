@@ -140,6 +140,10 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     try await registry.get(webViewId).clearCookies()
   }
 
+  func clearWebsiteData(webViewId: Int64, types: [WebsiteDataTypeMessage]) async throws {
+    try await registry.get(webViewId).clearWebsiteData(types)
+  }
+
   func addUserScript(webViewId: Int64, script: UserScriptMessage) throws {
     try registry.get(webViewId).addUserScript(script)
   }

@@ -378,6 +378,8 @@ class ScrollPositionMessage {
   double y;
 }
 
+enum WebsiteDataTypeMessage { cache, localStorage, indexedDb }
+
 class CookieMessage {
   CookieMessage({
     required this.name,
@@ -508,6 +510,11 @@ abstract class AdvancedWebViewHostApi {
 
   @async
   void clearCookies(int webViewId);
+
+  /// Removes the given kinds of website data. Cookies are not included; see
+  /// `clearCookies`.
+  @async
+  void clearWebsiteData(int webViewId, List<WebsiteDataTypeMessage> types);
 
   /// Registers a script for pages loaded from now on.
   void addUserScript(int webViewId, UserScriptMessage script);

@@ -115,6 +115,29 @@ void main() {
     expect(seen.first.defaultText, isNull);
   });
 
+  testWidgets('clearWebsiteData removes the selected storage', (tester) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+    await harness.show(tester);
+    await harness.loadHtml('<html><body></body></html>');
+    Future<Object?> read() => harness.controller.runJavaScriptReturningResult(
+      '[localStorage.getItem("k"), sessionStorage.getItem("k")]',
+    );
+
+    await harness.controller.runJavaScript(
+      'localStorage.setItem("k", "v"); sessionStorage.setItem("k", "v");',
+    );
+    expect(await read(), ['v', 'v']);
+
+    // Clearing only the cache leaves storage alone.
+    await harness.controller.clearWebsiteData(types: {WebsiteDataType.cache});
+    expect(await read(), ['v', 'v']);
+
+    await harness.controller.clearWebsiteData();
+    await harness.loadHtml('<html><body></body></html>');
+    expect((await read() as List)[0], isNull);
+  });
+
   testWidgets('console output is reported with its level', (tester) async {
     final messages = <WebViewConsoleMessage>[];
     final harness = _Harness(onConsoleMessage: messages.add);
