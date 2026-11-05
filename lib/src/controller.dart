@@ -510,7 +510,7 @@ class AdvancedWebViewController {
   /// The page should have finished loading. Android lays the content out on
   /// A4 pages the way printing does (the page's print styles apply). iOS
   /// returns a single page as tall as the whole content, with the screen
-  /// styles. Throws a [PlatformException] with code `pdf-failed` when the
+  /// styles. Throws a `PlatformException` with code `pdf-failed` when the
   /// platform cannot render the page.
   ///
   /// Android: `WebView.createPrintDocumentAdapter` written to a temporary
