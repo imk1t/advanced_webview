@@ -492,6 +492,78 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun interceptedRequestsAreAnsweredByDartOnAnIoThread() {
+        hostApi.create(params(webViewId = 1, interceptSchemes = listOf("app")))
+        val view = registry.get(1)
+        val answer = InterceptResponseMessage(
+            statusCode = 201,
+            mimeType = "text/html; charset=utf-8",
+            headers = mapOf("X-A" to "b", "content-type" to "ignored"),
+            body = "<p>hi</p>".toByteArray(),
+        )
+        `when`(messenger.send(eq(INTERCEPT_CHANNEL), any(), any())).thenAnswer {
+            val reply = it.getArgument<BinaryMessenger.BinaryReply>(2)
+            val encoded = AdvancedWebViewFlutterApi.codec.encodeMessage(listOf(answer))!!
+            encoded.rewind()
+            reply.reply(encoded)
+        }
+
+        val response =
+            onIoThread { view.webView.webViewClient.shouldInterceptRequest(view.webView, request("app://a/")) }
+
+        assertNotNull(response)
+        assertEquals(201, response.statusCode)
+        assertEquals("text/html", response.mimeType)
+        assertEquals("utf-8", response.encoding)
+        assertEquals(mapOf("X-A" to "b"), response.responseHeaders)
+        assertEquals("<p>hi</p>", response.data.readBytes().decodeToString())
+    }
+
+    @Test
+    fun otherSchemesAndUnansweredRequestsAreLetThrough() {
+        hostApi.create(params(webViewId = 1, interceptSchemes = listOf("app")))
+        val view = registry.get(1)
+        view.interceptTimeoutMillis = 100
+
+        assertNull(
+            onIoThread { view.webView.webViewClient.shouldInterceptRequest(view.webView, request("https://a.test/")) },
+        )
+        verify(messenger, never()).send(eq(INTERCEPT_CHANNEL), any(), any())
+
+        // Dart never replies: the request goes on to the network.
+        assertNull(onIoThread { view.webView.webViewClient.shouldInterceptRequest(view.webView, request("app://a/")) })
+        verify(messenger).send(eq(INTERCEPT_CHANNEL), any(), any())
+    }
+
+    @Test
+    fun redirectStatusesCannotBeInterceptedOnAndroid() {
+        val redirect = InterceptResponseMessage(302, "text/plain", mapOf("Location" to "/x"), ByteArray(0))
+
+        assertNull(redirect.toWebResourceResponse())
+    }
+
+    private fun request(url: String): WebResourceRequest {
+        val request = mock(WebResourceRequest::class.java)
+        `when`(request.url).thenReturn(Uri.parse(url))
+        `when`(request.method).thenReturn("GET")
+        `when`(request.requestHeaders).thenReturn(emptyMap())
+        `when`(request.isForMainFrame).thenReturn(false)
+        return request
+    }
+
+    /** Runs [block] like a WebView IO thread would, while the main looper keeps serving the answer. */
+    private fun <T> onIoThread(block: () -> T): T {
+        var result: Result<T>? = null
+        val thread = Thread { result = runCatching(block) }
+        thread.start()
+        while (thread.isAlive) {
+            shadowOf(Looper.getMainLooper()).idle()
+            Thread.sleep(5)
+        }
+        return result!!.getOrThrow()
+    }
+
+    @Test
     fun javaScriptDialogsAreForwardedToDartWhenThereIsADelegate() {
         hostApi.create(params(webViewId = 1, hasJsDialogDelegate = true))
         val client = registry.get(1).webView.webChromeClient!!
@@ -744,6 +816,7 @@ class WebViewHostApiImplTest {
         hasConsoleMessageDelegate: Boolean = false,
         hasJsDialogDelegate: Boolean = false,
         hasHttpErrorDelegate: Boolean = false,
+        interceptSchemes: List<String> = emptyList(),
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
         webViewId,
@@ -762,6 +835,7 @@ class WebViewHostApiImplTest {
         hasConsoleMessageDelegate,
         hasJsDialogDelegate,
         hasHttpErrorDelegate,
+        interceptSchemes,
         userScripts,
     )
 
@@ -812,3 +886,6 @@ class WebViewHostApiImplTest {
         userAgent = userAgent,
     )
 }
+
+private const val INTERCEPT_CHANNEL =
+    "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInterceptRequest"

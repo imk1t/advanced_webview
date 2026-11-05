@@ -13,6 +13,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Bundle
+import android.os.Looper
 import android.os.Message
 import android.os.Parcel
 import android.print.PrintAttributes
@@ -54,11 +55,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.math.roundToInt
 
@@ -99,11 +103,15 @@ class AdvancedWebView(
     private val hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     private val hasJsDialogDelegate = params.hasJsDialogDelegate
     private val hasHttpErrorDelegate = params.hasHttpErrorDelegate
+    private val interceptSchemes = params.interceptSchemes.map { it.lowercase(Locale.ROOT) }.toSet()
     private val scriptHandlers = mutableListOf<ScriptHandler>()
     private var isDestroyed = false
 
     /** Called after a page started or finished loading or its title changed, e.g. to refresh a toolbar. */
     var onPageStateChanged: (() -> Unit)? = null
+
+    /** How long a WebView IO thread waits for Dart to answer an intercepted request. Tests shorten it. */
+    internal var interceptTimeoutMillis = INTERCEPT_TIMEOUT_MILLIS
     private var findQuery: String? = null
     private var pendingFind: CancellableContinuation<FindResultMessage>? = null
 
@@ -503,6 +511,41 @@ class AdvancedWebView(
         webView.destroy()
     }
 
+    /**
+     * Asks Dart to answer [request] when its scheme was registered. WebView calls this on an IO thread and
+     * needs the answer synchronously, so that thread waits while the main thread talks to Dart. A failure or a
+     * timeout lets the request through.
+     */
+    private fun interceptRequest(request: WebResourceRequest): WebResourceResponse? {
+        val scheme = request.url.scheme?.lowercase(Locale.ROOT)
+        if (scheme == null || scheme !in interceptSchemes) return null
+        // Waiting on the main thread would deadlock, because the answer is delivered there.
+        if (Looper.myLooper() == Looper.getMainLooper()) return null
+        val message = InterceptRequestMessage(
+            url = request.url.toString(),
+            method = request.method,
+            headers = request.requestHeaders.orEmpty(),
+            isMainFrame = request.isForMainFrame,
+        )
+        val answer = CompletableFuture<InterceptResponseMessage?>()
+        scope.launch {
+            val response = try {
+                if (isDestroyed) null else flutterApi.onInterceptRequest(id, message)
+            } catch (e: Throwable) {
+                Log.w(TAG, "Intercept delegate failed, letting the request through: ${e.message}")
+                null
+            }
+            answer.complete(response)
+        }
+        val response = try {
+            answer.get(interceptTimeoutMillis, TimeUnit.MILLISECONDS)
+        } catch (e: Exception) {
+            Log.w(TAG, "No answer for ${message.url}, letting the request through: ${e.javaClass.simpleName}")
+            null
+        } ?: return null
+        return response.toWebResourceResponse()
+    }
+
     /** Fire-and-forget call into Dart. Failures are logged, never thrown. */
     private fun send(block: suspend () -> Unit) {
         scope.launch {
@@ -538,9 +581,10 @@ class AdvancedWebView(
             send { flutterApi.onReceivedError(id, message) }
         }
 
-        // Serves Flutter assets loaded with `loadFlutterAsset`; every other request goes to the network.
+        // Serves Flutter assets loaded with `loadFlutterAsset` and the schemes Dart asked for; every other
+        // request goes to the network.
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
-            assetLoader.shouldInterceptRequest(request.url)
+            assetLoader.shouldInterceptRequest(request.url) ?: interceptRequest(request)
 
         override fun onReceivedHttpError(
             view: WebView,
@@ -824,6 +868,7 @@ class AdvancedWebView(
 
     companion object {
         private const val TAG = "AdvancedWebView"
+        private const val INTERCEPT_TIMEOUT_MILLIS = 10_000L
 
         /** Virtual host that serves the app's assets, so pages can load them without `allowFileAccess`. */
         private const val ASSET_DOMAIN = "appassets.androidplatform.net"
@@ -867,4 +912,34 @@ class AdvancedWebView(
             })();
         """.trimIndent()
     }
+}
+
+/**
+ * Turns Dart's answer into a WebView response, or null when Android cannot represent it (a status
+ * outside the ranges [WebResourceResponse] accepts).
+ */
+internal fun InterceptResponseMessage.toWebResourceResponse(): WebResourceResponse? {
+    val status = statusCode.toInt()
+    if (status !in 100..299 && status !in 400..599) {
+        Log.w("AdvancedWebView", "Unsupported intercept status $status, letting the request through")
+        return null
+    }
+    val type = mimeType.substringBefore(';').trim().ifEmpty { "application/octet-stream" }
+    val charset = mimeType.substringAfter("charset=", "").substringBefore(';').trim().trim('"').ifEmpty { null }
+    val responseHeaders = headers.filterKeys { !it.equals("Content-Type", ignoreCase = true) }
+    val stream = ByteArrayInputStream(body)
+    return WebResourceResponse(type, charset, status, reasonPhrase(status), responseHeaders, stream)
+}
+
+private fun reasonPhrase(status: Int): String = when (status) {
+    200 -> "OK"
+    201 -> "Created"
+    204 -> "No Content"
+    206 -> "Partial Content"
+    400 -> "Bad Request"
+    401 -> "Unauthorized"
+    403 -> "Forbidden"
+    404 -> "Not Found"
+    500 -> "Internal Server Error"
+    else -> if (status < 400) "OK" else "Error"
 }

@@ -581,6 +581,9 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
   var hasJsDialogDelegate: Bool
   /// When false, HTTP error statuses are never reported to Dart.
   var hasHttpErrorDelegate: Bool
+  /// Lower-case URL schemes whose requests are answered by Dart through
+  /// `onInterceptRequest`. Empty when the app has no intercept callback.
+  var interceptSchemes: [String]
   /// Scripts injected into every page loaded after creation.
   var userScripts: [UserScriptMessage]
 
@@ -603,7 +606,8 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     let hasConsoleMessageDelegate = pigeonVar_list[13] as! Bool
     let hasJsDialogDelegate = pigeonVar_list[14] as! Bool
     let hasHttpErrorDelegate = pigeonVar_list[15] as! Bool
-    let userScripts = pigeonVar_list[16] as! [UserScriptMessage]
+    let interceptSchemes = pigeonVar_list[16] as! [String]
+    let userScripts = pigeonVar_list[17] as! [UserScriptMessage]
 
     return CreationParamsMessage(
       webViewId: webViewId,
@@ -622,6 +626,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       hasConsoleMessageDelegate: hasConsoleMessageDelegate,
       hasJsDialogDelegate: hasJsDialogDelegate,
       hasHttpErrorDelegate: hasHttpErrorDelegate,
+      interceptSchemes: interceptSchemes,
       userScripts: userScripts
     )
   }
@@ -643,6 +648,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
       hasConsoleMessageDelegate,
       hasJsDialogDelegate,
       hasHttpErrorDelegate,
+      interceptSchemes,
       userScripts,
     ]
   }
@@ -650,7 +656,7 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasDownloadDelegate, rhs.hasDownloadDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasSslErrorDelegate, rhs.hasSslErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpAuthDelegate, rhs.hasHttpAuthDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasScrollDelegate, rhs.hasScrollDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasLongPressDelegate, rhs.hasLongPressDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasConsoleMessageDelegate, rhs.hasConsoleMessageDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasJsDialogDelegate, rhs.hasJsDialogDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpErrorDelegate, rhs.hasHttpErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
+    return MessagesPigeonInternal.deepEquals(lhs.webViewId, rhs.webViewId) && MessagesPigeonInternal.deepEquals(lhs.settings, rhs.settings) && MessagesPigeonInternal.deepEquals(lhs.javaScriptChannelNames, rhs.javaScriptChannelNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerNames, rhs.javaScriptHandlerNames) && MessagesPigeonInternal.deepEquals(lhs.javaScriptHandlerObjectName, rhs.javaScriptHandlerObjectName) && MessagesPigeonInternal.deepEquals(lhs.hasNavigationDelegate, rhs.hasNavigationDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasNewWindowDelegate, rhs.hasNewWindowDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasPermissionDelegate, rhs.hasPermissionDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasDownloadDelegate, rhs.hasDownloadDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasSslErrorDelegate, rhs.hasSslErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpAuthDelegate, rhs.hasHttpAuthDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasScrollDelegate, rhs.hasScrollDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasLongPressDelegate, rhs.hasLongPressDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasConsoleMessageDelegate, rhs.hasConsoleMessageDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasJsDialogDelegate, rhs.hasJsDialogDelegate) && MessagesPigeonInternal.deepEquals(lhs.hasHttpErrorDelegate, rhs.hasHttpErrorDelegate) && MessagesPigeonInternal.deepEquals(lhs.interceptSchemes, rhs.interceptSchemes) && MessagesPigeonInternal.deepEquals(lhs.userScripts, rhs.userScripts)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -671,11 +677,12 @@ struct CreationParamsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: hasConsoleMessageDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasJsDialogDelegate, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: hasHttpErrorDelegate, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: interceptSchemes, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userScripts, hasher: &hasher)
   }
 
   public var description: String {
-    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), hasDownloadDelegate: \(String(describing: hasDownloadDelegate)), hasSslErrorDelegate: \(String(describing: hasSslErrorDelegate)), hasHttpAuthDelegate: \(String(describing: hasHttpAuthDelegate)), hasScrollDelegate: \(String(describing: hasScrollDelegate)), hasLongPressDelegate: \(String(describing: hasLongPressDelegate)), hasConsoleMessageDelegate: \(String(describing: hasConsoleMessageDelegate)), hasJsDialogDelegate: \(String(describing: hasJsDialogDelegate)), hasHttpErrorDelegate: \(String(describing: hasHttpErrorDelegate)), userScripts: \(String(describing: userScripts)))"
+    return "CreationParamsMessage(webViewId: \(String(describing: webViewId)), settings: \(String(describing: settings)), javaScriptChannelNames: \(String(describing: javaScriptChannelNames)), javaScriptHandlerNames: \(String(describing: javaScriptHandlerNames)), javaScriptHandlerObjectName: \(String(describing: javaScriptHandlerObjectName)), hasNavigationDelegate: \(String(describing: hasNavigationDelegate)), hasNewWindowDelegate: \(String(describing: hasNewWindowDelegate)), hasPermissionDelegate: \(String(describing: hasPermissionDelegate)), hasDownloadDelegate: \(String(describing: hasDownloadDelegate)), hasSslErrorDelegate: \(String(describing: hasSslErrorDelegate)), hasHttpAuthDelegate: \(String(describing: hasHttpAuthDelegate)), hasScrollDelegate: \(String(describing: hasScrollDelegate)), hasLongPressDelegate: \(String(describing: hasLongPressDelegate)), hasConsoleMessageDelegate: \(String(describing: hasConsoleMessageDelegate)), hasJsDialogDelegate: \(String(describing: hasJsDialogDelegate)), hasHttpErrorDelegate: \(String(describing: hasHttpErrorDelegate)), interceptSchemes: \(String(describing: interceptSchemes)), userScripts: \(String(describing: userScripts)))"
   }
 }
 
@@ -1126,6 +1133,107 @@ struct JsDialogResultMessage: Hashable, CustomStringConvertible {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct InterceptRequestMessage: Hashable, CustomStringConvertible {
+  var url: String
+  var method: String
+  var headers: [String: String]
+  var isMainFrame: Bool
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> InterceptRequestMessage? {
+    let url = pigeonVar_list[0] as! String
+    let method = pigeonVar_list[1] as! String
+    let headers = pigeonVar_list[2] as! [String: String]
+    let isMainFrame = pigeonVar_list[3] as! Bool
+
+    return InterceptRequestMessage(
+      url: url,
+      method: method,
+      headers: headers,
+      isMainFrame: isMainFrame
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      url,
+      method,
+      headers,
+      isMainFrame,
+    ]
+  }
+  static func == (lhs: InterceptRequestMessage, rhs: InterceptRequestMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.url, rhs.url) && MessagesPigeonInternal.deepEquals(lhs.method, rhs.method) && MessagesPigeonInternal.deepEquals(lhs.headers, rhs.headers) && MessagesPigeonInternal.deepEquals(lhs.isMainFrame, rhs.isMainFrame)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("InterceptRequestMessage")
+    MessagesPigeonInternal.deepHash(value: url, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: method, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: headers, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: isMainFrame, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "InterceptRequestMessage(url: \(String(describing: url)), method: \(String(describing: method)), headers: \(String(describing: headers)), isMainFrame: \(String(describing: isMainFrame)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct InterceptResponseMessage: Hashable, CustomStringConvertible {
+  var statusCode: Int64
+  /// May carry a charset parameter, e.g. `text/html; charset=utf-8`.
+  var mimeType: String
+  var headers: [String: String]
+  var body: FlutterStandardTypedData
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> InterceptResponseMessage? {
+    let statusCode = pigeonVar_list[0] as! Int64
+    let mimeType = pigeonVar_list[1] as! String
+    let headers = pigeonVar_list[2] as! [String: String]
+    let body = pigeonVar_list[3] as! FlutterStandardTypedData
+
+    return InterceptResponseMessage(
+      statusCode: statusCode,
+      mimeType: mimeType,
+      headers: headers,
+      body: body
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      statusCode,
+      mimeType,
+      headers,
+      body,
+    ]
+  }
+  static func == (lhs: InterceptResponseMessage, rhs: InterceptResponseMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.statusCode, rhs.statusCode) && MessagesPigeonInternal.deepEquals(lhs.mimeType, rhs.mimeType) && MessagesPigeonInternal.deepEquals(lhs.headers, rhs.headers) && MessagesPigeonInternal.deepEquals(lhs.body, rhs.body)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("InterceptResponseMessage")
+    MessagesPigeonInternal.deepHash(value: statusCode, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: mimeType, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: headers, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: body, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "InterceptResponseMessage(statusCode: \(String(describing: statusCode)), mimeType: \(String(describing: mimeType)), headers: \(String(describing: headers)), body: \(String(describing: body)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct FindResultMessage: Hashable, CustomStringConvertible {
   var found: Bool
   /// Total matches on the page. Null on iOS, which does not report a count.
@@ -1453,12 +1561,16 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 154:
       return JsDialogResultMessage.fromList(self.readValue() as! [Any?])
     case 155:
-      return FindResultMessage.fromList(self.readValue() as! [Any?])
+      return InterceptRequestMessage.fromList(self.readValue() as! [Any?])
     case 156:
-      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+      return InterceptResponseMessage.fromList(self.readValue() as! [Any?])
     case 157:
-      return CookieMessage.fromList(self.readValue() as! [Any?])
+      return FindResultMessage.fromList(self.readValue() as! [Any?])
     case 158:
+      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+    case 159:
+      return CookieMessage.fromList(self.readValue() as! [Any?])
+    case 160:
       return InAppBrowserParamsMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1546,17 +1658,23 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? JsDialogResultMessage {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? FindResultMessage {
+    } else if let value = value as? InterceptRequestMessage {
       super.writeByte(155)
       super.writeValue(value.toList())
-    } else if let value = value as? ScrollPositionMessage {
+    } else if let value = value as? InterceptResponseMessage {
       super.writeByte(156)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? FindResultMessage {
       super.writeByte(157)
       super.writeValue(value.toList())
-    } else if let value = value as? InAppBrowserParamsMessage {
+    } else if let value = value as? ScrollPositionMessage {
       super.writeByte(158)
+      super.writeValue(value.toList())
+    } else if let value = value as? CookieMessage {
+      super.writeByte(159)
+      super.writeValue(value.toList())
+    } else if let value = value as? InAppBrowserParamsMessage {
+      super.writeByte(160)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -2258,6 +2376,11 @@ protocol AdvancedWebViewFlutterApiProtocol {
   /// The page opened a JavaScript dialog (`alert`, `confirm` or `prompt`).
   /// The page is blocked until this completes.
   @MainActor func onJsDialog(webViewId webViewIdArg: Int64, request requestArg: JsDialogRequestMessage) async throws -> JsDialogResultMessage
+  /// A request to a scheme listed in `interceptSchemes`. Null lets the
+  /// request through (Android) or fails it (iOS, where custom schemes have no
+  /// network fallback). Android blocks a WebView IO thread, not the main
+  /// thread, until this completes.
+  @MainActor func onInterceptRequest(webViewId webViewIdArg: Int64, request requestArg: InterceptRequestMessage) async throws -> InterceptResponseMessage?
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
   /// argument list; the result is the JSON-encoded return value. Throwing
   /// rejects the page's promise.
@@ -2617,6 +2740,31 @@ class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
           continuation.resume(throwing: PigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: ""))
         } else {
           let result = listResponse[0] as! JsDialogResultMessage
+          continuation.resume(returning: result)
+        }
+      }
+    }
+  }
+  /// A request to a scheme listed in `interceptSchemes`. Null lets the
+  /// request through (Android) or fails it (iOS, where custom schemes have no
+  /// network fallback). Android blocks a WebView IO thread, not the main
+  /// thread, until this completes.
+  @MainActor func onInterceptRequest(webViewId webViewIdArg: Int64, request requestArg: InterceptRequestMessage) async throws -> InterceptResponseMessage? {
+    return try await withCheckedThrowingContinuation { continuation in
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInterceptRequest\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([webViewIdArg, requestArg] as [Any?]) { response in
+        guard let listResponse = response as? [Any?] else {
+          continuation.resume(throwing: createConnectionError(withChannelName: channelName))
+          return
+        }
+        if listResponse.count > 1 {
+          let code: String = listResponse[0] as! String
+          let message: String? = nilOrValue(listResponse[1])
+          let details: String? = nilOrValue(listResponse[2])
+          continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
+        } else {
+          let result: InterceptResponseMessage? = nilOrValue(listResponse[0])
           continuation.resume(returning: result)
         }
       }

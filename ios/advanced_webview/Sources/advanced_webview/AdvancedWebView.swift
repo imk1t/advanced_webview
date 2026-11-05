@@ -51,6 +51,12 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     if params.settings.incognito {
       configuration.websiteDataStore = .nonPersistent()
     }
+    // WebKit refuses to hand its built-in schemes (http, https, file, ...) to an app.
+    for scheme in Set(params.interceptSchemes) where !WKWebView.handlesURLScheme(scheme) {
+      configuration.setURLSchemeHandler(
+        InterceptSchemeHandler(webViewId: params.webViewId, flutterApi: flutterApi),
+        forURLScheme: scheme)
+    }
     self.webView = WKWebView(frame: .zero, configuration: configuration)
     super.init()
 
@@ -925,5 +931,70 @@ extension AdvancedWebView: UIGestureRecognizerDelegate {
     shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer
   ) -> Bool {
     return true
+  }
+}
+
+/// Answers requests to custom URL schemes by asking Dart. WebKit offers no way to intercept `http` or
+/// `https`, and no network fallback exists for a custom scheme, so a `nil` answer fails the request.
+final class InterceptSchemeHandler: NSObject, WKURLSchemeHandler {
+  private let webViewId: Int64
+  private let flutterApi: AdvancedWebViewFlutterApi
+  /// Tasks Dart has not answered yet. WebKit raises if a stopped task is used, so a task is dropped
+  /// here as soon as `stop` arrives.
+  private var pending: [ObjectIdentifier: WKURLSchemeTask] = [:]
+
+  init(webViewId: Int64, flutterApi: AdvancedWebViewFlutterApi) {
+    self.webViewId = webViewId
+    self.flutterApi = flutterApi
+  }
+
+  func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
+    let request = urlSchemeTask.request
+    guard let url = request.url else {
+      urlSchemeTask.didFailWithError(URLError(.badURL))
+      return
+    }
+    let message = InterceptRequestMessage(
+      url: url.absoluteString,
+      method: request.httpMethod ?? "GET",
+      headers: request.allHTTPHeaderFields ?? [:],
+      isMainFrame: request.mainDocumentURL == url)
+    let key = ObjectIdentifier(urlSchemeTask)
+    pending[key] = urlSchemeTask
+    let api = flutterApi
+    let id = webViewId
+    Task { @MainActor [weak self] in
+      let answer: InterceptResponseMessage?
+      do {
+        answer = try await api.onInterceptRequest(webViewId: id, request: message)
+      } catch {
+        NSLog("AdvancedWebView: intercept delegate failed, failing the request: \(error)")
+        answer = nil
+      }
+      // `stop` removed the task while Dart was thinking.
+      guard let self = self, let task = self.pending.removeValue(forKey: key) else { return }
+      guard let answer = answer else {
+        task.didFailWithError(URLError(.unsupportedURL))
+        return
+      }
+      var headers = answer.headers
+      headers["Content-Type"] = answer.mimeType
+      headers["Content-Length"] = String(answer.body.data.count)
+      guard
+        let response = HTTPURLResponse(
+          url: url, statusCode: Int(answer.statusCode), httpVersion: "HTTP/1.1",
+          headerFields: headers)
+      else {
+        task.didFailWithError(URLError(.cannotParseResponse))
+        return
+      }
+      task.didReceive(response)
+      task.didReceive(answer.body.data)
+      task.didFinish()
+    }
+  }
+
+  func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {
+    pending.removeValue(forKey: ObjectIdentifier(urlSchemeTask))
   }
 }

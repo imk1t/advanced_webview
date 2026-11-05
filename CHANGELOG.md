@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.onInterceptRequest`, `interceptSchemes`, `InterceptedRequest` and `InterceptResponse`: answer requests to custom URL schemes (and, on Android, any scheme including `https`) with bytes made up in Dart, or let them through. iOS can only intercept custom schemes because WebKit does not allow `http` and `https`.
+
 ## 0.8.0 - 2026-11-05
 
 - Add `AdvancedWebViewController.onJsDialog`, `JsDialogRequest`, `JsDialogResponse` and `JsDialogType`: answer JavaScript `alert`, `confirm` and `prompt` dialogs from Dart. Without a callback Android keeps the system WebView's dialog and iOS now shows a native alert (WebKit used to dismiss them silently).

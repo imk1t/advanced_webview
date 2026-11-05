@@ -507,6 +507,7 @@ class CreationParamsMessage {
     required this.hasConsoleMessageDelegate,
     required this.hasJsDialogDelegate,
     required this.hasHttpErrorDelegate,
+    required this.interceptSchemes,
     required this.userScripts,
   });
 
@@ -565,6 +566,10 @@ class CreationParamsMessage {
   /// When false, HTTP error statuses are never reported to Dart.
   bool hasHttpErrorDelegate;
 
+  /// Lower-case URL schemes whose requests are answered by Dart through
+  /// `onInterceptRequest`. Empty when the app has no intercept callback.
+  List<String> interceptSchemes;
+
   /// Scripts injected into every page loaded after creation.
   List<UserScriptMessage> userScripts;
 
@@ -586,6 +591,7 @@ class CreationParamsMessage {
       hasConsoleMessageDelegate,
       hasJsDialogDelegate,
       hasHttpErrorDelegate,
+      interceptSchemes,
       userScripts,
     ];
   }
@@ -612,7 +618,8 @@ class CreationParamsMessage {
       hasConsoleMessageDelegate: result[13]! as bool,
       hasJsDialogDelegate: result[14]! as bool,
       hasHttpErrorDelegate: result[15]! as bool,
-      userScripts: (result[16]! as List<Object?>).cast<UserScriptMessage>(),
+      interceptSchemes: (result[16]! as List<Object?>).cast<String>(),
+      userScripts: (result[17]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -625,7 +632,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(interceptSchemes, other.interceptSchemes) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -634,7 +641,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, hasHttpErrorDelegate: $hasHttpErrorDelegate, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, hasHttpErrorDelegate: $hasHttpErrorDelegate, interceptSchemes: $interceptSchemes, userScripts: $userScripts)';
   }
 }
 
@@ -1184,6 +1191,127 @@ class JsDialogResultMessage {
   }
 }
 
+class InterceptRequestMessage {
+  InterceptRequestMessage({
+    required this.url,
+    required this.method,
+    required this.headers,
+    required this.isMainFrame,
+  });
+
+  String url;
+
+  String method;
+
+  Map<String, String> headers;
+
+  bool isMainFrame;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      url,
+      method,
+      headers,
+      isMainFrame,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static InterceptRequestMessage decode(Object result) {
+    result as List<Object?>;
+    return InterceptRequestMessage(
+      url: result[0]! as String,
+      method: result[1]! as String,
+      headers: (result[2]! as Map<Object?, Object?>).cast<String, String>(),
+      isMainFrame: result[3]! as bool,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! InterceptRequestMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(url, other.url) && _deepEquals(method, other.method) && _deepEquals(headers, other.headers) && _deepEquals(isMainFrame, other.isMainFrame);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'InterceptRequestMessage(url: $url, method: $method, headers: $headers, isMainFrame: $isMainFrame)';
+  }
+}
+
+class InterceptResponseMessage {
+  InterceptResponseMessage({
+    required this.statusCode,
+    required this.mimeType,
+    required this.headers,
+    required this.body,
+  });
+
+  int statusCode;
+
+  /// May carry a charset parameter, e.g. `text/html; charset=utf-8`.
+  String mimeType;
+
+  Map<String, String> headers;
+
+  Uint8List body;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      statusCode,
+      mimeType,
+      headers,
+      body,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static InterceptResponseMessage decode(Object result) {
+    result as List<Object?>;
+    return InterceptResponseMessage(
+      statusCode: result[0]! as int,
+      mimeType: result[1]! as String,
+      headers: (result[2]! as Map<Object?, Object?>).cast<String, String>(),
+      body: result[3]! as Uint8List,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! InterceptResponseMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(statusCode, other.statusCode) && _deepEquals(mimeType, other.mimeType) && _deepEquals(headers, other.headers) && _deepEquals(body, other.body);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'InterceptResponseMessage(statusCode: $statusCode, mimeType: $mimeType, headers: $headers, body: $body)';
+  }
+}
+
 class FindResultMessage {
   FindResultMessage({
     required this.found,
@@ -1533,17 +1661,23 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is JsDialogResultMessage) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    }    else if (value is FindResultMessage) {
+    }    else if (value is InterceptRequestMessage) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    }    else if (value is ScrollPositionMessage) {
+    }    else if (value is InterceptResponseMessage) {
       buffer.putUint8(156);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is FindResultMessage) {
       buffer.putUint8(157);
       writeValue(buffer, value.encode());
-    }    else if (value is InAppBrowserParamsMessage) {
+    }    else if (value is ScrollPositionMessage) {
       buffer.putUint8(158);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(159);
+      writeValue(buffer, value.encode());
+    }    else if (value is InAppBrowserParamsMessage) {
+      buffer.putUint8(160);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1618,12 +1752,16 @@ class _PigeonCodec extends StandardMessageCodec {
       case 154:
         return JsDialogResultMessage.decode(readValue(buffer)!);
       case 155:
-        return FindResultMessage.decode(readValue(buffer)!);
+        return InterceptRequestMessage.decode(readValue(buffer)!);
       case 156:
-        return ScrollPositionMessage.decode(readValue(buffer)!);
+        return InterceptResponseMessage.decode(readValue(buffer)!);
       case 157:
-        return CookieMessage.decode(readValue(buffer)!);
+        return FindResultMessage.decode(readValue(buffer)!);
       case 158:
+        return ScrollPositionMessage.decode(readValue(buffer)!);
+      case 159:
+        return CookieMessage.decode(readValue(buffer)!);
+      case 160:
         return InAppBrowserParamsMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2346,6 +2484,12 @@ abstract class AdvancedWebViewFlutterApi {
   /// The page is blocked until this completes.
   Future<JsDialogResultMessage> onJsDialog(int webViewId, JsDialogRequestMessage request);
 
+  /// A request to a scheme listed in `interceptSchemes`. Null lets the
+  /// request through (Android) or fails it (iOS, where custom schemes have no
+  /// network fallback). Android blocks a WebView IO thread, not the main
+  /// thread, until this completes.
+  Future<InterceptResponseMessage?> onInterceptRequest(int webViewId, InterceptRequestMessage request);
+
   /// A page called a JavaScript handler. `argsJson` is the JSON-encoded
   /// argument list; the result is the JSON-encoded return value. Throwing
   /// rejects the page's promise.
@@ -2709,6 +2853,28 @@ abstract class AdvancedWebViewFlutterApi {
           final JsDialogRequestMessage arg_request = args[1]! as JsDialogRequestMessage;
           try {
             final JsDialogResultMessage output = await api.onJsDialog(arg_webViewId, arg_request);
+            return wrapResponse(result: output);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInterceptRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final InterceptRequestMessage arg_request = args[1]! as InterceptRequestMessage;
+          try {
+            final InterceptResponseMessage? output = await api.onInterceptRequest(arg_webViewId, arg_request);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

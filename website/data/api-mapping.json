@@ -134,6 +134,8 @@
       "HTTPCookie": "https://developer.apple.com/documentation/foundation/httpcookie",
       "WKUIDelegate": "https://developer.apple.com/documentation/webkit/wkuidelegate",
       "WKFrameInfo": "https://developer.apple.com/documentation/webkit/wkframeinfo",
+      "WKURLSchemeHandler": "https://developer.apple.com/documentation/webkit/wkurlschemehandler",
+      "WKURLSchemeTask": "https://developer.apple.com/documentation/webkit/wkurlschemetask",
       "HTTPURLResponse": "https://developer.apple.com/documentation/foundation/httpurlresponse",
       "FlutterPluginRegistrar": "https://api.flutter.dev/ios-embedder/protocol_flutter_plugin_registrar-p.html",
       "WKWindowFeatures": "https://developer.apple.com/documentation/webkit/wkwindowfeatures",
@@ -2239,6 +2241,107 @@
       "ios": {
         "status": "supported",
         "apis": ["WKUIDelegate"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onInterceptRequest",
+      "group": "events",
+      "summary": {
+        "en": "Answers requests to the schemes in interceptSchemes with data made up in Dart, or lets them through.",
+        "ja": "interceptSchemes のスキームへのリクエストに、Dart で用意したデータで応答します。応答しない場合はそのまま通します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewClient.shouldInterceptRequest(WebView, WebResourceRequest)"],
+        "note": {
+          "en": "Works for every scheme, including http and https. WebView calls it on an IO thread and needs the answer synchronously, so that thread waits (up to 10 seconds) while the main thread asks Dart. A null answer, an error or a timeout loads the request from the network.",
+          "ja": "http や https を含むすべてのスキームで使えます。WebView は IO スレッドで呼び出して同期的な答えを求めるため、そのスレッドが（最大10秒）待つ間にメインスレッドが Dart に問い合わせます。null、エラー、タイムアウトの場合はネットワークから読み込みます。"
+        }
+      },
+      "ios": {
+        "status": "partial",
+        "apis": [
+          "WKURLSchemeHandler.webView(_:start:)",
+          "WKURLSchemeHandler.webView(_:stop:)",
+          "WKWebViewConfiguration.setURLSchemeHandler(_:forURLScheme:)"
+        ],
+        "note": {
+          "en": "Custom schemes only. WebKit does not let apps handle http, https, file, data and other built-in schemes (WKWebView.handlesURLScheme), so those entries are ignored. A custom scheme has no network behind it, so a null answer or an error fails the request.",
+          "ja": "カスタムスキームのみです。WebKit は http、https、file、data などの組み込みスキームをアプリが処理することを許さない（WKWebView.handlesURLScheme）ため、それらは無視されます。カスタムスキームにはフォールバック先のネットワークがないため、null やエラーのときはリクエストが失敗します。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.interceptSchemes",
+      "group": "events",
+      "summary": {
+        "en": "The URL schemes whose requests are passed to onInterceptRequest.",
+        "ja": "リクエストが onInterceptRequest に渡される URL スキームです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebResourceRequest.getUrl()"],
+        "note": {
+          "en": "The scheme of each request is compared with this list inside shouldInterceptRequest.",
+          "ja": "shouldInterceptRequest の中で各リクエストのスキームをこの一覧と照合します。"
+        }
+      },
+      "ios": {
+        "status": "partial",
+        "apis": ["WKWebViewConfiguration.setURLSchemeHandler(_:forURLScheme:)"],
+        "note": {
+          "en": "Registered when the WebView is created; built-in schemes are skipped.",
+          "ja": "WebView の生成時に登録されます。組み込みスキームは除外されます。"
+        }
+      }
+    },
+    {
+      "dart": "InterceptedRequest",
+      "group": "events",
+      "summary": {
+        "en": "The URL, method, headers and main-frame flag of an intercepted request. Bodies are not available.",
+        "ja": "インターセプトしたリクエストの URL、メソッド、ヘッダ、メインフレームかどうかです。ボディは取得できません。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebResourceRequest.getUrl()",
+          "WebResourceRequest.getMethod()",
+          "WebResourceRequest.getRequestHeaders()",
+          "WebResourceRequest.isForMainFrame()"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKURLSchemeTask.request"],
+        "note": {
+          "en": "isMainFrame compares URLRequest.mainDocumentURL with the request URL.",
+          "ja": "isMainFrame は URLRequest.mainDocumentURL とリクエスト URL を比較して求めます。"
+        }
+      }
+    },
+    {
+      "dart": "InterceptResponse",
+      "group": "events",
+      "summary": {
+        "en": "A response made up by the app: body bytes, MIME type, status and headers.",
+        "ja": "アプリが用意した応答です。ボディのバイト列、MIME タイプ、ステータス、ヘッダを持ちます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebResourceResponse(String, String, int, String, Map, InputStream)"],
+        "note": {
+          "en": "Redirect statuses (300 to 399) are not supported by WebResourceResponse; such an answer lets the request through.",
+          "ja": "WebResourceResponse はリダイレクト用のステータス（300〜399）に対応していません。その場合はリクエストをそのまま通します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKURLSchemeTask.didReceive(URLResponse)",
+          "WKURLSchemeTask.didReceive(Data)",
+          "WKURLSchemeTask.didFinish()"
+        ]
       }
     },
     {
