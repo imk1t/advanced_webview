@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:advanced_webview/advanced_webview.dart';
 import 'package:flutter/material.dart';
@@ -169,6 +170,65 @@ void main() {
 
     expect(mainFrame().single.statusCode, 404);
     expect(mainFrame().single.url, '$base/missing');
+  });
+
+  testWidgets('loads a Flutter asset', (tester) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+    await harness.show(tester);
+
+    final finished = harness.expectPageFinished();
+    await harness.controller.loadFlutterAsset('assets/hello.html');
+    await finished;
+
+    expect(await harness.controller.title(), 'hello asset');
+  });
+
+  testWidgets('loads a local file', (tester) async {
+    final dir = await Directory.systemTemp.createTemp('advanced_webview');
+    addTearDown(() => dir.delete(recursive: true));
+    final file = File('${dir.path}/page.html')
+      ..writeAsStringSync('<html><head><title>from file</title></head></html>');
+    final harness = _Harness(
+      settings: const WebViewSettings(
+        android: AndroidWebViewSettings(allowFileAccess: true),
+      ),
+    );
+    addTearDown(harness.dispose);
+    await harness.show(tester);
+
+    final finished = harness.expectPageFinished();
+    await harness.controller.loadFile(file.path);
+    await finished;
+
+    expect(await harness.controller.title(), 'from file');
+  });
+
+  testWidgets('loadRequest sends a POST body', (tester) async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    server.listen((request) async {
+      final body = await utf8.decoder.bind(request).join();
+      request.response
+        ..headers.contentType = ContentType.html
+        ..write(
+          '<html><head><title>${request.method} $body</title></head></html>',
+        )
+        ..close();
+    });
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+    await harness.show(tester);
+
+    final finished = harness.expectPageFinished();
+    await harness.controller.loadRequest(
+      'http://127.0.0.1:${server.port}/submit',
+      method: WebViewHttpMethod.post,
+      body: Uint8List.fromList(utf8.encode('a=1&b=2')),
+    );
+    await finished;
+
+    expect(await harness.controller.title(), 'POST a=1&b=2');
   });
 
   testWidgets('console output is reported with its level', (tester) async {
@@ -634,8 +694,10 @@ class _Harness {
     ConsoleMessageCallback? onConsoleMessage,
     JsDialogCallback? onJsDialog,
     HttpErrorCallback? onHttpError,
+    WebViewSettings settings = const WebViewSettings(),
   }) {
     controller = AdvancedWebViewController(
+      settings: settings,
       javaScriptChannels: javaScriptChannels,
       javaScriptHandlers: javaScriptHandlers,
       userScripts: userScripts,
@@ -665,6 +727,12 @@ class _Harness {
     );
     await controller.ready;
     await tester.pumpAndSettle();
+  }
+
+  /// Completes when the next page finishes loading; start it before the load.
+  Future<void> expectPageFinished() {
+    final finished = _pageFinished = Completer<void>();
+    return finished.future.timeout(_timeout);
   }
 
   /// Loads [html] at [_baseUrl] and waits for the page to finish.

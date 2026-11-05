@@ -79,6 +79,7 @@
       "ScriptHandler": "https://developer.android.com/reference/androidx/webkit/ScriptHandler",
       "PermissionRequest": "https://developer.android.com/reference/android/webkit/PermissionRequest",
       "WebStorage": "https://developer.android.com/reference/android/webkit/WebStorage",
+      "WebViewAssetLoader": "https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader",
       "WebResourceResponse": "https://developer.android.com/reference/android/webkit/WebResourceResponse",
       "JsResult": "https://developer.android.com/reference/android/webkit/JsResult",
       "JsPromptResult": "https://developer.android.com/reference/android/webkit/JsPromptResult",
@@ -134,6 +135,7 @@
       "WKUIDelegate": "https://developer.apple.com/documentation/webkit/wkuidelegate",
       "WKFrameInfo": "https://developer.apple.com/documentation/webkit/wkframeinfo",
       "HTTPURLResponse": "https://developer.apple.com/documentation/foundation/httpurlresponse",
+      "FlutterPluginRegistrar": "https://api.flutter.dev/ios-embedder/protocol_flutter_plugin_registrar-p.html",
       "WKWindowFeatures": "https://developer.apple.com/documentation/webkit/wkwindowfeatures",
       "UINavigationController": "https://developer.apple.com/documentation/uikit/uinavigationcontroller",
       "UIViewController": "https://developer.apple.com/documentation/uikit/uiviewcontroller",
@@ -276,6 +278,100 @@
       "ios": {
         "status": "supported",
         "apis": ["WKWebView.loadHTMLString(_:baseURL:)"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.loadRequest",
+      "group": "loading",
+      "summary": {
+        "en": "Loads a URL with an explicit method (GET or POST), headers and a POST body.",
+        "ja": "メソッド（GET または POST）、ヘッダー、POST の body を指定して URL を読み込みます。"
+      },
+      "android": {
+        "status": "partial",
+        "apis": ["WebView.loadUrl(String, Map)", "WebView.postUrl(String, byte[])"],
+        "note": {
+          "en": "A POST is sent as application/x-www-form-urlencoded and cannot carry custom headers; passing headers throws unsupported.",
+          "ja": "POST は application/x-www-form-urlencoded で送り、カスタムヘッダーは付けられません。ヘッダーを渡すと unsupported を投げます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.load(_:)", "URLRequest.httpMethod", "URLRequest.httpBody"]
+      }
+    },
+    {
+      "dart": "WebViewHttpMethod",
+      "group": "loading",
+      "summary": {
+        "en": "The HTTP method of loadRequest: get or post.",
+        "ja": "loadRequest の HTTP メソッド（get または post）です。"
+      },
+      "android": {
+        "status": "partial",
+        "apis": ["WebView.postUrl(String, byte[])"],
+        "note": {
+          "en": "POST cannot carry custom headers.",
+          "ja": "POST にカスタムヘッダーは付けられません。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLRequest.httpMethod"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.loadFlutterAsset",
+      "group": "loading",
+      "summary": {
+        "en": "Loads a Flutter asset declared in pubspec.yaml.",
+        "ja": "pubspec.yaml に宣言した Flutter アセットを読み込みます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewAssetLoader",
+          "WebViewClient.shouldInterceptRequest(WebView, WebResourceRequest)"
+        ],
+        "note": {
+          "en": "Served from https://appassets.androidplatform.net/assets/, so allowFileAccess is not needed. A missing asset loads as a 404.",
+          "ja": "https://appassets.androidplatform.net/assets/ から配信するため allowFileAccess は不要です。存在しないアセットは 404 として読み込まれます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKWebView.loadFileURL(_:allowingReadAccessTo:)",
+          "FlutterPluginRegistrar.lookupKey(forAsset:)"
+        ],
+        "note": {
+          "en": "The page can read the asset's folder. A missing asset throws not-found.",
+          "ja": "ページはアセットのあるフォルダを読み取れます。存在しないアセットは not-found を投げます。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.loadFile",
+      "group": "loading",
+      "summary": {
+        "en": "Loads a file from the device by absolute path.",
+        "ja": "端末上のファイルを絶対パスで読み込みます。"
+      },
+      "android": {
+        "status": "partial",
+        "apis": ["WebView.loadUrl(String)", "WebSettings.getAllowFileAccess()"],
+        "note": {
+          "en": "Needs AndroidWebViewSettings.allowFileAccess; otherwise throws file-access-disabled.",
+          "ja": "AndroidWebViewSettings.allowFileAccess が必要で、無効の場合は file-access-disabled を投げます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.loadFileURL(_:allowingReadAccessTo:)"],
+        "note": {
+          "en": "The page can read the file's folder. A missing file throws not-found.",
+          "ja": "ページはファイルのあるフォルダを読み取れます。存在しないファイルは not-found を投げます。"
+        }
       }
     },
     {

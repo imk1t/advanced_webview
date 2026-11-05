@@ -10,6 +10,7 @@ import 'download.dart';
 import 'find.dart';
 import 'hit_test.dart';
 import 'js_dialog.dart';
+import 'load_request.dart';
 import 'navigation.dart';
 import 'permission.dart';
 import 'platform/event_dispatcher.dart';
@@ -281,6 +282,65 @@ class AdvancedWebViewController {
 
   Future<void> loadHtmlString(String html, {String? baseUrl}) =>
       _call(() => _hostApi.loadHtmlString(webViewId, html, baseUrl));
+
+  /// Loads [url] with the given [method].
+  ///
+  /// A [body] is only allowed with [WebViewHttpMethod.post]. On Android a POST
+  /// is sent as `application/x-www-form-urlencoded` and [headers] must be empty
+  /// (the platform cannot add headers to a POST), otherwise this throws a
+  /// `PlatformException` with the code `unsupported`. iOS sends [headers] and
+  /// the [body] as given.
+  ///
+  /// Android: `WebView.loadUrl(String, Map)` and `WebView.postUrl(String, byte[])`.
+  /// iOS: `WKWebView.load(_:)` with a `URLRequest` carrying the method and body.
+  Future<void> loadRequest(
+    String url, {
+    WebViewHttpMethod method = WebViewHttpMethod.get,
+    Map<String, String> headers = const {},
+    Uint8List? body,
+  }) {
+    if (body != null && method != WebViewHttpMethod.post) {
+      throw ArgumentError.value(body, 'body', 'is only allowed with POST');
+    }
+    return _call(
+      () => _hostApi.loadRequest(
+        webViewId,
+        url,
+        switch (method) {
+          WebViewHttpMethod.get => HttpMethodMessage.get,
+          WebViewHttpMethod.post => HttpMethodMessage.post,
+        },
+        headers,
+        body,
+      ),
+    );
+  }
+
+  /// Loads a Flutter asset declared under `flutter: assets:` in `pubspec.yaml`,
+  /// for example `loadFlutterAsset('assets/web/index.html')`.
+  ///
+  /// Relative links in the page resolve to sibling assets. Android serves the
+  /// asset from `https://appassets.androidplatform.net/assets/flutter_assets/...`
+  /// and does not need `allowFileAccess`. iOS loads the file from the app bundle
+  /// with read access to its folder. A missing asset throws on iOS; on Android
+  /// the page loads as a 404 (see [onHttpError]).
+  ///
+  /// Android: `WebViewAssetLoader` with `AssetsPathHandler`.
+  /// iOS: `WKWebView.loadFileURL(_:allowingReadAccessTo:)`.
+  Future<void> loadFlutterAsset(String key) =>
+      _call(() => _hostApi.loadFlutterAsset(webViewId, key));
+
+  /// Loads the file at the absolute [path] on the device.
+  ///
+  /// On Android this needs [AndroidWebViewSettings.allowFileAccess] (off by
+  /// default); without it this throws a `PlatformException` with the code
+  /// `file-access-disabled`. iOS gives the page read access to the file's
+  /// folder, and throws `not-found` when the file does not exist.
+  ///
+  /// Android: `WebView.loadUrl` with a `file://` URL. iOS:
+  /// `WKWebView.loadFileURL(_:allowingReadAccessTo:)`.
+  Future<void> loadFile(String path) =>
+      _call(() => _hostApi.loadFile(webViewId, path));
 
   Future<void> reload() => _call(() => _hostApi.reload(webViewId));
 

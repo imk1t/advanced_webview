@@ -53,7 +53,11 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
+  # Loaded by the integration tests with `loadFlutterAsset`.
+  assets:
+    - assets/hello.html
+
+  # Example of an assets section:
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

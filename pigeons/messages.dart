@@ -396,6 +396,8 @@ class ScrollPositionMessage {
 
 enum WebsiteDataTypeMessage { cache, localStorage, indexedDb }
 
+enum HttpMethodMessage { get, post }
+
 class CookieMessage {
   CookieMessage({
     required this.name,
@@ -462,6 +464,21 @@ abstract class AdvancedWebViewHostApi {
   void loadUrl(int webViewId, String url, Map<String, String> headers);
 
   void loadHtmlString(int webViewId, String html, String? baseUrl);
+
+  /// Loads `url` with an explicit method. A `body` is only sent with POST.
+  void loadRequest(
+    int webViewId,
+    String url,
+    HttpMethodMessage method,
+    Map<String, String> headers,
+    Uint8List? body,
+  );
+
+  /// Loads a Flutter asset declared in the app's `pubspec.yaml`.
+  void loadFlutterAsset(int webViewId, String key);
+
+  /// Loads a file from the device's file system by absolute path.
+  void loadFile(int webViewId, String path);
 
   void reload(int webViewId);
 

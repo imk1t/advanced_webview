@@ -8,7 +8,14 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
   private let flutterApi: AdvancedWebViewFlutterApi
   private var browsers: [Int64: InAppBrowserViewController] = [:]
 
-  init(registry: WebViewRegistry, flutterApi: AdvancedWebViewFlutterApi) {
+  /// Maps a Flutter asset key to its path inside the app bundle.
+  private let assetPath: (String) -> String?
+
+  init(
+    registry: WebViewRegistry, flutterApi: AdvancedWebViewFlutterApi,
+    assetPath: @escaping (String) -> String? = { _ in nil }
+  ) {
+    self.assetPath = assetPath
     self.registry = registry
     self.flutterApi = flutterApi
   }
@@ -40,6 +47,42 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
 
   func loadHtmlString(webViewId: Int64, html: String, baseUrl: String?) throws {
     try registry.get(webViewId).loadHTMLString(html, baseURL: baseUrl.flatMap(URL.init))
+  }
+
+  func loadRequest(
+    webViewId: Int64, url: String, method: HttpMethodMessage, headers: [String: String],
+    body: FlutterStandardTypedData?
+  ) throws {
+    guard let target = URL(string: url) else {
+      throw PigeonError(code: "invalid-url", message: "Invalid URL: \(url)", details: nil)
+    }
+    var request = URLRequest(url: target)
+    request.httpMethod = method == .post ? "POST" : "GET"
+    if method == .post { request.httpBody = body?.data }
+    for (field, value) in headers {
+      request.setValue(value, forHTTPHeaderField: field)
+    }
+    try registry.get(webViewId).load(request)
+  }
+
+  func loadFlutterAsset(webViewId: Int64, key: String) throws {
+    guard let relative = assetPath(key) else {
+      throw PigeonError(code: "not-found", message: "No Flutter asset \(key)", details: nil)
+    }
+    try loadFileURL(webViewId, Bundle.main.bundleURL.appendingPathComponent(relative))
+  }
+
+  func loadFile(webViewId: Int64, path: String) throws {
+    try loadFileURL(webViewId, URL(fileURLWithPath: path))
+  }
+
+  /// Gives the page read access to the file's folder so relative links keep working.
+  private func loadFileURL(_ webViewId: Int64, _ url: URL) throws {
+    guard FileManager.default.fileExists(atPath: url.path) else {
+      throw PigeonError(code: "not-found", message: "No file at \(url.path)", details: nil)
+    }
+    try registry.get(webViewId).webView.loadFileURL(
+      url, allowingReadAccessTo: url.deletingLastPathComponent())
   }
 
   func reload(webViewId: Int64) throws {

@@ -33,6 +33,7 @@ class AdvancedWebViewPlugin :
             fileChooser,
             permissionRequester,
             { activity },
+            { binding.flutterAssets.getAssetFilePathByName(it) },
         ).also { hostApi = it }
 
         AdvancedWebViewHostApi.setUp(binding.binaryMessenger, hostApi)

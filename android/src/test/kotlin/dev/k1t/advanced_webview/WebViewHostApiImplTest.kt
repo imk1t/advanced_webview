@@ -430,6 +430,42 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun postRequestsCannotCarryCustomHeadersOnAndroid() {
+        hostApi.create(params(webViewId = 1))
+
+        val error = assertFailsWith<FlutterError> {
+            hostApi.loadRequest(1, "https://a.test/", HttpMethodMessage.POST, mapOf("X" to "1"), null)
+        }
+
+        assertEquals("unsupported", error.code)
+        hostApi.loadRequest(1, "https://a.test/", HttpMethodMessage.POST, emptyMap(), byteArrayOf(1))
+    }
+
+    @Test
+    fun loadFileNeedsFileAccess() {
+        hostApi.create(params(webViewId = 1, settings = settings(allowFileAccess = false)))
+        hostApi.create(params(webViewId = 2, settings = settings(allowFileAccess = true)))
+
+        val error = assertFailsWith<FlutterError> { hostApi.loadFile(1, "/data/local/tmp/a.html") }
+
+        assertEquals("file-access-disabled", error.code)
+        hostApi.loadFile(2, "/data/local/tmp/a.html")
+        assertEquals("file:///data/local/tmp/a.html", registry.get(2).webView.url)
+    }
+
+    @Test
+    fun flutterAssetsLoadFromTheVirtualAssetHost() {
+        hostApi.create(params(webViewId = 1))
+
+        hostApi.loadFlutterAsset(1, "assets/a.html")
+
+        assertEquals(
+            "https://appassets.androidplatform.net/assets/flutter_assets/assets/a.html",
+            registry.get(1).webView.url,
+        )
+    }
+
+    @Test
     fun httpErrorsAreForwardedToDartOnlyWithADelegate() {
         val response = WebResourceResponse("text/html", "utf-8", 503, "Unavailable", emptyMap(), null)
         val request = mock(WebResourceRequest::class.java)

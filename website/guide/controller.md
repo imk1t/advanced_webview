@@ -25,6 +25,19 @@ await controller.dispose();
 await controller.loadUrl('https://example.com', headers: {'X-Token': 'abc'});
 await controller.loadHtmlString('<h1>Hello</h1>', baseUrl: 'https://example.com');
 
+// A Flutter asset from `flutter: assets:` in pubspec.yaml
+await controller.loadFlutterAsset('assets/web/index.html');
+
+// A file on the device
+await controller.loadFile('/path/to/page.html');
+
+// A POST request
+await controller.loadRequest(
+  'https://example.com/login',
+  method: WebViewHttpMethod.post,
+  body: Uint8List.fromList(utf8.encode('user=a&pass=b')),
+);
+
 await controller.reload();
 await controller.stopLoading();
 if (await controller.canGoBack()) await controller.goBack();
@@ -33,6 +46,18 @@ if (await controller.canGoForward()) await controller.goForward();
 final url = await controller.currentUrl();
 final title = await controller.title();
 ```
+
+Platform notes for the three newer loaders:
+
+- `loadFlutterAsset`: relative links resolve to sibling assets. Android serves them from
+  `https://appassets.androidplatform.net/assets/flutter_assets/...` and does not need
+  `allowFileAccess`; a missing asset loads as a 404 (see `onHttpError`). iOS loads the file from the
+  app bundle with read access to its folder and throws `not-found` for a missing asset.
+- `loadFile`: Android needs `AndroidWebViewSettings.allowFileAccess` (off by default), otherwise it
+  throws `file-access-disabled`. iOS throws `not-found` for a missing file.
+- `loadRequest`: Android sends a POST body as `application/x-www-form-urlencoded` and cannot add
+  headers to a POST (it throws `unsupported` when you pass some). iOS sends the headers and body as
+  given. A `body` is only allowed with `WebViewHttpMethod.post`.
 
 ## Screenshots
 
