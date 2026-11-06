@@ -14,6 +14,15 @@ Android と iOS 向けの、シンプルで多機能な Flutter WebView プラ�
 
 設計判断（Pigeon 採用理由など）は [ARCHITECTURE.md](ARCHITECTURE.md) を参照してください。
 
+## スクリーンショット
+
+[example アプリ](example)で `AdvancedWebView` を使い、ドキュメントサイトを表示している様子です（左: iOS、右: Android）。
+
+<p>
+  <img src="doc/images/example-ios.png" alt="iOS シミュレーター上の example アプリ" width="300">
+  <img src="doc/images/example-android.png" alt="Android エミュレーター上の example アプリ" width="300">
+</p>
+
 ## 対応プラットフォーム
 
 | Android | iOS |

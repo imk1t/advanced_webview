@@ -47,3 +47,4 @@ apm_modules/
 .venv-apm/
 mise.toml
 website/
+doc/images/
