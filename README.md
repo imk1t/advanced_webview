@@ -21,8 +21,8 @@ For design decisions (such as why Pigeon was chosen), see
 The [example app](example) running `AdvancedWebView` on iOS (left) and Android (right), loading the documentation site.
 
 <p>
-  <img src="doc/images/example-ios.png" alt="Example app on the iOS simulator" width="300">
-  <img src="doc/images/example-android.png" alt="Example app on the Android emulator" width="300">
+  <img src="https://raw.githubusercontent.com/imk1t/advanced_webview/main/doc/images/example-ios.png" alt="Example app on the iOS simulator" width="300">
+  <img src="https://raw.githubusercontent.com/imk1t/advanced_webview/main/doc/images/example-android.png" alt="Example app on the Android emulator" width="300">
 </p>
 
 ## Supported platforms
