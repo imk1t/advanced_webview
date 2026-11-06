@@ -69,6 +69,8 @@
       "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
+      "ClientCertRequest": "https://developer.android.com/reference/android/webkit/ClientCertRequest",
+      "KeyStore": "https://developer.android.com/reference/java/security/KeyStore",
       "WebChromeClient": "https://developer.android.com/reference/android/webkit/WebChromeClient",
       "ConsoleMessage": "https://developer.android.com/reference/android/webkit/ConsoleMessage",
       "WebResourceRequest": "https://developer.android.com/reference/android/webkit/WebResourceRequest",
@@ -120,6 +122,7 @@
       "SecTrustEvaluateWithError": "https://developer.apple.com/documentation/security/sectrustevaluatewitherror(_:_:)",
       "URLCredential": "https://developer.apple.com/documentation/foundation/urlcredential",
       "URLAuthenticationChallenge": "https://developer.apple.com/documentation/foundation/urlauthenticationchallenge",
+      "SecPKCS12Import": "https://developer.apple.com/documentation/security/secpkcs12import(_:_:_:)",
       "URLSession": "https://developer.apple.com/documentation/foundation/urlsession",
       "WKSecurityOrigin": "https://developer.apple.com/documentation/webkit/wksecurityorigin",
       "WKMediaCaptureType": "https://developer.apple.com/documentation/webkit/wkmediacapturetype",
@@ -2779,6 +2782,103 @@
           "en": "Without a callback the system default handling runs, which also fails the request. Proxy authentication is left to the system.",
           "ja": "コールバックがない場合はシステムの既定処理になり、リクエストは失敗します。プロキシ認証はシステムに任せます。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onClientCertRequest",
+      "group": "events",
+      "summary": {
+        "en": "Answers a server's request for a client certificate (mutual TLS) with a PKCS#12 identity, cancels it or continues without one.",
+        "ja": "サーバーからのクライアント証明書（相互 TLS）の要求に、PKCS#12 の証明書で応答するか、キャンセルするか、証明書なしで続行します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewClient.onReceivedClientCertRequest(WebView, ClientCertRequest)",
+          "ClientCertRequest.proceed(PrivateKey, X509Certificate[])",
+          "ClientCertRequest.cancel()",
+          "ClientCertRequest.ignore()",
+          "KeyStore.getInstance(String)"
+        ],
+        "note": {
+          "en": "Without a callback the request is cancelled. WebView remembers the answer for the host and port for the lifetime of the WebView. The PKCS#12 file is read with the PKCS12 KeyStore.",
+          "ja": "コールバックがない場合はリクエストをキャンセルします。WebView は応答をそのホストとポートについて WebView の存続中記憶します。PKCS#12 は PKCS12 の KeyStore で読み込みます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKNavigationDelegate.webView(_:didReceive:completionHandler:)",
+          "SecPKCS12Import",
+          "URLCredential(identity:certificates:persistence:)"
+        ],
+        "note": {
+          "en": "Ignore maps to the system default handling. Without a callback the system default handling runs. The realm is URLProtectionSpace.realm.",
+          "ja": "ignore はシステムの既定処理になります。コールバックがない場合もシステムの既定処理です。レルムは URLProtectionSpace.realm です。"
+        }
+      }
+    },
+    {
+      "dart": "ClientCertRequest",
+      "group": "events",
+      "summary": {
+        "en": "The host, port and (iOS only) realm of a client certificate request.",
+        "ja": "クライアント証明書要求のホスト、ポート、（iOS のみ）レルムです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["ClientCertRequest.getHost()", "ClientCertRequest.getPort()"],
+        "note": {
+          "en": "The realm is always null.",
+          "ja": "レルムは常に null です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLAuthenticationChallenge.protectionSpace"]
+      }
+    },
+    {
+      "dart": "ClientCertAction",
+      "group": "events",
+      "summary": {
+        "en": "Whether to proceed with a certificate, cancel the request or continue without a certificate.",
+        "ja": "証明書で続行するか、リクエストをキャンセルするか、証明書なしで続行するかです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "ClientCertRequest.proceed(PrivateKey, X509Certificate[])",
+          "ClientCertRequest.cancel()",
+          "ClientCertRequest.ignore()"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["URLSession.AuthChallengeDisposition"]
+      }
+    },
+    {
+      "dart": "ClientCertResponse",
+      "group": "events",
+      "summary": {
+        "en": "The answer to a client certificate request: proceed with a PKCS#12 file and its password, cancel, or ignore.",
+        "ja": "クライアント証明書要求への応答です。PKCS#12 ファイルとそのパスワードで続行、キャンセル、または無視のいずれかです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "ClientCertRequest.proceed(PrivateKey, X509Certificate[])",
+          "ClientCertRequest.cancel()",
+          "ClientCertRequest.ignore()"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "URLCredential(identity:certificates:persistence:)",
+          "URLSession.AuthChallengeDisposition"
+        ]
       }
     },
     {

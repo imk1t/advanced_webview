@@ -339,6 +339,76 @@ final class RunnerTests: XCTestCase {
     XCTAssertFalse(restored)
   }
 
+  /// A throw-away client certificate (password "secret"), the same one the integration test uses.
+  private static let clientPkcs12Base64 =
+    "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"
+
+  func testClientCertificateIdentityLoadsFromPKCS12() throws {
+    let data = try XCTUnwrap(Data(base64Encoded: Self.clientPkcs12Base64))
+
+    let credential = AdvancedWebView.credential(fromPKCS12: data, password: "secret")
+
+    XCTAssertNotNil(credential?.identity)
+    XCTAssertNil(AdvancedWebView.credential(fromPKCS12: data, password: "wrong"))
+    XCTAssertNil(AdvancedWebView.credential(fromPKCS12: Data([1, 2, 3]), password: "secret"))
+  }
+
   @MainActor
   func testPauseResumeAndTimerCallsAreAccepted() async throws {
     let (hostApi, _, _) = makeHostApi()
@@ -547,6 +617,7 @@ final class RunnerTests: XCTestCase {
     hasDownloadDelegate: Bool = false,
     hasSslErrorDelegate: Bool = false,
     hasHttpAuthDelegate: Bool = false,
+    hasClientCertDelegate: Bool = false,
     hasScrollDelegate: Bool = false,
     hasLongPressDelegate: Bool = false,
     hasConsoleMessageDelegate: Bool = false,
@@ -570,6 +641,7 @@ final class RunnerTests: XCTestCase {
       hasDownloadDelegate: hasDownloadDelegate,
       hasSslErrorDelegate: hasSslErrorDelegate,
       hasHttpAuthDelegate: hasHttpAuthDelegate,
+      hasClientCertDelegate: hasClientCertDelegate,
       hasScrollDelegate: hasScrollDelegate,
       hasLongPressDelegate: hasLongPressDelegate,
       hasConsoleMessageDelegate: hasConsoleMessageDelegate,

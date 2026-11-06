@@ -55,6 +55,7 @@ class AdvancedWebViewController {
     this.onDownloadStart,
     this.onSslError,
     this.onHttpAuthRequest,
+    this.onClientCertRequest,
     @visibleForTesting AdvancedWebViewHostApi? hostApi,
     @visibleForTesting WebViewEventDispatcher? dispatcher,
   }) : webViewId = _nextWebViewId++,
@@ -86,6 +87,7 @@ class AdvancedWebViewController {
         hasDownloadDelegate: onDownloadStart != null,
         hasSslErrorDelegate: onSslError != null,
         hasHttpAuthDelegate: onHttpAuthRequest != null,
+        hasClientCertDelegate: onClientCertRequest != null,
         hasScrollDelegate: onScrollChanged != null,
         hasLongPressDelegate: onLongPress != null,
         hasConsoleMessageDelegate: onConsoleMessage != null,
@@ -277,6 +279,21 @@ class AdvancedWebViewController {
   /// iOS: `WKNavigationDelegate.webView(_:didReceive:completionHandler:)` for
   /// `NSURLAuthenticationMethodHTTPBasic`, `HTTPDigest` and `NTLM`.
   final HttpAuthCallback? onHttpAuthRequest;
+
+  /// Called when a server asks for a client certificate (mutual TLS). Return
+  /// [ClientCertResponse.proceed] with a PKCS#12 file to present your
+  /// identity, [ClientCertResponse.cancel] to fail the connection, or
+  /// [ClientCertResponse.ignore] to continue without a certificate.
+  ///
+  /// Without a callback, Android cancels the request and iOS uses the system
+  /// default handling. Android remembers the answer for the host and port for
+  /// the lifetime of the WebView and does not ask again. If the callback
+  /// throws, the request is cancelled.
+  ///
+  /// Android: `WebViewClient.onReceivedClientCertRequest(WebView, ClientCertRequest)`.
+  /// iOS: `WKNavigationDelegate.webView(_:didReceive:completionHandler:)` for
+  /// `NSURLAuthenticationMethodClientCertificate`.
+  final ClientCertCallback? onClientCertRequest;
 
   /// Called when the page starts a download: a link to a file the WebView
   /// cannot show, or a response with `Content-Disposition: attachment`.
@@ -867,6 +884,32 @@ class _EventListener implements WebViewEventListener {
       SslErrorDecision.proceed => SslErrorDecisionMessage.proceed,
       SslErrorDecision.cancel => SslErrorDecisionMessage.cancel,
     };
+  }
+
+  @override
+  Future<ClientCertResponseMessage> onClientCertRequest(
+    ClientCertRequestMessage request,
+  ) async {
+    final callback = _controller.onClientCertRequest;
+    if (callback == null) {
+      return ClientCertResponseMessage(action: ClientCertActionMessage.cancel);
+    }
+    final response = await callback(
+      ClientCertRequest(
+        host: request.host,
+        port: request.port,
+        realm: request.realm,
+      ),
+    );
+    return ClientCertResponseMessage(
+      action: switch (response.action) {
+        ClientCertAction.proceed => ClientCertActionMessage.proceed,
+        ClientCertAction.cancel => ClientCertActionMessage.cancel,
+        ClientCertAction.ignore => ClientCertActionMessage.ignore,
+      },
+      pkcs12: response.pkcs12,
+      password: response.password,
+    );
   }
 
   @override

@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
+import 'tls_fixtures.dart';
+
 const _timeout = Duration(seconds: 20);
 const _baseUrl = 'https://advanced-webview.test/';
 
@@ -693,6 +695,81 @@ void main() {
     expect(icons.last, '$base/favicon.ico');
   });
 
+  /// An HTTPS server that asks for a client certificate and puts the subject of
+  /// the one it got (or `none`) into the page title.
+  Future<HttpServer> bindMutualTlsServer() async {
+    final context = SecurityContext()
+      ..useCertificateChainBytes(utf8.encode(testServerCertificate))
+      ..usePrivateKeyBytes(utf8.encode(testServerKey))
+      ..setTrustedCertificatesBytes(utf8.encode(testClientCa));
+    final server = await HttpServer.bindSecure(
+      InternetAddress.loopbackIPv4,
+      0,
+      context,
+      requestClientCertificate: true,
+    );
+    server.listen((request) {
+      final subject = request.certificate?.subject ?? 'none';
+      request.response
+        ..headers.contentType = ContentType.html
+        ..write('<html><head><title>cert:$subject</title></head></html>')
+        ..close();
+    });
+    return server;
+  }
+
+  testWidgets('a client certificate request is answered with a PKCS#12', (
+    tester,
+  ) async {
+    final server = await bindMutualTlsServer();
+    addTearDown(() => server.close(force: true));
+    final requests = <ClientCertRequest>[];
+    final harness = _Harness(
+      // The test server's own certificate is self-signed.
+      onSslError: (_) => SslErrorDecision.proceed,
+      onClientCertRequest: (request) {
+        requests.add(request);
+        return ClientCertResponse.proceed(
+          pkcs12: testClientPkcs12,
+          password: testClientPkcs12Password,
+        );
+      },
+    );
+    addTearDown(harness.dispose);
+    await harness.show(tester);
+
+    final finished = harness.expectPageFinished();
+    await harness.controller.loadUrl('https://127.0.0.1:${server.port}/');
+    await finished;
+
+    expect(requests, isNotEmpty);
+    expect(requests.first.host, '127.0.0.1');
+    expect(requests.first.port, server.port);
+    expect(
+      await harness.controller.title(),
+      contains('advanced_webview test client'),
+    );
+  });
+
+  testWidgets('ignoring a client certificate request sends none', (
+    tester,
+  ) async {
+    final server = await bindMutualTlsServer();
+    addTearDown(() => server.close(force: true));
+    final harness = _Harness(
+      onSslError: (_) => SslErrorDecision.proceed,
+      onClientCertRequest: (_) => const ClientCertResponse.ignore(),
+    );
+    addTearDown(harness.dispose);
+    await harness.show(tester);
+
+    final finished = harness.expectPageFinished();
+    await harness.controller.loadUrl('https://127.0.0.1:${server.port}/');
+    await finished;
+
+    expect(await harness.controller.title(), 'cert:none');
+  });
+
   testWidgets('pause and resume leave the page working', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);
@@ -832,6 +909,8 @@ class _Harness {
     HttpErrorCallback? onHttpError,
     FindResultCallback? onFindResult,
     FaviconChangedCallback? onFaviconChanged,
+    SslErrorCallback? onSslError,
+    ClientCertCallback? onClientCertRequest,
     List<String> interceptSchemes = const [],
     InterceptRequestCallback? onInterceptRequest,
     WebViewSettings settings = const WebViewSettings(),
@@ -849,6 +928,8 @@ class _Harness {
       onHttpError: onHttpError,
       onFindResult: onFindResult,
       onFaviconChanged: onFaviconChanged,
+      onSslError: onSslError,
+      onClientCertRequest: onClientCertRequest,
       interceptSchemes: interceptSchemes,
       onInterceptRequest: onInterceptRequest,
       onPageStarted: startedUrls.add,

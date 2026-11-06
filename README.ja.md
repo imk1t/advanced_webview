@@ -96,7 +96,7 @@ JS からは両OS共通で `window.Bridge.postMessage('hello')` を呼べます�
 - ページからの権限リクエスト（カメラ、マイク、位置情報）
 - ダウンロードの通知（ファイルの取得方法はアプリが決める）
 - ツールバー付きの全画面アプリ内ブラウザ（`AdvancedInAppBrowser`）
-- 証明書エラーと HTTP 認証のコールバック
+- 証明書エラー、HTTP 認証、クライアント証明書（相互 TLS）のコールバック
 - リクエストのインターセプト: カスタムスキーム（Android では `https` も）へのリクエストに Dart から応答
 - 一時停止と再開（`pause`、`resume`、Android の `pauseTimers`）
 - ズーム操作（`zoomBy`、`setZoomScale`）
