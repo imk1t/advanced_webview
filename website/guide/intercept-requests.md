@@ -23,7 +23,7 @@ await controller.loadUrl('app://host/index.html');
 (default 200) and extra `headers`. `InterceptResponse.text` is a shortcut for UTF-8 text.
 
 Give `interceptSchemes` and `onInterceptRequest` together. The callback is called for the page itself
-and for every sub-resource it requests (scripts, images, `fetch`), so relative URLs inside a page
+and for every sub-resource it requests (scripts, stylesheets, images), so relative URLs inside a page
 served from `app://host/` come back to the callback too. Request bodies are not available.
 
 ## Differences
@@ -42,6 +42,9 @@ served from `app://host/` come back to the callback too. Request bodies are not 
 - **Threads.** Neither platform blocks the UI thread. On Android, WebView asks on one of its own IO
   threads and that thread waits while Dart answers, so keep the callback quick. A slow callback delays
   only that one request.
+- **`fetch` and XHR on a custom scheme.** Android's Chromium refuses `fetch()` and `XMLHttpRequest` to a custom
+  scheme before the request reaches the callback (the page sees `TypeError: Failed to fetch`). Load
+  sub-resources with `<script src>`, `<link>` and `<img>` instead, or use `https` on Android.
 - **Cross-origin access.** A page on one origin that fetches from another needs the usual CORS
   headers in `InterceptResponse.headers` (for example `Access-Control-Allow-Origin`).
 
