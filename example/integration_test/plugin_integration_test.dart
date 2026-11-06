@@ -646,6 +646,8 @@ void main() {
     final before = await harness.controller.getZoomScale();
     expect(before, greaterThan(0));
 
+    // Android ignores zoom requests until the page has been drawn.
+    await tester.pump(const Duration(seconds: 3));
     await harness.controller.zoomBy(2);
     await _pumpUntilAsync(
       tester,

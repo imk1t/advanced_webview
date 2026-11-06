@@ -100,7 +100,7 @@ final scale = await controller.getZoomScale(); // double
 `<meta>` タグがないページは、通常 `1.0` より小さい倍率から始まります。どちらのプラットフォームも結果をページのズーム範囲内に
 収めるため、`user-scalable=no` のページではこれらの呼び出しは無視されます。Android では設定の `supportZoom` と
 `builtInZoomControls` が有効である必要があります（既定で有効）。Android には絶対値で設定する API がないため、`setZoomScale` は
-現在の倍率との比でズームし、わずかにずれることがあります。iOS はスクロールビュー（`UIScrollView.zoomScale`）をズームします。
+現在の倍率との比でズームし、わずかにずれることがあります。また Android はページが描画されるまでズームの呼び出しを無視するため、読み込み完了の直後の呼び出しは無効になることがあります。iOS はスクロールビュー（`UIScrollView.zoomScale`）をズームします。
 `WKWebView.pageZoom` は `textZoom` が使うため、両者は干渉しません。
 
 ## 状態の保存と復元

@@ -522,7 +522,8 @@ class AdvancedWebViewController {
   /// that forbids zooming (`user-scalable=no`) ignores it. On Android the
   /// WebView must allow zooming ([AndroidWebViewSettings.supportZoom] and
   /// [AndroidWebViewSettings.builtInZoomControls]). This is independent of
-  /// [WebViewSettings.textZoom].
+  /// [WebViewSettings.textZoom]. Android ignores the call until the page has
+  /// been drawn, so a call right after the page finished loading can be lost.
   ///
   /// Android: `WebView.zoomBy(float)`.
   /// iOS: `UIScrollView.setZoomScale(_:animated:)` on `WKWebView.scrollView`.

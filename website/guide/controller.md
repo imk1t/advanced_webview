@@ -101,7 +101,7 @@ The scale is in logical pixels per CSS pixel: `1.0` shows one CSS pixel as one l
 viewport `<meta>` tag usually starts below `1.0`. Both platforms keep the result within the page's zoom limits, so a
 page with `user-scalable=no` ignores these calls. On Android the settings `supportZoom` and `builtInZoomControls`
 must be on (they are by default); Android has no absolute setter, so `setZoomScale` zooms by the ratio to the current
-scale and can be slightly off. iOS zooms the scroll view (`UIScrollView.zoomScale`); `WKWebView.pageZoom` stays with
+scale and can be slightly off. Android also ignores zoom calls until the page has been drawn, so a call right after the page finished loading can be lost. iOS zooms the scroll view (`UIScrollView.zoomScale`); `WKWebView.pageZoom` stays with
 `textZoom`, so the two do not interfere.
 
 ## Saving and restoring state
