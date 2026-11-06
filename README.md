@@ -16,6 +16,15 @@ Documentation: https://imk1t.github.io/advanced_webview/
 For design decisions (such as why Pigeon was chosen), see
 [ARCHITECTURE.md](ARCHITECTURE.md) (Japanese).
 
+## Screenshots
+
+The [example app](example) running `AdvancedWebView` on iOS (left) and Android (right), loading the documentation site.
+
+<p>
+  <img src="doc/images/example-ios.png" alt="Example app on the iOS simulator" width="300">
+  <img src="doc/images/example-android.png" alt="Example app on the Android emulator" width="300">
+</p>
+
 ## Supported platforms
 
 | Android | iOS |
