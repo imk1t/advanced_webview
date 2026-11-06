@@ -88,6 +88,21 @@ final offset = await controller.scrollPosition(); // Offset
 `onScrollChanged: (offset) {}` を渡します。スクロールの1ステップごとに呼ばれるため、処理は軽くしてください。
 未指定ならスクロールイベントはプラットフォームチャネルを通りません。
 
+## ズーム
+
+```dart
+await controller.zoomBy(1.5);           // 現在の倍率に掛ける
+await controller.setZoomScale(2);       // 倍率を設定
+final scale = await controller.getZoomScale(); // double
+```
+
+倍率は CSS ピクセルあたりの論理ピクセル数で、`1.0` は CSS の1ピクセルを論理1ピクセルで表示します。viewport の
+`<meta>` タグがないページは、通常 `1.0` より小さい倍率から始まります。どちらのプラットフォームも結果をページのズーム範囲内に
+収めるため、`user-scalable=no` のページではこれらの呼び出しは無視されます。Android では設定の `supportZoom` と
+`builtInZoomControls` が有効である必要があります（既定で有効）。Android には絶対値で設定する API がないため、`setZoomScale` は
+現在の倍率との比でズームし、わずかにずれることがあります。iOS はスクロールビュー（`UIScrollView.zoomScale`）をズームします。
+`WKWebView.pageZoom` は `textZoom` が使うため、両者は干渉しません。
+
 ## 状態の保存と復元
 
 ```dart

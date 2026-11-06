@@ -632,6 +632,33 @@ void main() {
     expect(png!.sublist(0, 4), [0x89, 0x50, 0x4e, 0x47]);
   });
 
+  testWidgets('zoomBy and setZoomScale change the zoom scale', (tester) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml(
+      '<html><head><meta name="viewport" content="width=device-width, '
+      'initial-scale=1, maximum-scale=5"></head>'
+      '<body style="height:3000px">zoom</body></html>',
+    );
+    await harness.waitForSize(tester);
+    final before = await harness.controller.getZoomScale();
+    expect(before, greaterThan(0));
+
+    await harness.controller.zoomBy(2);
+    await _pumpUntilAsync(
+      tester,
+      () async => await harness.controller.getZoomScale() > before * 1.5,
+    );
+
+    await harness.controller.setZoomScale(before);
+    await _pumpUntilAsync(
+      tester,
+      () async => await harness.controller.getZoomScale() < before * 1.2,
+    );
+  });
+
   testWidgets('the favicon URL is read from the page', (tester) async {
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     addTearDown(() => server.close(force: true));

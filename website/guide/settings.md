@@ -45,6 +45,8 @@ Passed as `WebViewSettings.android`. iOS ignores all of them.
 | Setting | Default | Android | iOS |
 | --- | --- | --- | --- |
 | `supportZoom` | `true` | Yes | Ignored |
+| `builtInZoomControls` | `true` | Yes (pinch and double tap; needs `supportZoom`) | Ignored |
+| `displayZoomControls` | `false` | Yes (on-screen + / - buttons) | Ignored |
 | `passkeysEnabled` | `false` | Yes | Ignored (see below) |
 | `domStorageEnabled` | `true` | Yes | Ignored (always on) |
 | `allowFileAccess` | `false` | Yes | Ignored |

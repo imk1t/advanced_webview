@@ -764,6 +764,70 @@
       }
     },
     {
+      "dart": "AdvancedWebViewController.zoomBy",
+      "group": "loading",
+      "summary": {
+        "en": "Multiplies the page's zoom scale by a factor.",
+        "ja": "ページのズーム倍率に係数を掛けます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.zoomBy(float)"],
+        "note": {
+          "en": "The factor is clamped to the 0.01 to 100 range that WebView accepts. Needs supportZoom and builtInZoomControls.",
+          "ja": "係数は WebView が受け付ける 0.01〜100 の範囲に丸められます。supportZoom と builtInZoomControls が必要です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.setZoomScale(_:animated:)", "UIScrollView.zoomScale"],
+        "note": {
+          "en": "The scroll view keeps the scale within the page's zoom limits. WKWebView.pageZoom is left to textZoom.",
+          "ja": "スクロールビューがページのズーム範囲内に収めます。WKWebView.pageZoom は textZoom 用に使われています。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.setZoomScale",
+      "group": "loading",
+      "summary": {
+        "en": "Sets the page's zoom scale.",
+        "ja": "ページのズーム倍率を設定します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.zoomBy(float)", "WebView.getScale()"],
+        "note": {
+          "en": "WebView has no absolute setter, so the plugin zooms by the ratio of the target to the current scale.",
+          "ja": "WebView に絶対値で設定する API はないため、現在の倍率に対する目標倍率の比で zoomBy を呼びます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.setZoomScale(_:animated:)"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.getZoomScale",
+      "group": "loading",
+      "summary": {
+        "en": "Returns the current zoom scale in logical pixels per CSS pixel.",
+        "ja": "現在のズーム倍率（CSS ピクセルあたりの論理ピクセル数）を返します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.getScale()"],
+        "note": {
+          "en": "WebView reports physical pixels per CSS pixel, so the plugin divides by the display density.",
+          "ja": "WebView は CSS ピクセルあたりの物理ピクセル数を返すため、画面密度で割っています。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIScrollView.zoomScale"]
+      }
+    },
+    {
       "dart": "AdvancedWebViewController.scrollPosition",
       "group": "loading",
       "summary": {
@@ -1519,15 +1583,7 @@
       },
       "android": {
         "status": "supported",
-        "apis": [
-          "WebSettings.setSupportZoom(boolean)",
-          "WebSettings.setBuiltInZoomControls(boolean)",
-          "WebSettings.setDisplayZoomControls(boolean)"
-        ],
-        "note": {
-          "en": "The on-screen zoom controls are always hidden.",
-          "ja": "画面上のズームコントロールは常に非表示です。"
-        }
+        "apis": ["WebSettings.setSupportZoom(boolean)"]
       },
       "ios": {
         "status": "unsupported",
@@ -1535,6 +1591,46 @@
         "note": {
           "en": "Zoom is controlled by the page's viewport meta tag.",
           "ja": "ズームはページの viewport meta タグで決まります。"
+        }
+      }
+    },
+    {
+      "dart": "AndroidWebViewSettings.builtInZoomControls",
+      "group": "settings",
+      "summary": {
+        "en": "Enables the gestures of the built-in zoom mechanism (pinch and double tap). Android needs it together with supportZoom.",
+        "ja": "組み込みズーム機構のジェスチャー（ピンチ・ダブルタップ）を有効にします。Android では supportZoom と併せて必要です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setBuiltInZoomControls(boolean)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Zoom is controlled by the page's viewport meta tag.",
+          "ja": "ズームはページの viewport meta タグで決まります。"
+        }
+      }
+    },
+    {
+      "dart": "AndroidWebViewSettings.displayZoomControls",
+      "group": "settings",
+      "summary": {
+        "en": "Shows the on-screen + / - zoom buttons (off by default).",
+        "ja": "画面上の + / - ズームボタンを表示します（既定は非表示）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setDisplayZoomControls(boolean)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "iOS has no on-screen zoom buttons.",
+          "ja": "iOS に画面上のズームボタンはありません。"
         }
       }
     },

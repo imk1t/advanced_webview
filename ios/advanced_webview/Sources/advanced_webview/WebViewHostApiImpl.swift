@@ -140,6 +140,18 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     try registry.get(webViewId).scrollBy(dx: dx, dy: dy)
   }
 
+  func zoomBy(webViewId: Int64, factor: Double) throws {
+    try registry.get(webViewId).zoomBy(factor)
+  }
+
+  func setZoomScale(webViewId: Int64, scale: Double) throws {
+    try registry.get(webViewId).setZoomScale(scale)
+  }
+
+  func getZoomScale(webViewId: Int64) throws -> Double {
+    return try registry.get(webViewId).zoomScale()
+  }
+
   func getScrollPosition(webViewId: Int64) throws -> ScrollPositionMessage {
     return try registry.get(webViewId).scrollPosition()
   }

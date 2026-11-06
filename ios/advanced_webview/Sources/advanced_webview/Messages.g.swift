@@ -266,6 +266,10 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   var allowsInlineMediaPlayback: Bool
   /// Android only. Ignored on iOS.
   var supportZoom: Bool
+  /// Android only. Ignored on iOS.
+  var builtInZoomControls: Bool
+  /// Android only. Ignored on iOS.
+  var displayZoomControls: Bool
   var transparentBackground: Bool
   /// Android only. Ignored on iOS, where WebAuthn is governed by entitlements.
   var passkeysEnabled: Bool
@@ -323,33 +327,37 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     let mediaPlaybackRequiresUserGesture = pigeonVar_list[1] as! Bool
     let allowsInlineMediaPlayback = pigeonVar_list[2] as! Bool
     let supportZoom = pigeonVar_list[3] as! Bool
-    let transparentBackground = pigeonVar_list[4] as! Bool
-    let passkeysEnabled = pigeonVar_list[5] as! Bool
-    let allowsBackForwardNavigationGestures = pigeonVar_list[6] as! Bool
-    let inspectable = pigeonVar_list[7] as! Bool
-    let textZoom = pigeonVar_list[8] as! Int64
-    let cacheMode = pigeonVar_list[9] as! CacheModeMessage
-    let incognito = pigeonVar_list[10] as! Bool
-    let javaScriptCanOpenWindowsAutomatically = pigeonVar_list[11] as! Bool
-    let scrollbarsVisible = pigeonVar_list[12] as! Bool
-    let overScrollEnabled = pigeonVar_list[13] as! Bool
-    let pullToRefreshEnabled = pigeonVar_list[14] as! Bool
-    let domStorageEnabled = pigeonVar_list[15] as! Bool
-    let allowFileAccess = pigeonVar_list[16] as! Bool
-    let allowContentAccess = pigeonVar_list[17] as! Bool
-    let mixedContentMode = pigeonVar_list[18] as! MixedContentModeMessage
-    let contentMode = pigeonVar_list[19] as! ContentModeMessage
-    let allowsLinkPreview = pigeonVar_list[20] as! Bool
-    let geolocationEnabled = pigeonVar_list[21] as! Bool
-    let minimumFontSize: Int64? = nilOrValue(pigeonVar_list[22])
-    let userAgent: String? = nilOrValue(pigeonVar_list[23])
-    let applicationNameForUserAgent: String? = nilOrValue(pigeonVar_list[24])
+    let builtInZoomControls = pigeonVar_list[4] as! Bool
+    let displayZoomControls = pigeonVar_list[5] as! Bool
+    let transparentBackground = pigeonVar_list[6] as! Bool
+    let passkeysEnabled = pigeonVar_list[7] as! Bool
+    let allowsBackForwardNavigationGestures = pigeonVar_list[8] as! Bool
+    let inspectable = pigeonVar_list[9] as! Bool
+    let textZoom = pigeonVar_list[10] as! Int64
+    let cacheMode = pigeonVar_list[11] as! CacheModeMessage
+    let incognito = pigeonVar_list[12] as! Bool
+    let javaScriptCanOpenWindowsAutomatically = pigeonVar_list[13] as! Bool
+    let scrollbarsVisible = pigeonVar_list[14] as! Bool
+    let overScrollEnabled = pigeonVar_list[15] as! Bool
+    let pullToRefreshEnabled = pigeonVar_list[16] as! Bool
+    let domStorageEnabled = pigeonVar_list[17] as! Bool
+    let allowFileAccess = pigeonVar_list[18] as! Bool
+    let allowContentAccess = pigeonVar_list[19] as! Bool
+    let mixedContentMode = pigeonVar_list[20] as! MixedContentModeMessage
+    let contentMode = pigeonVar_list[21] as! ContentModeMessage
+    let allowsLinkPreview = pigeonVar_list[22] as! Bool
+    let geolocationEnabled = pigeonVar_list[23] as! Bool
+    let minimumFontSize: Int64? = nilOrValue(pigeonVar_list[24])
+    let userAgent: String? = nilOrValue(pigeonVar_list[25])
+    let applicationNameForUserAgent: String? = nilOrValue(pigeonVar_list[26])
 
     return WebViewSettingsMessage(
       javaScriptEnabled: javaScriptEnabled,
       mediaPlaybackRequiresUserGesture: mediaPlaybackRequiresUserGesture,
       allowsInlineMediaPlayback: allowsInlineMediaPlayback,
       supportZoom: supportZoom,
+      builtInZoomControls: builtInZoomControls,
+      displayZoomControls: displayZoomControls,
       transparentBackground: transparentBackground,
       passkeysEnabled: passkeysEnabled,
       allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,
@@ -379,6 +387,8 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       mediaPlaybackRequiresUserGesture,
       allowsInlineMediaPlayback,
       supportZoom,
+      builtInZoomControls,
+      displayZoomControls,
       transparentBackground,
       passkeysEnabled,
       allowsBackForwardNavigationGestures,
@@ -406,7 +416,7 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.cacheMode, rhs.cacheMode) && MessagesPigeonInternal.deepEquals(lhs.incognito, rhs.incognito) && MessagesPigeonInternal.deepEquals(lhs.javaScriptCanOpenWindowsAutomatically, rhs.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonInternal.deepEquals(lhs.scrollbarsVisible, rhs.scrollbarsVisible) && MessagesPigeonInternal.deepEquals(lhs.overScrollEnabled, rhs.overScrollEnabled) && MessagesPigeonInternal.deepEquals(lhs.pullToRefreshEnabled, rhs.pullToRefreshEnabled) && MessagesPigeonInternal.deepEquals(lhs.domStorageEnabled, rhs.domStorageEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowFileAccess, rhs.allowFileAccess) && MessagesPigeonInternal.deepEquals(lhs.allowContentAccess, rhs.allowContentAccess) && MessagesPigeonInternal.deepEquals(lhs.mixedContentMode, rhs.mixedContentMode) && MessagesPigeonInternal.deepEquals(lhs.contentMode, rhs.contentMode) && MessagesPigeonInternal.deepEquals(lhs.allowsLinkPreview, rhs.allowsLinkPreview) && MessagesPigeonInternal.deepEquals(lhs.geolocationEnabled, rhs.geolocationEnabled) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent) && MessagesPigeonInternal.deepEquals(lhs.applicationNameForUserAgent, rhs.applicationNameForUserAgent)
+    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.builtInZoomControls, rhs.builtInZoomControls) && MessagesPigeonInternal.deepEquals(lhs.displayZoomControls, rhs.displayZoomControls) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.cacheMode, rhs.cacheMode) && MessagesPigeonInternal.deepEquals(lhs.incognito, rhs.incognito) && MessagesPigeonInternal.deepEquals(lhs.javaScriptCanOpenWindowsAutomatically, rhs.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonInternal.deepEquals(lhs.scrollbarsVisible, rhs.scrollbarsVisible) && MessagesPigeonInternal.deepEquals(lhs.overScrollEnabled, rhs.overScrollEnabled) && MessagesPigeonInternal.deepEquals(lhs.pullToRefreshEnabled, rhs.pullToRefreshEnabled) && MessagesPigeonInternal.deepEquals(lhs.domStorageEnabled, rhs.domStorageEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowFileAccess, rhs.allowFileAccess) && MessagesPigeonInternal.deepEquals(lhs.allowContentAccess, rhs.allowContentAccess) && MessagesPigeonInternal.deepEquals(lhs.mixedContentMode, rhs.mixedContentMode) && MessagesPigeonInternal.deepEquals(lhs.contentMode, rhs.contentMode) && MessagesPigeonInternal.deepEquals(lhs.allowsLinkPreview, rhs.allowsLinkPreview) && MessagesPigeonInternal.deepEquals(lhs.geolocationEnabled, rhs.geolocationEnabled) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent) && MessagesPigeonInternal.deepEquals(lhs.applicationNameForUserAgent, rhs.applicationNameForUserAgent)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -415,6 +425,8 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: mediaPlaybackRequiresUserGesture, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: allowsInlineMediaPlayback, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: supportZoom, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: builtInZoomControls, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: displayZoomControls, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: transparentBackground, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: passkeysEnabled, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: allowsBackForwardNavigationGestures, hasher: &hasher)
@@ -439,7 +451,7 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   }
 
   public var description: String {
-    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), cacheMode: \(String(describing: cacheMode)), incognito: \(String(describing: incognito)), javaScriptCanOpenWindowsAutomatically: \(String(describing: javaScriptCanOpenWindowsAutomatically)), scrollbarsVisible: \(String(describing: scrollbarsVisible)), overScrollEnabled: \(String(describing: overScrollEnabled)), pullToRefreshEnabled: \(String(describing: pullToRefreshEnabled)), domStorageEnabled: \(String(describing: domStorageEnabled)), allowFileAccess: \(String(describing: allowFileAccess)), allowContentAccess: \(String(describing: allowContentAccess)), mixedContentMode: \(String(describing: mixedContentMode)), contentMode: \(String(describing: contentMode)), allowsLinkPreview: \(String(describing: allowsLinkPreview)), geolocationEnabled: \(String(describing: geolocationEnabled)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)), applicationNameForUserAgent: \(String(describing: applicationNameForUserAgent)))"
+    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), builtInZoomControls: \(String(describing: builtInZoomControls)), displayZoomControls: \(String(describing: displayZoomControls)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), cacheMode: \(String(describing: cacheMode)), incognito: \(String(describing: incognito)), javaScriptCanOpenWindowsAutomatically: \(String(describing: javaScriptCanOpenWindowsAutomatically)), scrollbarsVisible: \(String(describing: scrollbarsVisible)), overScrollEnabled: \(String(describing: overScrollEnabled)), pullToRefreshEnabled: \(String(describing: pullToRefreshEnabled)), domStorageEnabled: \(String(describing: domStorageEnabled)), allowFileAccess: \(String(describing: allowFileAccess)), allowContentAccess: \(String(describing: allowContentAccess)), mixedContentMode: \(String(describing: mixedContentMode)), contentMode: \(String(describing: contentMode)), allowsLinkPreview: \(String(describing: allowsLinkPreview)), geolocationEnabled: \(String(describing: geolocationEnabled)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)), applicationNameForUserAgent: \(String(describing: applicationNameForUserAgent)))"
   }
 }
 
@@ -1756,6 +1768,13 @@ protocol AdvancedWebViewHostApi {
   func scrollTo(webViewId: Int64, x: Double, y: Double) throws
   /// Scrolls the page by `dx`, `dy` (logical pixels) without animation.
   func scrollBy(webViewId: Int64, dx: Double, dy: Double) throws
+  /// Multiplies the current zoom scale by `factor` (greater than 0). Android
+  /// calls `WebView.zoomBy`; iOS sets `UIScrollView.zoomScale`.
+  func zoomBy(webViewId: Int64, factor: Double) throws
+  /// Sets the zoom scale. The platform clamps it to the page's limits.
+  func setZoomScale(webViewId: Int64, scale: Double) throws
+  /// The current zoom scale, in device-independent pixels per CSS pixel.
+  func getZoomScale(webViewId: Int64) throws -> Double
   func getScrollPosition(webViewId: Int64) throws -> ScrollPositionMessage
   /// Opaque snapshot of the back/forward list and scroll position, or null
   /// when there is nothing to save. Only valid on the same platform.
@@ -2161,6 +2180,57 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       scrollByChannel.setMessageHandler(nil)
+    }
+    /// Multiplies the current zoom scale by `factor` (greater than 0). Android
+    /// calls `WebView.zoomBy`; iOS sets `UIScrollView.zoomScale`.
+    let zoomByChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.zoomBy\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      zoomByChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let factorArg = args[1] as! Double
+        do {
+          try api.zoomBy(webViewId: webViewIdArg, factor: factorArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      zoomByChannel.setMessageHandler(nil)
+    }
+    /// Sets the zoom scale. The platform clamps it to the page's limits.
+    let setZoomScaleChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setZoomScale\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setZoomScaleChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let scaleArg = args[1] as! Double
+        do {
+          try api.setZoomScale(webViewId: webViewIdArg, scale: scaleArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      setZoomScaleChannel.setMessageHandler(nil)
+    }
+    /// The current zoom scale, in device-independent pixels per CSS pixel.
+    let getZoomScaleChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getZoomScale\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getZoomScaleChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        do {
+          let result = try api.getZoomScale(webViewId: webViewIdArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getZoomScaleChannel.setMessageHandler(nil)
     }
     let getScrollPositionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getScrollPosition\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

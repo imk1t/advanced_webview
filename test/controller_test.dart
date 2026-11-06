@@ -537,6 +537,42 @@ void main() {
     });
   });
 
+  group('zoom', () {
+    test('zoomBy, setZoomScale and getZoomScale use the host API', () async {
+      final controller = createController();
+      await controller.setZoomScale(2);
+      await controller.zoomBy(1.5);
+
+      expect(await controller.getZoomScale(), 3);
+      expect(
+        hostApi.calls,
+        containsAllInOrder([
+          'setZoomScale(2.0)',
+          'zoomBy(1.5)',
+          'getZoomScale',
+        ]),
+      );
+      await controller.dispose();
+      expect(controller.zoomBy(2), throwsStateError);
+    });
+
+    test('Android zoom control settings default and pass through', () {
+      const defaults = WebViewSettings();
+      expect(defaults.toMessage().builtInZoomControls, isTrue);
+      expect(defaults.toMessage().displayZoomControls, isFalse);
+
+      const custom = WebViewSettings(
+        android: AndroidWebViewSettings(
+          builtInZoomControls: false,
+          displayZoomControls: true,
+        ),
+      );
+      expect(custom.toMessage().builtInZoomControls, isFalse);
+      expect(custom.toMessage().displayZoomControls, isTrue);
+      expect(custom.android, isNot(defaults.android));
+    });
+  });
+
   group('scrolling', () {
     test('scrollTo, scrollBy and scrollPosition use the host API', () async {
       final controller = createController();

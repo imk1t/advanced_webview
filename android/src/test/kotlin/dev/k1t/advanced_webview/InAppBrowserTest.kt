@@ -228,6 +228,8 @@ class InAppBrowserTest {
             mediaPlaybackRequiresUserGesture = true,
             allowsInlineMediaPlayback = false,
             supportZoom = true,
+            builtInZoomControls = true,
+            displayZoomControls = false,
             transparentBackground = false,
             passkeysEnabled = false,
             allowsBackForwardNavigationGestures = false,
