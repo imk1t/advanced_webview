@@ -89,6 +89,20 @@ Offsets are logical pixels on both platforms. To follow the scroll position, pas
 `onScrollChanged: (offset) {}` to the constructor. It fires for every scroll step, so keep it cheap;
 when it is not set, no scroll events cross the platform channel.
 
+## Pause and resume
+
+```dart
+await controller.pause();   // for example while another screen covers the WebView
+await controller.resume();
+await controller.pauseTimers();  // Android only, affects every WebView in the app
+await controller.resumeTimers();
+```
+
+Android pauses what `WebView.onPause` pauses (animations, geolocation, plugins); JavaScript timers keep running
+until `pauseTimers`, which applies to **all** WebViews of the app. iOS has no general pause, so `pause` suspends the
+playback of every audio and video element, and `pauseTimers` / `resumeTimers` do nothing. After `resume` on iOS,
+media that was playing stays paused until the page plays it again.
+
 ## Zoom
 
 ```dart

@@ -53,6 +53,18 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
   Future<void> reload(int webViewId) async => calls.add('reload');
 
   @override
+  Future<void> pause(int webViewId) async => calls.add('pause');
+
+  @override
+  Future<void> resume(int webViewId) async => calls.add('resume');
+
+  @override
+  Future<void> pauseTimers(int webViewId) async => calls.add('pauseTimers');
+
+  @override
+  Future<void> resumeTimers(int webViewId) async => calls.add('resumeTimers');
+
+  @override
   Future<void> stopLoading(int webViewId) async => calls.add('stopLoading');
 
   @override

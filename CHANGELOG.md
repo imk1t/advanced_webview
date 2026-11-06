@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.pause`, `resume`, `pauseTimers` and `resumeTimers`. Android calls `WebView.onPause` / `onResume` and the process-wide `pauseTimers` / `resumeTimers`; iOS suspends media playback and ignores the timer calls.
+
 - Add `AdvancedWebViewController.zoomBy`, `setZoomScale`, and `getZoomScale`, and the Android settings `builtInZoomControls` and `displayZoomControls`. Android uses `WebView.zoomBy`; iOS zooms the scroll view and leaves `WKWebView.pageZoom` to `textZoom`. The defaults match the previous behaviour (pinch zoom on, on-screen buttons hidden).
 
 ## 0.9.0 - 2026-11-06

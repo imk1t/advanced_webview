@@ -88,6 +88,20 @@ final offset = await controller.scrollPosition(); // Offset
 `onScrollChanged: (offset) {}` を渡します。スクロールの1ステップごとに呼ばれるため、処理は軽くしてください。
 未指定ならスクロールイベントはプラットフォームチャネルを通りません。
 
+## 一時停止と再開
+
+```dart
+await controller.pause();   // たとえば別の画面が WebView を覆っている間
+await controller.resume();
+await controller.pauseTimers();  // Android のみ。アプリ内のすべての WebView に影響
+await controller.resumeTimers();
+```
+
+Android は `WebView.onPause` が止めるもの（アニメーション、位置情報、プラグイン）を一時停止します。JavaScript のタイマーは
+`pauseTimers` を呼ぶまで動き続け、これはアプリ内の**すべて**の WebView に効きます。iOS には汎用の一時停止がないため、
+`pause` はすべての音声・動画要素の再生を停止し、`pauseTimers` / `resumeTimers` は何もしません。iOS で `resume` しても、
+再生中だったメディアはページが再び再生するまで停止したままです。
+
 ## ズーム
 
 ```dart

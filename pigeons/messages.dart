@@ -538,6 +538,21 @@ abstract class AdvancedWebViewHostApi {
 
   void reload(int webViewId);
 
+  /// Pauses what the page does in the background. Android: `WebView.onPause`.
+  /// iOS: suspends media playback of all media in the page.
+  @async
+  void pause(int webViewId);
+
+  /// Undoes `pause`.
+  @async
+  void resume(int webViewId);
+
+  /// Android only: `WebView.pauseTimers`, which is process-wide. No-op on iOS.
+  void pauseTimers(int webViewId);
+
+  /// Android only: `WebView.resumeTimers`, which is process-wide. No-op on iOS.
+  void resumeTimers(int webViewId);
+
   void stopLoading(int webViewId);
 
   void goBack(int webViewId);

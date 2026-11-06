@@ -73,6 +73,14 @@ class WebViewHostApiImpl(
 
     override fun reload(webViewId: Long) = registry.get(webViewId).webView.reload()
 
+    override suspend fun pause(webViewId: Long) = registry.get(webViewId).webView.onPause()
+
+    override suspend fun resume(webViewId: Long) = registry.get(webViewId).webView.onResume()
+
+    override fun pauseTimers(webViewId: Long) = registry.get(webViewId).webView.pauseTimers()
+
+    override fun resumeTimers(webViewId: Long) = registry.get(webViewId).webView.resumeTimers()
+
     override fun stopLoading(webViewId: Long) = registry.get(webViewId).webView.stopLoading()
 
     override fun goBack(webViewId: Long) = registry.get(webViewId).webView.goBack()

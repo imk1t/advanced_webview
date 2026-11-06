@@ -101,6 +101,7 @@ On both platforms, JavaScript can call `window.Bridge.postMessage('hello')`.
 - Certificate error and HTTP authentication callbacks
 - Navigation decisions (main frame)
 - Request interception: answer custom-scheme requests (and, on Android, `https`) from Dart
+- Pause and resume (`pause`, `resume`, Android `pauseTimers`)
 - Zoom control (`zoomBy`, `setZoomScale`)
 - PDF export, live find-in-page match count, favicon URL and fullscreen video callbacks
 - Callbacks: page started / finished, progress, title changed, load errors

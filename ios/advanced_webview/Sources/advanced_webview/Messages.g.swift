@@ -1743,6 +1743,15 @@ protocol AdvancedWebViewHostApi {
   /// Loads a file from the device's file system by absolute path.
   func loadFile(webViewId: Int64, path: String) throws
   func reload(webViewId: Int64) throws
+  /// Pauses what the page does in the background. Android: `WebView.onPause`.
+  /// iOS: suspends media playback of all media in the page.
+  func pause(webViewId: Int64) async throws
+  /// Undoes `pause`.
+  func resume(webViewId: Int64) async throws
+  /// Android only: `WebView.pauseTimers`, which is process-wide. No-op on iOS.
+  func pauseTimers(webViewId: Int64) throws
+  /// Android only: `WebView.resumeTimers`, which is process-wide. No-op on iOS.
+  func resumeTimers(webViewId: Int64) throws
   func stopLoading(webViewId: Int64) throws
   func goBack(webViewId: Int64) throws
   func goForward(webViewId: Int64) throws
@@ -1944,6 +1953,75 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       reloadChannel.setMessageHandler(nil)
+    }
+    /// Pauses what the page does in the background. Android: `WebView.onPause`.
+    /// iOS: suspends media playback of all media in the page.
+    let pauseChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.pause\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      pauseChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        Task { @MainActor in
+          do {
+            try await api.pause(webViewId: webViewIdArg)
+            reply(wrapResult(nil))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      pauseChannel.setMessageHandler(nil)
+    }
+    /// Undoes `pause`.
+    let resumeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.resume\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      resumeChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        Task { @MainActor in
+          do {
+            try await api.resume(webViewId: webViewIdArg)
+            reply(wrapResult(nil))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      resumeChannel.setMessageHandler(nil)
+    }
+    /// Android only: `WebView.pauseTimers`, which is process-wide. No-op on iOS.
+    let pauseTimersChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.pauseTimers\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      pauseTimersChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        do {
+          try api.pauseTimers(webViewId: webViewIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      pauseTimersChannel.setMessageHandler(nil)
+    }
+    /// Android only: `WebView.resumeTimers`, which is process-wide. No-op on iOS.
+    let resumeTimersChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.resumeTimers\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      resumeTimersChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        do {
+          try api.resumeTimers(webViewId: webViewIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      resumeTimersChannel.setMessageHandler(nil)
     }
     let stopLoadingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.stopLoading\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

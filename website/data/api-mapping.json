@@ -764,6 +764,94 @@
       }
     },
     {
+      "dart": "AdvancedWebViewController.pause",
+      "group": "loading",
+      "summary": {
+        "en": "Pauses the page's background activity, for example while another screen covers the WebView.",
+        "ja": "WebView を別の画面が覆っている間などに、ページのバックグラウンドでの動作を一時停止します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.onPause()"],
+        "note": {
+          "en": "Pauses animations, geolocation and plugins. JavaScript timers keep running unless pauseTimers is called too.",
+          "ja": "アニメーション、位置情報、プラグインを一時停止します。JavaScript のタイマーは pauseTimers も呼ばない限り動き続けます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.setAllMediaPlaybackSuspended(_:)"],
+        "note": {
+          "en": "WebKit has no general pause, so only media playback is suspended.",
+          "ja": "WebKit に汎用の一時停止はないため、メディアの再生だけを停止します。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.resume",
+      "group": "loading",
+      "summary": {
+        "en": "Undoes pause.",
+        "ja": "pause を元に戻します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.onResume()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.setAllMediaPlaybackSuspended(_:)"],
+        "note": {
+          "en": "Media that was playing before pause stays paused until the page plays it again.",
+          "ja": "pause 前に再生していたメディアは、ページが再び再生するまで停止したままです。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.pauseTimers",
+      "group": "loading",
+      "summary": {
+        "en": "Pauses layout, parsing and JavaScript timers of every WebView in the app.",
+        "ja": "アプリ内のすべての WebView のレイアウト、パース、JavaScript タイマーを一時停止します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.pauseTimers()"],
+        "note": {
+          "en": "Process-wide, not per WebView.",
+          "ja": "WebView 単位ではなくプロセス全体に効きます。"
+        }
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "WKWebView has no equivalent; the call does nothing.",
+          "ja": "WKWebView に相当する API はなく、何も起こりません。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.resumeTimers",
+      "group": "loading",
+      "summary": {
+        "en": "Undoes pauseTimers.",
+        "ja": "pauseTimers を元に戻します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.resumeTimers()"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "WKWebView has no equivalent; the call does nothing.",
+          "ja": "WKWebView に相当する API はなく、何も起こりません。"
+        }
+      }
+    },
+    {
       "dart": "AdvancedWebViewController.zoomBy",
       "group": "loading",
       "summary": {
