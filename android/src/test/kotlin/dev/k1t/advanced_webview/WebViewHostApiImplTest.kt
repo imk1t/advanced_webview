@@ -241,6 +241,17 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun pauseResumeAndTimersReachTheWebView() = runBlocking(Dispatchers.Unconfined) {
+        hostApi.create(params(webViewId = 1))
+
+        // Robolectric does not expose the paused state; the calls must at least be accepted.
+        hostApi.pause(1)
+        hostApi.resume(1)
+        hostApi.pauseTimers(1)
+        hostApi.resumeTimers(1)
+    }
+
+    @Test
     fun findCompletesWhenTheWebViewFinishesCounting() = runBlocking(Dispatchers.Unconfined) {
         hostApi.create(params(webViewId = 1))
         val view = registry.get(1)

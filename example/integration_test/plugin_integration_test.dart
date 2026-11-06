@@ -691,6 +691,31 @@ void main() {
     expect(icons.last, '$base/favicon.ico');
   });
 
+  testWidgets('pause and resume leave the page working', (tester) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.loadHtml(
+      '<html><body><script>window.ticks = 0; '
+      'setInterval(function () { window.ticks++; }, 50);</script></body></html>',
+    );
+    await harness.waitForSize(tester);
+
+    await harness.controller.pause();
+    await harness.controller.resume();
+    await harness.controller.pauseTimers();
+    await harness.controller.resumeTimers();
+
+    // Timers run again after resumeTimers (and were never stopped on iOS).
+    await _pumpUntilAsync(tester, () async {
+      final ticks = await harness.controller.runJavaScriptReturningResult(
+        'window.ticks',
+      );
+      return (ticks as num) > 2;
+    });
+  });
+
   testWidgets('createPdf renders the page to a PDF', (tester) async {
     final harness = _Harness();
     addTearDown(harness.dispose);

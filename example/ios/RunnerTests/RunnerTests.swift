@@ -340,6 +340,18 @@ final class RunnerTests: XCTestCase {
   }
 
   @MainActor
+  func testPauseResumeAndTimerCallsAreAccepted() async throws {
+    let (hostApi, _, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    defer { hostApi.disposeAll() }
+
+    try await hostApi.pause(webViewId: 1)
+    try await hostApi.resume(webViewId: 1)
+    try hostApi.pauseTimers(webViewId: 1)
+    try hostApi.resumeTimers(webViewId: 1)
+  }
+
+  @MainActor
   func testZoomCallsReachTheScrollView() throws {
     let (hostApi, _, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))

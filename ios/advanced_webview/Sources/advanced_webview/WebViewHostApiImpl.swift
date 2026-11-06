@@ -89,6 +89,22 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     try registry.get(webViewId).webView.reload()
   }
 
+  @MainActor
+  func pause(webViewId: Int64) async throws {
+    try await registry.get(webViewId).webView.setAllMediaPlaybackSuspended(true)
+  }
+
+  @MainActor
+  func resume(webViewId: Int64) async throws {
+    try await registry.get(webViewId).webView.setAllMediaPlaybackSuspended(false)
+  }
+
+  /// WKWebView has no timer switch; Android only.
+  func pauseTimers(webViewId: Int64) throws {}
+
+  /// WKWebView has no timer switch; Android only.
+  func resumeTimers(webViewId: Int64) throws {}
+
   func stopLoading(webViewId: Int64) throws {
     try registry.get(webViewId).webView.stopLoading()
   }

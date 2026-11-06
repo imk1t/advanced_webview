@@ -444,6 +444,40 @@ class AdvancedWebViewController {
 
   Future<void> reload() => _call(() => _hostApi.reload(webViewId));
 
+  /// Pauses the page's background activity, for example when the app shows
+  /// something on top of the WebView or goes to the background. Call
+  /// [resume] to undo it.
+  ///
+  /// Android pauses what `WebView.onPause` pauses: animations, geolocation
+  /// and plugins; JavaScript timers keep running unless [pauseTimers] is
+  /// called too. iOS suspends the playback of every audio and video element
+  /// in the page; WebKit has no other pause. Neither stops a download or
+  /// a page load.
+  ///
+  /// Android: `WebView.onPause()`.
+  /// iOS: `WKWebView.setAllMediaPlaybackSuspended(_:)`.
+  Future<void> pause() => _call(() => _hostApi.pause(webViewId));
+
+  /// Undoes [pause].
+  ///
+  /// Android: `WebView.onResume()`.
+  /// iOS: `WKWebView.setAllMediaPlaybackSuspended(_:)` with `false`; media
+  /// that was playing before [pause] stays paused until the page plays it.
+  Future<void> resume() => _call(() => _hostApi.resume(webViewId));
+
+  /// Android only: pauses the layout, parsing and JavaScript timers of
+  /// **every** WebView in the app, not just this one. Does nothing on iOS.
+  /// Undo with [resumeTimers].
+  ///
+  /// Android: `WebView.pauseTimers()`.
+  Future<void> pauseTimers() => _call(() => _hostApi.pauseTimers(webViewId));
+
+  /// Android only: undoes [pauseTimers] for every WebView in the app. Does
+  /// nothing on iOS.
+  ///
+  /// Android: `WebView.resumeTimers()`.
+  Future<void> resumeTimers() => _call(() => _hostApi.resumeTimers(webViewId));
+
   Future<void> stopLoading() => _call(() => _hostApi.stopLoading(webViewId));
 
   Future<void> goBack() => _call(() => _hostApi.goBack(webViewId));

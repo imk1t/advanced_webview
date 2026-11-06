@@ -537,6 +537,23 @@ void main() {
     });
   });
 
+  group('pause and resume', () {
+    test('call the host API and fail after dispose', () async {
+      final controller = createController();
+      await controller.pause();
+      await controller.resume();
+      await controller.pauseTimers();
+      await controller.resumeTimers();
+
+      expect(
+        hostApi.calls,
+        containsAllInOrder(['pause', 'resume', 'pauseTimers', 'resumeTimers']),
+      );
+      await controller.dispose();
+      expect(controller.pause(), throwsStateError);
+    });
+  });
+
   group('zoom', () {
     test('zoomBy, setZoomScale and getZoomScale use the host API', () async {
       final controller = createController();
