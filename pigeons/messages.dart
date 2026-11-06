@@ -33,6 +33,8 @@ class WebViewSettingsMessage {
     required this.mediaPlaybackRequiresUserGesture,
     required this.allowsInlineMediaPlayback,
     required this.supportZoom,
+    required this.builtInZoomControls,
+    required this.displayZoomControls,
     required this.transparentBackground,
     required this.passkeysEnabled,
     required this.allowsBackForwardNavigationGestures,
@@ -64,6 +66,12 @@ class WebViewSettingsMessage {
 
   /// Android only. Ignored on iOS.
   bool supportZoom;
+
+  /// Android only. Ignored on iOS.
+  bool builtInZoomControls;
+
+  /// Android only. Ignored on iOS.
+  bool displayZoomControls;
   bool transparentBackground;
 
   /// Android only. Ignored on iOS, where WebAuthn is governed by entitlements.
@@ -572,6 +580,16 @@ abstract class AdvancedWebViewHostApi {
 
   /// Scrolls the page by `dx`, `dy` (logical pixels) without animation.
   void scrollBy(int webViewId, double dx, double dy);
+
+  /// Multiplies the current zoom scale by `factor` (greater than 0). Android
+  /// calls `WebView.zoomBy`; iOS sets `UIScrollView.zoomScale`.
+  void zoomBy(int webViewId, double factor);
+
+  /// Sets the zoom scale. The platform clamps it to the page's limits.
+  void setZoomScale(int webViewId, double scale);
+
+  /// The current zoom scale, in device-independent pixels per CSS pixel.
+  double getZoomScale(int webViewId);
 
   ScrollPositionMessage getScrollPosition(int webViewId);
 

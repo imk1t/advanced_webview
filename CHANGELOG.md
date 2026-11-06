@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.zoomBy`, `setZoomScale`, and `getZoomScale`, and the Android settings `builtInZoomControls` and `displayZoomControls`. Android uses `WebView.zoomBy`; iOS zooms the scroll view and leaves `WKWebView.pageZoom` to `textZoom`. The defaults match the previous behaviour (pinch zoom on, on-screen buttons hidden).
+
 ## 0.9.0 - 2026-11-06
 
 - Add `AdvancedWebViewController.onInterceptRequest`, `interceptSchemes`, `InterceptedRequest` and `InterceptResponse`: answer requests to custom URL schemes (and, on Android, any scheme including `https`) with bytes made up in Dart, or let them through. iOS can only intercept custom schemes because WebKit does not allow `http` and `https`.

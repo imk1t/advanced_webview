@@ -183,6 +183,8 @@ class WebViewSettingsMessage {
     required this.mediaPlaybackRequiresUserGesture,
     required this.allowsInlineMediaPlayback,
     required this.supportZoom,
+    required this.builtInZoomControls,
+    required this.displayZoomControls,
     required this.transparentBackground,
     required this.passkeysEnabled,
     required this.allowsBackForwardNavigationGestures,
@@ -215,6 +217,12 @@ class WebViewSettingsMessage {
 
   /// Android only. Ignored on iOS.
   bool supportZoom;
+
+  /// Android only. Ignored on iOS.
+  bool builtInZoomControls;
+
+  /// Android only. Ignored on iOS.
+  bool displayZoomControls;
 
   bool transparentBackground;
 
@@ -292,6 +300,8 @@ class WebViewSettingsMessage {
       mediaPlaybackRequiresUserGesture,
       allowsInlineMediaPlayback,
       supportZoom,
+      builtInZoomControls,
+      displayZoomControls,
       transparentBackground,
       passkeysEnabled,
       allowsBackForwardNavigationGestures,
@@ -326,27 +336,29 @@ class WebViewSettingsMessage {
       mediaPlaybackRequiresUserGesture: result[1]! as bool,
       allowsInlineMediaPlayback: result[2]! as bool,
       supportZoom: result[3]! as bool,
-      transparentBackground: result[4]! as bool,
-      passkeysEnabled: result[5]! as bool,
-      allowsBackForwardNavigationGestures: result[6]! as bool,
-      inspectable: result[7]! as bool,
-      textZoom: result[8]! as int,
-      cacheMode: result[9]! as CacheModeMessage,
-      incognito: result[10]! as bool,
-      javaScriptCanOpenWindowsAutomatically: result[11]! as bool,
-      scrollbarsVisible: result[12]! as bool,
-      overScrollEnabled: result[13]! as bool,
-      pullToRefreshEnabled: result[14]! as bool,
-      domStorageEnabled: result[15]! as bool,
-      allowFileAccess: result[16]! as bool,
-      allowContentAccess: result[17]! as bool,
-      mixedContentMode: result[18]! as MixedContentModeMessage,
-      contentMode: result[19]! as ContentModeMessage,
-      allowsLinkPreview: result[20]! as bool,
-      geolocationEnabled: result[21]! as bool,
-      minimumFontSize: result[22] as int?,
-      userAgent: result[23] as String?,
-      applicationNameForUserAgent: result[24] as String?,
+      builtInZoomControls: result[4]! as bool,
+      displayZoomControls: result[5]! as bool,
+      transparentBackground: result[6]! as bool,
+      passkeysEnabled: result[7]! as bool,
+      allowsBackForwardNavigationGestures: result[8]! as bool,
+      inspectable: result[9]! as bool,
+      textZoom: result[10]! as int,
+      cacheMode: result[11]! as CacheModeMessage,
+      incognito: result[12]! as bool,
+      javaScriptCanOpenWindowsAutomatically: result[13]! as bool,
+      scrollbarsVisible: result[14]! as bool,
+      overScrollEnabled: result[15]! as bool,
+      pullToRefreshEnabled: result[16]! as bool,
+      domStorageEnabled: result[17]! as bool,
+      allowFileAccess: result[18]! as bool,
+      allowContentAccess: result[19]! as bool,
+      mixedContentMode: result[20]! as MixedContentModeMessage,
+      contentMode: result[21]! as ContentModeMessage,
+      allowsLinkPreview: result[22]! as bool,
+      geolocationEnabled: result[23]! as bool,
+      minimumFontSize: result[24] as int?,
+      userAgent: result[25] as String?,
+      applicationNameForUserAgent: result[26] as String?,
     );
   }
 
@@ -359,7 +371,7 @@ class WebViewSettingsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(incognito, other.incognito) && _deepEquals(javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && _deepEquals(scrollbarsVisible, other.scrollbarsVisible) && _deepEquals(overScrollEnabled, other.overScrollEnabled) && _deepEquals(pullToRefreshEnabled, other.pullToRefreshEnabled) && _deepEquals(domStorageEnabled, other.domStorageEnabled) && _deepEquals(allowFileAccess, other.allowFileAccess) && _deepEquals(allowContentAccess, other.allowContentAccess) && _deepEquals(mixedContentMode, other.mixedContentMode) && _deepEquals(contentMode, other.contentMode) && _deepEquals(allowsLinkPreview, other.allowsLinkPreview) && _deepEquals(geolocationEnabled, other.geolocationEnabled) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent) && _deepEquals(applicationNameForUserAgent, other.applicationNameForUserAgent);
+    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(builtInZoomControls, other.builtInZoomControls) && _deepEquals(displayZoomControls, other.displayZoomControls) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(incognito, other.incognito) && _deepEquals(javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && _deepEquals(scrollbarsVisible, other.scrollbarsVisible) && _deepEquals(overScrollEnabled, other.overScrollEnabled) && _deepEquals(pullToRefreshEnabled, other.pullToRefreshEnabled) && _deepEquals(domStorageEnabled, other.domStorageEnabled) && _deepEquals(allowFileAccess, other.allowFileAccess) && _deepEquals(allowContentAccess, other.allowContentAccess) && _deepEquals(mixedContentMode, other.mixedContentMode) && _deepEquals(contentMode, other.contentMode) && _deepEquals(allowsLinkPreview, other.allowsLinkPreview) && _deepEquals(geolocationEnabled, other.geolocationEnabled) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent) && _deepEquals(applicationNameForUserAgent, other.applicationNameForUserAgent);
   }
 
   @override
@@ -368,7 +380,7 @@ class WebViewSettingsMessage {
 
   @override
   String toString() {
-    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, cacheMode: $cacheMode, incognito: $incognito, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, scrollbarsVisible: $scrollbarsVisible, overScrollEnabled: $overScrollEnabled, pullToRefreshEnabled: $pullToRefreshEnabled, domStorageEnabled: $domStorageEnabled, allowFileAccess: $allowFileAccess, allowContentAccess: $allowContentAccess, mixedContentMode: $mixedContentMode, contentMode: $contentMode, allowsLinkPreview: $allowsLinkPreview, geolocationEnabled: $geolocationEnabled, minimumFontSize: $minimumFontSize, userAgent: $userAgent, applicationNameForUserAgent: $applicationNameForUserAgent)';
+    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, builtInZoomControls: $builtInZoomControls, displayZoomControls: $displayZoomControls, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, cacheMode: $cacheMode, incognito: $incognito, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, scrollbarsVisible: $scrollbarsVisible, overScrollEnabled: $overScrollEnabled, pullToRefreshEnabled: $pullToRefreshEnabled, domStorageEnabled: $domStorageEnabled, allowFileAccess: $allowFileAccess, allowContentAccess: $allowContentAccess, mixedContentMode: $mixedContentMode, contentMode: $contentMode, allowsLinkPreview: $allowsLinkPreview, geolocationEnabled: $geolocationEnabled, minimumFontSize: $minimumFontSize, userAgent: $userAgent, applicationNameForUserAgent: $applicationNameForUserAgent)';
   }
 }
 
@@ -2223,6 +2235,65 @@ class AdvancedWebViewHostApi {
         isNullValid: true,
     )
     ;
+  }
+
+  /// Multiplies the current zoom scale by `factor` (greater than 0). Android
+  /// calls `WebView.zoomBy`; iOS sets `UIScrollView.zoomScale`.
+  Future<void> zoomBy(int webViewId, double factor) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.zoomBy$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, factor]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// Sets the zoom scale. The platform clamps it to the page's limits.
+  Future<void> setZoomScale(int webViewId, double scale) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setZoomScale$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, scale]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// The current zoom scale, in device-independent pixels per CSS pixel.
+  Future<double> getZoomScale(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getZoomScale$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return pigeonVar_replyValue! as double;
   }
 
   Future<ScrollPositionMessage> getScrollPosition(int webViewId) async {

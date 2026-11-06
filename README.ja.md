@@ -98,6 +98,7 @@ JS からは両OS共通で `window.Bridge.postMessage('hello')` を呼べます�
 - ツールバー付きの全画面アプリ内ブラウザ（`AdvancedInAppBrowser`）
 - 証明書エラーと HTTP 認証のコールバック
 - リクエストのインターセプト: カスタムスキーム（Android では `https` も）へのリクエストに Dart から応答
+- ズーム操作（`zoomBy`、`setZoomScale`）
 - PDF の書き出し、ページ内検索のヒット数のライブ通知、ファビコン URL と全画面動画のコールバック
 - コールバック: ページ開始・完了、進捗、タイトル変更、読み込みエラー
 - 設定: JavaScript 有効化、User-Agent、メディア自動再生、インライン再生（iOS）、ズーム（Android）、背景透過

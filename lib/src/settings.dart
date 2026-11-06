@@ -52,6 +52,8 @@ enum WebViewCacheMode {
 class AndroidWebViewSettings {
   const AndroidWebViewSettings({
     this.supportZoom = true,
+    this.builtInZoomControls = true,
+    this.displayZoomControls = false,
     this.passkeysEnabled = false,
     this.domStorageEnabled = true,
     this.allowFileAccess = false,
@@ -62,6 +64,17 @@ class AndroidWebViewSettings {
 
   /// Lets the user pinch to zoom (`WebSettings.setSupportZoom`).
   final bool supportZoom;
+
+  /// Lets the user zoom with pinch and double-tap gestures
+  /// (`WebSettings.setBuiltInZoomControls`). WebView needs this together with
+  /// [supportZoom] for pinch zoom to work, so turn either off to disable it.
+  /// iOS has no setting; page zoom follows the page's viewport.
+  final bool builtInZoomControls;
+
+  /// Shows the on-screen `+` / `-` zoom buttons
+  /// (`WebSettings.setDisplayZoomControls`). Only has an effect when
+  /// [builtInZoomControls] is on. iOS has no such buttons.
+  final bool displayZoomControls;
 
   /// Enables WebAuthn / passkeys for web content loaded in the WebView
   /// (`WebSettingsCompat.setWebAuthenticationSupport`; a no-op when the
@@ -104,6 +117,8 @@ class AndroidWebViewSettings {
 
   AndroidWebViewSettings copyWith({
     bool? supportZoom,
+    bool? builtInZoomControls,
+    bool? displayZoomControls,
     bool? passkeysEnabled,
     bool? domStorageEnabled,
     bool? allowFileAccess,
@@ -113,6 +128,8 @@ class AndroidWebViewSettings {
   }) {
     return AndroidWebViewSettings(
       supportZoom: supportZoom ?? this.supportZoom,
+      builtInZoomControls: builtInZoomControls ?? this.builtInZoomControls,
+      displayZoomControls: displayZoomControls ?? this.displayZoomControls,
       passkeysEnabled: passkeysEnabled ?? this.passkeysEnabled,
       domStorageEnabled: domStorageEnabled ?? this.domStorageEnabled,
       allowFileAccess: allowFileAccess ?? this.allowFileAccess,
@@ -126,6 +143,8 @@ class AndroidWebViewSettings {
   bool operator ==(Object other) =>
       other is AndroidWebViewSettings &&
       other.supportZoom == supportZoom &&
+      other.builtInZoomControls == builtInZoomControls &&
+      other.displayZoomControls == displayZoomControls &&
       other.passkeysEnabled == passkeysEnabled &&
       other.domStorageEnabled == domStorageEnabled &&
       other.allowFileAccess == allowFileAccess &&
@@ -136,6 +155,8 @@ class AndroidWebViewSettings {
   @override
   int get hashCode => Object.hash(
     supportZoom,
+    builtInZoomControls,
+    displayZoomControls,
     passkeysEnabled,
     domStorageEnabled,
     allowFileAccess,
@@ -377,6 +398,8 @@ class WebViewSettings {
     mediaPlaybackRequiresUserGesture: mediaPlaybackRequiresUserGesture,
     allowsInlineMediaPlayback: ios.allowsInlineMediaPlayback,
     supportZoom: android.supportZoom,
+    builtInZoomControls: android.builtInZoomControls,
+    displayZoomControls: android.displayZoomControls,
     transparentBackground: transparentBackground,
     passkeysEnabled: android.passkeysEnabled,
     allowsBackForwardNavigationGestures:

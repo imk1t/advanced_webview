@@ -43,6 +43,8 @@ const WebViewSettings(
 | 設定 | 既定値 | Android | iOS |
 | --- | --- | --- | --- |
 | `supportZoom` | `true` | 対応 | 無視 |
+| `builtInZoomControls` | `true` | 対応（ピンチ・ダブルタップ。`supportZoom` が必要） | 無視 |
+| `displayZoomControls` | `false` | 対応（画面上の + / - ボタン） | 無視 |
 | `passkeysEnabled` | `false` | 対応 | 無視（下記参照） |
 | `domStorageEnabled` | `true` | 対応 | 無視（常に有効） |
 | `allowFileAccess` | `false` | 対応 | 無視 |

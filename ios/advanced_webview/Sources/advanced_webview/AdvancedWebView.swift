@@ -191,6 +191,20 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     scrollTo(x: Double(offset.x) + dx, y: Double(offset.y) + dy)
   }
 
+  /// The zoom scale in points per CSS pixel, like Android.
+  func zoomScale() -> Double {
+    return Double(webView.scrollView.zoomScale)
+  }
+
+  func zoomBy(_ factor: Double) {
+    setZoomScale(zoomScale() * factor)
+  }
+
+  /// The scroll view keeps the scale within the page's minimum and maximum.
+  func setZoomScale(_ scale: Double) {
+    webView.scrollView.setZoomScale(CGFloat(scale), animated: false)
+  }
+
   func scrollPosition() -> ScrollPositionMessage {
     let offset = webView.scrollView.contentOffset
     return ScrollPositionMessage(x: Double(offset.x), y: Double(offset.y))

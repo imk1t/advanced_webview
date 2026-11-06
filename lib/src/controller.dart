@@ -516,6 +516,47 @@ class AdvancedWebViewController {
   Future<void> scrollBy(double dx, double dy) =>
       _call(() => _hostApi.scrollBy(webViewId, dx, dy));
 
+  /// Multiplies the page's zoom scale by [factor], which must be positive.
+  ///
+  /// The platform keeps the result within the page's zoom limits, so a page
+  /// that forbids zooming (`user-scalable=no`) ignores it. On Android the
+  /// WebView must allow zooming ([AndroidWebViewSettings.supportZoom] and
+  /// [AndroidWebViewSettings.builtInZoomControls]). This is independent of
+  /// [WebViewSettings.textZoom]. Android ignores the call until the page has
+  /// been drawn, so a call right after the page finished loading can be lost.
+  ///
+  /// Android: `WebView.zoomBy(float)`.
+  /// iOS: `UIScrollView.setZoomScale(_:animated:)` on `WKWebView.scrollView`.
+  Future<void> zoomBy(double factor) {
+    assert(factor > 0, 'factor must be positive');
+    return _call(() => _hostApi.zoomBy(webViewId, factor));
+  }
+
+  /// Sets the page's zoom scale to [scale], which must be positive.
+  ///
+  /// See [zoomBy] for the limits that apply, and [getZoomScale] for what the
+  /// number means. Android has no absolute setter, so the plugin calls
+  /// `zoomBy` with the ratio to the current scale; the result can be slightly
+  /// off for that reason.
+  ///
+  /// Android: `WebView.zoomBy(float)`.
+  /// iOS: `UIScrollView.setZoomScale(_:animated:)` on `WKWebView.scrollView`.
+  Future<void> setZoomScale(double scale) {
+    assert(scale > 0, 'scale must be positive');
+    return _call(() => _hostApi.setZoomScale(webViewId, scale));
+  }
+
+  /// The current zoom scale of the page, in logical pixels per CSS pixel.
+  ///
+  /// `1.0` shows one CSS pixel as one logical pixel. A page without a
+  /// viewport `<meta>` tag is usually laid out wider than the screen and
+  /// starts below `1.0`.
+  ///
+  /// Android: `WebView.getScale()` divided by the display density.
+  /// iOS: `UIScrollView.zoomScale` of `WKWebView.scrollView`.
+  Future<double> getZoomScale() =>
+      _call(() => _hostApi.getZoomScale(webViewId));
+
   /// The current scroll offset of the page in logical pixels.
   Future<Offset> scrollPosition() async {
     final position = await _call(() => _hostApi.getScrollPosition(webViewId));

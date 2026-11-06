@@ -160,6 +160,19 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun zoomControlSettingsAreAppliedAtCreationAndOnUpdate() {
+        hostApi.create(params(webViewId = 1))
+        val nativeSettings = registry.get(1).webView.settings
+        assertTrue(nativeSettings.builtInZoomControls)
+        assertFalse(nativeSettings.displayZoomControls)
+
+        hostApi.updateSettings(1, settings(builtInZoomControls = false, displayZoomControls = true))
+
+        assertFalse(nativeSettings.builtInZoomControls)
+        assertTrue(nativeSettings.displayZoomControls)
+    }
+
+    @Test
     fun cacheModeIsAppliedAtCreationAndOnUpdate() {
         hostApi.create(params(webViewId = 1, settings = settings(cacheMode = CacheModeMessage.CACHE_ONLY)))
         val nativeSettings = registry.get(1).webView.settings
@@ -930,6 +943,8 @@ class WebViewHostApiImplTest {
     private fun settings(
         javaScriptEnabled: Boolean = true,
         supportZoom: Boolean = true,
+        builtInZoomControls: Boolean = true,
+        displayZoomControls: Boolean = false,
         transparentBackground: Boolean = false,
         userAgent: String? = null,
         passkeysEnabled: Boolean = false,
@@ -952,6 +967,8 @@ class WebViewHostApiImplTest {
         mediaPlaybackRequiresUserGesture = true,
         allowsInlineMediaPlayback = false,
         supportZoom = supportZoom,
+        builtInZoomControls = builtInZoomControls,
+        displayZoomControls = displayZoomControls,
         transparentBackground = transparentBackground,
         passkeysEnabled = passkeysEnabled,
         allowsBackForwardNavigationGestures = false,

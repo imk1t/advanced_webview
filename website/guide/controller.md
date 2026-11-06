@@ -89,6 +89,21 @@ Offsets are logical pixels on both platforms. To follow the scroll position, pas
 `onScrollChanged: (offset) {}` to the constructor. It fires for every scroll step, so keep it cheap;
 when it is not set, no scroll events cross the platform channel.
 
+## Zoom
+
+```dart
+await controller.zoomBy(1.5);           // multiply the current scale
+await controller.setZoomScale(2);       // set the scale
+final scale = await controller.getZoomScale(); // double
+```
+
+The scale is in logical pixels per CSS pixel: `1.0` shows one CSS pixel as one logical pixel. A page without a
+viewport `<meta>` tag usually starts below `1.0`. Both platforms keep the result within the page's zoom limits, so a
+page with `user-scalable=no` ignores these calls. On Android the settings `supportZoom` and `builtInZoomControls`
+must be on (they are by default); Android has no absolute setter, so `setZoomScale` zooms by the ratio to the current
+scale and can be slightly off. Android also ignores zoom calls until the page has been drawn, so a call right after the page finished loading can be lost. iOS zooms the scroll view (`UIScrollView.zoomScale`); `WKWebView.pageZoom` stays with
+`textZoom`, so the two do not interfere.
+
 ## Saving and restoring state
 
 ```dart

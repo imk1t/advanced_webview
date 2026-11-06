@@ -104,6 +104,26 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
   Future<void> scrollTo(int webViewId, double x, double y) async =>
       calls.add('scrollTo($x, $y)');
 
+  double zoomScale = 1;
+
+  @override
+  Future<void> zoomBy(int webViewId, double factor) async {
+    calls.add('zoomBy($factor)');
+    zoomScale *= factor;
+  }
+
+  @override
+  Future<void> setZoomScale(int webViewId, double scale) async {
+    calls.add('setZoomScale($scale)');
+    zoomScale = scale;
+  }
+
+  @override
+  Future<double> getZoomScale(int webViewId) async {
+    calls.add('getZoomScale');
+    return zoomScale;
+  }
+
   @override
   Future<void> scrollBy(int webViewId, double dx, double dy) async =>
       calls.add('scrollBy($dx, $dy)');

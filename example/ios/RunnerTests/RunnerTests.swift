@@ -340,6 +340,19 @@ final class RunnerTests: XCTestCase {
   }
 
   @MainActor
+  func testZoomCallsReachTheScrollView() throws {
+    let (hostApi, _, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    defer { hostApi.disposeAll() }
+
+    XCTAssertEqual(try hostApi.getZoomScale(webViewId: 1), 1)
+    // Without a loaded page the scroll view's zoom limits stay at 1, so the
+    // calls must be accepted and leave the scale in range.
+    try hostApi.setZoomScale(webViewId: 1, scale: 2)
+    try hostApi.zoomBy(webViewId: 1, factor: 1.5)
+    XCTAssertGreaterThan(try hostApi.getZoomScale(webViewId: 1), 0)
+  }
+  @MainActor
   func testScrollToByAndPosition() throws {
     let (hostApi, _, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))
@@ -587,6 +600,8 @@ final class RunnerTests: XCTestCase {
       mediaPlaybackRequiresUserGesture: mediaPlaybackRequiresUserGesture,
       allowsInlineMediaPlayback: allowsInlineMediaPlayback,
       supportZoom: true,
+      builtInZoomControls: true,
+      displayZoomControls: false,
       transparentBackground: transparentBackground,
       passkeysEnabled: false,
       allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,

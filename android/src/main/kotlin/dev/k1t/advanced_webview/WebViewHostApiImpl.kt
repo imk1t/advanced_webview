@@ -103,6 +103,12 @@ class WebViewHostApiImpl(
 
     override fun scrollBy(webViewId: Long, dx: Double, dy: Double) = registry.get(webViewId).scrollBy(dx, dy)
 
+    override fun zoomBy(webViewId: Long, factor: Double) = registry.get(webViewId).zoomBy(factor)
+
+    override fun setZoomScale(webViewId: Long, scale: Double) = registry.get(webViewId).setZoomScale(scale)
+
+    override fun getZoomScale(webViewId: Long): Double = registry.get(webViewId).zoomScale()
+
     override fun getScrollPosition(webViewId: Long): ScrollPositionMessage = registry.get(webViewId).scrollPosition()
 
     override fun saveState(webViewId: Long): ByteArray? = registry.get(webViewId).saveState()

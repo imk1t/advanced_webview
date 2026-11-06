@@ -217,8 +217,8 @@ class AdvancedWebView(
             javaScriptEnabled = settings.javaScriptEnabled
             mediaPlaybackRequiresUserGesture = settings.mediaPlaybackRequiresUserGesture
             setSupportZoom(settings.supportZoom)
-            builtInZoomControls = settings.supportZoom
-            displayZoomControls = false
+            builtInZoomControls = settings.builtInZoomControls
+            displayZoomControls = settings.displayZoomControls
             javaScriptCanOpenWindowsAutomatically = settings.javaScriptCanOpenWindowsAutomatically
             textZoom = settings.textZoom.toInt()
             cacheMode = when (settings.cacheMode) {
@@ -328,6 +328,18 @@ class AdvancedWebView(
     fun scrollTo(x: Double, y: Double) = webView.scrollTo((x * density).roundToInt(), (y * density).roundToInt())
 
     fun scrollBy(dx: Double, dy: Double) = webView.scrollBy((dx * density).roundToInt(), (dy * density).roundToInt())
+
+    /** The zoom scale in logical pixels per CSS pixel, like iOS. */
+    @Suppress("DEPRECATION")
+    fun zoomScale(): Double = webView.scale / density
+
+    /** `WebView.zoomBy` accepts factors from 0.01 to 100 only and throws otherwise. */
+    fun zoomBy(factor: Double) = webView.zoomBy(factor.toFloat().coerceIn(MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR))
+
+    fun setZoomScale(scale: Double) {
+        val current = zoomScale()
+        if (current > 0) zoomBy(scale / current)
+    }
 
     fun scrollPosition(): ScrollPositionMessage = ScrollPositionMessage(
         webView.scrollX / density,
@@ -998,6 +1010,8 @@ class AdvancedWebView(
     companion object {
         private const val TAG = "AdvancedWebView"
         private const val MATCH_PARENT = ViewGroup.LayoutParams.MATCH_PARENT
+        private const val MIN_ZOOM_FACTOR = 0.01f
+        private const val MAX_ZOOM_FACTOR = 100f
 
         @Suppress("DEPRECATION")
         private const val FULLSCREEN_FLAGS = View.SYSTEM_UI_FLAG_FULLSCREEN or
