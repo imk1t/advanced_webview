@@ -237,14 +237,16 @@ void main() {
       interceptSchemes: ['app'],
       onInterceptRequest: (request) {
         requests.add(request.url);
-        if (request.url.endsWith('/data.txt')) {
-          return InterceptResponse.text('from dart', mimeType: 'text/plain');
+        if (request.url.endsWith('/data.js')) {
+          return InterceptResponse.text(
+            'document.title = "from dart";',
+            mimeType: 'text/javascript',
+          );
         }
+        // A script element, because Android's Chromium refuses fetch() to a
+        // custom scheme before the request reaches the callback.
         return InterceptResponse.text(
-          '<html><body><script>'
-          'fetch("app://host/data.txt").then(r => r.text())'
-          '.then(t => document.title = t);'
-          '</script></body></html>',
+          '<html><body><script src="app://host/data.js"></script></body></html>',
         );
       },
     );
@@ -258,7 +260,7 @@ void main() {
     );
 
     expect(await harness.controller.title(), 'from dart');
-    expect(requests, ['app://host/index.html', 'app://host/data.txt']);
+    expect(requests, ['app://host/index.html', 'app://host/data.js']);
   });
 
   testWidgets('console output is reported with its level', (tester) async {

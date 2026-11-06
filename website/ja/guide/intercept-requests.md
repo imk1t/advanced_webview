@@ -23,7 +23,7 @@ await controller.loadUrl('app://host/index.html');
 追加の `headers` を持ちます。`InterceptResponse.text` は UTF-8 テキスト用の近道です。
 
 `interceptSchemes` と `onInterceptRequest` は必ず一緒に指定します。コールバックはページ自身と、そのページが
-要求するすべてのサブリソース（スクリプト、画像、`fetch`）で呼ばれるため、`app://host/` から配信したページ内の
+要求するすべてのサブリソース（スクリプト、スタイルシート、画像）で呼ばれるため、`app://host/` から配信したページ内の
 相対 URL もコールバックに届きます。リクエストのボディは取得できません。
 
 ## 違い
@@ -42,6 +42,9 @@ await controller.loadUrl('app://host/index.html');
 - **スレッド。** どちらも UI スレッドはブロックしません。Android では WebView が自身の IO スレッドで問い合わせ、
   Dart の応答までそのスレッドが待つため、コールバックは短く保ってください。遅いコールバックが
   遅らせるのはそのリクエストだけです。
+- **カスタムスキームへの `fetch` と XHR。** Android の Chromium は、カスタムスキームへの `fetch()` と
+  `XMLHttpRequest` をコールバックに届く前に拒否します（ページには `TypeError: Failed to fetch` が見えます）。
+  サブリソースは `<script src>`、`<link>`、`<img>` で読み込むか、Android では `https` を使ってください。
 - **オリジン間アクセス。** あるオリジンのページが別のオリジンから取得する場合は、通常の CORS ヘッダ
   （例: `Access-Control-Allow-Origin`）を `InterceptResponse.headers` に付ける必要があります。
 
