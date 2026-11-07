@@ -189,6 +189,7 @@ class CreationParamsMessage {
     required this.hasDownloadDelegate,
     required this.hasSslErrorDelegate,
     required this.hasHttpAuthDelegate,
+    required this.hasClientCertDelegate,
     required this.hasScrollDelegate,
     required this.hasLongPressDelegate,
     required this.hasConsoleMessageDelegate,
@@ -237,6 +238,10 @@ class CreationParamsMessage {
   /// When false, HTTP authentication challenges get the platform default
   /// handling without a round trip to Dart.
   bool hasHttpAuthDelegate;
+
+  /// When false, client certificate requests get the platform default
+  /// handling (Android cancels them) without a round trip to Dart.
+  bool hasClientCertDelegate;
 
   /// When false, scroll changes are never reported to Dart.
   bool hasScrollDelegate;
@@ -327,6 +332,32 @@ class HttpAuthRequestMessage {
 
   String host;
   String? realm;
+}
+
+class ClientCertRequestMessage {
+  ClientCertRequestMessage({
+    required this.host,
+    required this.port,
+    this.realm,
+  });
+
+  String host;
+  int port;
+
+  /// iOS only: `URLProtectionSpace.realm`. Always null on Android.
+  String? realm;
+}
+
+enum ClientCertActionMessage { proceed, cancel, ignore }
+
+class ClientCertResponseMessage {
+  ClientCertResponseMessage({required this.action, this.pkcs12, this.password});
+
+  ClientCertActionMessage action;
+
+  /// A PKCS#12 (`.p12`) file. Only used with `proceed`.
+  Uint8List? pkcs12;
+  String? password;
 }
 
 class HttpAuthCredentialsMessage {
@@ -721,6 +752,13 @@ abstract class AdvancedWebViewFlutterApi {
   HttpAuthCredentialsMessage? onHttpAuthRequest(
     int webViewId,
     HttpAuthRequestMessage request,
+  );
+
+  /// A server asked for a client certificate (mutual TLS).
+  @async
+  ClientCertResponseMessage onClientCertRequest(
+    int webViewId,
+    ClientCertRequestMessage request,
   );
 
   /// The page started a download. The WebView does not save the file.

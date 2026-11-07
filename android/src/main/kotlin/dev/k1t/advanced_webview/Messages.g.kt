@@ -285,6 +285,18 @@ enum class SslErrorDecisionMessage(val raw: Int) {
   }
 }
 
+enum class ClientCertActionMessage(val raw: Int) {
+  PROCEED(0),
+  CANCEL(1),
+  IGNORE(2);
+
+  companion object {
+    fun ofRaw(raw: Int): ClientCertActionMessage? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class PermissionResourceMessage(val raw: Int) {
   CAMERA(0),
   MICROPHONE(1),
@@ -673,6 +685,11 @@ data class CreationParamsMessage (
    * handling without a round trip to Dart.
    */
   val hasHttpAuthDelegate: Boolean,
+  /**
+   * When false, client certificate requests get the platform default
+   * handling (Android cancels them) without a round trip to Dart.
+   */
+  val hasClientCertDelegate: Boolean,
   /** When false, scroll changes are never reported to Dart. */
   val hasScrollDelegate: Boolean,
   /** When false, long presses are never reported to Dart. */
@@ -720,17 +737,18 @@ data class CreationParamsMessage (
       val hasDownloadDelegate = pigeonVar_list[8] as Boolean
       val hasSslErrorDelegate = pigeonVar_list[9] as Boolean
       val hasHttpAuthDelegate = pigeonVar_list[10] as Boolean
-      val hasScrollDelegate = pigeonVar_list[11] as Boolean
-      val hasLongPressDelegate = pigeonVar_list[12] as Boolean
-      val hasConsoleMessageDelegate = pigeonVar_list[13] as Boolean
-      val hasJsDialogDelegate = pigeonVar_list[14] as Boolean
-      val hasHttpErrorDelegate = pigeonVar_list[15] as Boolean
-      val hasFindDelegate = pigeonVar_list[16] as Boolean
-      val hasFaviconDelegate = pigeonVar_list[17] as Boolean
-      val hasFullscreenDelegate = pigeonVar_list[18] as Boolean
-      val interceptSchemes = pigeonVar_list[19] as List<String>
-      val userScripts = pigeonVar_list[20] as List<UserScriptMessage>
-      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, hasDownloadDelegate, hasSslErrorDelegate, hasHttpAuthDelegate, hasScrollDelegate, hasLongPressDelegate, hasConsoleMessageDelegate, hasJsDialogDelegate, hasHttpErrorDelegate, hasFindDelegate, hasFaviconDelegate, hasFullscreenDelegate, interceptSchemes, userScripts)
+      val hasClientCertDelegate = pigeonVar_list[11] as Boolean
+      val hasScrollDelegate = pigeonVar_list[12] as Boolean
+      val hasLongPressDelegate = pigeonVar_list[13] as Boolean
+      val hasConsoleMessageDelegate = pigeonVar_list[14] as Boolean
+      val hasJsDialogDelegate = pigeonVar_list[15] as Boolean
+      val hasHttpErrorDelegate = pigeonVar_list[16] as Boolean
+      val hasFindDelegate = pigeonVar_list[17] as Boolean
+      val hasFaviconDelegate = pigeonVar_list[18] as Boolean
+      val hasFullscreenDelegate = pigeonVar_list[19] as Boolean
+      val interceptSchemes = pigeonVar_list[20] as List<String>
+      val userScripts = pigeonVar_list[21] as List<UserScriptMessage>
+      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, hasDownloadDelegate, hasSslErrorDelegate, hasHttpAuthDelegate, hasClientCertDelegate, hasScrollDelegate, hasLongPressDelegate, hasConsoleMessageDelegate, hasJsDialogDelegate, hasHttpErrorDelegate, hasFindDelegate, hasFaviconDelegate, hasFullscreenDelegate, interceptSchemes, userScripts)
     }
   }
   fun toList(): List<Any?> {
@@ -746,6 +764,7 @@ data class CreationParamsMessage (
       hasDownloadDelegate,
       hasSslErrorDelegate,
       hasHttpAuthDelegate,
+      hasClientCertDelegate,
       hasScrollDelegate,
       hasLongPressDelegate,
       hasConsoleMessageDelegate,
@@ -766,7 +785,7 @@ data class CreationParamsMessage (
       return true
     }
     val other = other as CreationParamsMessage
-    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.hasDownloadDelegate, other.hasDownloadDelegate) && MessagesPigeonUtils.deepEquals(this.hasSslErrorDelegate, other.hasSslErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpAuthDelegate, other.hasHttpAuthDelegate) && MessagesPigeonUtils.deepEquals(this.hasScrollDelegate, other.hasScrollDelegate) && MessagesPigeonUtils.deepEquals(this.hasLongPressDelegate, other.hasLongPressDelegate) && MessagesPigeonUtils.deepEquals(this.hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && MessagesPigeonUtils.deepEquals(this.hasJsDialogDelegate, other.hasJsDialogDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpErrorDelegate, other.hasHttpErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasFindDelegate, other.hasFindDelegate) && MessagesPigeonUtils.deepEquals(this.hasFaviconDelegate, other.hasFaviconDelegate) && MessagesPigeonUtils.deepEquals(this.hasFullscreenDelegate, other.hasFullscreenDelegate) && MessagesPigeonUtils.deepEquals(this.interceptSchemes, other.interceptSchemes) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.hasDownloadDelegate, other.hasDownloadDelegate) && MessagesPigeonUtils.deepEquals(this.hasSslErrorDelegate, other.hasSslErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpAuthDelegate, other.hasHttpAuthDelegate) && MessagesPigeonUtils.deepEquals(this.hasClientCertDelegate, other.hasClientCertDelegate) && MessagesPigeonUtils.deepEquals(this.hasScrollDelegate, other.hasScrollDelegate) && MessagesPigeonUtils.deepEquals(this.hasLongPressDelegate, other.hasLongPressDelegate) && MessagesPigeonUtils.deepEquals(this.hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && MessagesPigeonUtils.deepEquals(this.hasJsDialogDelegate, other.hasJsDialogDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpErrorDelegate, other.hasHttpErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasFindDelegate, other.hasFindDelegate) && MessagesPigeonUtils.deepEquals(this.hasFaviconDelegate, other.hasFaviconDelegate) && MessagesPigeonUtils.deepEquals(this.hasFullscreenDelegate, other.hasFullscreenDelegate) && MessagesPigeonUtils.deepEquals(this.interceptSchemes, other.interceptSchemes) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
   }
 
   override fun hashCode(): Int {
@@ -782,6 +801,7 @@ data class CreationParamsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasDownloadDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasSslErrorDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasHttpAuthDelegate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.hasClientCertDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasScrollDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasLongPressDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasConsoleMessageDelegate)
@@ -795,7 +815,7 @@ data class CreationParamsMessage (
     return result
   }
   override fun toString(): String {
-    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, hasDownloadDelegate=$hasDownloadDelegate, hasSslErrorDelegate=$hasSslErrorDelegate, hasHttpAuthDelegate=$hasHttpAuthDelegate, hasScrollDelegate=$hasScrollDelegate, hasLongPressDelegate=$hasLongPressDelegate, hasConsoleMessageDelegate=$hasConsoleMessageDelegate, hasJsDialogDelegate=$hasJsDialogDelegate, hasHttpErrorDelegate=$hasHttpErrorDelegate, hasFindDelegate=$hasFindDelegate, hasFaviconDelegate=$hasFaviconDelegate, hasFullscreenDelegate=$hasFullscreenDelegate, interceptSchemes=$interceptSchemes, userScripts=$userScripts)"
+    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, hasDownloadDelegate=$hasDownloadDelegate, hasSslErrorDelegate=$hasSslErrorDelegate, hasHttpAuthDelegate=$hasHttpAuthDelegate, hasClientCertDelegate=$hasClientCertDelegate, hasScrollDelegate=$hasScrollDelegate, hasLongPressDelegate=$hasLongPressDelegate, hasConsoleMessageDelegate=$hasConsoleMessageDelegate, hasJsDialogDelegate=$hasJsDialogDelegate, hasHttpErrorDelegate=$hasHttpErrorDelegate, hasFindDelegate=$hasFindDelegate, hasFaviconDelegate=$hasFaviconDelegate, hasFullscreenDelegate=$hasFullscreenDelegate, interceptSchemes=$interceptSchemes, userScripts=$userScripts)"
   }
 }
 
@@ -1017,6 +1037,98 @@ data class HttpAuthRequestMessage (
   }
   override fun toString(): String {
     return "HttpAuthRequestMessage(host=$host, realm=$realm)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ClientCertRequestMessage (
+  val host: String,
+  val port: Long,
+  /** iOS only: `URLProtectionSpace.realm`. Always null on Android. */
+  val realm: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ClientCertRequestMessage {
+      val host = pigeonVar_list[0] as String
+      val port = pigeonVar_list[1] as Long
+      val realm = pigeonVar_list[2] as String?
+      return ClientCertRequestMessage(host, port, realm)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      host,
+      port,
+      realm,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as ClientCertRequestMessage
+    return MessagesPigeonUtils.deepEquals(this.host, other.host) && MessagesPigeonUtils.deepEquals(this.port, other.port) && MessagesPigeonUtils.deepEquals(this.realm, other.realm)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.host)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.port)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.realm)
+    return result
+  }
+  override fun toString(): String {
+    return "ClientCertRequestMessage(host=$host, port=$port, realm=$realm)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ClientCertResponseMessage (
+  val action: ClientCertActionMessage,
+  /** A PKCS#12 (`.p12`) file. Only used with `proceed`. */
+  val pkcs12: ByteArray? = null,
+  val password: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ClientCertResponseMessage {
+      val action = pigeonVar_list[0] as ClientCertActionMessage
+      val pkcs12 = pigeonVar_list[1] as ByteArray?
+      val password = pigeonVar_list[2] as String?
+      return ClientCertResponseMessage(action, pkcs12, password)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      action,
+      pkcs12,
+      password,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as ClientCertResponseMessage
+    return MessagesPigeonUtils.deepEquals(this.action, other.action) && MessagesPigeonUtils.deepEquals(this.pkcs12, other.pkcs12) && MessagesPigeonUtils.deepEquals(this.password, other.password)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.action)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.pkcs12)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.password)
+    return result
+  }
+  override fun toString(): String {
+    return "ClientCertResponseMessage(action=$action, pkcs12=${pkcs12?.contentToString()}, password=$password)"
   }
 }
 
@@ -1611,125 +1723,140 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       136.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PermissionResourceMessage.ofRaw(it.toInt())
+          ClientCertActionMessage.ofRaw(it.toInt())
         }
       }
       137.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PermissionDecisionMessage.ofRaw(it.toInt())
+          PermissionResourceMessage.ofRaw(it.toInt())
         }
       }
       138.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          JsDialogTypeMessage.ofRaw(it.toInt())
+          PermissionDecisionMessage.ofRaw(it.toInt())
         }
       }
       139.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          WebsiteDataTypeMessage.ofRaw(it.toInt())
+          JsDialogTypeMessage.ofRaw(it.toInt())
         }
       }
       140.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          HttpMethodMessage.ofRaw(it.toInt())
+          WebsiteDataTypeMessage.ofRaw(it.toInt())
         }
       }
       141.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          WebViewSettingsMessage.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          HttpMethodMessage.ofRaw(it.toInt())
         }
       }
       142.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ConsoleMessageMessage.fromList(it)
+          WebViewSettingsMessage.fromList(it)
         }
       }
       143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UserScriptMessage.fromList(it)
+          ConsoleMessageMessage.fromList(it)
         }
       }
       144.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CreationParamsMessage.fromList(it)
+          UserScriptMessage.fromList(it)
         }
       }
       145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          NavigationRequestMessage.fromList(it)
+          CreationParamsMessage.fromList(it)
         }
       }
       146.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpErrorMessage.fromList(it)
+          NavigationRequestMessage.fromList(it)
         }
       }
       147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          WebResourceErrorMessage.fromList(it)
+          HttpErrorMessage.fromList(it)
         }
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SslErrorMessage.fromList(it)
+          WebResourceErrorMessage.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthRequestMessage.fromList(it)
+          SslErrorMessage.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthCredentialsMessage.fromList(it)
+          HttpAuthRequestMessage.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DownloadRequestMessage.fromList(it)
+          ClientCertRequestMessage.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PermissionRequestMessage.fromList(it)
+          ClientCertResponseMessage.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogRequestMessage.fromList(it)
+          HttpAuthCredentialsMessage.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogResultMessage.fromList(it)
+          DownloadRequestMessage.fromList(it)
         }
       }
       155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InterceptRequestMessage.fromList(it)
+          PermissionRequestMessage.fromList(it)
         }
       }
       156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InterceptResponseMessage.fromList(it)
+          JsDialogRequestMessage.fromList(it)
         }
       }
       157.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          FindResultMessage.fromList(it)
+          JsDialogResultMessage.fromList(it)
         }
       }
       158.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ScrollPositionMessage.fromList(it)
+          InterceptRequestMessage.fromList(it)
         }
       }
       159.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CookieMessage.fromList(it)
+          InterceptResponseMessage.fromList(it)
         }
       }
       160.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          FindResultMessage.fromList(it)
+        }
+      }
+      161.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ScrollPositionMessage.fromList(it)
+        }
+      }
+      162.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CookieMessage.fromList(it)
+        }
+      }
+      163.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           InAppBrowserParamsMessage.fromList(it)
         }
@@ -1767,104 +1894,116 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(135)
         writeValue(stream, value.raw.toLong())
       }
-      is PermissionResourceMessage -> {
+      is ClientCertActionMessage -> {
         stream.write(136)
         writeValue(stream, value.raw.toLong())
       }
-      is PermissionDecisionMessage -> {
+      is PermissionResourceMessage -> {
         stream.write(137)
         writeValue(stream, value.raw.toLong())
       }
-      is JsDialogTypeMessage -> {
+      is PermissionDecisionMessage -> {
         stream.write(138)
         writeValue(stream, value.raw.toLong())
       }
-      is WebsiteDataTypeMessage -> {
+      is JsDialogTypeMessage -> {
         stream.write(139)
         writeValue(stream, value.raw.toLong())
       }
-      is HttpMethodMessage -> {
+      is WebsiteDataTypeMessage -> {
         stream.write(140)
         writeValue(stream, value.raw.toLong())
       }
-      is WebViewSettingsMessage -> {
+      is HttpMethodMessage -> {
         stream.write(141)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is ConsoleMessageMessage -> {
+      is WebViewSettingsMessage -> {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is UserScriptMessage -> {
+      is ConsoleMessageMessage -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
-      is CreationParamsMessage -> {
+      is UserScriptMessage -> {
         stream.write(144)
         writeValue(stream, value.toList())
       }
-      is NavigationRequestMessage -> {
+      is CreationParamsMessage -> {
         stream.write(145)
         writeValue(stream, value.toList())
       }
-      is HttpErrorMessage -> {
+      is NavigationRequestMessage -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
-      is WebResourceErrorMessage -> {
+      is HttpErrorMessage -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is SslErrorMessage -> {
+      is WebResourceErrorMessage -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is HttpAuthRequestMessage -> {
+      is SslErrorMessage -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is HttpAuthCredentialsMessage -> {
+      is HttpAuthRequestMessage -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is DownloadRequestMessage -> {
+      is ClientCertRequestMessage -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is PermissionRequestMessage -> {
+      is ClientCertResponseMessage -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is JsDialogRequestMessage -> {
+      is HttpAuthCredentialsMessage -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is JsDialogResultMessage -> {
+      is DownloadRequestMessage -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is InterceptRequestMessage -> {
+      is PermissionRequestMessage -> {
         stream.write(155)
         writeValue(stream, value.toList())
       }
-      is InterceptResponseMessage -> {
+      is JsDialogRequestMessage -> {
         stream.write(156)
         writeValue(stream, value.toList())
       }
-      is FindResultMessage -> {
+      is JsDialogResultMessage -> {
         stream.write(157)
         writeValue(stream, value.toList())
       }
-      is ScrollPositionMessage -> {
+      is InterceptRequestMessage -> {
         stream.write(158)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is InterceptResponseMessage -> {
         stream.write(159)
         writeValue(stream, value.toList())
       }
-      is InAppBrowserParamsMessage -> {
+      is FindResultMessage -> {
         stream.write(160)
+        writeValue(stream, value.toList())
+      }
+      is ScrollPositionMessage -> {
+        stream.write(161)
+        writeValue(stream, value.toList())
+      }
+      is CookieMessage -> {
+        stream.write(162)
+        writeValue(stream, value.toList())
+      }
+      is InAppBrowserParamsMessage -> {
+        stream.write(163)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -3140,6 +3279,29 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
             continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
           } else {
             val output = it[0] as HttpAuthCredentialsMessage?
+            continuation.resume(output)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /** A server asked for a client certificate (mutual TLS). */
+  suspend fun onClientCertRequest(webViewIdArg: Long, requestArg: ClientCertRequestMessage): ClientCertResponseMessage
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onClientCertRequest$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg, requestArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else if (it[0] == null) {
+            continuation.resumeWithException(FlutterError("null-error", "Flutter api returned null value for non-null return value.", ""))
+          } else {
+            val output = it[0] as ClientCertResponseMessage
             continuation.resume(output)
           }
         } else {

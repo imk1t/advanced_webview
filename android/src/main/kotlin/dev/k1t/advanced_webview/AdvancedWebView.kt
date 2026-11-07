@@ -24,6 +24,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.ClientCertRequest
 import android.webkit.ConsoleMessage
 import android.webkit.CookieManager
 import android.webkit.GeolocationPermissions
@@ -65,6 +66,9 @@ import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.security.KeyStore
+import java.security.PrivateKey
+import java.security.cert.X509Certificate
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -109,6 +113,7 @@ class AdvancedWebView(
     private val hasPermissionDelegate = params.hasPermissionDelegate
     private val hasSslErrorDelegate = params.hasSslErrorDelegate
     private val hasHttpAuthDelegate = params.hasHttpAuthDelegate
+    private val hasClientCertDelegate = params.hasClientCertDelegate
     private val hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     private val hasJsDialogDelegate = params.hasJsDialogDelegate
     private val hasHttpErrorDelegate = params.hasHttpErrorDelegate
@@ -776,6 +781,28 @@ class AdvancedWebView(
             }
         }
 
+        override fun onReceivedClientCertRequest(view: WebView, request: ClientCertRequest) {
+            if (!hasClientCertDelegate) {
+                request.cancel()
+                return
+            }
+            val message = ClientCertRequestMessage(request.host, request.port.toLong(), null)
+            scope.launch {
+                val response = try {
+                    flutterApi.onClientCertRequest(id, message)
+                } catch (e: Throwable) {
+                    Log.w(TAG, "Client certificate delegate failed, cancelling: ${e.message}")
+                    null
+                }
+                if (isDestroyed) return@launch
+                when (response?.action) {
+                    ClientCertActionMessage.PROCEED -> proceedWithIdentity(request, response)
+                    ClientCertActionMessage.IGNORE -> request.ignore()
+                    else -> request.cancel()
+                }
+            }
+        }
+
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             // Android needs a synchronous answer. For main-frame navigations we
             // cancel, ask Dart, and re-issue the load if allowed. Sub-frame
@@ -984,6 +1011,29 @@ class AdvancedWebView(
             (resultMsg.obj as WebView.WebViewTransport).webView = popup
             resultMsg.sendToTarget()
             return true
+        }
+    }
+
+    /** Answers with the first key entry of the PKCS#12 file; anything unreadable cancels the request. */
+    private fun proceedWithIdentity(request: ClientCertRequest, response: ClientCertResponseMessage) {
+        val bytes = response.pkcs12
+        val password = response.password
+        if (bytes == null || password == null) {
+            request.cancel()
+            return
+        }
+        try {
+            val chars = password.toCharArray()
+            val store = KeyStore.getInstance("PKCS12")
+            store.load(ByteArrayInputStream(bytes), chars)
+            val alias = store.aliases().toList().firstOrNull { store.isKeyEntry(it) }
+                ?: throw IllegalArgumentException("The PKCS#12 file holds no private key")
+            val key = store.getKey(alias, chars) as PrivateKey
+            val chain = store.getCertificateChain(alias).map { it as X509Certificate }.toTypedArray()
+            request.proceed(key, chain)
+        } catch (e: Exception) {
+            Log.w(TAG, "Cannot use the client certificate, cancelling: ${e.message}")
+            request.cancel()
         }
     }
 

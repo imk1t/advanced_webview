@@ -28,6 +28,9 @@ abstract interface class WebViewEventListener {
   Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(
     HttpAuthRequestMessage request,
   );
+  Future<ClientCertResponseMessage> onClientCertRequest(
+    ClientCertRequestMessage request,
+  );
   Future<PermissionDecisionMessage> onPermissionRequest(
     PermissionRequestMessage request,
   );
@@ -153,6 +156,18 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
     final listener = _listeners[webViewId];
     if (listener == null) return SslErrorDecisionMessage.cancel;
     return listener.onSslError(error);
+  }
+
+  @override
+  Future<ClientCertResponseMessage> onClientCertRequest(
+    int webViewId,
+    ClientCertRequestMessage request,
+  ) async {
+    final listener = _listeners[webViewId];
+    if (listener == null) {
+      return ClientCertResponseMessage(action: ClientCertActionMessage.cancel);
+    }
+    return listener.onClientCertRequest(request);
   }
 
   @override

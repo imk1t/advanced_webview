@@ -14,6 +14,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasDownloadDelegate: Bool
   private let hasSslErrorDelegate: Bool
   private let hasHttpAuthDelegate: Bool
+  private let hasClientCertDelegate: Bool
   private let hasConsoleMessageDelegate: Bool
   private let hasJsDialogDelegate: Bool
   private let hasHttpErrorDelegate: Bool
@@ -42,6 +43,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.hasDownloadDelegate = params.hasDownloadDelegate
     self.hasSslErrorDelegate = params.hasSslErrorDelegate
     self.hasHttpAuthDelegate = params.hasHttpAuthDelegate
+    self.hasClientCertDelegate = params.hasClientCertDelegate
     self.hasConsoleMessageDelegate = params.hasConsoleMessageDelegate
     self.hasJsDialogDelegate = params.hasJsDialogDelegate
     self.hasHttpErrorDelegate = params.hasHttpErrorDelegate
@@ -639,7 +641,7 @@ extension AdvancedWebView: WKNavigationDelegate {
     reportError(error, url: webView.url)
   }
 
-  /// Certificate problems and HTTP authentication. Without a Dart delegate a bad certificate
+  /// Certificate problems, HTTP authentication and client certificates. Without a Dart delegate a bad certificate
   /// is refused (the default) and authentication gets the system default handling.
   func webView(
     _ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge,
@@ -704,9 +706,61 @@ extension AdvancedWebView: WKNavigationDelegate {
           completionHandler(.cancelAuthenticationChallenge, nil)
         }
       }
+    case NSURLAuthenticationMethodClientCertificate:
+      guard hasClientCertDelegate else {
+        completionHandler(.performDefaultHandling, nil)
+        return
+      }
+      let request = ClientCertRequestMessage(
+        host: space.host, port: Int64(space.port), realm: space.realm)
+      let api = flutterApi
+      let id = self.id
+      Task { @MainActor in
+        let response: ClientCertResponseMessage?
+        do {
+          response = try await api.onClientCertRequest(webViewId: id, request: request)
+        } catch {
+          NSLog("AdvancedWebView: client certificate delegate failed, cancelling: \(error)")
+          response = nil
+        }
+        switch response?.action {
+        case .proceed:
+          if let data = response?.pkcs12?.data, let password = response?.password,
+            let credential = AdvancedWebView.credential(fromPKCS12: data, password: password)
+          {
+            completionHandler(.useCredential, credential)
+          } else {
+            NSLog("AdvancedWebView: cannot use the client certificate, cancelling")
+            completionHandler(.cancelAuthenticationChallenge, nil)
+          }
+        case .ignore:
+          completionHandler(.performDefaultHandling, nil)
+        default:
+          completionHandler(.cancelAuthenticationChallenge, nil)
+        }
+      }
     default:
       completionHandler(.performDefaultHandling, nil)
     }
+  }
+
+  /// The identity (key and certificate) of the first entry of a PKCS#12 file, or nil when the
+  /// data or the password is wrong.
+  static func credential(fromPKCS12 data: Data, password: String) -> URLCredential? {
+    let options = [kSecImportExportPassphrase as String: password] as CFDictionary
+    var items: CFArray?
+    guard SecPKCS12Import(data as CFData, options, &items) == errSecSuccess,
+      let entries = items as? [[String: Any]],
+      let entry = entries.first,
+      let identityRef = entry[kSecImportItemIdentity as String]
+    else {
+      return nil
+    }
+    let identity = identityRef as! SecIdentity
+    // The first certificate of the chain is the identity's own; send only the intermediates.
+    let chain = (entry[kSecImportItemCertChain as String] as? [SecCertificate]) ?? []
+    return URLCredential(
+      identity: identity, certificates: Array(chain.dropFirst()), persistence: .forSession)
   }
 
   /// Attachments and types WebKit cannot show are reported to Dart instead of being loaded.

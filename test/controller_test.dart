@@ -43,6 +43,7 @@ void main() {
     DownloadStartCallback? onDownloadStart,
     SslErrorCallback? onSslError,
     HttpAuthCallback? onHttpAuthRequest,
+    ClientCertCallback? onClientCertRequest,
   }) {
     return AdvancedWebViewController(
       hostApi: hostApi,
@@ -70,6 +71,7 @@ void main() {
       onDownloadStart: onDownloadStart,
       onSslError: onSslError,
       onHttpAuthRequest: onHttpAuthRequest,
+      onClientCertRequest: onClientCertRequest,
     );
   }
 
@@ -752,6 +754,88 @@ void main() {
       expect(
         await dispatcher.onSslError(disposed.webViewId, error),
         SslErrorDecisionMessage.cancel,
+      );
+    });
+  });
+
+  group('client certificates', () {
+    final request = ClientCertRequestMessage(
+      host: 'a.test',
+      port: 8443,
+      realm: 'r',
+    );
+
+    test('are only delegated when a callback is set', () async {
+      final without = createController();
+      final withCallback = createController(
+        onClientCertRequest: (_) => const ClientCertResponse.cancel(),
+      );
+      await without.ready;
+      await withCallback.ready;
+
+      expect(hostApi.created[without.webViewId]!.hasClientCertDelegate, false);
+      expect(
+        hostApi.created[withCallback.webViewId]!.hasClientCertDelegate,
+        true,
+      );
+    });
+
+    test('proceed hands the PKCS#12 to native', () async {
+      ClientCertRequest? seen;
+      final bytes = Uint8List.fromList([1, 2, 3]);
+      final controller = createController(
+        onClientCertRequest: (r) async {
+          seen = r;
+          return ClientCertResponse.proceed(pkcs12: bytes, password: 'pw');
+        },
+      );
+
+      final result = await dispatcher.onClientCertRequest(
+        controller.webViewId,
+        request,
+      );
+
+      expect(result.action, ClientCertActionMessage.proceed);
+      expect(result.pkcs12, bytes);
+      expect(result.password, 'pw');
+      expect(seen!.host, 'a.test');
+      expect(seen!.port, 8443);
+      expect(seen!.realm, 'r');
+    });
+
+    test('cancel and ignore are mapped', () async {
+      final cancelling = createController(
+        onClientCertRequest: (_) => const ClientCertResponse.cancel(),
+      );
+      final ignoring = createController(
+        onClientCertRequest: (_) => const ClientCertResponse.ignore(),
+      );
+      final without = createController();
+
+      expect(
+        (await dispatcher.onClientCertRequest(
+          cancelling.webViewId,
+          request,
+        )).action,
+        ClientCertActionMessage.cancel,
+      );
+      expect(
+        (await dispatcher.onClientCertRequest(
+          ignoring.webViewId,
+          request,
+        )).action,
+        ClientCertActionMessage.ignore,
+      );
+      expect(
+        (await dispatcher.onClientCertRequest(
+          without.webViewId,
+          request,
+        )).action,
+        ClientCertActionMessage.cancel,
+      );
+      expect(
+        (await dispatcher.onClientCertRequest(9999, request)).action,
+        ClientCertActionMessage.cancel,
       );
     });
   });

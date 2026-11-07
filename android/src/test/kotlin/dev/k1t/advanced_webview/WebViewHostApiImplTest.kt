@@ -7,6 +7,7 @@ import android.net.http.SslError
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.ClientCertRequest
 import android.webkit.ConsoleMessage
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
@@ -772,6 +773,33 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun clientCertRequestsAreCancelledWithoutADelegate() {
+        hostApi.create(params(webViewId = 1, hasClientCertDelegate = false))
+        val request = mock(ClientCertRequest::class.java)
+
+        registry.get(1).webView.webViewClient.onReceivedClientCertRequest(registry.get(1).webView, request)
+
+        verify(request).cancel()
+    }
+
+    @Test
+    fun clientCertRequestsAreForwardedToDart() {
+        hostApi.create(params(webViewId = 1, hasClientCertDelegate = true))
+        val request = mock(ClientCertRequest::class.java)
+        `when`(request.host).thenReturn("a.test")
+        `when`(request.port).thenReturn(8443)
+
+        registry.get(1).webView.webViewClient.onReceivedClientCertRequest(registry.get(1).webView, request)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(messenger).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onClientCertRequest"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
     fun downloadsAreOnlyInterceptedWithADelegate() {
         hostApi.create(params(webViewId = 1, hasDownloadDelegate = false))
 
@@ -917,6 +945,7 @@ class WebViewHostApiImplTest {
         hasDownloadDelegate: Boolean = false,
         hasSslErrorDelegate: Boolean = false,
         hasHttpAuthDelegate: Boolean = false,
+        hasClientCertDelegate: Boolean = false,
         hasScrollDelegate: Boolean = false,
         hasLongPressDelegate: Boolean = false,
         hasConsoleMessageDelegate: Boolean = false,
@@ -939,6 +968,7 @@ class WebViewHostApiImplTest {
         hasDownloadDelegate,
         hasSslErrorDelegate,
         hasHttpAuthDelegate,
+        hasClientCertDelegate,
         hasScrollDelegate,
         hasLongPressDelegate,
         hasConsoleMessageDelegate,

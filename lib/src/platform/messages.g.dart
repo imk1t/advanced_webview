@@ -149,6 +149,12 @@ enum SslErrorDecisionMessage {
   cancel;
 }
 
+enum ClientCertActionMessage {
+  proceed,
+  cancel,
+  ignore;
+}
+
 enum PermissionResourceMessage {
   camera,
   microphone,
@@ -514,6 +520,7 @@ class CreationParamsMessage {
     required this.hasDownloadDelegate,
     required this.hasSslErrorDelegate,
     required this.hasHttpAuthDelegate,
+    required this.hasClientCertDelegate,
     required this.hasScrollDelegate,
     required this.hasLongPressDelegate,
     required this.hasConsoleMessageDelegate,
@@ -564,6 +571,10 @@ class CreationParamsMessage {
   /// handling without a round trip to Dart.
   bool hasHttpAuthDelegate;
 
+  /// When false, client certificate requests get the platform default
+  /// handling (Android cancels them) without a round trip to Dart.
+  bool hasClientCertDelegate;
+
   /// When false, scroll changes are never reported to Dart.
   bool hasScrollDelegate;
 
@@ -611,6 +622,7 @@ class CreationParamsMessage {
       hasDownloadDelegate,
       hasSslErrorDelegate,
       hasHttpAuthDelegate,
+      hasClientCertDelegate,
       hasScrollDelegate,
       hasLongPressDelegate,
       hasConsoleMessageDelegate,
@@ -641,16 +653,17 @@ class CreationParamsMessage {
       hasDownloadDelegate: result[8]! as bool,
       hasSslErrorDelegate: result[9]! as bool,
       hasHttpAuthDelegate: result[10]! as bool,
-      hasScrollDelegate: result[11]! as bool,
-      hasLongPressDelegate: result[12]! as bool,
-      hasConsoleMessageDelegate: result[13]! as bool,
-      hasJsDialogDelegate: result[14]! as bool,
-      hasHttpErrorDelegate: result[15]! as bool,
-      hasFindDelegate: result[16]! as bool,
-      hasFaviconDelegate: result[17]! as bool,
-      hasFullscreenDelegate: result[18]! as bool,
-      interceptSchemes: (result[19]! as List<Object?>).cast<String>(),
-      userScripts: (result[20]! as List<Object?>).cast<UserScriptMessage>(),
+      hasClientCertDelegate: result[11]! as bool,
+      hasScrollDelegate: result[12]! as bool,
+      hasLongPressDelegate: result[13]! as bool,
+      hasConsoleMessageDelegate: result[14]! as bool,
+      hasJsDialogDelegate: result[15]! as bool,
+      hasHttpErrorDelegate: result[16]! as bool,
+      hasFindDelegate: result[17]! as bool,
+      hasFaviconDelegate: result[18]! as bool,
+      hasFullscreenDelegate: result[19]! as bool,
+      interceptSchemes: (result[20]! as List<Object?>).cast<String>(),
+      userScripts: (result[21]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -663,7 +676,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(hasFindDelegate, other.hasFindDelegate) && _deepEquals(hasFaviconDelegate, other.hasFaviconDelegate) && _deepEquals(hasFullscreenDelegate, other.hasFullscreenDelegate) && _deepEquals(interceptSchemes, other.interceptSchemes) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasClientCertDelegate, other.hasClientCertDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(hasFindDelegate, other.hasFindDelegate) && _deepEquals(hasFaviconDelegate, other.hasFaviconDelegate) && _deepEquals(hasFullscreenDelegate, other.hasFullscreenDelegate) && _deepEquals(interceptSchemes, other.interceptSchemes) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -672,7 +685,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, hasHttpErrorDelegate: $hasHttpErrorDelegate, hasFindDelegate: $hasFindDelegate, hasFaviconDelegate: $hasFaviconDelegate, hasFullscreenDelegate: $hasFullscreenDelegate, interceptSchemes: $interceptSchemes, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasClientCertDelegate: $hasClientCertDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, hasHttpErrorDelegate: $hasHttpErrorDelegate, hasFindDelegate: $hasFindDelegate, hasFaviconDelegate: $hasFaviconDelegate, hasFullscreenDelegate: $hasFullscreenDelegate, interceptSchemes: $interceptSchemes, userScripts: $userScripts)';
   }
 }
 
@@ -943,6 +956,118 @@ class HttpAuthRequestMessage {
   @override
   String toString() {
     return 'HttpAuthRequestMessage(host: $host, realm: $realm)';
+  }
+}
+
+class ClientCertRequestMessage {
+  ClientCertRequestMessage({
+    required this.host,
+    required this.port,
+    this.realm,
+  });
+
+  String host;
+
+  int port;
+
+  /// iOS only: `URLProtectionSpace.realm`. Always null on Android.
+  String? realm;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      host,
+      port,
+      realm,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ClientCertRequestMessage decode(Object result) {
+    result as List<Object?>;
+    return ClientCertRequestMessage(
+      host: result[0]! as String,
+      port: result[1]! as int,
+      realm: result[2] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ClientCertRequestMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(host, other.host) && _deepEquals(port, other.port) && _deepEquals(realm, other.realm);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ClientCertRequestMessage(host: $host, port: $port, realm: $realm)';
+  }
+}
+
+class ClientCertResponseMessage {
+  ClientCertResponseMessage({
+    required this.action,
+    this.pkcs12,
+    this.password,
+  });
+
+  ClientCertActionMessage action;
+
+  /// A PKCS#12 (`.p12`) file. Only used with `proceed`.
+  Uint8List? pkcs12;
+
+  String? password;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      action,
+      pkcs12,
+      password,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ClientCertResponseMessage decode(Object result) {
+    result as List<Object?>;
+    return ClientCertResponseMessage(
+      action: result[0]! as ClientCertActionMessage,
+      pkcs12: result[1] as Uint8List?,
+      password: result[2] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ClientCertResponseMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(action, other.action) && _deepEquals(pkcs12, other.pkcs12) && _deepEquals(password, other.password);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ClientCertResponseMessage(action: $action, pkcs12: $pkcs12, password: $password)';
   }
 }
 
@@ -1635,80 +1760,89 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is SslErrorDecisionMessage) {
       buffer.putUint8(135);
       writeValue(buffer, value.index);
-    }    else if (value is PermissionResourceMessage) {
+    }    else if (value is ClientCertActionMessage) {
       buffer.putUint8(136);
       writeValue(buffer, value.index);
-    }    else if (value is PermissionDecisionMessage) {
+    }    else if (value is PermissionResourceMessage) {
       buffer.putUint8(137);
       writeValue(buffer, value.index);
-    }    else if (value is JsDialogTypeMessage) {
+    }    else if (value is PermissionDecisionMessage) {
       buffer.putUint8(138);
       writeValue(buffer, value.index);
-    }    else if (value is WebsiteDataTypeMessage) {
+    }    else if (value is JsDialogTypeMessage) {
       buffer.putUint8(139);
       writeValue(buffer, value.index);
-    }    else if (value is HttpMethodMessage) {
+    }    else if (value is WebsiteDataTypeMessage) {
       buffer.putUint8(140);
       writeValue(buffer, value.index);
-    }    else if (value is WebViewSettingsMessage) {
+    }    else if (value is HttpMethodMessage) {
       buffer.putUint8(141);
-      writeValue(buffer, value.encode());
-    }    else if (value is ConsoleMessageMessage) {
+      writeValue(buffer, value.index);
+    }    else if (value is WebViewSettingsMessage) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    }    else if (value is UserScriptMessage) {
+    }    else if (value is ConsoleMessageMessage) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    }    else if (value is CreationParamsMessage) {
+    }    else if (value is UserScriptMessage) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    }    else if (value is NavigationRequestMessage) {
+    }    else if (value is CreationParamsMessage) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpErrorMessage) {
+    }    else if (value is NavigationRequestMessage) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    }    else if (value is WebResourceErrorMessage) {
+    }    else if (value is HttpErrorMessage) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    }    else if (value is SslErrorMessage) {
+    }    else if (value is WebResourceErrorMessage) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthRequestMessage) {
+    }    else if (value is SslErrorMessage) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthCredentialsMessage) {
+    }    else if (value is HttpAuthRequestMessage) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    }    else if (value is DownloadRequestMessage) {
+    }    else if (value is ClientCertRequestMessage) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    }    else if (value is PermissionRequestMessage) {
+    }    else if (value is ClientCertResponseMessage) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    }    else if (value is JsDialogRequestMessage) {
+    }    else if (value is HttpAuthCredentialsMessage) {
       buffer.putUint8(153);
       writeValue(buffer, value.encode());
-    }    else if (value is JsDialogResultMessage) {
+    }    else if (value is DownloadRequestMessage) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    }    else if (value is InterceptRequestMessage) {
+    }    else if (value is PermissionRequestMessage) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    }    else if (value is InterceptResponseMessage) {
+    }    else if (value is JsDialogRequestMessage) {
       buffer.putUint8(156);
       writeValue(buffer, value.encode());
-    }    else if (value is FindResultMessage) {
+    }    else if (value is JsDialogResultMessage) {
       buffer.putUint8(157);
       writeValue(buffer, value.encode());
-    }    else if (value is ScrollPositionMessage) {
+    }    else if (value is InterceptRequestMessage) {
       buffer.putUint8(158);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is InterceptResponseMessage) {
       buffer.putUint8(159);
       writeValue(buffer, value.encode());
-    }    else if (value is InAppBrowserParamsMessage) {
+    }    else if (value is FindResultMessage) {
       buffer.putUint8(160);
+      writeValue(buffer, value.encode());
+    }    else if (value is ScrollPositionMessage) {
+      buffer.putUint8(161);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookieMessage) {
+      buffer.putUint8(162);
+      writeValue(buffer, value.encode());
+    }    else if (value is InAppBrowserParamsMessage) {
+      buffer.putUint8(163);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1741,58 +1875,65 @@ class _PigeonCodec extends StandardMessageCodec {
         return value == null ? null : SslErrorDecisionMessage.values[value];
       case 136:
         final value = readValue(buffer) as int?;
-        return value == null ? null : PermissionResourceMessage.values[value];
+        return value == null ? null : ClientCertActionMessage.values[value];
       case 137:
         final value = readValue(buffer) as int?;
-        return value == null ? null : PermissionDecisionMessage.values[value];
+        return value == null ? null : PermissionResourceMessage.values[value];
       case 138:
         final value = readValue(buffer) as int?;
-        return value == null ? null : JsDialogTypeMessage.values[value];
+        return value == null ? null : PermissionDecisionMessage.values[value];
       case 139:
         final value = readValue(buffer) as int?;
-        return value == null ? null : WebsiteDataTypeMessage.values[value];
+        return value == null ? null : JsDialogTypeMessage.values[value];
       case 140:
         final value = readValue(buffer) as int?;
-        return value == null ? null : HttpMethodMessage.values[value];
+        return value == null ? null : WebsiteDataTypeMessage.values[value];
       case 141:
-        return WebViewSettingsMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : HttpMethodMessage.values[value];
       case 142:
-        return ConsoleMessageMessage.decode(readValue(buffer)!);
+        return WebViewSettingsMessage.decode(readValue(buffer)!);
       case 143:
-        return UserScriptMessage.decode(readValue(buffer)!);
+        return ConsoleMessageMessage.decode(readValue(buffer)!);
       case 144:
-        return CreationParamsMessage.decode(readValue(buffer)!);
+        return UserScriptMessage.decode(readValue(buffer)!);
       case 145:
-        return NavigationRequestMessage.decode(readValue(buffer)!);
+        return CreationParamsMessage.decode(readValue(buffer)!);
       case 146:
-        return HttpErrorMessage.decode(readValue(buffer)!);
+        return NavigationRequestMessage.decode(readValue(buffer)!);
       case 147:
-        return WebResourceErrorMessage.decode(readValue(buffer)!);
+        return HttpErrorMessage.decode(readValue(buffer)!);
       case 148:
-        return SslErrorMessage.decode(readValue(buffer)!);
+        return WebResourceErrorMessage.decode(readValue(buffer)!);
       case 149:
-        return HttpAuthRequestMessage.decode(readValue(buffer)!);
+        return SslErrorMessage.decode(readValue(buffer)!);
       case 150:
-        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
+        return HttpAuthRequestMessage.decode(readValue(buffer)!);
       case 151:
-        return DownloadRequestMessage.decode(readValue(buffer)!);
+        return ClientCertRequestMessage.decode(readValue(buffer)!);
       case 152:
-        return PermissionRequestMessage.decode(readValue(buffer)!);
+        return ClientCertResponseMessage.decode(readValue(buffer)!);
       case 153:
-        return JsDialogRequestMessage.decode(readValue(buffer)!);
+        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
       case 154:
-        return JsDialogResultMessage.decode(readValue(buffer)!);
+        return DownloadRequestMessage.decode(readValue(buffer)!);
       case 155:
-        return InterceptRequestMessage.decode(readValue(buffer)!);
+        return PermissionRequestMessage.decode(readValue(buffer)!);
       case 156:
-        return InterceptResponseMessage.decode(readValue(buffer)!);
+        return JsDialogRequestMessage.decode(readValue(buffer)!);
       case 157:
-        return FindResultMessage.decode(readValue(buffer)!);
+        return JsDialogResultMessage.decode(readValue(buffer)!);
       case 158:
-        return ScrollPositionMessage.decode(readValue(buffer)!);
+        return InterceptRequestMessage.decode(readValue(buffer)!);
       case 159:
-        return CookieMessage.decode(readValue(buffer)!);
+        return InterceptResponseMessage.decode(readValue(buffer)!);
       case 160:
+        return FindResultMessage.decode(readValue(buffer)!);
+      case 161:
+        return ScrollPositionMessage.decode(readValue(buffer)!);
+      case 162:
+        return CookieMessage.decode(readValue(buffer)!);
+      case 163:
         return InAppBrowserParamsMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2681,6 +2822,9 @@ abstract class AdvancedWebViewFlutterApi {
   /// A server asked for credentials. Null cancels the request.
   Future<HttpAuthCredentialsMessage?> onHttpAuthRequest(int webViewId, HttpAuthRequestMessage request);
 
+  /// A server asked for a client certificate (mutual TLS).
+  Future<ClientCertResponseMessage> onClientCertRequest(int webViewId, ClientCertRequestMessage request);
+
   /// The page started a download. The WebView does not save the file.
   void onDownloadStart(int webViewId, DownloadRequestMessage request);
 
@@ -3082,6 +3226,28 @@ abstract class AdvancedWebViewFlutterApi {
           final HttpAuthRequestMessage arg_request = args[1]! as HttpAuthRequestMessage;
           try {
             final HttpAuthCredentialsMessage? output = await api.onHttpAuthRequest(arg_webViewId, arg_request);
+            return wrapResponse(result: output);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onClientCertRequest$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final ClientCertRequestMessage arg_request = args[1]! as ClientCertRequestMessage;
+          try {
+            final ClientCertResponseMessage output = await api.onClientCertRequest(arg_webViewId, arg_request);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

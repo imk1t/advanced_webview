@@ -258,6 +258,7 @@ class InAppBrowserTest {
         hasDownloadDelegate = false,
         hasSslErrorDelegate = false,
         hasHttpAuthDelegate = false,
+        hasClientCertDelegate = false,
         hasScrollDelegate = false,
         hasLongPressDelegate = false,
         hasConsoleMessageDelegate = false,
