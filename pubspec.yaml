@@ -11,6 +11,11 @@ topics:
   - android
   - ios
 
+# The integration test of client certificates ships throw-away, self-signed TLS keys
+# that protect nothing; tell pub's secret scanner so.
+false_secrets:
+  - /example/integration_test/tls_fixtures.dart
+
 environment:
   sdk: ^3.13.7
   flutter: '>=3.47.8'
