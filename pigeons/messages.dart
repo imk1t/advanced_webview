@@ -299,6 +299,14 @@ class HttpErrorMessage {
   bool isMainFrame;
 }
 
+class RenderProcessGoneMessage {
+  RenderProcessGoneMessage({this.didCrash});
+
+  /// True when the renderer crashed, false when the system killed it (for
+  /// example to free memory), null when the platform does not say.
+  bool? didCrash;
+}
+
 class WebResourceErrorMessage {
   WebResourceErrorMessage({
     required this.errorCode,
@@ -729,6 +737,10 @@ abstract class AdvancedWebViewFlutterApi {
   /// The page left fullscreen. Only sent when the controller was created with
   /// `hasFullscreenDelegate`.
   void onExitFullscreen(int webViewId);
+
+  /// The process that renders web content crashed or was killed, so the
+  /// WebView shows nothing (iOS) or cannot be used any more (Android).
+  void onRenderProcessGone(int webViewId, RenderProcessGoneMessage details);
 
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 

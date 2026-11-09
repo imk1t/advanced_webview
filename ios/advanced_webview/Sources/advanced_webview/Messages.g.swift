@@ -816,6 +816,43 @@ struct HttpErrorMessage: Hashable, CustomStringConvertible {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct RenderProcessGoneMessage: Hashable, CustomStringConvertible {
+  /// True when the renderer crashed, false when the system killed it (for
+  /// example to free memory), null when the platform does not say.
+  var didCrash: Bool? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> RenderProcessGoneMessage? {
+    let didCrash: Bool? = nilOrValue(pigeonVar_list[0])
+
+    return RenderProcessGoneMessage(
+      didCrash: didCrash
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      didCrash
+    ]
+  }
+  static func == (lhs: RenderProcessGoneMessage, rhs: RenderProcessGoneMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.didCrash, rhs.didCrash)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("RenderProcessGoneMessage")
+    MessagesPigeonInternal.deepHash(value: didCrash, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "RenderProcessGoneMessage(didCrash: \(String(describing: didCrash)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct WebResourceErrorMessage: Hashable, CustomStringConvertible {
   var errorCode: Int64
   var message: String
@@ -1687,36 +1724,38 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 147:
       return HttpErrorMessage.fromList(self.readValue() as! [Any?])
     case 148:
-      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+      return RenderProcessGoneMessage.fromList(self.readValue() as! [Any?])
     case 149:
-      return SslErrorMessage.fromList(self.readValue() as! [Any?])
+      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
     case 150:
-      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
+      return SslErrorMessage.fromList(self.readValue() as! [Any?])
     case 151:
-      return ClientCertRequestMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
     case 152:
-      return ClientCertResponseMessage.fromList(self.readValue() as! [Any?])
+      return ClientCertRequestMessage.fromList(self.readValue() as! [Any?])
     case 153:
-      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
+      return ClientCertResponseMessage.fromList(self.readValue() as! [Any?])
     case 154:
-      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
     case 155:
-      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
+      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
     case 156:
-      return JsDialogRequestMessage.fromList(self.readValue() as! [Any?])
+      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
     case 157:
-      return JsDialogResultMessage.fromList(self.readValue() as! [Any?])
+      return JsDialogRequestMessage.fromList(self.readValue() as! [Any?])
     case 158:
-      return InterceptRequestMessage.fromList(self.readValue() as! [Any?])
+      return JsDialogResultMessage.fromList(self.readValue() as! [Any?])
     case 159:
-      return InterceptResponseMessage.fromList(self.readValue() as! [Any?])
+      return InterceptRequestMessage.fromList(self.readValue() as! [Any?])
     case 160:
-      return FindResultMessage.fromList(self.readValue() as! [Any?])
+      return InterceptResponseMessage.fromList(self.readValue() as! [Any?])
     case 161:
-      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+      return FindResultMessage.fromList(self.readValue() as! [Any?])
     case 162:
-      return CookieMessage.fromList(self.readValue() as! [Any?])
+      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
     case 163:
+      return CookieMessage.fromList(self.readValue() as! [Any?])
+    case 164:
       return InAppBrowserParamsMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1783,53 +1822,56 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? HttpErrorMessage {
       super.writeByte(147)
       super.writeValue(value.toList())
-    } else if let value = value as? WebResourceErrorMessage {
+    } else if let value = value as? RenderProcessGoneMessage {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? SslErrorMessage {
+    } else if let value = value as? WebResourceErrorMessage {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthRequestMessage {
+    } else if let value = value as? SslErrorMessage {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? ClientCertRequestMessage {
+    } else if let value = value as? HttpAuthRequestMessage {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? ClientCertResponseMessage {
+    } else if let value = value as? ClientCertRequestMessage {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthCredentialsMessage {
+    } else if let value = value as? ClientCertResponseMessage {
       super.writeByte(153)
       super.writeValue(value.toList())
-    } else if let value = value as? DownloadRequestMessage {
+    } else if let value = value as? HttpAuthCredentialsMessage {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? PermissionRequestMessage {
+    } else if let value = value as? DownloadRequestMessage {
       super.writeByte(155)
       super.writeValue(value.toList())
-    } else if let value = value as? JsDialogRequestMessage {
+    } else if let value = value as? PermissionRequestMessage {
       super.writeByte(156)
       super.writeValue(value.toList())
-    } else if let value = value as? JsDialogResultMessage {
+    } else if let value = value as? JsDialogRequestMessage {
       super.writeByte(157)
       super.writeValue(value.toList())
-    } else if let value = value as? InterceptRequestMessage {
+    } else if let value = value as? JsDialogResultMessage {
       super.writeByte(158)
       super.writeValue(value.toList())
-    } else if let value = value as? InterceptResponseMessage {
+    } else if let value = value as? InterceptRequestMessage {
       super.writeByte(159)
       super.writeValue(value.toList())
-    } else if let value = value as? FindResultMessage {
+    } else if let value = value as? InterceptResponseMessage {
       super.writeByte(160)
       super.writeValue(value.toList())
-    } else if let value = value as? ScrollPositionMessage {
+    } else if let value = value as? FindResultMessage {
       super.writeByte(161)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? ScrollPositionMessage {
       super.writeByte(162)
       super.writeValue(value.toList())
-    } else if let value = value as? InAppBrowserParamsMessage {
+    } else if let value = value as? CookieMessage {
       super.writeByte(163)
+      super.writeValue(value.toList())
+    } else if let value = value as? InAppBrowserParamsMessage {
+      super.writeByte(164)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -2689,6 +2731,9 @@ protocol AdvancedWebViewFlutterApiProtocol {
   /// The page left fullscreen. Only sent when the controller was created with
   /// `hasFullscreenDelegate`.
   @MainActor func onExitFullscreen(webViewId webViewIdArg: Int64) async throws
+  /// The process that renders web content crashed or was killed, so the
+  /// WebView shows nothing (iOS) or cannot be used any more (Android).
+  @MainActor func onRenderProcessGone(webViewId webViewIdArg: Int64, details detailsArg: RenderProcessGoneMessage) async throws
   @MainActor func onReceivedError(webViewId webViewIdArg: Int64, error errorArg: WebResourceErrorMessage) async throws
   /// A server answered with a status of 400 or more.
   @MainActor func onReceivedHttpError(webViewId webViewIdArg: Int64, error errorArg: HttpErrorMessage) async throws
@@ -2951,6 +2996,28 @@ class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
       let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onExitFullscreen\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg] as [Any?]) { response in
+        guard let listResponse = response as? [Any?] else {
+          continuation.resume(throwing: createConnectionError(withChannelName: channelName))
+          return
+        }
+        if listResponse.count > 1 {
+          let code: String = listResponse[0] as! String
+          let message: String? = nilOrValue(listResponse[1])
+          let details: String? = nilOrValue(listResponse[2])
+          continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
+        } else {
+          continuation.resume()
+        }
+      }
+    }
+  }
+  /// The process that renders web content crashed or was killed, so the
+  /// WebView shows nothing (iOS) or cannot be used any more (Android).
+  @MainActor func onRenderProcessGone(webViewId webViewIdArg: Int64, details detailsArg: RenderProcessGoneMessage) async throws {
+    return try await withCheckedThrowingContinuation { continuation in
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onRenderProcessGone\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([webViewIdArg, detailsArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
           continuation.resume(throwing: createConnectionError(withChannelName: channelName))
           return

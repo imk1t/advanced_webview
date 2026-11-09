@@ -17,6 +17,7 @@ abstract interface class WebViewEventListener {
   void onExitFullscreen();
   void onReceivedError(WebResourceErrorMessage error);
   void onReceivedHttpError(HttpErrorMessage error);
+  void onRenderProcessGone(RenderProcessGoneMessage details);
   Future<NavigationDecisionMessage> shouldOverrideUrlLoading(
     NavigationRequestMessage request,
   );
@@ -113,6 +114,10 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   @override
   void onConsoleMessage(int webViewId, ConsoleMessageMessage message) =>
       _listeners[webViewId]?.onConsoleMessage(message);
+
+  @override
+  void onRenderProcessGone(int webViewId, RenderProcessGoneMessage details) =>
+      _listeners[webViewId]?.onRenderProcessGone(details);
 
   @override
   void onReceivedHttpError(int webViewId, HttpErrorMessage error) =>

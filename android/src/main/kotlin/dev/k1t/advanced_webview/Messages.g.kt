@@ -906,6 +906,47 @@ data class HttpErrorMessage (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class RenderProcessGoneMessage (
+  /**
+   * True when the renderer crashed, false when the system killed it (for
+   * example to free memory), null when the platform does not say.
+   */
+  val didCrash: Boolean? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): RenderProcessGoneMessage {
+      val didCrash = pigeonVar_list[0] as Boolean?
+      return RenderProcessGoneMessage(didCrash)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      didCrash,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as RenderProcessGoneMessage
+    return MessagesPigeonUtils.deepEquals(this.didCrash, other.didCrash)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.didCrash)
+    return result
+  }
+  override fun toString(): String {
+    return "RenderProcessGoneMessage(didCrash=$didCrash)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class WebResourceErrorMessage (
   val errorCode: Long,
   val message: String,
@@ -1783,80 +1824,85 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          WebResourceErrorMessage.fromList(it)
+          RenderProcessGoneMessage.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SslErrorMessage.fromList(it)
+          WebResourceErrorMessage.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthRequestMessage.fromList(it)
+          SslErrorMessage.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ClientCertRequestMessage.fromList(it)
+          HttpAuthRequestMessage.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ClientCertResponseMessage.fromList(it)
+          ClientCertRequestMessage.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthCredentialsMessage.fromList(it)
+          ClientCertResponseMessage.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DownloadRequestMessage.fromList(it)
+          HttpAuthCredentialsMessage.fromList(it)
         }
       }
       155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PermissionRequestMessage.fromList(it)
+          DownloadRequestMessage.fromList(it)
         }
       }
       156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogRequestMessage.fromList(it)
+          PermissionRequestMessage.fromList(it)
         }
       }
       157.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogResultMessage.fromList(it)
+          JsDialogRequestMessage.fromList(it)
         }
       }
       158.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InterceptRequestMessage.fromList(it)
+          JsDialogResultMessage.fromList(it)
         }
       }
       159.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InterceptResponseMessage.fromList(it)
+          InterceptRequestMessage.fromList(it)
         }
       }
       160.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          FindResultMessage.fromList(it)
+          InterceptResponseMessage.fromList(it)
         }
       }
       161.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ScrollPositionMessage.fromList(it)
+          FindResultMessage.fromList(it)
         }
       }
       162.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CookieMessage.fromList(it)
+          ScrollPositionMessage.fromList(it)
         }
       }
       163.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CookieMessage.fromList(it)
+        }
+      }
+      164.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           InAppBrowserParamsMessage.fromList(it)
         }
@@ -1942,68 +1988,72 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is WebResourceErrorMessage -> {
+      is RenderProcessGoneMessage -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is SslErrorMessage -> {
+      is WebResourceErrorMessage -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is HttpAuthRequestMessage -> {
+      is SslErrorMessage -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is ClientCertRequestMessage -> {
+      is HttpAuthRequestMessage -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is ClientCertResponseMessage -> {
+      is ClientCertRequestMessage -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is HttpAuthCredentialsMessage -> {
+      is ClientCertResponseMessage -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is DownloadRequestMessage -> {
+      is HttpAuthCredentialsMessage -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is PermissionRequestMessage -> {
+      is DownloadRequestMessage -> {
         stream.write(155)
         writeValue(stream, value.toList())
       }
-      is JsDialogRequestMessage -> {
+      is PermissionRequestMessage -> {
         stream.write(156)
         writeValue(stream, value.toList())
       }
-      is JsDialogResultMessage -> {
+      is JsDialogRequestMessage -> {
         stream.write(157)
         writeValue(stream, value.toList())
       }
-      is InterceptRequestMessage -> {
+      is JsDialogResultMessage -> {
         stream.write(158)
         writeValue(stream, value.toList())
       }
-      is InterceptResponseMessage -> {
+      is InterceptRequestMessage -> {
         stream.write(159)
         writeValue(stream, value.toList())
       }
-      is FindResultMessage -> {
+      is InterceptResponseMessage -> {
         stream.write(160)
         writeValue(stream, value.toList())
       }
-      is ScrollPositionMessage -> {
+      is FindResultMessage -> {
         stream.write(161)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is ScrollPositionMessage -> {
         stream.write(162)
         writeValue(stream, value.toList())
       }
-      is InAppBrowserParamsMessage -> {
+      is CookieMessage -> {
         stream.write(163)
+        writeValue(stream, value.toList())
+      }
+      is InAppBrowserParamsMessage -> {
+        stream.write(164)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -3151,6 +3201,29 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
       val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onExitFullscreen$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else {
+            continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /**
+   * The process that renders web content crashed or was killed, so the
+   * WebView shows nothing (iOS) or cannot be used any more (Android).
+   */
+  suspend fun onRenderProcessGone(webViewIdArg: Long, detailsArg: RenderProcessGoneMessage)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onRenderProcessGone$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg, detailsArg)) {
         if (it is List<*>) {
           if (it.size > 1) {
             continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))

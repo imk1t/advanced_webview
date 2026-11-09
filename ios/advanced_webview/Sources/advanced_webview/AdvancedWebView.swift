@@ -763,6 +763,13 @@ extension AdvancedWebView: WKNavigationDelegate {
       identity: identity, certificates: Array(chain.dropFirst()), persistence: .forSession)
   }
 
+  /// WebKit does not say whether the web content process crashed or was killed; the view stays blank
+  /// until Dart calls `reload`.
+  func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+    let details = RenderProcessGoneMessage(didCrash: nil)
+    send { api, id in try await api.onRenderProcessGone(webViewId: id, details: details) }
+  }
+
   /// Attachments and types WebKit cannot show are reported to Dart instead of being loaded.
   func webView(
     _ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,

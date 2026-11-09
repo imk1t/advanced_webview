@@ -69,6 +69,7 @@
       "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
+      "RenderProcessGoneDetail": "https://developer.android.com/reference/android/webkit/RenderProcessGoneDetail",
       "ClientCertRequest": "https://developer.android.com/reference/android/webkit/ClientCertRequest",
       "KeyStore": "https://developer.android.com/reference/java/security/KeyStore",
       "WebChromeClient": "https://developer.android.com/reference/android/webkit/WebChromeClient",
@@ -1137,6 +1138,30 @@
       }
     },
     {
+      "dart": "AdvancedWebViewController.onRenderProcessGone",
+      "group": "events",
+      "summary": {
+        "en": "The process that renders web content crashed or was killed by the system.",
+        "ja": "Web コンテンツを描画するプロセスがクラッシュした、またはシステムに終了されました。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewClient.onRenderProcessGone(WebView, RenderProcessGoneDetail)"],
+        "note": {
+          "en": "The plugin returns true so the app is not terminated; the WebView cannot be used afterwards, so dispose the controller and create a new one. RenderProcessGone.didCrash comes from RenderProcessGoneDetail.didCrash().",
+          "ja": "アプリが終了しないようプラグインが true を返します。その後この WebView は使えないため、コントローラーを dispose して作り直してください。RenderProcessGone.didCrash は RenderProcessGoneDetail.didCrash() の値です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKNavigationDelegate.webViewWebContentProcessDidTerminate(_:)"],
+        "note": {
+          "en": "The view stays blank until you call reload. WebKit does not say whether the process crashed, so RenderProcessGone.didCrash is null.",
+          "ja": "reload を呼ぶまでビューは空白のままです。WebKit はクラッシュかどうかを伝えないため、RenderProcessGone.didCrash は null です。"
+        }
+      }
+    },
+    {
       "dart": "AdvancedWebViewController.onEnterFullscreen",
       "group": "events",
       "summary": {
@@ -1494,6 +1519,26 @@
       "ios": {
         "status": "supported",
         "apis": ["HTTPURLResponse.statusCode", "WKNavigationResponse.isForMainFrame"]
+      }
+    },
+    {
+      "dart": "RenderProcessGone",
+      "group": "events",
+      "summary": {
+        "en": "Whether the renderer crashed (didCrash) when the render process ended.",
+        "ja": "描画プロセスの終了時に、クラッシュだったか（didCrash）を表します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["RenderProcessGoneDetail.didCrash()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKNavigationDelegate.webViewWebContentProcessDidTerminate(_:)"],
+        "note": {
+          "en": "WebKit does not say; didCrash is null.",
+          "ja": "WebKit は伝えないため、didCrash は null です。"
+        }
       }
     },
     {

@@ -44,6 +44,7 @@ class AdvancedWebViewController {
     this.onConsoleMessage,
     this.onWebResourceError,
     this.onHttpError,
+    this.onRenderProcessGone,
     this.onFindResult,
     this.onFaviconChanged,
     this.onEnterFullscreen,
@@ -229,6 +230,19 @@ class AdvancedWebViewController {
   /// `WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)` for
   /// navigation responses, reading `HTTPURLResponse.statusCode`.
   final HttpErrorCallback? onHttpError;
+
+  /// Called when the process that renders web content crashes or is killed
+  /// by the system, for example under memory pressure.
+  ///
+  /// The page is gone and the WebView cannot show anything until you act.
+  /// Android: the WebView can no longer be used, so dispose this controller
+  /// and create a new one (and a new [AdvancedWebView]); the plugin handles
+  /// the event so the app is not terminated, even without this callback.
+  /// iOS: the view is blank; call [reload] to recover.
+  ///
+  /// Android: `WebViewClient.onRenderProcessGone(WebView, RenderProcessGoneDetail)`.
+  /// iOS: `WKNavigationDelegate.webViewWebContentProcessDidTerminate(_:)`.
+  final RenderProcessGoneCallback? onRenderProcessGone;
 
   /// Called for main-frame navigations started by the page (links, forms,
   /// `window.location`, redirects). Android does not report POST requests.
@@ -815,6 +829,11 @@ class _EventListener implements WebViewEventListener {
           lineNumber: message.lineNumber,
         ),
       );
+
+  @override
+  void onRenderProcessGone(RenderProcessGoneMessage details) => _controller
+      .onRenderProcessGone
+      ?.call(RenderProcessGone(didCrash: details.didCrash));
 
   @override
   void onReceivedHttpError(HttpErrorMessage error) =>
