@@ -209,6 +209,18 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
   }
 
   @override
+  Future<void> deleteCookie(int webViewId, String url, String name) async {
+    calls.add('deleteCookie($url, $name)');
+    cookies.removeWhere((_, cookie) => cookie.name == name);
+  }
+
+  @override
+  Future<void> deleteCookies(int webViewId, String url) async {
+    calls.add('deleteCookies($url)');
+    cookies.clear();
+  }
+
+  @override
   Future<void> clearCookies(int webViewId) async {
     calls.add('clearCookies');
     cookies.clear();

@@ -248,9 +248,13 @@ class AdvancedWebView(
             } else if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
                 WebSettingsCompat.setAlgorithmicDarkeningAllowed(this, settings.algorithmicDarkeningAllowed)
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                safeBrowsingEnabled = settings.safeBrowsingEnabled
+            }
             minimumFontSize = settings.minimumFontSize?.toInt() ?: DEFAULT_MINIMUM_FONT_SIZE
             userAgentString = settings.userAgent ?: WebSettings.getDefaultUserAgent(webView.context)
         }
+        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, settings.thirdPartyCookiesEnabled)
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
             WebSettingsCompat.setWebAuthenticationSupport(
                 webView.settings,
@@ -495,6 +499,37 @@ class AdvancedWebView(
             WebStorage.getInstance().deleteAllData()
         }
     }
+
+    /** Expires the cookies [names] of [url]; Android cannot see their domain or path, so it tries the likely ones. */
+    suspend fun deleteCookies(url: String, names: List<String>) {
+        val uri = Uri.parse(url)
+        val host = uri.host.orEmpty()
+        val scheme = uri.scheme ?: "https"
+        val segments = uri.pathSegments
+        val paths = listOf("/") + segments.indices.map { "/" + segments.take(it + 1).joinToString("/") }
+        // The host itself, then each parent domain that still has two labels (never a bare top-level domain).
+        val labels = host.split('.')
+        val domains = if (labels.size > 1) (0..labels.size - 2).map { labels.drop(it).joinToString(".") } else emptyList()
+        val manager = CookieManager.getInstance()
+        for (name in names) {
+            for (path in paths) {
+                val base = "$name=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=$path"
+                suspendCancellableCoroutine<Boolean> { cont ->
+                    manager.setCookie("$scheme://$host$path", base) { cont.resume(it) }
+                }
+                for (domain in domains) {
+                    suspendCancellableCoroutine<Boolean> { cont ->
+                        manager.setCookie("$scheme://$host$path", "$base; Domain=$domain") { cont.resume(it) }
+                    }
+                }
+            }
+        }
+        manager.flush()
+    }
+
+    suspend fun deleteCookie(url: String, name: String) = deleteCookies(url, listOf(name))
+
+    suspend fun deleteCookies(url: String) = deleteCookies(url, getCookies(url).map { it.name })
 
     suspend fun clearCookies() {
         suspendCancellableCoroutine<Boolean> { cont ->

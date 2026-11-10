@@ -74,6 +74,8 @@ class AndroidWebViewSettings {
     this.mixedContentMode = WebViewMixedContentMode.neverAllow,
     this.geolocationEnabled = true,
     this.algorithmicDarkeningAllowed = false,
+    this.thirdPartyCookiesEnabled = false,
+    this.safeBrowsingEnabled = true,
   });
 
   /// Lets the user pinch to zoom (`WebSettings.setSupportZoom`).
@@ -139,6 +141,20 @@ class AndroidWebViewSettings {
   /// [IOSWebViewSettings.userInterfaceStyle] for `prefers-color-scheme`.
   final bool algorithmicDarkeningAllowed;
 
+  /// Accepts cookies that a page's embedded content (an iframe or an image,
+  /// for example) sets for another site
+  /// (`CookieManager.setAcceptThirdPartyCookies`). Off by default, which is
+  /// the platform's own default. Turn it on for embedded sign-in or payment
+  /// frames that need them. iOS has no equivalent: WebKit decides.
+  final bool thirdPartyCookiesEnabled;
+
+  /// Checks pages against Google's list of dangerous sites and warns before
+  /// showing one (`WebSettings.setSafeBrowsingEnabled`). On by default, as in
+  /// earlier versions. Needs Android 8.0 (API 26) and a WebView that supports
+  /// it, and is ignored otherwise. iOS has no switch: WebKit's fraudulent
+  /// website warning is always on.
+  final bool safeBrowsingEnabled;
+
   AndroidWebViewSettings copyWith({
     bool? supportZoom,
     bool? builtInZoomControls,
@@ -150,6 +166,8 @@ class AndroidWebViewSettings {
     WebViewMixedContentMode? mixedContentMode,
     bool? geolocationEnabled,
     bool? algorithmicDarkeningAllowed,
+    bool? thirdPartyCookiesEnabled,
+    bool? safeBrowsingEnabled,
   }) {
     return AndroidWebViewSettings(
       supportZoom: supportZoom ?? this.supportZoom,
@@ -163,6 +181,9 @@ class AndroidWebViewSettings {
       geolocationEnabled: geolocationEnabled ?? this.geolocationEnabled,
       algorithmicDarkeningAllowed:
           algorithmicDarkeningAllowed ?? this.algorithmicDarkeningAllowed,
+      thirdPartyCookiesEnabled:
+          thirdPartyCookiesEnabled ?? this.thirdPartyCookiesEnabled,
+      safeBrowsingEnabled: safeBrowsingEnabled ?? this.safeBrowsingEnabled,
     );
   }
 
@@ -178,7 +199,9 @@ class AndroidWebViewSettings {
       other.allowContentAccess == allowContentAccess &&
       other.mixedContentMode == mixedContentMode &&
       other.geolocationEnabled == geolocationEnabled &&
-      other.algorithmicDarkeningAllowed == algorithmicDarkeningAllowed;
+      other.algorithmicDarkeningAllowed == algorithmicDarkeningAllowed &&
+      other.thirdPartyCookiesEnabled == thirdPartyCookiesEnabled &&
+      other.safeBrowsingEnabled == safeBrowsingEnabled;
 
   @override
   int get hashCode => Object.hash(
@@ -192,6 +215,8 @@ class AndroidWebViewSettings {
     mixedContentMode,
     geolocationEnabled,
     algorithmicDarkeningAllowed,
+    thirdPartyCookiesEnabled,
+    safeBrowsingEnabled,
   );
 }
 
@@ -463,6 +488,8 @@ class WebViewSettings {
     allowsLinkPreview: ios.allowsLinkPreview,
     geolocationEnabled: android.geolocationEnabled,
     algorithmicDarkeningAllowed: android.algorithmicDarkeningAllowed,
+    thirdPartyCookiesEnabled: android.thirdPartyCookiesEnabled,
+    safeBrowsingEnabled: android.safeBrowsingEnabled,
     userInterfaceStyle:
         UserInterfaceStyleMessage.values[ios.userInterfaceStyle.index],
     minimumFontSize: minimumFontSize,

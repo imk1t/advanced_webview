@@ -218,6 +218,21 @@ void main() {
       );
     });
 
+    test('cookie and safe browsing settings are passed to native', () {
+      final defaults = const WebViewSettings().toMessage();
+      expect(defaults.thirdPartyCookiesEnabled, isFalse);
+      expect(defaults.safeBrowsingEnabled, isTrue);
+
+      final message = const WebViewSettings(
+        android: AndroidWebViewSettings(
+          thirdPartyCookiesEnabled: true,
+          safeBrowsingEnabled: false,
+        ),
+      ).toMessage();
+      expect(message.thirdPartyCookiesEnabled, isTrue);
+      expect(message.safeBrowsingEnabled, isFalse);
+    });
+
     test('dark mode settings are passed to native', () {
       final defaults = const WebViewSettings().toMessage();
       expect(defaults.algorithmicDarkeningAllowed, isFalse);
@@ -658,6 +673,32 @@ void main() {
       expect(
         hostApi.calls,
         containsAllInOrder(['setCookie(sid)', 'clearCookies']),
+      );
+    });
+
+    test('deletes one cookie or every cookie for a URL', () async {
+      final controller = createController();
+      for (final name in ['a', 'b']) {
+        await controller.setCookie(
+          WebViewCookie(name: name, value: '1', domain: 'example.com'),
+        );
+      }
+
+      await controller.deleteCookie('https://example.com/', 'a');
+      expect(
+        (await controller.getCookies('https://example.com/'))
+            .map((c) => c.name),
+        ['b'],
+      );
+
+      await controller.deleteCookies('https://example.com/');
+      expect(await controller.getCookies('https://example.com/'), isEmpty);
+      expect(
+        hostApi.calls,
+        containsAllInOrder([
+          'deleteCookie(https://example.com/, a)',
+          'deleteCookies(https://example.com/)',
+        ]),
       );
     });
 

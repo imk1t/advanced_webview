@@ -2040,6 +2040,50 @@
       }
     },
     {
+      "dart": "AndroidWebViewSettings.thirdPartyCookiesEnabled",
+      "group": "settings",
+      "summary": {
+        "en": "Accepts cookies that embedded content sets for another site (Android, off by default).",
+        "ja": "埋め込みコンテンツが別サイト向けに設定する Cookie を受け付けます（Android、既定は無効）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["CookieManager.setAcceptThirdPartyCookies(WebView, boolean)"]
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "iOS has no equivalent; WebKit decides.",
+          "ja": "iOS には該当する設定がなく、WebKit が判断します。"
+        }
+      }
+    },
+    {
+      "dart": "AndroidWebViewSettings.safeBrowsingEnabled",
+      "group": "settings",
+      "summary": {
+        "en": "Checks pages against Google's list of dangerous sites (Android, on by default).",
+        "ja": "ページを Google の危険なサイトの一覧と照合します（Android、既定は有効）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettings.setSafeBrowsingEnabled(boolean)"],
+        "note": {
+          "en": "Needs Android 8.0 (API 26) or later; ignored on older versions.",
+          "ja": "Android 8.0（API 26）以降が必要で、それより前では無視されます。"
+        }
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "iOS has no switch; WebKit's fraudulent website warning is always on.",
+          "ja": "iOS には切り替えがなく、WebKit の不正なウェブサイトの警告は常に有効です。"
+        }
+      }
+    },
+    {
       "dart": "AndroidWebViewSettings.algorithmicDarkeningAllowed",
       "group": "settings",
       "summary": {
@@ -2407,6 +2451,53 @@
           "en": "All cookies are filtered by host, path and scheme of the URL.",
           "ja": "全 Cookie を URL のホスト・パス・スキームで絞り込みます。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.deleteCookie",
+      "group": "cookies",
+      "summary": {
+        "en": "Removes the cookies with a given name that the WebView would send to a URL.",
+        "ja": "指定した URL に WebView が送信する Cookie のうち、指定した名前のものを削除します。"
+      },
+      "android": {
+        "status": "partial",
+        "apis": ["CookieManager.setCookie(String, String, ValueCallback)"],
+        "note": {
+          "en": "Android cannot see a cookie's domain or path, so the plugin expires it for the host, its parent domains and every path down to the URL's. A cookie stored for a deeper path stays.",
+          "ja": "Android は Cookie のドメインとパスを取得できないため、ホスト・親ドメイン・URL までのすべてのパスについて期限切れの Cookie を設定します。URL より深いパスの Cookie は残ります。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKHTTPCookieStore.allCookies()", "WKHTTPCookieStore.deleteCookie(_:)"],
+        "note": {
+          "en": "Deletes exactly the cookies getCookies reports for the URL.",
+          "ja": "getCookies がその URL に対して返す Cookie をそのまま削除します。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.deleteCookies",
+      "group": "cookies",
+      "summary": {
+        "en": "Removes every cookie the WebView would send to a URL.",
+        "ja": "指定した URL に WebView が送信するすべての Cookie を削除します。"
+      },
+      "android": {
+        "status": "partial",
+        "apis": [
+          "CookieManager.getCookie(String)",
+          "CookieManager.setCookie(String, String, ValueCallback)"
+        ],
+        "note": {
+          "en": "Same limits as deleteCookie: it expires each cookie name that getCookie lists for the URL.",
+          "ja": "deleteCookie と同じ制限があり、URL に対して getCookie が返す名前ごとに期限切れの Cookie を設定します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKHTTPCookieStore.allCookies()", "WKHTTPCookieStore.deleteCookie(_:)"]
       }
     },
     {

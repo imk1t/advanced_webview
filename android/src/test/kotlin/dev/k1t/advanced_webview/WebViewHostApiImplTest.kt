@@ -218,6 +218,32 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun deletingCookiesExpiresOnlyTheOnesForTheUrl() = runBlocking {
+        hostApi.create(params(webViewId = 1))
+        val manager = android.webkit.CookieManager.getInstance()
+        manager.setCookie("https://delete-me.test/", "a=1; Path=/")
+        manager.setCookie("https://delete-me.test/", "b=1; Path=/")
+        manager.setCookie("https://keep-me.test/", "a=1; Path=/")
+
+        hostApi.deleteCookie(1, "https://delete-me.test/", "a")
+        assertEquals("b=1", manager.getCookie("https://delete-me.test/"))
+
+        hostApi.deleteCookies(1, "https://delete-me.test/")
+        assertNull(manager.getCookie("https://delete-me.test/"))
+        assertEquals("a=1", manager.getCookie("https://keep-me.test/"))
+    }
+
+    @Test
+    fun cookieAndSafeBrowsingSettingsCanBeApplied() {
+        hostApi.create(params(webViewId = 1, settings = settings(thirdPartyCookiesEnabled = true)))
+        val manager = android.webkit.CookieManager.getInstance()
+        assertTrue(manager.acceptThirdPartyCookies(registry.get(1).webView))
+
+        hostApi.updateSettings(1, settings(thirdPartyCookiesEnabled = false))
+        assertFalse(manager.acceptThirdPartyCookies(registry.get(1).webView))
+    }
+
+    @Test
     fun algorithmicDarkeningCanBeAppliedAtCreationAndOnUpdate() {
         // WebSettingsCompat needs a real WebView provider, so this only checks that applying it is safe.
         hostApi.create(params(webViewId = 1, settings = settings(algorithmicDarkeningAllowed = true)))
@@ -1029,6 +1055,7 @@ class WebViewHostApiImplTest {
         mixedContentMode: MixedContentModeMessage = MixedContentModeMessage.NEVER_ALLOW,
         geolocationEnabled: Boolean = true,
         algorithmicDarkeningAllowed: Boolean = false,
+        thirdPartyCookiesEnabled: Boolean = false,
         minimumFontSize: Long? = null,
     ) = WebViewSettingsMessage(
         javaScriptEnabled = javaScriptEnabled,
@@ -1056,6 +1083,8 @@ class WebViewHostApiImplTest {
         allowsLinkPreview = true,
         geolocationEnabled = geolocationEnabled,
         algorithmicDarkeningAllowed = algorithmicDarkeningAllowed,
+        thirdPartyCookiesEnabled = thirdPartyCookiesEnabled,
+        safeBrowsingEnabled = true,
         userInterfaceStyle = UserInterfaceStyleMessage.UNSPECIFIED,
         minimumFontSize = minimumFontSize,
         userAgent = userAgent,

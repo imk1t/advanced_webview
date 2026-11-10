@@ -16,7 +16,9 @@ await controller.setCookie(
 
 final cookies = await controller.getCookies('https://example.com/');
 
-await controller.clearCookies();
+await controller.deleteCookie('https://example.com/', 'session'); // 名前を指定して 1 件削除
+await controller.deleteCookies('https://example.com/'); // その URL に送信されるすべての Cookie を削除
+await controller.clearCookies(); // すべて削除
 ```
 
 `setCookie` の後にページを読み込む（または再読み込みする）と、その Cookie が送信されます。
@@ -38,6 +40,10 @@ Cookie は削除されないため、削除するには `clearCookies` を呼び
 
 ## プラットフォーム差
 
+- `deleteCookie` と `deleteCookies` は、WebView がその URL に送信する Cookie を削除します。iOS は `getCookies` が返す
+  Cookie をそのまま削除します。Android は Cookie のドメインとパスを取得できないため、ホスト・親ドメイン・`/` から
+  URL のパスまでのすべてのパスについて期限切れの Cookie を設定します。URL より深いパスに保存された Cookie は残ります。
+  Cookie を設定したページの URL を渡してください。
 - Cookie ストアは、Android ではアプリ内のすべての WebView で、iOS ではデフォルトのデータストアを
   使うすべての WebView で共有されます。
 - Android の `getCookies` は `name` と `value` のみ返します（`CookieManager.getCookie` が

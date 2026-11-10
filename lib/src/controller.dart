@@ -735,6 +735,31 @@ class AdvancedWebViewController {
     return cookies.map(WebViewCookie.fromMessage).toList();
   }
 
+  /// Removes the cookies called [name] that the WebView would send to [url].
+  ///
+  /// Completes when they are gone. Android and iOS differ: Android cannot see
+  /// a cookie's domain or path, so it expires the cookie for the host of [url]
+  /// (and its parent domains) at every path from `/` down to the path of
+  /// [url]; a cookie stored for a deeper path than [url] stays. iOS deletes
+  /// exactly the cookies [getCookies] reports for [url].
+  ///
+  /// Android: `CookieManager.setCookie(String, String, ValueCallback)` with an
+  /// expired date.
+  /// iOS: `WKHTTPCookieStore.deleteCookie(_:)`.
+  Future<void> deleteCookie(String url, String name) =>
+      _call(() => _hostApi.deleteCookie(webViewId, url, name));
+
+  /// Removes every cookie the WebView would send to [url].
+  ///
+  /// See [deleteCookie] for how the platforms differ. Other sites' cookies are
+  /// kept; use [clearCookies] to remove everything.
+  ///
+  /// Android: `CookieManager.getCookie(String)` and `setCookie` with an
+  /// expired date for each name.
+  /// iOS: `WKHTTPCookieStore.deleteCookie(_:)`.
+  Future<void> deleteCookies(String url) =>
+      _call(() => _hostApi.deleteCookies(webViewId, url));
+
   /// Removes every cookie from the WebView's cookie store.
   ///
   /// Android: `CookieManager.removeAllCookies(ValueCallback)`.

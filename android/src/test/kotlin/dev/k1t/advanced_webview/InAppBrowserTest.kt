@@ -249,6 +249,8 @@ class InAppBrowserTest {
             allowsLinkPreview = true,
             geolocationEnabled = true,
             algorithmicDarkeningAllowed = false,
+            thirdPartyCookiesEnabled = false,
+            safeBrowsingEnabled = true,
             userInterfaceStyle = UserInterfaceStyleMessage.UNSPECIFIED,
         ),
         javaScriptChannelNames = emptyList(),

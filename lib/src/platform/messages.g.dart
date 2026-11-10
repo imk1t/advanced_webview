@@ -216,6 +216,8 @@ class WebViewSettingsMessage {
     required this.allowsLinkPreview,
     required this.geolocationEnabled,
     required this.algorithmicDarkeningAllowed,
+    required this.thirdPartyCookiesEnabled,
+    required this.safeBrowsingEnabled,
     required this.userInterfaceStyle,
     this.minimumFontSize,
     this.userAgent,
@@ -302,6 +304,14 @@ class WebViewSettingsMessage {
   /// installed WebView supports it. iOS has no equivalent.
   bool algorithmicDarkeningAllowed;
 
+  /// Android: `CookieManager.setAcceptThirdPartyCookies` for this WebView. iOS
+  /// has no equivalent.
+  bool thirdPartyCookiesEnabled;
+
+  /// Android: `WebSettings.setSafeBrowsingEnabled` (API 26+). iOS has no
+  /// switch.
+  bool safeBrowsingEnabled;
+
   /// iOS: `UIView.overrideUserInterfaceStyle`. Ignored on Android.
   UserInterfaceStyleMessage userInterfaceStyle;
 
@@ -342,6 +352,8 @@ class WebViewSettingsMessage {
       allowsLinkPreview,
       geolocationEnabled,
       algorithmicDarkeningAllowed,
+      thirdPartyCookiesEnabled,
+      safeBrowsingEnabled,
       userInterfaceStyle,
       minimumFontSize,
       userAgent,
@@ -380,10 +392,12 @@ class WebViewSettingsMessage {
       allowsLinkPreview: result[22]! as bool,
       geolocationEnabled: result[23]! as bool,
       algorithmicDarkeningAllowed: result[24]! as bool,
-      userInterfaceStyle: result[25]! as UserInterfaceStyleMessage,
-      minimumFontSize: result[26] as int?,
-      userAgent: result[27] as String?,
-      applicationNameForUserAgent: result[28] as String?,
+      thirdPartyCookiesEnabled: result[25]! as bool,
+      safeBrowsingEnabled: result[26]! as bool,
+      userInterfaceStyle: result[27]! as UserInterfaceStyleMessage,
+      minimumFontSize: result[28] as int?,
+      userAgent: result[29] as String?,
+      applicationNameForUserAgent: result[30] as String?,
     );
   }
 
@@ -396,7 +410,7 @@ class WebViewSettingsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(builtInZoomControls, other.builtInZoomControls) && _deepEquals(displayZoomControls, other.displayZoomControls) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(incognito, other.incognito) && _deepEquals(javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && _deepEquals(scrollbarsVisible, other.scrollbarsVisible) && _deepEquals(overScrollEnabled, other.overScrollEnabled) && _deepEquals(pullToRefreshEnabled, other.pullToRefreshEnabled) && _deepEquals(domStorageEnabled, other.domStorageEnabled) && _deepEquals(allowFileAccess, other.allowFileAccess) && _deepEquals(allowContentAccess, other.allowContentAccess) && _deepEquals(mixedContentMode, other.mixedContentMode) && _deepEquals(contentMode, other.contentMode) && _deepEquals(allowsLinkPreview, other.allowsLinkPreview) && _deepEquals(geolocationEnabled, other.geolocationEnabled) && _deepEquals(algorithmicDarkeningAllowed, other.algorithmicDarkeningAllowed) && _deepEquals(userInterfaceStyle, other.userInterfaceStyle) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent) && _deepEquals(applicationNameForUserAgent, other.applicationNameForUserAgent);
+    return _deepEquals(javaScriptEnabled, other.javaScriptEnabled) && _deepEquals(mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && _deepEquals(allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && _deepEquals(supportZoom, other.supportZoom) && _deepEquals(builtInZoomControls, other.builtInZoomControls) && _deepEquals(displayZoomControls, other.displayZoomControls) && _deepEquals(transparentBackground, other.transparentBackground) && _deepEquals(passkeysEnabled, other.passkeysEnabled) && _deepEquals(allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && _deepEquals(inspectable, other.inspectable) && _deepEquals(textZoom, other.textZoom) && _deepEquals(cacheMode, other.cacheMode) && _deepEquals(incognito, other.incognito) && _deepEquals(javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && _deepEquals(scrollbarsVisible, other.scrollbarsVisible) && _deepEquals(overScrollEnabled, other.overScrollEnabled) && _deepEquals(pullToRefreshEnabled, other.pullToRefreshEnabled) && _deepEquals(domStorageEnabled, other.domStorageEnabled) && _deepEquals(allowFileAccess, other.allowFileAccess) && _deepEquals(allowContentAccess, other.allowContentAccess) && _deepEquals(mixedContentMode, other.mixedContentMode) && _deepEquals(contentMode, other.contentMode) && _deepEquals(allowsLinkPreview, other.allowsLinkPreview) && _deepEquals(geolocationEnabled, other.geolocationEnabled) && _deepEquals(algorithmicDarkeningAllowed, other.algorithmicDarkeningAllowed) && _deepEquals(thirdPartyCookiesEnabled, other.thirdPartyCookiesEnabled) && _deepEquals(safeBrowsingEnabled, other.safeBrowsingEnabled) && _deepEquals(userInterfaceStyle, other.userInterfaceStyle) && _deepEquals(minimumFontSize, other.minimumFontSize) && _deepEquals(userAgent, other.userAgent) && _deepEquals(applicationNameForUserAgent, other.applicationNameForUserAgent);
   }
 
   @override
@@ -405,7 +419,7 @@ class WebViewSettingsMessage {
 
   @override
   String toString() {
-    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, builtInZoomControls: $builtInZoomControls, displayZoomControls: $displayZoomControls, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, cacheMode: $cacheMode, incognito: $incognito, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, scrollbarsVisible: $scrollbarsVisible, overScrollEnabled: $overScrollEnabled, pullToRefreshEnabled: $pullToRefreshEnabled, domStorageEnabled: $domStorageEnabled, allowFileAccess: $allowFileAccess, allowContentAccess: $allowContentAccess, mixedContentMode: $mixedContentMode, contentMode: $contentMode, allowsLinkPreview: $allowsLinkPreview, geolocationEnabled: $geolocationEnabled, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, userInterfaceStyle: $userInterfaceStyle, minimumFontSize: $minimumFontSize, userAgent: $userAgent, applicationNameForUserAgent: $applicationNameForUserAgent)';
+    return 'WebViewSettingsMessage(javaScriptEnabled: $javaScriptEnabled, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, supportZoom: $supportZoom, builtInZoomControls: $builtInZoomControls, displayZoomControls: $displayZoomControls, transparentBackground: $transparentBackground, passkeysEnabled: $passkeysEnabled, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, inspectable: $inspectable, textZoom: $textZoom, cacheMode: $cacheMode, incognito: $incognito, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, scrollbarsVisible: $scrollbarsVisible, overScrollEnabled: $overScrollEnabled, pullToRefreshEnabled: $pullToRefreshEnabled, domStorageEnabled: $domStorageEnabled, allowFileAccess: $allowFileAccess, allowContentAccess: $allowContentAccess, mixedContentMode: $mixedContentMode, contentMode: $contentMode, allowsLinkPreview: $allowsLinkPreview, geolocationEnabled: $geolocationEnabled, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, safeBrowsingEnabled: $safeBrowsingEnabled, userInterfaceStyle: $userInterfaceStyle, minimumFontSize: $minimumFontSize, userAgent: $userAgent, applicationNameForUserAgent: $applicationNameForUserAgent)';
   }
 }
 
@@ -2725,6 +2739,44 @@ class AdvancedWebViewHostApi {
     )
     ;
     return (pigeonVar_replyValue! as List<Object?>).cast<CookieMessage>();
+  }
+
+  /// Removes the cookies called `name` that the WebView would send to `url`.
+  Future<void> deleteCookie(int webViewId, String url, String name) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.deleteCookie$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, url, name]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// Removes every cookie the WebView would send to `url`.
+  Future<void> deleteCookies(int webViewId, String url) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.deleteCookies$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, url]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> clearCookies(int webViewId) async {

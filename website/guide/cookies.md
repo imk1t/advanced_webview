@@ -16,7 +16,9 @@ await controller.setCookie(
 
 final cookies = await controller.getCookies('https://example.com/');
 
-await controller.clearCookies();
+await controller.deleteCookie('https://example.com/', 'session'); // one cookie by name
+await controller.deleteCookies('https://example.com/'); // every cookie sent to that URL
+await controller.clearCookies(); // everything
 ```
 
 Load or reload a page after `setCookie` for the cookie to be sent.
@@ -37,6 +39,11 @@ cannot clear `localStorage` and IndexedDB separately: selecting either one clear
 the app. Pages that are already loaded keep what they hold in memory until they reload.
 
 ## Platform differences
+
+- `deleteCookie` and `deleteCookies` remove what the WebView would send to the URL. iOS deletes exactly the
+  cookies `getCookies` reports. Android cannot see a cookie's domain or path, so it expires the cookie for the
+  host, its parent domains and every path from `/` down to the URL's path; a cookie stored for a deeper path than
+  the URL stays. Pass the URL of the page that set the cookie.
 
 - The cookie store is shared by all WebViews of the app on Android, and by all WebViews that use
   the default data store on iOS.
