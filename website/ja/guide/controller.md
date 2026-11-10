@@ -237,6 +237,21 @@ Android はデコード済みのビットマップしか渡さないため、ど
 このリリース以前の Android は全画面表示自体に対応していませんでした。iOS は WebKit 独自の全画面ビューを表示し、
 プラグインはそのために要素の全画面 API を有効にします。
 
+## レンダラーのクラッシュ {#renderer-crashes}
+
+```dart
+AdvancedWebViewController(
+  onRenderProcessGone: (details) {
+    // details.didCrash: Android は true / false、iOS は null
+  },
+);
+```
+
+Web コンテンツを描画するプロセスは、メモリ不足などでクラッシュしたりシステムに終了されたりすることがあります。
+iOS ではビューが空白になり、`controller.reload()` でページを復元できます。Android ではアプリが終了しないようプラグインが
+イベントを処理しますが、その WebView はもう使えないため、コントローラーを dispose して作り直してください
+（`AdvancedWebView` も新しくします）。コールバックがなくても Android は同じ動作になります。
+
 ## ファイルのアップロード {#file-uploads}
 
 `<input type="file">` は、Dart 側のコードなしで両プラットフォームで動作します。

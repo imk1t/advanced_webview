@@ -39,6 +39,19 @@ class HttpError {
   String toString() => 'HttpError($statusCode, $url, mainFrame: $isMainFrame)';
 }
 
+/// The process that renders web content ended while the WebView was in use.
+@immutable
+class RenderProcessGone {
+  const RenderProcessGone({this.didCrash});
+
+  /// True when the renderer crashed, false when the system killed it (for
+  /// example to free memory). `null` on iOS, where WebKit does not say.
+  final bool? didCrash;
+
+  @override
+  String toString() => 'RenderProcessGone(didCrash: $didCrash)';
+}
+
 /// A load error reported by the native WebView.
 @immutable
 class WebResourceError {
@@ -69,6 +82,7 @@ typedef LongPressCallback = void Function(Offset offset);
 typedef ScrollChangedCallback = void Function(Offset offset);
 typedef WebResourceErrorCallback = void Function(WebResourceError error);
 typedef HttpErrorCallback = void Function(HttpError error);
+typedef RenderProcessGoneCallback = void Function(RenderProcessGone details);
 typedef NavigationRequestCallback = FutureOr<NavigationDecision> Function(
   NavigationRequest request,
 );

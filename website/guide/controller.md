@@ -239,6 +239,21 @@ the system bars and leaves fullscreen when the user presses back. It does not ro
 orientation yourself in `onEnterFullscreen` if you want landscape. Before this release Android did not offer
 fullscreen at all. iOS presents WebKit's own fullscreen view and the plugin enables the element fullscreen API for it.
 
+## Renderer crashes
+
+```dart
+AdvancedWebViewController(
+  onRenderProcessGone: (details) {
+    // details.didCrash: true / false on Android, null on iOS
+  },
+);
+```
+
+The process that renders web content can crash or be killed by the system, for example under memory pressure.
+On iOS the view turns blank and `controller.reload()` brings the page back. On Android the plugin handles the event so
+the app is not terminated, but that WebView cannot be used any more: dispose the controller and create a new one
+(with a new `AdvancedWebView`). Without the callback, Android does the same silently.
+
 ## File uploads
 
 `<input type="file">` works on both platforms without any Dart code.

@@ -30,6 +30,7 @@ void main() {
     ConsoleMessageCallback? onConsoleMessage,
     WebResourceErrorCallback? onWebResourceError,
     HttpErrorCallback? onHttpError,
+    RenderProcessGoneCallback? onRenderProcessGone,
     FindResultCallback? onFindResult,
     FaviconChangedCallback? onFaviconChanged,
     VoidCallback? onEnterFullscreen,
@@ -58,6 +59,7 @@ void main() {
       onConsoleMessage: onConsoleMessage,
       onWebResourceError: onWebResourceError,
       onHttpError: onHttpError,
+      onRenderProcessGone: onRenderProcessGone,
       onFindResult: onFindResult,
       onFaviconChanged: onFaviconChanged,
       onEnterFullscreen: onEnterFullscreen,
@@ -1182,6 +1184,39 @@ void main() {
       expect(error?.statusCode, 404);
       expect(error?.url, 'https://example.com/missing');
       expect(error?.isMainFrame, true);
+    });
+  });
+
+  group('render process gone', () {
+    test('is mapped and routed by webViewId', () {
+      RenderProcessGone? details;
+      final controller = createController(
+        onRenderProcessGone: (d) => details = d,
+      );
+      final other = createController(
+        onRenderProcessGone: (_) => fail('wrong view'),
+      );
+      addTearDown(other.dispose);
+
+      dispatcher.onRenderProcessGone(
+        controller.webViewId,
+        RenderProcessGoneMessage(didCrash: true),
+      );
+      expect(details?.didCrash, true);
+
+      dispatcher.onRenderProcessGone(
+        controller.webViewId,
+        RenderProcessGoneMessage(),
+      );
+      expect(details?.didCrash, isNull);
+    });
+
+    test('is ignored without a callback', () {
+      final controller = createController();
+      dispatcher.onRenderProcessGone(
+        controller.webViewId,
+        RenderProcessGoneMessage(didCrash: false),
+      );
     });
   });
 

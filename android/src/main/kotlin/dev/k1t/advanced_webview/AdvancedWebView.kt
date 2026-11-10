@@ -33,6 +33,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.JsPromptResult
 import android.webkit.JsResult
 import android.webkit.PermissionRequest
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
@@ -740,6 +741,12 @@ class AdvancedWebView(
                 isMainFrame = request.isForMainFrame,
             )
             send { flutterApi.onReceivedHttpError(id, message) }
+        }
+
+        // Returning false would terminate the whole app; the dead WebView is left for Dart to dispose and recreate.
+        override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+            send { flutterApi.onRenderProcessGone(id, RenderProcessGoneMessage(didCrash = detail.didCrash())) }
+            return true
         }
 
         override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {

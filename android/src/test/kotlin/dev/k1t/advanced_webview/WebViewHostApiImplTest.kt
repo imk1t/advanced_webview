@@ -599,6 +599,24 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun aGoneRenderProcessIsReportedAndHandledSoTheAppSurvives() {
+        val detail = org.mockito.Mockito.mock(android.webkit.RenderProcessGoneDetail::class.java)
+        org.mockito.Mockito.`when`(detail.didCrash()).thenReturn(true)
+        hostApi.create(params(webViewId = 1))
+        val view = registry.get(1).webView
+
+        val handled = view.webViewClient.onRenderProcessGone(view, detail)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertTrue(handled)
+        verify(messenger).send(
+            eq("dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onRenderProcessGone"),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
     fun interceptedRequestsAreAnsweredByDartOnAnIoThread() {
         hostApi.create(params(webViewId = 1, interceptSchemes = listOf("app")))
         val view = registry.get(1)

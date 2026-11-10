@@ -794,6 +794,53 @@ class HttpErrorMessage {
   }
 }
 
+class RenderProcessGoneMessage {
+  RenderProcessGoneMessage({
+    this.didCrash,
+  });
+
+  /// True when the renderer crashed, false when the system killed it (for
+  /// example to free memory), null when the platform does not say.
+  bool? didCrash;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      didCrash,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static RenderProcessGoneMessage decode(Object result) {
+    result as List<Object?>;
+    return RenderProcessGoneMessage(
+      didCrash: result[0] as bool?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! RenderProcessGoneMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(didCrash, other.didCrash);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'RenderProcessGoneMessage(didCrash: $didCrash)';
+  }
+}
+
 class WebResourceErrorMessage {
   WebResourceErrorMessage({
     required this.errorCode,
@@ -1796,53 +1843,56 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is HttpErrorMessage) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    }    else if (value is WebResourceErrorMessage) {
+    }    else if (value is RenderProcessGoneMessage) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    }    else if (value is SslErrorMessage) {
+    }    else if (value is WebResourceErrorMessage) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthRequestMessage) {
+    }    else if (value is SslErrorMessage) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    }    else if (value is ClientCertRequestMessage) {
+    }    else if (value is HttpAuthRequestMessage) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    }    else if (value is ClientCertResponseMessage) {
+    }    else if (value is ClientCertRequestMessage) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthCredentialsMessage) {
+    }    else if (value is ClientCertResponseMessage) {
       buffer.putUint8(153);
       writeValue(buffer, value.encode());
-    }    else if (value is DownloadRequestMessage) {
+    }    else if (value is HttpAuthCredentialsMessage) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    }    else if (value is PermissionRequestMessage) {
+    }    else if (value is DownloadRequestMessage) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    }    else if (value is JsDialogRequestMessage) {
+    }    else if (value is PermissionRequestMessage) {
       buffer.putUint8(156);
       writeValue(buffer, value.encode());
-    }    else if (value is JsDialogResultMessage) {
+    }    else if (value is JsDialogRequestMessage) {
       buffer.putUint8(157);
       writeValue(buffer, value.encode());
-    }    else if (value is InterceptRequestMessage) {
+    }    else if (value is JsDialogResultMessage) {
       buffer.putUint8(158);
       writeValue(buffer, value.encode());
-    }    else if (value is InterceptResponseMessage) {
+    }    else if (value is InterceptRequestMessage) {
       buffer.putUint8(159);
       writeValue(buffer, value.encode());
-    }    else if (value is FindResultMessage) {
+    }    else if (value is InterceptResponseMessage) {
       buffer.putUint8(160);
       writeValue(buffer, value.encode());
-    }    else if (value is ScrollPositionMessage) {
+    }    else if (value is FindResultMessage) {
       buffer.putUint8(161);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is ScrollPositionMessage) {
       buffer.putUint8(162);
       writeValue(buffer, value.encode());
-    }    else if (value is InAppBrowserParamsMessage) {
+    }    else if (value is CookieMessage) {
       buffer.putUint8(163);
+      writeValue(buffer, value.encode());
+    }    else if (value is InAppBrowserParamsMessage) {
+      buffer.putUint8(164);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1904,36 +1954,38 @@ class _PigeonCodec extends StandardMessageCodec {
       case 147:
         return HttpErrorMessage.decode(readValue(buffer)!);
       case 148:
-        return WebResourceErrorMessage.decode(readValue(buffer)!);
+        return RenderProcessGoneMessage.decode(readValue(buffer)!);
       case 149:
-        return SslErrorMessage.decode(readValue(buffer)!);
+        return WebResourceErrorMessage.decode(readValue(buffer)!);
       case 150:
-        return HttpAuthRequestMessage.decode(readValue(buffer)!);
+        return SslErrorMessage.decode(readValue(buffer)!);
       case 151:
-        return ClientCertRequestMessage.decode(readValue(buffer)!);
+        return HttpAuthRequestMessage.decode(readValue(buffer)!);
       case 152:
-        return ClientCertResponseMessage.decode(readValue(buffer)!);
+        return ClientCertRequestMessage.decode(readValue(buffer)!);
       case 153:
-        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
+        return ClientCertResponseMessage.decode(readValue(buffer)!);
       case 154:
-        return DownloadRequestMessage.decode(readValue(buffer)!);
+        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
       case 155:
-        return PermissionRequestMessage.decode(readValue(buffer)!);
+        return DownloadRequestMessage.decode(readValue(buffer)!);
       case 156:
-        return JsDialogRequestMessage.decode(readValue(buffer)!);
+        return PermissionRequestMessage.decode(readValue(buffer)!);
       case 157:
-        return JsDialogResultMessage.decode(readValue(buffer)!);
+        return JsDialogRequestMessage.decode(readValue(buffer)!);
       case 158:
-        return InterceptRequestMessage.decode(readValue(buffer)!);
+        return JsDialogResultMessage.decode(readValue(buffer)!);
       case 159:
-        return InterceptResponseMessage.decode(readValue(buffer)!);
+        return InterceptRequestMessage.decode(readValue(buffer)!);
       case 160:
-        return FindResultMessage.decode(readValue(buffer)!);
+        return InterceptResponseMessage.decode(readValue(buffer)!);
       case 161:
-        return ScrollPositionMessage.decode(readValue(buffer)!);
+        return FindResultMessage.decode(readValue(buffer)!);
       case 162:
-        return CookieMessage.decode(readValue(buffer)!);
+        return ScrollPositionMessage.decode(readValue(buffer)!);
       case 163:
+        return CookieMessage.decode(readValue(buffer)!);
+      case 164:
         return InAppBrowserParamsMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2807,6 +2859,10 @@ abstract class AdvancedWebViewFlutterApi {
   /// `hasFullscreenDelegate`.
   void onExitFullscreen(int webViewId);
 
+  /// The process that renders web content crashed or was killed, so the
+  /// WebView shows nothing (iOS) or cannot be used any more (Android).
+  void onRenderProcessGone(int webViewId, RenderProcessGoneMessage details);
+
   void onReceivedError(int webViewId, WebResourceErrorMessage error);
 
   /// A server answered with a status of 400 or more.
@@ -3093,6 +3149,28 @@ abstract class AdvancedWebViewFlutterApi {
           final int arg_webViewId = args[0]! as int;
           try {
             api.onExitFullscreen(arg_webViewId);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onRenderProcessGone$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final RenderProcessGoneMessage arg_details = args[1]! as RenderProcessGoneMessage;
+          try {
+            api.onRenderProcessGone(arg_webViewId, arg_details);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

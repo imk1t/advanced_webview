@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.onRenderProcessGone`, `RenderProcessGone` and `RenderProcessGoneCallback`: be told when the process that renders web content crashes or is killed. Android now handles the event instead of letting the app terminate (dispose the controller and create a new one); iOS reports it so you can call `reload`. `RenderProcessGone.didCrash` is `null` on iOS.
+
 ## 0.10.0 - 2026-11-08
 
 - Add `AdvancedWebViewController.zoomBy`, `setZoomScale`, and `getZoomScale`, and the Android settings `builtInZoomControls` and `displayZoomControls`. Android uses `WebView.zoomBy`; iOS zooms the scroll view and leaves `WKWebView.pageZoom` to `textZoom`. The defaults match the previous behaviour (pinch zoom on, on-screen buttons hidden).
