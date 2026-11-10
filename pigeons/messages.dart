@@ -25,6 +25,8 @@ enum CacheModeMessage { normal, preferCache, cacheOnly, noCache }
 
 enum ContentModeMessage { recommended, mobile, desktop }
 
+enum UserInterfaceStyleMessage { unspecified, light, dark }
+
 enum MixedContentModeMessage { neverAllow, compatibility, alwaysAllow }
 
 class WebViewSettingsMessage {
@@ -53,6 +55,8 @@ class WebViewSettingsMessage {
     required this.contentMode,
     required this.allowsLinkPreview,
     required this.geolocationEnabled,
+    required this.algorithmicDarkeningAllowed,
+    required this.userInterfaceStyle,
     this.minimumFontSize,
     this.userAgent,
     this.applicationNameForUserAgent,
@@ -131,6 +135,13 @@ class WebViewSettingsMessage {
 
   /// Android: `WebSettings.setGeolocationEnabled`. iOS has no switch.
   bool geolocationEnabled;
+
+  /// Android: `WebSettingsCompat.setAlgorithmicDarkeningAllowed`, when the
+  /// installed WebView supports it. iOS has no equivalent.
+  bool algorithmicDarkeningAllowed;
+
+  /// iOS: `UIView.overrideUserInterfaceStyle`. Ignored on Android.
+  UserInterfaceStyleMessage userInterfaceStyle;
 
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
   /// `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.

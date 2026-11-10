@@ -218,6 +218,14 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun algorithmicDarkeningCanBeAppliedAtCreationAndOnUpdate() {
+        // WebSettingsCompat needs a real WebView provider, so this only checks that applying it is safe.
+        hostApi.create(params(webViewId = 1, settings = settings(algorithmicDarkeningAllowed = true)))
+
+        hostApi.updateSettings(1, settings(algorithmicDarkeningAllowed = false))
+    }
+
+    @Test
     fun windowAndScrollSettingsAreAppliedAtCreationAndOnUpdate() {
         hostApi.create(params(webViewId = 1, settings = settings()))
         val webView = registry.get(1).webView
@@ -1020,6 +1028,7 @@ class WebViewHostApiImplTest {
         allowContentAccess: Boolean = false,
         mixedContentMode: MixedContentModeMessage = MixedContentModeMessage.NEVER_ALLOW,
         geolocationEnabled: Boolean = true,
+        algorithmicDarkeningAllowed: Boolean = false,
         minimumFontSize: Long? = null,
     ) = WebViewSettingsMessage(
         javaScriptEnabled = javaScriptEnabled,
@@ -1046,6 +1055,8 @@ class WebViewHostApiImplTest {
         contentMode = ContentModeMessage.RECOMMENDED,
         allowsLinkPreview = true,
         geolocationEnabled = geolocationEnabled,
+        algorithmicDarkeningAllowed = algorithmicDarkeningAllowed,
+        userInterfaceStyle = UserInterfaceStyleMessage.UNSPECIFIED,
         minimumFontSize = minimumFontSize,
         userAgent = userAgent,
     )

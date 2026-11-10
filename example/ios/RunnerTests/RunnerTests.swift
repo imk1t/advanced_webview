@@ -169,6 +169,19 @@ final class RunnerTests: XCTestCase {
     XCTAssertFalse(webView.allowsLinkPreview)
   }
 
+  func testUserInterfaceStyleIsAppliedAtCreationAndOnUpdate() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1, settings: settings(userInterfaceStyle: .dark)))
+    let webView = try registry.get(1).webView
+    XCTAssertEqual(webView.overrideUserInterfaceStyle, .dark)
+
+    try hostApi.updateSettings(webViewId: 1, settings: settings(userInterfaceStyle: .light))
+    XCTAssertEqual(webView.overrideUserInterfaceStyle, .light)
+
+    try hostApi.updateSettings(webViewId: 1, settings: settings())
+    XCTAssertEqual(webView.overrideUserInterfaceStyle, .unspecified)
+  }
+
   func testIncognitoUsesANonPersistentDataStore() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1, settings: settings()))
@@ -675,6 +688,8 @@ final class RunnerTests: XCTestCase {
     contentMode: ContentModeMessage = .recommended,
     allowsLinkPreview: Bool = true,
     geolocationEnabled: Bool = true,
+    algorithmicDarkeningAllowed: Bool = false,
+    userInterfaceStyle: UserInterfaceStyleMessage = .unspecified,
     minimumFontSize: Int? = nil,
     userAgent: String? = nil,
     applicationNameForUserAgent: String? = nil
@@ -704,6 +719,8 @@ final class RunnerTests: XCTestCase {
       contentMode: contentMode,
       allowsLinkPreview: allowsLinkPreview,
       geolocationEnabled: geolocationEnabled,
+      algorithmicDarkeningAllowed: algorithmicDarkeningAllowed,
+      userInterfaceStyle: userInterfaceStyle,
       minimumFontSize: minimumFontSize.map { Int64($0) },
       userAgent: userAgent,
       applicationNameForUserAgent: applicationNameForUserAgent)

@@ -51,6 +51,7 @@ const WebViewSettings(
 | `allowContentAccess` | `false` | 対応 | 無視 |
 | `mixedContentMode` | `neverAllow` | 対応 | 無視（WebKit が遮断） |
 | `geolocationEnabled` | `true` | 対応 | 無視（OS が判断） |
+| `algorithmicDarkeningAllowed` | `false` | 対応（アプリのテーマがダークであることが必要） | 無視（`userInterfaceStyle` を参照） |
 
 ## iOS 専用の設定
 
@@ -64,8 +65,18 @@ const WebViewSettings(
 | `applicationNameForUserAgent` | `null` | 無視 | 生成時のみ |
 | `contentMode` | `recommended` | 無視 | 対応 |
 | `allowsLinkPreview` | `true` | 無視 | 対応 |
+| `userInterfaceStyle` | `unspecified` | 無視 | 対応（`light` / `dark` で `prefers-color-scheme` を固定） |
 
 「生成時のみ」の設定はネイティブビューの生成時に適用され、そのプラットフォームでは `updateSettings` で変更しても無視されます。
+
+## ダークモード {#dark-mode}
+
+ページは `prefers-color-scheme` に従います。iOS では `IOSWebViewSettings.userInterfaceStyle`（`light` / `dark`）でその
+WebView の外観を固定でき、ダークテーマに対応したページはシステム設定にかかわらず切り替わります。既定の `unspecified` は
+アプリに従います。Android では `AndroidWebViewSettings.algorithmicDarkeningAllowed` を有効にすると、ダークテーマのない
+ページを WebView が暗くします。暗くなるのはアプリのテーマがダークのとき（例: `DayNight` テーマでシステムがダークモード）に
+限られ、ページ自身が `color-scheme: dark` を指定している場合は変更せず、この機能に対応しない WebView では何も起こりません。
+どちらも既定では無効のため、既存アプリの見た目は変わりません。
 
 ## Android のセキュリティ設定
 

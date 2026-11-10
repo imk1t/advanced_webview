@@ -226,6 +226,18 @@ enum class ContentModeMessage(val raw: Int) {
   }
 }
 
+enum class UserInterfaceStyleMessage(val raw: Int) {
+  UNSPECIFIED(0),
+  LIGHT(1),
+  DARK(2);
+
+  companion object {
+    fun ofRaw(raw: Int): UserInterfaceStyleMessage? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class MixedContentModeMessage(val raw: Int) {
   NEVER_ALLOW(0),
   COMPATIBILITY(1),
@@ -424,6 +436,13 @@ data class WebViewSettingsMessage (
   /** Android: `WebSettings.setGeolocationEnabled`. iOS has no switch. */
   val geolocationEnabled: Boolean,
   /**
+   * Android: `WebSettingsCompat.setAlgorithmicDarkeningAllowed`, when the
+   * installed WebView supports it. iOS has no equivalent.
+   */
+  val algorithmicDarkeningAllowed: Boolean,
+  /** iOS: `UIView.overrideUserInterfaceStyle`. Ignored on Android. */
+  val userInterfaceStyle: UserInterfaceStyleMessage,
+  /**
    * Android: `WebSettings.setMinimumFontSize` (sp). iOS:
    * `WKPreferences.minimumFontSize` (pt). `null` uses the platform default.
    */
@@ -462,10 +481,12 @@ data class WebViewSettingsMessage (
       val contentMode = pigeonVar_list[21] as ContentModeMessage
       val allowsLinkPreview = pigeonVar_list[22] as Boolean
       val geolocationEnabled = pigeonVar_list[23] as Boolean
-      val minimumFontSize = pigeonVar_list[24] as Long?
-      val userAgent = pigeonVar_list[25] as String?
-      val applicationNameForUserAgent = pigeonVar_list[26] as String?
-      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, builtInZoomControls, displayZoomControls, transparentBackground, passkeysEnabled, allowsBackForwardNavigationGestures, inspectable, textZoom, cacheMode, incognito, javaScriptCanOpenWindowsAutomatically, scrollbarsVisible, overScrollEnabled, pullToRefreshEnabled, domStorageEnabled, allowFileAccess, allowContentAccess, mixedContentMode, contentMode, allowsLinkPreview, geolocationEnabled, minimumFontSize, userAgent, applicationNameForUserAgent)
+      val algorithmicDarkeningAllowed = pigeonVar_list[24] as Boolean
+      val userInterfaceStyle = pigeonVar_list[25] as UserInterfaceStyleMessage
+      val minimumFontSize = pigeonVar_list[26] as Long?
+      val userAgent = pigeonVar_list[27] as String?
+      val applicationNameForUserAgent = pigeonVar_list[28] as String?
+      return WebViewSettingsMessage(javaScriptEnabled, mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback, supportZoom, builtInZoomControls, displayZoomControls, transparentBackground, passkeysEnabled, allowsBackForwardNavigationGestures, inspectable, textZoom, cacheMode, incognito, javaScriptCanOpenWindowsAutomatically, scrollbarsVisible, overScrollEnabled, pullToRefreshEnabled, domStorageEnabled, allowFileAccess, allowContentAccess, mixedContentMode, contentMode, allowsLinkPreview, geolocationEnabled, algorithmicDarkeningAllowed, userInterfaceStyle, minimumFontSize, userAgent, applicationNameForUserAgent)
     }
   }
   fun toList(): List<Any?> {
@@ -494,6 +515,8 @@ data class WebViewSettingsMessage (
       contentMode,
       allowsLinkPreview,
       geolocationEnabled,
+      algorithmicDarkeningAllowed,
+      userInterfaceStyle,
       minimumFontSize,
       userAgent,
       applicationNameForUserAgent,
@@ -507,7 +530,7 @@ data class WebViewSettingsMessage (
       return true
     }
     val other = other as WebViewSettingsMessage
-    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.builtInZoomControls, other.builtInZoomControls) && MessagesPigeonUtils.deepEquals(this.displayZoomControls, other.displayZoomControls) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && MessagesPigeonUtils.deepEquals(this.inspectable, other.inspectable) && MessagesPigeonUtils.deepEquals(this.textZoom, other.textZoom) && MessagesPigeonUtils.deepEquals(this.cacheMode, other.cacheMode) && MessagesPigeonUtils.deepEquals(this.incognito, other.incognito) && MessagesPigeonUtils.deepEquals(this.javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonUtils.deepEquals(this.scrollbarsVisible, other.scrollbarsVisible) && MessagesPigeonUtils.deepEquals(this.overScrollEnabled, other.overScrollEnabled) && MessagesPigeonUtils.deepEquals(this.pullToRefreshEnabled, other.pullToRefreshEnabled) && MessagesPigeonUtils.deepEquals(this.domStorageEnabled, other.domStorageEnabled) && MessagesPigeonUtils.deepEquals(this.allowFileAccess, other.allowFileAccess) && MessagesPigeonUtils.deepEquals(this.allowContentAccess, other.allowContentAccess) && MessagesPigeonUtils.deepEquals(this.mixedContentMode, other.mixedContentMode) && MessagesPigeonUtils.deepEquals(this.contentMode, other.contentMode) && MessagesPigeonUtils.deepEquals(this.allowsLinkPreview, other.allowsLinkPreview) && MessagesPigeonUtils.deepEquals(this.geolocationEnabled, other.geolocationEnabled) && MessagesPigeonUtils.deepEquals(this.minimumFontSize, other.minimumFontSize) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent) && MessagesPigeonUtils.deepEquals(this.applicationNameForUserAgent, other.applicationNameForUserAgent)
+    return MessagesPigeonUtils.deepEquals(this.javaScriptEnabled, other.javaScriptEnabled) && MessagesPigeonUtils.deepEquals(this.mediaPlaybackRequiresUserGesture, other.mediaPlaybackRequiresUserGesture) && MessagesPigeonUtils.deepEquals(this.allowsInlineMediaPlayback, other.allowsInlineMediaPlayback) && MessagesPigeonUtils.deepEquals(this.supportZoom, other.supportZoom) && MessagesPigeonUtils.deepEquals(this.builtInZoomControls, other.builtInZoomControls) && MessagesPigeonUtils.deepEquals(this.displayZoomControls, other.displayZoomControls) && MessagesPigeonUtils.deepEquals(this.transparentBackground, other.transparentBackground) && MessagesPigeonUtils.deepEquals(this.passkeysEnabled, other.passkeysEnabled) && MessagesPigeonUtils.deepEquals(this.allowsBackForwardNavigationGestures, other.allowsBackForwardNavigationGestures) && MessagesPigeonUtils.deepEquals(this.inspectable, other.inspectable) && MessagesPigeonUtils.deepEquals(this.textZoom, other.textZoom) && MessagesPigeonUtils.deepEquals(this.cacheMode, other.cacheMode) && MessagesPigeonUtils.deepEquals(this.incognito, other.incognito) && MessagesPigeonUtils.deepEquals(this.javaScriptCanOpenWindowsAutomatically, other.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonUtils.deepEquals(this.scrollbarsVisible, other.scrollbarsVisible) && MessagesPigeonUtils.deepEquals(this.overScrollEnabled, other.overScrollEnabled) && MessagesPigeonUtils.deepEquals(this.pullToRefreshEnabled, other.pullToRefreshEnabled) && MessagesPigeonUtils.deepEquals(this.domStorageEnabled, other.domStorageEnabled) && MessagesPigeonUtils.deepEquals(this.allowFileAccess, other.allowFileAccess) && MessagesPigeonUtils.deepEquals(this.allowContentAccess, other.allowContentAccess) && MessagesPigeonUtils.deepEquals(this.mixedContentMode, other.mixedContentMode) && MessagesPigeonUtils.deepEquals(this.contentMode, other.contentMode) && MessagesPigeonUtils.deepEquals(this.allowsLinkPreview, other.allowsLinkPreview) && MessagesPigeonUtils.deepEquals(this.geolocationEnabled, other.geolocationEnabled) && MessagesPigeonUtils.deepEquals(this.algorithmicDarkeningAllowed, other.algorithmicDarkeningAllowed) && MessagesPigeonUtils.deepEquals(this.userInterfaceStyle, other.userInterfaceStyle) && MessagesPigeonUtils.deepEquals(this.minimumFontSize, other.minimumFontSize) && MessagesPigeonUtils.deepEquals(this.userAgent, other.userAgent) && MessagesPigeonUtils.deepEquals(this.applicationNameForUserAgent, other.applicationNameForUserAgent)
   }
 
   override fun hashCode(): Int {
@@ -536,13 +559,15 @@ data class WebViewSettingsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.contentMode)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.allowsLinkPreview)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.geolocationEnabled)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.algorithmicDarkeningAllowed)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.userInterfaceStyle)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.minimumFontSize)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userAgent)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.applicationNameForUserAgent)
     return result
   }
   override fun toString(): String {
-    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, builtInZoomControls=$builtInZoomControls, displayZoomControls=$displayZoomControls, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, allowsBackForwardNavigationGestures=$allowsBackForwardNavigationGestures, inspectable=$inspectable, textZoom=$textZoom, cacheMode=$cacheMode, incognito=$incognito, javaScriptCanOpenWindowsAutomatically=$javaScriptCanOpenWindowsAutomatically, scrollbarsVisible=$scrollbarsVisible, overScrollEnabled=$overScrollEnabled, pullToRefreshEnabled=$pullToRefreshEnabled, domStorageEnabled=$domStorageEnabled, allowFileAccess=$allowFileAccess, allowContentAccess=$allowContentAccess, mixedContentMode=$mixedContentMode, contentMode=$contentMode, allowsLinkPreview=$allowsLinkPreview, geolocationEnabled=$geolocationEnabled, minimumFontSize=$minimumFontSize, userAgent=$userAgent, applicationNameForUserAgent=$applicationNameForUserAgent)"
+    return "WebViewSettingsMessage(javaScriptEnabled=$javaScriptEnabled, mediaPlaybackRequiresUserGesture=$mediaPlaybackRequiresUserGesture, allowsInlineMediaPlayback=$allowsInlineMediaPlayback, supportZoom=$supportZoom, builtInZoomControls=$builtInZoomControls, displayZoomControls=$displayZoomControls, transparentBackground=$transparentBackground, passkeysEnabled=$passkeysEnabled, allowsBackForwardNavigationGestures=$allowsBackForwardNavigationGestures, inspectable=$inspectable, textZoom=$textZoom, cacheMode=$cacheMode, incognito=$incognito, javaScriptCanOpenWindowsAutomatically=$javaScriptCanOpenWindowsAutomatically, scrollbarsVisible=$scrollbarsVisible, overScrollEnabled=$overScrollEnabled, pullToRefreshEnabled=$pullToRefreshEnabled, domStorageEnabled=$domStorageEnabled, allowFileAccess=$allowFileAccess, allowContentAccess=$allowContentAccess, mixedContentMode=$mixedContentMode, contentMode=$contentMode, allowsLinkPreview=$allowsLinkPreview, geolocationEnabled=$geolocationEnabled, algorithmicDarkeningAllowed=$algorithmicDarkeningAllowed, userInterfaceStyle=$userInterfaceStyle, minimumFontSize=$minimumFontSize, userAgent=$userAgent, applicationNameForUserAgent=$applicationNameForUserAgent)"
   }
 }
 
@@ -1739,170 +1764,175 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       131.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          MixedContentModeMessage.ofRaw(it.toInt())
+          UserInterfaceStyleMessage.ofRaw(it.toInt())
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          ConsoleMessageLevelMessage.ofRaw(it.toInt())
+          MixedContentModeMessage.ofRaw(it.toInt())
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          UserScriptInjectionTimeMessage.ofRaw(it.toInt())
+          ConsoleMessageLevelMessage.ofRaw(it.toInt())
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          NavigationDecisionMessage.ofRaw(it.toInt())
+          UserScriptInjectionTimeMessage.ofRaw(it.toInt())
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          SslErrorDecisionMessage.ofRaw(it.toInt())
+          NavigationDecisionMessage.ofRaw(it.toInt())
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          ClientCertActionMessage.ofRaw(it.toInt())
+          SslErrorDecisionMessage.ofRaw(it.toInt())
         }
       }
       137.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PermissionResourceMessage.ofRaw(it.toInt())
+          ClientCertActionMessage.ofRaw(it.toInt())
         }
       }
       138.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PermissionDecisionMessage.ofRaw(it.toInt())
+          PermissionResourceMessage.ofRaw(it.toInt())
         }
       }
       139.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          JsDialogTypeMessage.ofRaw(it.toInt())
+          PermissionDecisionMessage.ofRaw(it.toInt())
         }
       }
       140.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          WebsiteDataTypeMessage.ofRaw(it.toInt())
+          JsDialogTypeMessage.ofRaw(it.toInt())
         }
       }
       141.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          HttpMethodMessage.ofRaw(it.toInt())
+          WebsiteDataTypeMessage.ofRaw(it.toInt())
         }
       }
       142.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          WebViewSettingsMessage.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          HttpMethodMessage.ofRaw(it.toInt())
         }
       }
       143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ConsoleMessageMessage.fromList(it)
+          WebViewSettingsMessage.fromList(it)
         }
       }
       144.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UserScriptMessage.fromList(it)
+          ConsoleMessageMessage.fromList(it)
         }
       }
       145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CreationParamsMessage.fromList(it)
+          UserScriptMessage.fromList(it)
         }
       }
       146.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          NavigationRequestMessage.fromList(it)
+          CreationParamsMessage.fromList(it)
         }
       }
       147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpErrorMessage.fromList(it)
+          NavigationRequestMessage.fromList(it)
         }
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          RenderProcessGoneMessage.fromList(it)
+          HttpErrorMessage.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          WebResourceErrorMessage.fromList(it)
+          RenderProcessGoneMessage.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SslErrorMessage.fromList(it)
+          WebResourceErrorMessage.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthRequestMessage.fromList(it)
+          SslErrorMessage.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ClientCertRequestMessage.fromList(it)
+          HttpAuthRequestMessage.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ClientCertResponseMessage.fromList(it)
+          ClientCertRequestMessage.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthCredentialsMessage.fromList(it)
+          ClientCertResponseMessage.fromList(it)
         }
       }
       155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DownloadRequestMessage.fromList(it)
+          HttpAuthCredentialsMessage.fromList(it)
         }
       }
       156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PermissionRequestMessage.fromList(it)
+          DownloadRequestMessage.fromList(it)
         }
       }
       157.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogRequestMessage.fromList(it)
+          PermissionRequestMessage.fromList(it)
         }
       }
       158.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogResultMessage.fromList(it)
+          JsDialogRequestMessage.fromList(it)
         }
       }
       159.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InterceptRequestMessage.fromList(it)
+          JsDialogResultMessage.fromList(it)
         }
       }
       160.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InterceptResponseMessage.fromList(it)
+          InterceptRequestMessage.fromList(it)
         }
       }
       161.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          FindResultMessage.fromList(it)
+          InterceptResponseMessage.fromList(it)
         }
       }
       162.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ScrollPositionMessage.fromList(it)
+          FindResultMessage.fromList(it)
         }
       }
       163.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CookieMessage.fromList(it)
+          ScrollPositionMessage.fromList(it)
         }
       }
       164.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CookieMessage.fromList(it)
+        }
+      }
+      165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           InAppBrowserParamsMessage.fromList(it)
         }
@@ -1920,140 +1950,144 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(130)
         writeValue(stream, value.raw.toLong())
       }
-      is MixedContentModeMessage -> {
+      is UserInterfaceStyleMessage -> {
         stream.write(131)
         writeValue(stream, value.raw.toLong())
       }
-      is ConsoleMessageLevelMessage -> {
+      is MixedContentModeMessage -> {
         stream.write(132)
         writeValue(stream, value.raw.toLong())
       }
-      is UserScriptInjectionTimeMessage -> {
+      is ConsoleMessageLevelMessage -> {
         stream.write(133)
         writeValue(stream, value.raw.toLong())
       }
-      is NavigationDecisionMessage -> {
+      is UserScriptInjectionTimeMessage -> {
         stream.write(134)
         writeValue(stream, value.raw.toLong())
       }
-      is SslErrorDecisionMessage -> {
+      is NavigationDecisionMessage -> {
         stream.write(135)
         writeValue(stream, value.raw.toLong())
       }
-      is ClientCertActionMessage -> {
+      is SslErrorDecisionMessage -> {
         stream.write(136)
         writeValue(stream, value.raw.toLong())
       }
-      is PermissionResourceMessage -> {
+      is ClientCertActionMessage -> {
         stream.write(137)
         writeValue(stream, value.raw.toLong())
       }
-      is PermissionDecisionMessage -> {
+      is PermissionResourceMessage -> {
         stream.write(138)
         writeValue(stream, value.raw.toLong())
       }
-      is JsDialogTypeMessage -> {
+      is PermissionDecisionMessage -> {
         stream.write(139)
         writeValue(stream, value.raw.toLong())
       }
-      is WebsiteDataTypeMessage -> {
+      is JsDialogTypeMessage -> {
         stream.write(140)
         writeValue(stream, value.raw.toLong())
       }
-      is HttpMethodMessage -> {
+      is WebsiteDataTypeMessage -> {
         stream.write(141)
         writeValue(stream, value.raw.toLong())
       }
-      is WebViewSettingsMessage -> {
+      is HttpMethodMessage -> {
         stream.write(142)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is ConsoleMessageMessage -> {
+      is WebViewSettingsMessage -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
-      is UserScriptMessage -> {
+      is ConsoleMessageMessage -> {
         stream.write(144)
         writeValue(stream, value.toList())
       }
-      is CreationParamsMessage -> {
+      is UserScriptMessage -> {
         stream.write(145)
         writeValue(stream, value.toList())
       }
-      is NavigationRequestMessage -> {
+      is CreationParamsMessage -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
-      is HttpErrorMessage -> {
+      is NavigationRequestMessage -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is RenderProcessGoneMessage -> {
+      is HttpErrorMessage -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is WebResourceErrorMessage -> {
+      is RenderProcessGoneMessage -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is SslErrorMessage -> {
+      is WebResourceErrorMessage -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is HttpAuthRequestMessage -> {
+      is SslErrorMessage -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is ClientCertRequestMessage -> {
+      is HttpAuthRequestMessage -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is ClientCertResponseMessage -> {
+      is ClientCertRequestMessage -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is HttpAuthCredentialsMessage -> {
+      is ClientCertResponseMessage -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is DownloadRequestMessage -> {
+      is HttpAuthCredentialsMessage -> {
         stream.write(155)
         writeValue(stream, value.toList())
       }
-      is PermissionRequestMessage -> {
+      is DownloadRequestMessage -> {
         stream.write(156)
         writeValue(stream, value.toList())
       }
-      is JsDialogRequestMessage -> {
+      is PermissionRequestMessage -> {
         stream.write(157)
         writeValue(stream, value.toList())
       }
-      is JsDialogResultMessage -> {
+      is JsDialogRequestMessage -> {
         stream.write(158)
         writeValue(stream, value.toList())
       }
-      is InterceptRequestMessage -> {
+      is JsDialogResultMessage -> {
         stream.write(159)
         writeValue(stream, value.toList())
       }
-      is InterceptResponseMessage -> {
+      is InterceptRequestMessage -> {
         stream.write(160)
         writeValue(stream, value.toList())
       }
-      is FindResultMessage -> {
+      is InterceptResponseMessage -> {
         stream.write(161)
         writeValue(stream, value.toList())
       }
-      is ScrollPositionMessage -> {
+      is FindResultMessage -> {
         stream.write(162)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is ScrollPositionMessage -> {
         stream.write(163)
         writeValue(stream, value.toList())
       }
-      is InAppBrowserParamsMessage -> {
+      is CookieMessage -> {
         stream.write(164)
+        writeValue(stream, value.toList())
+      }
+      is InAppBrowserParamsMessage -> {
+        stream.write(165)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

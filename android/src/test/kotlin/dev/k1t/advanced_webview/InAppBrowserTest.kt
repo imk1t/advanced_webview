@@ -248,6 +248,8 @@ class InAppBrowserTest {
             contentMode = ContentModeMessage.RECOMMENDED,
             allowsLinkPreview = true,
             geolocationEnabled = true,
+            algorithmicDarkeningAllowed = false,
+            userInterfaceStyle = UserInterfaceStyleMessage.UNSPECIFIED,
         ),
         javaScriptChannelNames = emptyList(),
         javaScriptHandlerNames = emptyList(),

@@ -53,6 +53,7 @@ Passed as `WebViewSettings.android`. iOS ignores all of them.
 | `allowContentAccess` | `false` | Yes | Ignored |
 | `mixedContentMode` | `neverAllow` | Yes | Ignored (WebKit blocks it) |
 | `geolocationEnabled` | `true` | Yes | Ignored (system decides) |
+| `algorithmicDarkeningAllowed` | `false` | Yes (needs a dark app theme) | Ignored (see `userInterfaceStyle`) |
 
 ## iOS-only settings
 
@@ -66,9 +67,19 @@ Passed as `WebViewSettings.ios`. Android ignores all of them.
 | `applicationNameForUserAgent` | `null` | Ignored | Creation only |
 | `contentMode` | `recommended` | Ignored | Yes |
 | `allowsLinkPreview` | `true` | Ignored | Yes |
+| `userInterfaceStyle` | `unspecified` | Ignored | Yes (`light` / `dark` sets `prefers-color-scheme`) |
 
 "Creation only" settings are applied when the native view is created and ignored by
 `updateSettings` on that platform.
+
+## Dark mode
+
+Pages follow `prefers-color-scheme`. On iOS, `IOSWebViewSettings.userInterfaceStyle` (`light` / `dark`) fixes the
+appearance of that WebView, so pages that support a dark theme switch to it regardless of the system setting; the
+default `unspecified` follows the app. On Android, `AndroidWebViewSettings.algorithmicDarkeningAllowed` lets the
+WebView darken pages that have no dark theme. It only darkens while the app theme is dark (for example a `DayNight`
+theme with the system in dark mode), pages that set `color-scheme: dark` themselves are left alone, and it has no
+effect on a WebView that does not support the feature. Both are off by default, so existing apps look the same.
 
 ## Android security settings
 

@@ -2040,6 +2040,70 @@
       }
     },
     {
+      "dart": "AndroidWebViewSettings.algorithmicDarkeningAllowed",
+      "group": "settings",
+      "summary": {
+        "en": "Lets the WebView darken pages without a dark theme while the app theme is dark (Android, off by default).",
+        "ja": "アプリのテーマがダークの間、ダークテーマに対応していないページを暗くできるようにします（Android、既定は無効）。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebSettingsCompat.setAlgorithmicDarkeningAllowed(WebSettings, boolean)"],
+        "note": {
+          "en": "Needs a WebView that supports ALGORITHMIC_DARKENING; otherwise the setting has no effect.",
+          "ja": "ALGORITHMIC_DARKENING に対応した WebView が必要です。非対応の場合は何も起こりません。"
+        }
+      },
+      "ios": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "iOS has no equivalent; use IOSWebViewSettings.userInterfaceStyle to change prefers-color-scheme.",
+          "ja": "iOS には該当する設定がありません。prefers-color-scheme を変えるには IOSWebViewSettings.userInterfaceStyle を使います。"
+        }
+      }
+    },
+    {
+      "dart": "IOSWebViewSettings.userInterfaceStyle",
+      "group": "settings",
+      "summary": {
+        "en": "Forces the light or dark appearance, which decides prefers-color-scheme for pages (iOS).",
+        "ja": "ライト／ダークの外観を固定し、ページの prefers-color-scheme を決めます（iOS）。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Android has no equivalent; see AndroidWebViewSettings.algorithmicDarkeningAllowed.",
+          "ja": "Android には該当する設定がありません。AndroidWebViewSettings.algorithmicDarkeningAllowed を参照してください。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIView.overrideUserInterfaceStyle"]
+      }
+    },
+    {
+      "dart": "WebViewUserInterfaceStyle",
+      "group": "settings",
+      "summary": {
+        "en": "The values accepted by IOSWebViewSettings.userInterfaceStyle.",
+        "ja": "IOSWebViewSettings.userInterfaceStyle に指定できる値です。"
+      },
+      "android": {
+        "status": "unsupported",
+        "apis": [],
+        "note": {
+          "en": "Not applicable on Android.",
+          "ja": "Android には該当しません。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["UIView.overrideUserInterfaceStyle"]
+      }
+    },
+    {
       "dart": "IOSWebViewSettings.incognito",
       "group": "settings",
       "summary": {
