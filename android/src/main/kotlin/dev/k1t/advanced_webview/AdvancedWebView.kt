@@ -509,7 +509,7 @@ class AdvancedWebView(
         val paths = listOf("/") + segments.indices.map { "/" + segments.take(it + 1).joinToString("/") }
         // The host itself, then each parent domain that still has two labels (never a bare top-level domain).
         val labels = host.split('.')
-        val domains = if (labels.size > 1) (0..labels.size - 2).map { labels.drop(it).joinToString(".") } else emptyList()
+        val domains = (0 until labels.size - 1).map { labels.drop(it).joinToString(".") }
         val manager = CookieManager.getInstance()
         for (name in names) {
             for (path in paths) {
