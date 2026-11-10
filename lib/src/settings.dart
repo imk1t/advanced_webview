@@ -16,6 +16,19 @@ enum WebViewMixedContentMode {
   alwaysAllow,
 }
 
+/// Which appearance an iOS WebView uses, and so whether pages see
+/// `prefers-color-scheme: dark`.
+enum WebViewUserInterfaceStyle {
+  /// Follows the app (the system setting unless the app overrides it).
+  unspecified,
+
+  /// Always light.
+  light,
+
+  /// Always dark.
+  dark,
+}
+
 /// Which version of a site the WebView asks for (iOS only).
 enum WebViewContentMode {
   /// Lets WebKit choose for the device: mobile sites on iPhone, desktop sites
@@ -60,6 +73,7 @@ class AndroidWebViewSettings {
     this.allowContentAccess = false,
     this.mixedContentMode = WebViewMixedContentMode.neverAllow,
     this.geolocationEnabled = true,
+    this.algorithmicDarkeningAllowed = false,
   });
 
   /// Lets the user pinch to zoom (`WebSettings.setSupportZoom`).
@@ -115,6 +129,16 @@ class AndroidWebViewSettings {
   /// so there is no setting.
   final bool geolocationEnabled;
 
+  /// Lets the WebView darken pages that do not support a dark theme
+  /// (`WebSettingsCompat.setAlgorithmicDarkeningAllowed`). Off by default.
+  ///
+  /// It only darkens while the app theme is dark (for example `Theme.Material3.DayNight`
+  /// with the system in dark mode); pages that declare `color-scheme: dark`
+  /// themselves are left alone. It has no effect when the installed WebView
+  /// does not support the feature. iOS has no equivalent; see
+  /// [IOSWebViewSettings.userInterfaceStyle] for `prefers-color-scheme`.
+  final bool algorithmicDarkeningAllowed;
+
   AndroidWebViewSettings copyWith({
     bool? supportZoom,
     bool? builtInZoomControls,
@@ -125,6 +149,7 @@ class AndroidWebViewSettings {
     bool? allowContentAccess,
     WebViewMixedContentMode? mixedContentMode,
     bool? geolocationEnabled,
+    bool? algorithmicDarkeningAllowed,
   }) {
     return AndroidWebViewSettings(
       supportZoom: supportZoom ?? this.supportZoom,
@@ -136,6 +161,8 @@ class AndroidWebViewSettings {
       allowContentAccess: allowContentAccess ?? this.allowContentAccess,
       mixedContentMode: mixedContentMode ?? this.mixedContentMode,
       geolocationEnabled: geolocationEnabled ?? this.geolocationEnabled,
+      algorithmicDarkeningAllowed:
+          algorithmicDarkeningAllowed ?? this.algorithmicDarkeningAllowed,
     );
   }
 
@@ -150,7 +177,8 @@ class AndroidWebViewSettings {
       other.allowFileAccess == allowFileAccess &&
       other.allowContentAccess == allowContentAccess &&
       other.mixedContentMode == mixedContentMode &&
-      other.geolocationEnabled == geolocationEnabled;
+      other.geolocationEnabled == geolocationEnabled &&
+      other.algorithmicDarkeningAllowed == algorithmicDarkeningAllowed;
 
   @override
   int get hashCode => Object.hash(
@@ -163,6 +191,7 @@ class AndroidWebViewSettings {
     allowContentAccess,
     mixedContentMode,
     geolocationEnabled,
+    algorithmicDarkeningAllowed,
   );
 }
 
@@ -180,6 +209,7 @@ class IOSWebViewSettings {
     this.applicationNameForUserAgent,
     this.contentMode = WebViewContentMode.recommended,
     this.allowsLinkPreview = true,
+    this.userInterfaceStyle = WebViewUserInterfaceStyle.unspecified,
   });
 
   /// Plays videos inline instead of full screen
@@ -218,6 +248,13 @@ class IOSWebViewSettings {
   /// (`WKWebView.allowsLinkPreview`). Android has no equivalent.
   final bool allowsLinkPreview;
 
+  /// Forces the light or dark appearance for this WebView
+  /// (`UIView.overrideUserInterfaceStyle`), which decides whether pages match
+  /// `prefers-color-scheme: dark`. [WebViewUserInterfaceStyle.unspecified]
+  /// follows the app. Android has no equivalent; see
+  /// [AndroidWebViewSettings.algorithmicDarkeningAllowed].
+  final WebViewUserInterfaceStyle userInterfaceStyle;
+
   IOSWebViewSettings copyWith({
     bool? allowsInlineMediaPlayback,
     bool? allowsBackForwardNavigationGestures,
@@ -225,6 +262,7 @@ class IOSWebViewSettings {
     ValueGetter<String?>? applicationNameForUserAgent,
     WebViewContentMode? contentMode,
     bool? allowsLinkPreview,
+    WebViewUserInterfaceStyle? userInterfaceStyle,
   }) {
     return IOSWebViewSettings(
       allowsInlineMediaPlayback:
@@ -238,6 +276,7 @@ class IOSWebViewSettings {
           : this.applicationNameForUserAgent,
       contentMode: contentMode ?? this.contentMode,
       allowsLinkPreview: allowsLinkPreview ?? this.allowsLinkPreview,
+      userInterfaceStyle: userInterfaceStyle ?? this.userInterfaceStyle,
     );
   }
 
@@ -250,7 +289,8 @@ class IOSWebViewSettings {
       other.incognito == incognito &&
       other.applicationNameForUserAgent == applicationNameForUserAgent &&
       other.contentMode == contentMode &&
-      other.allowsLinkPreview == allowsLinkPreview;
+      other.allowsLinkPreview == allowsLinkPreview &&
+      other.userInterfaceStyle == userInterfaceStyle;
 
   @override
   int get hashCode => Object.hash(
@@ -260,6 +300,7 @@ class IOSWebViewSettings {
     applicationNameForUserAgent,
     contentMode,
     allowsLinkPreview,
+    userInterfaceStyle,
   );
 }
 
@@ -421,6 +462,9 @@ class WebViewSettings {
     contentMode: ContentModeMessage.values[ios.contentMode.index],
     allowsLinkPreview: ios.allowsLinkPreview,
     geolocationEnabled: android.geolocationEnabled,
+    algorithmicDarkeningAllowed: android.algorithmicDarkeningAllowed,
+    userInterfaceStyle:
+        UserInterfaceStyleMessage.values[ios.userInterfaceStyle.index],
     minimumFontSize: minimumFontSize,
     userAgent: userAgent,
     applicationNameForUserAgent: ios.applicationNameForUserAgent,

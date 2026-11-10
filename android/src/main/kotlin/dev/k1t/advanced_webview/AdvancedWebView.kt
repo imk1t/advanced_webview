@@ -242,6 +242,10 @@ class AdvancedWebView(
                 MixedContentModeMessage.ALWAYS_ALLOW -> WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             }
             setGeolocationEnabled(settings.geolocationEnabled)
+            // Older WebViews lack the feature; the setting then stays off.
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+                WebSettingsCompat.setAlgorithmicDarkeningAllowed(this, settings.algorithmicDarkeningAllowed)
+            }
             minimumFontSize = settings.minimumFontSize?.toInt() ?: DEFAULT_MINIMUM_FONT_SIZE
             userAgentString = settings.userAgent ?: WebSettings.getDefaultUserAgent(webView.context)
         }

@@ -218,6 +218,24 @@ void main() {
       );
     });
 
+    test('dark mode settings are passed to native', () {
+      final defaults = const WebViewSettings().toMessage();
+      expect(defaults.algorithmicDarkeningAllowed, isFalse);
+      expect(
+        defaults.userInterfaceStyle,
+        UserInterfaceStyleMessage.unspecified,
+      );
+
+      final message = const WebViewSettings(
+        android: AndroidWebViewSettings(algorithmicDarkeningAllowed: true),
+        ios: IOSWebViewSettings(
+          userInterfaceStyle: WebViewUserInterfaceStyle.dark,
+        ),
+      ).toMessage();
+      expect(message.algorithmicDarkeningAllowed, isTrue);
+      expect(message.userInterfaceStyle, UserInterfaceStyleMessage.dark);
+    });
+
     test('geolocationEnabled is passed to native', () {
       expect(const WebViewSettings().toMessage().geolocationEnabled, isTrue);
       expect(
