@@ -520,7 +520,8 @@ final class RunnerTests: XCTestCase {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))
     let store = try registry.get(1).webView.configuration.websiteDataStore.httpCookieStore
-    for (name, domain) in [("a", "delete-me.test"), ("b", "delete-me.test"), ("a", "keep-me.test")] {
+    for (name, domain) in [("a", "delete-me.test"), ("b", "delete-me.test"), ("a", "keep-me.test")]
+    {
       await store.setCookie(
         HTTPCookie(properties: [.name: name, .value: "1", .domain: domain, .path: "/"])!)
     }
