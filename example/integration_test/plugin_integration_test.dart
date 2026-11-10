@@ -553,6 +553,44 @@ void main() {
     expect(await harness.controller.getCookies(_baseUrl), isEmpty);
   });
 
+  testWidgets('deleteCookie and deleteCookies only remove cookies of the URL', (
+    tester,
+  ) async {
+    final harness = _Harness();
+    addTearDown(harness.dispose);
+
+    await harness.show(tester);
+    await harness.controller.clearCookies();
+    for (final (name, domain, path) in const [
+      ('a', 'advanced-webview.test', '/'),
+      ('b', 'advanced-webview.test', '/'),
+      ('c', 'advanced-webview.test', '/sub'),
+      ('a', 'other-site.test', '/'),
+    ]) {
+      await harness.controller.setCookie(
+        WebViewCookie(name: name, value: '1', domain: domain, path: path),
+      );
+    }
+    Future<Set<String>> names(String url) async => {
+      for (final c in await harness.controller.getCookies(url)) c.name,
+    };
+
+    expect(await names('https://advanced-webview.test/sub'), {'a', 'b', 'c'});
+
+    await harness.controller.deleteCookie(
+      'https://advanced-webview.test/',
+      'a',
+    );
+    expect(await names('https://advanced-webview.test/sub'), {'b', 'c'});
+    expect(await names('https://other-site.test/'), {'a'});
+
+    await harness.controller.deleteCookies('https://advanced-webview.test/sub');
+    expect(await names('https://advanced-webview.test/sub'), isEmpty);
+    expect(await names('https://other-site.test/'), {'a'});
+
+    await harness.controller.clearCookies();
+  });
+
   testWidgets('user scripts run at document start and end', (tester) async {
     final harness = _Harness(
       userScripts: const [
