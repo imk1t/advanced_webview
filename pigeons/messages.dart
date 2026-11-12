@@ -536,6 +536,24 @@ class CookieMessage {
   int? expiresMillis;
 }
 
+/// A page to show in the system browser (Chrome Custom Tabs on Android,
+/// `SFSafariViewController` on iOS).
+class SystemBrowserParamsMessage {
+  SystemBrowserParamsMessage({
+    required this.sessionId,
+    required this.url,
+    this.toolbarColor,
+  });
+
+  /// Identifies this browser in `onSystemBrowserClosed`.
+  int sessionId;
+  String url;
+
+  /// Toolbar background as ARGB (`Color.toARGB32`); `null` uses the platform
+  /// default.
+  int? toolbarColor;
+}
+
 /// Chrome of the full-screen in-app browser that hosts an existing WebView.
 class InAppBrowserParamsMessage {
   InAppBrowserParamsMessage({
@@ -717,6 +735,15 @@ abstract class AdvancedWebViewHostApi {
   /// Dismisses the in-app browser; a no-op when it is not open. The WebView
   /// itself stays alive.
   void closeInAppBrowser(int webViewId);
+
+  /// Whether a system browser can be opened: always true on iOS, true on
+  /// Android when an app can handle `https` links.
+  bool isSystemBrowserAvailable();
+
+  /// Opens `params.url` in the system browser. Fails with `not-attached` when
+  /// there is no screen to present from and with `unavailable` when no browser
+  /// can handle it.
+  void openSystemBrowser(SystemBrowserParamsMessage params);
 }
 
 // ---------------------------------------------------------------------------
@@ -845,4 +872,8 @@ abstract class AdvancedWebViewFlutterApi {
 
   /// The in-app browser was dismissed, by the user or by `closeInAppBrowser`.
   void onInAppBrowserClosed(int webViewId);
+
+  /// The system browser `sessionId` was dismissed, or (Android, best effort)
+  /// the user came back to the app.
+  void onSystemBrowserClosed(int sessionId);
 }

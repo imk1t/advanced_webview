@@ -51,15 +51,32 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
 
   final BinaryMessenger? binaryMessenger;
   final Map<int, WebViewEventListener> _listeners = {};
+  final Map<int, void Function()> _systemBrowsers = {};
   bool _isSetUp = false;
 
+  void _ensureSetUp() {
+    if (_isSetUp) return;
+    AdvancedWebViewFlutterApi.setUp(this, binaryMessenger: binaryMessenger);
+    _isSetUp = true;
+  }
+
   void register(int webViewId, WebViewEventListener listener) {
-    if (!_isSetUp) {
-      AdvancedWebViewFlutterApi.setUp(this, binaryMessenger: binaryMessenger);
-      _isSetUp = true;
-    }
+    _ensureSetUp();
     _listeners[webViewId] = listener;
   }
+
+  /// Calls [onClosed] once when system browser [sessionId] is dismissed.
+  void registerSystemBrowser(int sessionId, void Function() onClosed) {
+    _ensureSetUp();
+    _systemBrowsers[sessionId] = onClosed;
+  }
+
+  void unregisterSystemBrowser(int sessionId) =>
+      _systemBrowsers.remove(sessionId);
+
+  @override
+  void onSystemBrowserClosed(int sessionId) =>
+      _systemBrowsers.remove(sessionId)?.call();
 
   void unregister(int webViewId) => _listeners.remove(webViewId);
 

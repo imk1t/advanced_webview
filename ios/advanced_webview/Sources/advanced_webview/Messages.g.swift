@@ -1594,6 +1594,57 @@ struct CookieMessage: Hashable, CustomStringConvertible {
   }
 }
 
+/// A page to show in the system browser (Chrome Custom Tabs on Android,
+/// `SFSafariViewController` on iOS).
+///
+/// Generated class from Pigeon that represents data sent in messages.
+struct SystemBrowserParamsMessage: Hashable, CustomStringConvertible {
+  /// Identifies this browser in `onSystemBrowserClosed`.
+  var sessionId: Int64
+  var url: String
+  /// Toolbar background as ARGB (`Color.toARGB32`); `null` uses the platform
+  /// default.
+  var toolbarColor: Int64? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> SystemBrowserParamsMessage? {
+    let sessionId = pigeonVar_list[0] as! Int64
+    let url = pigeonVar_list[1] as! String
+    let toolbarColor: Int64? = nilOrValue(pigeonVar_list[2])
+
+    return SystemBrowserParamsMessage(
+      sessionId: sessionId,
+      url: url,
+      toolbarColor: toolbarColor
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      sessionId,
+      url,
+      toolbarColor,
+    ]
+  }
+  static func == (lhs: SystemBrowserParamsMessage, rhs: SystemBrowserParamsMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.sessionId, rhs.sessionId) && MessagesPigeonInternal.deepEquals(lhs.url, rhs.url) && MessagesPigeonInternal.deepEquals(lhs.toolbarColor, rhs.toolbarColor)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("SystemBrowserParamsMessage")
+    MessagesPigeonInternal.deepHash(value: sessionId, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: url, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: toolbarColor, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "SystemBrowserParamsMessage(sessionId: \(String(describing: sessionId)), url: \(String(describing: url)), toolbarColor: \(String(describing: toolbarColor)))"
+  }
+}
+
 /// Chrome of the full-screen in-app browser that hosts an existing WebView.
 ///
 /// Generated class from Pigeon that represents data sent in messages.
@@ -1795,6 +1846,8 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 164:
       return CookieMessage.fromList(self.readValue() as! [Any?])
     case 165:
+      return SystemBrowserParamsMessage.fromList(self.readValue() as! [Any?])
+    case 166:
       return InAppBrowserParamsMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1912,8 +1965,11 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? CookieMessage {
       super.writeByte(164)
       super.writeValue(value.toList())
-    } else if let value = value as? InAppBrowserParamsMessage {
+    } else if let value = value as? SystemBrowserParamsMessage {
       super.writeByte(165)
+      super.writeValue(value.toList())
+    } else if let value = value as? InAppBrowserParamsMessage {
+      super.writeByte(166)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -2023,6 +2079,13 @@ protocol AdvancedWebViewHostApi {
   /// Dismisses the in-app browser; a no-op when it is not open. The WebView
   /// itself stays alive.
   func closeInAppBrowser(webViewId: Int64) throws
+  /// Whether a system browser can be opened: always true on iOS, true on
+  /// Android when an app can handle `https` links.
+  func isSystemBrowserAvailable() throws -> Bool
+  /// Opens `params.url` in the system browser. Fails with `not-attached` when
+  /// there is no screen to present from and with `unavailable` when no browser
+  /// can handle it.
+  func openSystemBrowser(params: SystemBrowserParamsMessage) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -2785,6 +2848,39 @@ class AdvancedWebViewHostApiSetup {
     } else {
       closeInAppBrowserChannel.setMessageHandler(nil)
     }
+    /// Whether a system browser can be opened: always true on iOS, true on
+    /// Android when an app can handle `https` links.
+    let isSystemBrowserAvailableChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.isSystemBrowserAvailable\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isSystemBrowserAvailableChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isSystemBrowserAvailable()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isSystemBrowserAvailableChannel.setMessageHandler(nil)
+    }
+    /// Opens `params.url` in the system browser. Fails with `not-attached` when
+    /// there is no screen to present from and with `unavailable` when no browser
+    /// can handle it.
+    let openSystemBrowserChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.openSystemBrowser\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      openSystemBrowserChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let paramsArg = args[0] as! SystemBrowserParamsMessage
+        do {
+          try api.openSystemBrowser(params: paramsArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      openSystemBrowserChannel.setMessageHandler(nil)
+    }
   }
 }
 
@@ -2850,6 +2946,9 @@ protocol AdvancedWebViewFlutterApiProtocol {
   @MainActor func onNewWindowRequest(webViewId webViewIdArg: Int64, url urlArg: String) async throws
   /// The in-app browser was dismissed, by the user or by `closeInAppBrowser`.
   @MainActor func onInAppBrowserClosed(webViewId webViewIdArg: Int64) async throws
+  /// The system browser `sessionId` was dismissed, or (Android, best effort)
+  /// the user came back to the app.
+  @MainActor func onSystemBrowserClosed(sessionId sessionIdArg: Int64) async throws
 }
 class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -3420,6 +3519,28 @@ class AdvancedWebViewFlutterApi: AdvancedWebViewFlutterApiProtocol {
       let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInAppBrowserClosed\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([webViewIdArg] as [Any?]) { response in
+        guard let listResponse = response as? [Any?] else {
+          continuation.resume(throwing: createConnectionError(withChannelName: channelName))
+          return
+        }
+        if listResponse.count > 1 {
+          let code: String = listResponse[0] as! String
+          let message: String? = nilOrValue(listResponse[1])
+          let details: String? = nilOrValue(listResponse[2])
+          continuation.resume(throwing: PigeonError(code: code, message: message, details: details))
+        } else {
+          continuation.resume()
+        }
+      }
+    }
+  }
+  /// The system browser `sessionId` was dismissed, or (Android, best effort)
+  /// the user came back to the app.
+  @MainActor func onSystemBrowserClosed(sessionId sessionIdArg: Int64) async throws {
+    return try await withCheckedThrowingContinuation { continuation in
+      let channelName: String = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onSystemBrowserClosed\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([sessionIdArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
           continuation.resume(throwing: createConnectionError(withChannelName: channelName))
           return

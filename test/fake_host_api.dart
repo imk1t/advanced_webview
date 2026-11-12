@@ -251,6 +251,21 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     inAppBrowsers[params.webViewId] = params;
   }
 
+  bool systemBrowserAvailable = true;
+  Object? openSystemBrowserError;
+  final List<SystemBrowserParamsMessage> systemBrowsers = [];
+
+  @override
+  Future<bool> isSystemBrowserAvailable() async => systemBrowserAvailable;
+
+  @override
+  Future<void> openSystemBrowser(SystemBrowserParamsMessage params) async {
+    calls.add('openSystemBrowser(${params.url})');
+    final error = openSystemBrowserError;
+    if (error != null) throw error;
+    systemBrowsers.add(params);
+  }
+
   @override
   Future<void> closeInAppBrowser(int webViewId) async {
     calls.add('closeInAppBrowser($webViewId)');

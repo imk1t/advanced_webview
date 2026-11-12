@@ -69,6 +69,9 @@
       "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
+      "CustomTabsIntent": "https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent",
+      "CustomTabColorSchemeParams": "https://developer.android.com/reference/androidx/browser/customtabs/CustomTabColorSchemeParams",
+      "Intent": "https://developer.android.com/reference/android/content/Intent",
       "RenderProcessGoneDetail": "https://developer.android.com/reference/android/webkit/RenderProcessGoneDetail",
       "ClientCertRequest": "https://developer.android.com/reference/android/webkit/ClientCertRequest",
       "KeyStore": "https://developer.android.com/reference/java/security/KeyStore",
@@ -136,6 +139,8 @@
       "JSONSerialization": "https://developer.apple.com/documentation/foundation/jsonserialization",
       "FlutterPlatformView": "https://api.flutter.dev/ios-embedder/protocol_flutter_platform_view-p.html",
       "WKHTTPCookieStore": "https://developer.apple.com/documentation/webkit/wkhttpcookiestore",
+      "SFSafariViewController": "https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller",
+      "SFSafariViewControllerDelegate": "https://developer.apple.com/documentation/safariservices/sfsafariviewcontrollerdelegate",
       "HTTPCookie": "https://developer.apple.com/documentation/foundation/httpcookie",
       "WKUIDelegate": "https://developer.apple.com/documentation/webkit/wkuidelegate",
       "WKPDFConfiguration": "https://developer.apple.com/documentation/webkit/wkpdfconfiguration",
@@ -3224,6 +3229,52 @@
           "en": "Colour is applied through UINavigationBarAppearance; the buttons are in the bottom toolbar.",
           "ja": "色は UINavigationBarAppearance で設定し、ボタンは下部のツールバーに置きます。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedSystemBrowser",
+      "group": "inAppBrowser",
+      "summary": {
+        "en": "Opens a page in the system's own browser UI (Chrome Custom Tabs, SFSafariViewController), with the user's cookies and passkeys, for sign-in flows that should not run in an embedded WebView.",
+        "ja": "システム標準のブラウザ UI（Chrome Custom Tabs、SFSafariViewController）でページを開きます。ユーザーの Cookie やパスキーが使えるため、埋め込み WebView で行うべきでないサインインなどに向いています。"
+      },
+      "android": {
+        "status": "partial",
+        "apis": [
+          "CustomTabsIntent.launchUrl(Context, Uri)",
+          "Intent.resolveActivity(PackageManager)"
+        ],
+        "note": {
+          "en": "Falls back to a plain browser when no Custom Tabs provider is installed. Custom Tabs report nothing when they close, so onClosed fires when the app comes back to the foreground (best effort).",
+          "ja": "Custom Tabs に対応したブラウザがない場合は通常のブラウザで開きます。Custom Tabs は閉じたことを通知しないため、onClosed はアプリがフォアグラウンドに戻ったときに呼ばれます（ベストエフォート）。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "SFSafariViewController",
+          "SFSafariViewControllerDelegate.safariViewControllerDidFinish(_:)"
+        ],
+        "note": {
+          "en": "Presented modally from the top view controller of the foreground scene. Always available.",
+          "ja": "フォアグラウンドのシーンの最前面の view controller からモーダルで表示します。常に利用できます。"
+        }
+      }
+    },
+    {
+      "dart": "SystemBrowserOptions",
+      "group": "inAppBrowser",
+      "summary": {
+        "en": "The toolbar colour of the system browser.",
+        "ja": "システムブラウザのツールバーの色です。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["CustomTabColorSchemeParams"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["SFSafariViewController.preferredBarTintColor"]
       }
     }
   ]

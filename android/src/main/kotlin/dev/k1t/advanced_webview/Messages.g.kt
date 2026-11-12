@@ -1693,6 +1693,61 @@ data class CookieMessage (
 }
 
 /**
+ * A page to show in the system browser (Chrome Custom Tabs on Android,
+ * `SFSafariViewController` on iOS).
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class SystemBrowserParamsMessage (
+  /** Identifies this browser in `onSystemBrowserClosed`. */
+  val sessionId: Long,
+  val url: String,
+  /**
+   * Toolbar background as ARGB (`Color.toARGB32`); `null` uses the platform
+   * default.
+   */
+  val toolbarColor: Long? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): SystemBrowserParamsMessage {
+      val sessionId = pigeonVar_list[0] as Long
+      val url = pigeonVar_list[1] as String
+      val toolbarColor = pigeonVar_list[2] as Long?
+      return SystemBrowserParamsMessage(sessionId, url, toolbarColor)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      sessionId,
+      url,
+      toolbarColor,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as SystemBrowserParamsMessage
+    return MessagesPigeonUtils.deepEquals(this.sessionId, other.sessionId) && MessagesPigeonUtils.deepEquals(this.url, other.url) && MessagesPigeonUtils.deepEquals(this.toolbarColor, other.toolbarColor)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.sessionId)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.url)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.toolbarColor)
+    return result
+  }
+  override fun toString(): String {
+    return "SystemBrowserParamsMessage(sessionId=$sessionId, url=$url, toolbarColor=$toolbarColor)"
+  }
+}
+
+/**
  * Chrome of the full-screen in-app browser that hosts an existing WebView.
  *
  * Generated class from Pigeon that represents data sent in messages.
@@ -1950,6 +2005,11 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
+          SystemBrowserParamsMessage.fromList(it)
+        }
+      }
+      166.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
           InAppBrowserParamsMessage.fromList(it)
         }
       }
@@ -2102,8 +2162,12 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(164)
         writeValue(stream, value.toList())
       }
-      is InAppBrowserParamsMessage -> {
+      is SystemBrowserParamsMessage -> {
         stream.write(165)
+        writeValue(stream, value.toList())
+      }
+      is InAppBrowserParamsMessage -> {
+        stream.write(166)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -2221,6 +2285,17 @@ interface AdvancedWebViewHostApi {
    * itself stays alive.
    */
   fun closeInAppBrowser(webViewId: Long)
+  /**
+   * Whether a system browser can be opened: always true on iOS, true on
+   * Android when an app can handle `https` links.
+   */
+  fun isSystemBrowserAvailable(): Boolean
+  /**
+   * Opens `params.url` in the system browser. Fails with `not-attached` when
+   * there is no screen to present from and with `unavailable` when no browser
+   * can handle it.
+   */
+  fun openSystemBrowser(params: SystemBrowserParamsMessage)
 
   companion object {
     /** The codec used by AdvancedWebViewHostApi. */
@@ -3063,6 +3138,39 @@ interface AdvancedWebViewHostApi {
           channel.setMessageHandler(null)
         }
       }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.isSystemBrowserAvailable$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.isSystemBrowserAvailable())
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.openSystemBrowser$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val paramsArg = args[0] as SystemBrowserParamsMessage
+            val wrapped: List<Any?> = try {
+              api.openSystemBrowser(paramsArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
     }
   }
 }
@@ -3630,6 +3738,29 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
       val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onInAppBrowserClosed$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else {
+            continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /**
+   * The system browser `sessionId` was dismissed, or (Android, best effort)
+   * the user came back to the app.
+   */
+  suspend fun onSystemBrowserClosed(sessionIdArg: Long)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onSystemBrowserClosed$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(sessionIdArg)) {
         if (it is List<*>) {
           if (it.size > 1) {
             continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
