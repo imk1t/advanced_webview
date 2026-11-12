@@ -133,6 +133,11 @@ class WebViewHostApiImpl(
     override suspend fun getCookies(webViewId: Long, url: String): List<CookieMessage> =
         registry.get(webViewId).getCookies(url)
 
+    override suspend fun deleteCookie(webViewId: Long, url: String, name: String) =
+        registry.get(webViewId).deleteCookie(url, name)
+
+    override suspend fun deleteCookies(webViewId: Long, url: String) = registry.get(webViewId).deleteCookies(url)
+
     override suspend fun clearCookies(webViewId: Long) = registry.get(webViewId).clearCookies()
 
     override suspend fun clearWebsiteData(webViewId: Long, types: List<WebsiteDataTypeMessage>) =

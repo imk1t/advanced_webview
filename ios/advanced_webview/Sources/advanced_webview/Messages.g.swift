@@ -327,6 +327,12 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   /// Android: `WebSettingsCompat.setAlgorithmicDarkeningAllowed`, when the
   /// installed WebView supports it. iOS has no equivalent.
   var algorithmicDarkeningAllowed: Bool
+  /// Android: `CookieManager.setAcceptThirdPartyCookies` for this WebView. iOS
+  /// has no equivalent.
+  var thirdPartyCookiesEnabled: Bool
+  /// Android: `WebSettings.setSafeBrowsingEnabled` (API 26+). iOS has no
+  /// switch.
+  var safeBrowsingEnabled: Bool
   /// iOS: `UIView.overrideUserInterfaceStyle`. Ignored on Android.
   var userInterfaceStyle: UserInterfaceStyleMessage
   /// Android: `WebSettings.setMinimumFontSize` (sp). iOS:
@@ -365,10 +371,12 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     let allowsLinkPreview = pigeonVar_list[22] as! Bool
     let geolocationEnabled = pigeonVar_list[23] as! Bool
     let algorithmicDarkeningAllowed = pigeonVar_list[24] as! Bool
-    let userInterfaceStyle = pigeonVar_list[25] as! UserInterfaceStyleMessage
-    let minimumFontSize: Int64? = nilOrValue(pigeonVar_list[26])
-    let userAgent: String? = nilOrValue(pigeonVar_list[27])
-    let applicationNameForUserAgent: String? = nilOrValue(pigeonVar_list[28])
+    let thirdPartyCookiesEnabled = pigeonVar_list[25] as! Bool
+    let safeBrowsingEnabled = pigeonVar_list[26] as! Bool
+    let userInterfaceStyle = pigeonVar_list[27] as! UserInterfaceStyleMessage
+    let minimumFontSize: Int64? = nilOrValue(pigeonVar_list[28])
+    let userAgent: String? = nilOrValue(pigeonVar_list[29])
+    let applicationNameForUserAgent: String? = nilOrValue(pigeonVar_list[30])
 
     return WebViewSettingsMessage(
       javaScriptEnabled: javaScriptEnabled,
@@ -396,6 +404,8 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       allowsLinkPreview: allowsLinkPreview,
       geolocationEnabled: geolocationEnabled,
       algorithmicDarkeningAllowed: algorithmicDarkeningAllowed,
+      thirdPartyCookiesEnabled: thirdPartyCookiesEnabled,
+      safeBrowsingEnabled: safeBrowsingEnabled,
       userInterfaceStyle: userInterfaceStyle,
       minimumFontSize: minimumFontSize,
       userAgent: userAgent,
@@ -429,6 +439,8 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
       allowsLinkPreview,
       geolocationEnabled,
       algorithmicDarkeningAllowed,
+      thirdPartyCookiesEnabled,
+      safeBrowsingEnabled,
       userInterfaceStyle,
       minimumFontSize,
       userAgent,
@@ -439,7 +451,7 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.builtInZoomControls, rhs.builtInZoomControls) && MessagesPigeonInternal.deepEquals(lhs.displayZoomControls, rhs.displayZoomControls) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.cacheMode, rhs.cacheMode) && MessagesPigeonInternal.deepEquals(lhs.incognito, rhs.incognito) && MessagesPigeonInternal.deepEquals(lhs.javaScriptCanOpenWindowsAutomatically, rhs.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonInternal.deepEquals(lhs.scrollbarsVisible, rhs.scrollbarsVisible) && MessagesPigeonInternal.deepEquals(lhs.overScrollEnabled, rhs.overScrollEnabled) && MessagesPigeonInternal.deepEquals(lhs.pullToRefreshEnabled, rhs.pullToRefreshEnabled) && MessagesPigeonInternal.deepEquals(lhs.domStorageEnabled, rhs.domStorageEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowFileAccess, rhs.allowFileAccess) && MessagesPigeonInternal.deepEquals(lhs.allowContentAccess, rhs.allowContentAccess) && MessagesPigeonInternal.deepEquals(lhs.mixedContentMode, rhs.mixedContentMode) && MessagesPigeonInternal.deepEquals(lhs.contentMode, rhs.contentMode) && MessagesPigeonInternal.deepEquals(lhs.allowsLinkPreview, rhs.allowsLinkPreview) && MessagesPigeonInternal.deepEquals(lhs.geolocationEnabled, rhs.geolocationEnabled) && MessagesPigeonInternal.deepEquals(lhs.algorithmicDarkeningAllowed, rhs.algorithmicDarkeningAllowed) && MessagesPigeonInternal.deepEquals(lhs.userInterfaceStyle, rhs.userInterfaceStyle) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent) && MessagesPigeonInternal.deepEquals(lhs.applicationNameForUserAgent, rhs.applicationNameForUserAgent)
+    return MessagesPigeonInternal.deepEquals(lhs.javaScriptEnabled, rhs.javaScriptEnabled) && MessagesPigeonInternal.deepEquals(lhs.mediaPlaybackRequiresUserGesture, rhs.mediaPlaybackRequiresUserGesture) && MessagesPigeonInternal.deepEquals(lhs.allowsInlineMediaPlayback, rhs.allowsInlineMediaPlayback) && MessagesPigeonInternal.deepEquals(lhs.supportZoom, rhs.supportZoom) && MessagesPigeonInternal.deepEquals(lhs.builtInZoomControls, rhs.builtInZoomControls) && MessagesPigeonInternal.deepEquals(lhs.displayZoomControls, rhs.displayZoomControls) && MessagesPigeonInternal.deepEquals(lhs.transparentBackground, rhs.transparentBackground) && MessagesPigeonInternal.deepEquals(lhs.passkeysEnabled, rhs.passkeysEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowsBackForwardNavigationGestures, rhs.allowsBackForwardNavigationGestures) && MessagesPigeonInternal.deepEquals(lhs.inspectable, rhs.inspectable) && MessagesPigeonInternal.deepEquals(lhs.textZoom, rhs.textZoom) && MessagesPigeonInternal.deepEquals(lhs.cacheMode, rhs.cacheMode) && MessagesPigeonInternal.deepEquals(lhs.incognito, rhs.incognito) && MessagesPigeonInternal.deepEquals(lhs.javaScriptCanOpenWindowsAutomatically, rhs.javaScriptCanOpenWindowsAutomatically) && MessagesPigeonInternal.deepEquals(lhs.scrollbarsVisible, rhs.scrollbarsVisible) && MessagesPigeonInternal.deepEquals(lhs.overScrollEnabled, rhs.overScrollEnabled) && MessagesPigeonInternal.deepEquals(lhs.pullToRefreshEnabled, rhs.pullToRefreshEnabled) && MessagesPigeonInternal.deepEquals(lhs.domStorageEnabled, rhs.domStorageEnabled) && MessagesPigeonInternal.deepEquals(lhs.allowFileAccess, rhs.allowFileAccess) && MessagesPigeonInternal.deepEquals(lhs.allowContentAccess, rhs.allowContentAccess) && MessagesPigeonInternal.deepEquals(lhs.mixedContentMode, rhs.mixedContentMode) && MessagesPigeonInternal.deepEquals(lhs.contentMode, rhs.contentMode) && MessagesPigeonInternal.deepEquals(lhs.allowsLinkPreview, rhs.allowsLinkPreview) && MessagesPigeonInternal.deepEquals(lhs.geolocationEnabled, rhs.geolocationEnabled) && MessagesPigeonInternal.deepEquals(lhs.algorithmicDarkeningAllowed, rhs.algorithmicDarkeningAllowed) && MessagesPigeonInternal.deepEquals(lhs.thirdPartyCookiesEnabled, rhs.thirdPartyCookiesEnabled) && MessagesPigeonInternal.deepEquals(lhs.safeBrowsingEnabled, rhs.safeBrowsingEnabled) && MessagesPigeonInternal.deepEquals(lhs.userInterfaceStyle, rhs.userInterfaceStyle) && MessagesPigeonInternal.deepEquals(lhs.minimumFontSize, rhs.minimumFontSize) && MessagesPigeonInternal.deepEquals(lhs.userAgent, rhs.userAgent) && MessagesPigeonInternal.deepEquals(lhs.applicationNameForUserAgent, rhs.applicationNameForUserAgent)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -469,6 +481,8 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: allowsLinkPreview, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: geolocationEnabled, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: algorithmicDarkeningAllowed, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: thirdPartyCookiesEnabled, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: safeBrowsingEnabled, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userInterfaceStyle, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: minimumFontSize, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userAgent, hasher: &hasher)
@@ -476,7 +490,7 @@ struct WebViewSettingsMessage: Hashable, CustomStringConvertible {
   }
 
   public var description: String {
-    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), builtInZoomControls: \(String(describing: builtInZoomControls)), displayZoomControls: \(String(describing: displayZoomControls)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), cacheMode: \(String(describing: cacheMode)), incognito: \(String(describing: incognito)), javaScriptCanOpenWindowsAutomatically: \(String(describing: javaScriptCanOpenWindowsAutomatically)), scrollbarsVisible: \(String(describing: scrollbarsVisible)), overScrollEnabled: \(String(describing: overScrollEnabled)), pullToRefreshEnabled: \(String(describing: pullToRefreshEnabled)), domStorageEnabled: \(String(describing: domStorageEnabled)), allowFileAccess: \(String(describing: allowFileAccess)), allowContentAccess: \(String(describing: allowContentAccess)), mixedContentMode: \(String(describing: mixedContentMode)), contentMode: \(String(describing: contentMode)), allowsLinkPreview: \(String(describing: allowsLinkPreview)), geolocationEnabled: \(String(describing: geolocationEnabled)), algorithmicDarkeningAllowed: \(String(describing: algorithmicDarkeningAllowed)), userInterfaceStyle: \(String(describing: userInterfaceStyle)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)), applicationNameForUserAgent: \(String(describing: applicationNameForUserAgent)))"
+    return "WebViewSettingsMessage(javaScriptEnabled: \(String(describing: javaScriptEnabled)), mediaPlaybackRequiresUserGesture: \(String(describing: mediaPlaybackRequiresUserGesture)), allowsInlineMediaPlayback: \(String(describing: allowsInlineMediaPlayback)), supportZoom: \(String(describing: supportZoom)), builtInZoomControls: \(String(describing: builtInZoomControls)), displayZoomControls: \(String(describing: displayZoomControls)), transparentBackground: \(String(describing: transparentBackground)), passkeysEnabled: \(String(describing: passkeysEnabled)), allowsBackForwardNavigationGestures: \(String(describing: allowsBackForwardNavigationGestures)), inspectable: \(String(describing: inspectable)), textZoom: \(String(describing: textZoom)), cacheMode: \(String(describing: cacheMode)), incognito: \(String(describing: incognito)), javaScriptCanOpenWindowsAutomatically: \(String(describing: javaScriptCanOpenWindowsAutomatically)), scrollbarsVisible: \(String(describing: scrollbarsVisible)), overScrollEnabled: \(String(describing: overScrollEnabled)), pullToRefreshEnabled: \(String(describing: pullToRefreshEnabled)), domStorageEnabled: \(String(describing: domStorageEnabled)), allowFileAccess: \(String(describing: allowFileAccess)), allowContentAccess: \(String(describing: allowContentAccess)), mixedContentMode: \(String(describing: mixedContentMode)), contentMode: \(String(describing: contentMode)), allowsLinkPreview: \(String(describing: allowsLinkPreview)), geolocationEnabled: \(String(describing: geolocationEnabled)), algorithmicDarkeningAllowed: \(String(describing: algorithmicDarkeningAllowed)), thirdPartyCookiesEnabled: \(String(describing: thirdPartyCookiesEnabled)), safeBrowsingEnabled: \(String(describing: safeBrowsingEnabled)), userInterfaceStyle: \(String(describing: userInterfaceStyle)), minimumFontSize: \(String(describing: minimumFontSize)), userAgent: \(String(describing: userAgent)), applicationNameForUserAgent: \(String(describing: applicationNameForUserAgent)))"
   }
 }
 
@@ -1991,6 +2005,10 @@ protocol AdvancedWebViewHostApi {
   func setCookie(webViewId: Int64, cookie: CookieMessage) async throws
   /// Returns the cookies the WebView would send to `url`.
   func getCookies(webViewId: Int64, url: String) async throws -> [CookieMessage]
+  /// Removes the cookies called `name` that the WebView would send to `url`.
+  func deleteCookie(webViewId: Int64, url: String, name: String) async throws
+  /// Removes every cookie the WebView would send to `url`.
+  func deleteCookies(webViewId: Int64, url: String) async throws
   func clearCookies(webViewId: Int64) async throws
   /// Removes the given kinds of website data. Cookies are not included; see
   /// `clearCookies`.
@@ -2623,6 +2641,45 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       getCookiesChannel.setMessageHandler(nil)
+    }
+    /// Removes the cookies called `name` that the WebView would send to `url`.
+    let deleteCookieChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.deleteCookie\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      deleteCookieChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let urlArg = args[1] as! String
+        let nameArg = args[2] as! String
+        Task { @MainActor in
+          do {
+            try await api.deleteCookie(webViewId: webViewIdArg, url: urlArg, name: nameArg)
+            reply(wrapResult(nil))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      deleteCookieChannel.setMessageHandler(nil)
+    }
+    /// Removes every cookie the WebView would send to `url`.
+    let deleteCookiesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.deleteCookies\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      deleteCookiesChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let urlArg = args[1] as! String
+        Task { @MainActor in
+          do {
+            try await api.deleteCookies(webViewId: webViewIdArg, url: urlArg)
+            reply(wrapResult(nil))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      deleteCookiesChannel.setMessageHandler(nil)
     }
     let clearCookiesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.clearCookies\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

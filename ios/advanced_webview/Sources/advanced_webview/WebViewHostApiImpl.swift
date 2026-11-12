@@ -212,6 +212,22 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
   }
 
   @MainActor
+  func deleteCookie(webViewId: Int64, url: String, name: String) async throws {
+    guard let target = URL(string: url) else {
+      throw PigeonError(code: "invalid-url", message: "Invalid URL: \(url)", details: nil)
+    }
+    try await registry.get(webViewId).deleteCookies(for: target, name: name)
+  }
+
+  @MainActor
+  func deleteCookies(webViewId: Int64, url: String) async throws {
+    guard let target = URL(string: url) else {
+      throw PigeonError(code: "invalid-url", message: "Invalid URL: \(url)", details: nil)
+    }
+    try await registry.get(webViewId).deleteCookies(for: target, name: nil)
+  }
+
+  @MainActor
   func clearCookies(webViewId: Int64) async throws {
     try await registry.get(webViewId).clearCookies()
   }

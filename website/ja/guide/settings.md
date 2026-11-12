@@ -51,6 +51,8 @@ const WebViewSettings(
 | `allowContentAccess` | `false` | 対応 | 無視 |
 | `mixedContentMode` | `neverAllow` | 対応 | 無視（WebKit が遮断） |
 | `geolocationEnabled` | `true` | 対応 | 無視（OS が判断） |
+| `thirdPartyCookiesEnabled` | `false` | 対応 | 無視（WebKit が判断） |
+| `safeBrowsingEnabled` | `true` | 対応（Android 8.0 以降） | 無視（常に有効） |
 | `algorithmicDarkeningAllowed` | `false` | 対応（アプリのテーマがダークであることが必要） | 無視（`userInterfaceStyle` を参照） |
 
 ## iOS 専用の設定

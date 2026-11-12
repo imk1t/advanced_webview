@@ -56,6 +56,8 @@ class WebViewSettingsMessage {
     required this.allowsLinkPreview,
     required this.geolocationEnabled,
     required this.algorithmicDarkeningAllowed,
+    required this.thirdPartyCookiesEnabled,
+    required this.safeBrowsingEnabled,
     required this.userInterfaceStyle,
     this.minimumFontSize,
     this.userAgent,
@@ -139,6 +141,14 @@ class WebViewSettingsMessage {
   /// Android: `WebSettingsCompat.setAlgorithmicDarkeningAllowed`, when the
   /// installed WebView supports it. iOS has no equivalent.
   bool algorithmicDarkeningAllowed;
+
+  /// Android: `CookieManager.setAcceptThirdPartyCookies` for this WebView. iOS
+  /// has no equivalent.
+  bool thirdPartyCookiesEnabled;
+
+  /// Android: `WebSettings.setSafeBrowsingEnabled` (API 26+). iOS has no
+  /// switch.
+  bool safeBrowsingEnabled;
 
   /// iOS: `UIView.overrideUserInterfaceStyle`. Ignored on Android.
   UserInterfaceStyleMessage userInterfaceStyle;
@@ -677,6 +687,14 @@ abstract class AdvancedWebViewHostApi {
   /// Returns the cookies the WebView would send to `url`.
   @async
   List<CookieMessage> getCookies(int webViewId, String url);
+
+  /// Removes the cookies called `name` that the WebView would send to `url`.
+  @async
+  void deleteCookie(int webViewId, String url, String name);
+
+  /// Removes every cookie the WebView would send to `url`.
+  @async
+  void deleteCookies(int webViewId, String url);
 
   @async
   void clearCookies(int webViewId);

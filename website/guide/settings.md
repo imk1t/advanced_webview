@@ -53,6 +53,8 @@ Passed as `WebViewSettings.android`. iOS ignores all of them.
 | `allowContentAccess` | `false` | Yes | Ignored |
 | `mixedContentMode` | `neverAllow` | Yes | Ignored (WebKit blocks it) |
 | `geolocationEnabled` | `true` | Yes | Ignored (system decides) |
+| `thirdPartyCookiesEnabled` | `false` | Yes | Ignored (WebKit decides) |
+| `safeBrowsingEnabled` | `true` | Yes (Android 8.0+) | Ignored (always on) |
 | `algorithmicDarkeningAllowed` | `false` | Yes (needs a dark app theme) | Ignored (see `userInterfaceStyle`) |
 
 ## iOS-only settings

@@ -218,6 +218,28 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun deletingCookiesNeverTouchesTheCookiesOfOtherSites() = runBlocking {
+        // Robolectric's CookieManager shadow ignores expiring Set-Cookie writes, so the actual removal is only
+        // covered on a real WebView (example/integration_test). Here: the calls complete and stay scoped to the URL.
+        hostApi.create(params(webViewId = 1))
+        val manager = android.webkit.CookieManager.getInstance()
+        manager.setCookie("https://keep-me.test/", "a=1; Path=/")
+
+        hostApi.deleteCookie(1, "https://delete-me.test/sub/page", "a")
+        hostApi.deleteCookies(1, "https://delete-me.test/")
+
+        assertEquals("a=1", manager.getCookie("https://keep-me.test/"))
+    }
+
+    @Test
+    fun cookieAndSafeBrowsingSettingsCanBeApplied() {
+        // The shadow's acceptThirdPartyCookies is a stub, so this only checks that applying the settings is safe.
+        hostApi.create(params(webViewId = 1, settings = settings(thirdPartyCookiesEnabled = true)))
+
+        hostApi.updateSettings(1, settings(thirdPartyCookiesEnabled = false))
+    }
+
+    @Test
     fun algorithmicDarkeningCanBeAppliedAtCreationAndOnUpdate() {
         // WebSettingsCompat needs a real WebView provider, so this only checks that applying it is safe.
         hostApi.create(params(webViewId = 1, settings = settings(algorithmicDarkeningAllowed = true)))
@@ -1029,6 +1051,7 @@ class WebViewHostApiImplTest {
         mixedContentMode: MixedContentModeMessage = MixedContentModeMessage.NEVER_ALLOW,
         geolocationEnabled: Boolean = true,
         algorithmicDarkeningAllowed: Boolean = false,
+        thirdPartyCookiesEnabled: Boolean = false,
         minimumFontSize: Long? = null,
     ) = WebViewSettingsMessage(
         javaScriptEnabled = javaScriptEnabled,
@@ -1056,6 +1079,8 @@ class WebViewHostApiImplTest {
         allowsLinkPreview = true,
         geolocationEnabled = geolocationEnabled,
         algorithmicDarkeningAllowed = algorithmicDarkeningAllowed,
+        thirdPartyCookiesEnabled = thirdPartyCookiesEnabled,
+        safeBrowsingEnabled = true,
         userInterfaceStyle = UserInterfaceStyleMessage.UNSPECIFIED,
         minimumFontSize = minimumFontSize,
         userAgent = userAgent,

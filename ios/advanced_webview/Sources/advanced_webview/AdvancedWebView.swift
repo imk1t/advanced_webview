@@ -362,6 +362,29 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   /// Returns the cookies WebKit would send to `url`.
   @MainActor
   func cookies(for url: URL) async -> [CookieMessage] {
+    await matchingCookies(for: url).map { cookie in
+      CookieMessage(
+        name: cookie.name,
+        value: cookie.value,
+        domain: cookie.domain,
+        path: cookie.path,
+        isSecure: cookie.isSecure,
+        isHttpOnly: cookie.isHTTPOnly,
+        expiresMillis: cookie.expiresDate.map { Int64($0.timeIntervalSince1970 * 1000) })
+    }
+  }
+
+  /// Removes the cookies WebKit would send to `url`, only those called `name` when it is given.
+  @MainActor
+  func deleteCookies(for url: URL, name: String?) async {
+    let store = webView.configuration.websiteDataStore.httpCookieStore
+    for cookie in await matchingCookies(for: url) where name == nil || cookie.name == name {
+      await store.deleteCookie(cookie)
+    }
+  }
+
+  @MainActor
+  private func matchingCookies(for url: URL) async -> [HTTPCookie] {
     let all = await webView.configuration.websiteDataStore.httpCookieStore.allCookies()
     let host = url.host?.lowercased() ?? ""
     // URL.path can strip a trailing slash; cookie matching needs the request path verbatim.
@@ -379,15 +402,6 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
         || (path.hasPrefix(cookiePath)
           && (cookiePath.hasSuffix("/") || path.hasPrefix(cookiePath + "/")))
       return hostMatches && pathMatches && (!cookie.isSecure || isSecureScheme)
-    }.map { cookie in
-      CookieMessage(
-        name: cookie.name,
-        value: cookie.value,
-        domain: cookie.domain,
-        path: cookie.path,
-        isSecure: cookie.isSecure,
-        isHttpOnly: cookie.isHTTPOnly,
-        expiresMillis: cookie.expiresDate.map { Int64($0.timeIntervalSince1970 * 1000) })
     }
   }
 

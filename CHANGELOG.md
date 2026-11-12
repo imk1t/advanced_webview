@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.deleteCookie` and `deleteCookies`: remove one cookie by name, or every cookie, that the WebView would send to a URL, without clearing the whole store. iOS deletes exactly the cookies `getCookies` reports; Android cannot see a cookie's domain or path, so it expires it for the host, its parent domains and every path down to the URL's.
+- Add `AndroidWebViewSettings.thirdPartyCookiesEnabled` (default `false`, the platform default) and `safeBrowsingEnabled` (default `true`, as before; needs Android 8.0 or later). iOS has no equivalent for either.
 - Add `AndroidWebViewSettings.algorithmicDarkeningAllowed` (default `false`) and `IOSWebViewSettings.userInterfaceStyle` with `WebViewUserInterfaceStyle` (`unspecified`, `light`, `dark`; default `unspecified`). Android darkens pages that have no dark theme while the app theme is dark (`WebSettingsCompat.setAlgorithmicDarkeningAllowed`, ignored by WebViews without the feature); iOS fixes the WebView's appearance (`overrideUserInterfaceStyle`), which decides `prefers-color-scheme`. The defaults keep the previous behaviour.
 
 - Add `AdvancedWebViewController.onRenderProcessGone`, `RenderProcessGone` and `RenderProcessGoneCallback`: be told when the process that renders web content crashes or is killed. Android now handles the event instead of letting the app terminate (dispose the controller and create a new one); iOS reports it so you can call `reload`. `RenderProcessGone.didCrash` is `null` on iOS.

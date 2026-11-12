@@ -516,6 +516,29 @@ final class RunnerTests: XCTestCase {
     for cookie in cookies { await store.deleteCookie(cookie) }
   }
 
+  func testDeleteCookiesRemovesOnlyTheMatchingCookies() async throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    let store = try registry.get(1).webView.configuration.websiteDataStore.httpCookieStore
+    for (name, domain) in [("a", "delete-me.test"), ("b", "delete-me.test"), ("a", "keep-me.test")]
+    {
+      await store.setCookie(
+        HTTPCookie(properties: [.name: name, .value: "1", .domain: domain, .path: "/"])!)
+    }
+
+    try await hostApi.deleteCookie(webViewId: 1, url: "https://delete-me.test/", name: "a")
+    var remaining = try await hostApi.getCookies(webViewId: 1, url: "https://delete-me.test/")
+    XCTAssertEqual(remaining.map(\.name), ["b"])
+
+    try await hostApi.deleteCookies(webViewId: 1, url: "https://delete-me.test/")
+    remaining = try await hostApi.getCookies(webViewId: 1, url: "https://delete-me.test/")
+    XCTAssertTrue(remaining.isEmpty)
+    let other = try await hostApi.getCookies(webViewId: 1, url: "https://keep-me.test/")
+    XCTAssertEqual(other.map(\.name), ["a"])
+
+    try await hostApi.clearCookies(webViewId: 1)
+  }
+
   func testFactoryReturnsTheExistingInstance() throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 5))
@@ -689,6 +712,8 @@ final class RunnerTests: XCTestCase {
     allowsLinkPreview: Bool = true,
     geolocationEnabled: Bool = true,
     algorithmicDarkeningAllowed: Bool = false,
+    thirdPartyCookiesEnabled: Bool = false,
+    safeBrowsingEnabled: Bool = true,
     userInterfaceStyle: UserInterfaceStyleMessage = .unspecified,
     minimumFontSize: Int? = nil,
     userAgent: String? = nil,
@@ -720,6 +745,8 @@ final class RunnerTests: XCTestCase {
       allowsLinkPreview: allowsLinkPreview,
       geolocationEnabled: geolocationEnabled,
       algorithmicDarkeningAllowed: algorithmicDarkeningAllowed,
+      thirdPartyCookiesEnabled: thirdPartyCookiesEnabled,
+      safeBrowsingEnabled: safeBrowsingEnabled,
       userInterfaceStyle: userInterfaceStyle,
       minimumFontSize: minimumFontSize.map { Int64($0) },
       userAgent: userAgent,
