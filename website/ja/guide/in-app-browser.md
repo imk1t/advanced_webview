@@ -54,3 +54,29 @@ await browser.close();
   ブラウザのウェブサイトデータを分離できます。
 
 内部で使うネイティブ API は [プラットフォーム API 対応表](./api-mapping#アプリ内ブラウザ) を参照してください。
+
+## システムブラウザ {#system-browser}
+
+`AdvancedSystemBrowser` は、このプラグインの WebView ではなく、システム標準のブラウザ UI でページを開きます。
+Android は Chrome Custom Tabs、iOS は `SFSafariViewController` です。ページはユーザーのブラウザで動作し、
+ユーザーの Cookie・保存済みパスワード・パスキーが使えます。アプリからページの内容を読んだり操作したりはできません。
+OAuth のサインインなど、埋め込み WebView で行うべきでない処理に使います。
+
+```dart
+final browser = AdvancedSystemBrowser(onClosed: () => debugPrint('closed'));
+
+if (await browser.isAvailable()) {
+  await browser.open(
+    Uri.parse('https://example.com/login'),
+    options: const SystemBrowserOptions(toolbarColor: Color(0xFF1E3A8A)),
+  );
+}
+```
+
+- 受け付けるのは `http` と `https` の URL だけで、それ以外は `ArgumentError` を投げます。
+- `isAvailable` は iOS では常に `true` です。Android では `https` のリンクを処理できるアプリがあれば `true` で、
+  なければ `open` が `PlatformException`（`unavailable`）で失敗します。表示できる画面がない場合は `not-attached` です。
+- `onClosed` は iOS では確実に呼ばれます。Android の Custom Tabs は閉じたことを通知しないため、タブを表示したあとに
+  アプリがフォアグラウンドに戻ったときに呼ばれ、別の経路で戻った場合も呼ばれます。サインイン完了の判定には使わず、
+  結果はサーバーで確認してください。
+- Dart から閉じることはできず、ページを操作することもできません。必要な場合は `AdvancedInAppBrowser` を使ってください。

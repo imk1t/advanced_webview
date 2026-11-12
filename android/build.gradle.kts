@@ -76,6 +76,8 @@ dependencies {
     implementation("androidx.webkit:webkit:1.14.0")
     // Pull-to-refresh container around the WebView.
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    // Chrome Custom Tabs for AdvancedSystemBrowser.
+    implementation("androidx.browser:browser:1.9.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("org.mockito:mockito-core:5.14.2")

@@ -176,6 +176,20 @@ class WebViewHostApiImpl(
         }
     }
 
+    private val systemBrowser = SystemBrowser(context, activityProvider) { sessionId ->
+        scope.launch {
+            try {
+                flutterApi.onSystemBrowserClosed(sessionId)
+            } catch (e: Throwable) {
+                Log.w(TAG, "Failed to deliver event to Dart: ${e.message}")
+            }
+        }
+    }
+
+    override fun isSystemBrowserAvailable(): Boolean = systemBrowser.isAvailable()
+
+    override fun openSystemBrowser(params: SystemBrowserParamsMessage) = systemBrowser.open(params)
+
     override fun closeInAppBrowser(webViewId: Long) {
         val session = InAppBrowserSessions.get(webViewId) ?: return
         val activity = session.activity

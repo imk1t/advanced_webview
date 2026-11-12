@@ -1733,6 +1733,66 @@ class CookieMessage {
   }
 }
 
+/// A page to show in the system browser (Chrome Custom Tabs on Android,
+/// `SFSafariViewController` on iOS).
+class SystemBrowserParamsMessage {
+  SystemBrowserParamsMessage({
+    required this.sessionId,
+    required this.url,
+    this.toolbarColor,
+  });
+
+  /// Identifies this browser in `onSystemBrowserClosed`.
+  int sessionId;
+
+  String url;
+
+  /// Toolbar background as ARGB (`Color.toARGB32`); `null` uses the platform
+  /// default.
+  int? toolbarColor;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      sessionId,
+      url,
+      toolbarColor,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static SystemBrowserParamsMessage decode(Object result) {
+    result as List<Object?>;
+    return SystemBrowserParamsMessage(
+      sessionId: result[0]! as int,
+      url: result[1]! as String,
+      toolbarColor: result[2] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! SystemBrowserParamsMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(sessionId, other.sessionId) && _deepEquals(url, other.url) && _deepEquals(toolbarColor, other.toolbarColor);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'SystemBrowserParamsMessage(sessionId: $sessionId, url: $url, toolbarColor: $toolbarColor)';
+  }
+}
+
 /// Chrome of the full-screen in-app browser that hosts an existing WebView.
 class InAppBrowserParamsMessage {
   InAppBrowserParamsMessage({
@@ -1927,8 +1987,11 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is CookieMessage) {
       buffer.putUint8(164);
       writeValue(buffer, value.encode());
-    }    else if (value is InAppBrowserParamsMessage) {
+    }    else if (value is SystemBrowserParamsMessage) {
       buffer.putUint8(165);
+      writeValue(buffer, value.encode());
+    }    else if (value is InAppBrowserParamsMessage) {
+      buffer.putUint8(166);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2025,6 +2088,8 @@ class _PigeonCodec extends StandardMessageCodec {
       case 164:
         return CookieMessage.decode(readValue(buffer)!);
       case 165:
+        return SystemBrowserParamsMessage.decode(readValue(buffer)!);
+      case 166:
         return InAppBrowserParamsMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2894,6 +2959,48 @@ class AdvancedWebViewHostApi {
     )
     ;
   }
+
+  /// Whether a system browser can be opened: always true on iOS, true on
+  /// Android when an app can handle `https` links.
+  Future<bool> isSystemBrowserAvailable() async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.isSystemBrowserAvailable$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return pigeonVar_replyValue! as bool;
+  }
+
+  /// Opens `params.url` in the system browser. Fails with `not-attached` when
+  /// there is no screen to present from and with `unavailable` when no browser
+  /// can handle it.
+  Future<void> openSystemBrowser(SystemBrowserParamsMessage params) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.openSystemBrowser$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[params]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
 }
 
 abstract class AdvancedWebViewFlutterApi {
@@ -2984,6 +3091,10 @@ abstract class AdvancedWebViewFlutterApi {
 
   /// The in-app browser was dismissed, by the user or by `closeInAppBrowser`.
   void onInAppBrowserClosed(int webViewId);
+
+  /// The system browser `sessionId` was dismissed, or (Android, best effort)
+  /// the user came back to the app.
+  void onSystemBrowserClosed(int sessionId);
 
   static void setUp(AdvancedWebViewFlutterApi? api, {
     BinaryMessenger? binaryMessenger, 
@@ -3557,6 +3668,27 @@ abstract class AdvancedWebViewFlutterApi {
           final int arg_webViewId = args[0]! as int;
           try {
             api.onInAppBrowserClosed(arg_webViewId);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onSystemBrowserClosed$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_sessionId = args[0]! as int;
+          try {
+            api.onSystemBrowserClosed(arg_sessionId);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

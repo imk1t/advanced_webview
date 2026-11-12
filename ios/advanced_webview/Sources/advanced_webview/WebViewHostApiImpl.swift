@@ -7,6 +7,15 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
   private let registry: WebViewRegistry
   private let flutterApi: AdvancedWebViewFlutterApi
   private var browsers: [Int64: InAppBrowserViewController] = [:]
+  private lazy var systemBrowser = SystemBrowser { [flutterApi] sessionId in
+    Task { @MainActor in
+      do {
+        try await flutterApi.onSystemBrowserClosed(sessionId: sessionId)
+      } catch {
+        NSLog("advanced_webview: failed to deliver event to Dart: \(error)")
+      }
+    }
+  }
 
   /// Maps a Flutter asset key to its path inside the app bundle.
   private let assetPath: (String) -> String?
@@ -274,6 +283,18 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
 
   func closeInAppBrowser(webViewId: Int64) throws {
     browsers[webViewId]?.close()
+  }
+
+  func isSystemBrowserAvailable() throws -> Bool {
+    true
+  }
+
+  func openSystemBrowser(params: SystemBrowserParamsMessage) throws {
+    guard let presenter = Self.topViewController() else {
+      throw PigeonError(
+        code: "not-attached", message: "No view controller to present from", details: nil)
+    }
+    try systemBrowser.open(params: params, from: presenter)
   }
 
   /// The view controller on top of the foreground scene, where a modal can be presented.

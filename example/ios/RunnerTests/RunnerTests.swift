@@ -1,4 +1,5 @@
 import Flutter
+import SafariServices
 import UIKit
 import WebKit
 import XCTest
@@ -559,6 +560,39 @@ final class RunnerTests: XCTestCase {
       error in
       XCTAssertEqual((error as? PigeonError)?.code, "not-found")
     }
+  }
+
+  func testSystemBrowserIsAlwaysAvailable() throws {
+    let (hostApi, _, _) = makeHostApi()
+    XCTAssertTrue(try hostApi.isSystemBrowserAvailable())
+  }
+
+  func testOpenSystemBrowserRejectsANonHttpUrl() throws {
+    let controller = UIViewController()
+    let browser = SystemBrowser { _ in }
+    let params = SystemBrowserParamsMessage(sessionId: 1, url: "file:///etc/passwd")
+
+    XCTAssertThrowsError(try browser.open(params: params, from: controller)) {
+      XCTAssertEqual(($0 as? PigeonError)?.code, "invalid-url")
+    }
+  }
+
+  func testSystemBrowserReportsTheSessionOnceWhenDismissed() throws {
+    var closed: [Int64] = []
+    let browser = SystemBrowser { closed.append($0) }
+    let host = UIViewController()
+    let window = UIWindow(frame: UIScreen.main.bounds)
+    window.rootViewController = host
+    window.makeKeyAndVisible()
+
+    try browser.open(
+      params: SystemBrowserParamsMessage(sessionId: 5, url: "https://example.com/"), from: host)
+    let presented = try XCTUnwrap(host.presentedViewController as? SFSafariViewController)
+
+    browser.safariViewControllerDidFinish(presented)
+    browser.safariViewControllerDidFinish(presented)
+
+    XCTAssertEqual(closed, [5])
   }
 
   func testCloseInAppBrowserIsANoOpWhenNotOpen() {

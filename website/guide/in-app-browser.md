@@ -55,3 +55,31 @@ await browser.close();
   isolate the browser's website data.
 
 See [Platform API mapping](./api-mapping#in-app-browser) for the native APIs behind it.
+
+## System browser
+
+`AdvancedSystemBrowser` opens a page in the system's own browser UI instead of a WebView of this plugin: Chrome
+Custom Tabs on Android and `SFSafariViewController` on iOS. The page runs in the user's browser, with its
+cookies, saved passwords and passkeys, and your app cannot read or script it. Use it for OAuth sign-in and other
+flows that should not run in an embedded WebView.
+
+```dart
+final browser = AdvancedSystemBrowser(onClosed: () => debugPrint('closed'));
+
+if (await browser.isAvailable()) {
+  await browser.open(
+    Uri.parse('https://example.com/login'),
+    options: const SystemBrowserOptions(toolbarColor: Color(0xFF1E3A8A)),
+  );
+}
+```
+
+- Only `http` and `https` URLs are accepted; anything else throws an `ArgumentError`.
+- `isAvailable` is always `true` on iOS. On Android it is `true` when an app can handle `https` links; `open`
+  fails with a `PlatformException` (`unavailable`) otherwise, and with `not-attached` when the app has no screen to
+  present from.
+- `onClosed` is reliable on iOS. Android's Custom Tabs report nothing when they close, so it is called when the
+  app comes back to the foreground after the tab was shown, which also happens if the user returns by another
+  route. Do not rely on it to mean the user finished signing in; check the result with your server.
+- It cannot be closed from Dart, and the page cannot be scripted. If you need either, use
+  `AdvancedInAppBrowser`.
