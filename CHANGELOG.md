@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.11.0 - 2026-11-12
+
 - Add `AdvancedSystemBrowser` and `SystemBrowserOptions`: open an `http` or `https` page in the system's browser UI, Chrome Custom Tabs on Android and `SFSafariViewController` on iOS, with `isAvailable()`, a `toolbarColor` option and an `onClosed` callback. The page runs in the user's browser with its cookies and passkeys, for sign-in flows that should not run in an embedded WebView. `onClosed` is reliable on iOS and best effort on Android, where Custom Tabs report nothing when they close. The plugin now depends on `androidx.browser`.
 
 - Add `AdvancedWebViewController.deleteCookie` and `deleteCookies`: remove one cookie by name, or every cookie, that the WebView would send to a URL, without clearing the whole store. iOS deletes exactly the cookies `getCookies` reports; Android cannot see a cookie's domain or path, so it expires it for the host, its parent domains and every path down to the URL's.
