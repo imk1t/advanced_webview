@@ -29,6 +29,7 @@ final class RunnerTests: XCTestCase {
   }
 
   func testAnEmptyHistoryHasNoCurrentEntry() throws {
+    let (hostApi, _, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))
 
     let list = try hostApi.getBackForwardList(webViewId: 1)
