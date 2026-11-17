@@ -47,6 +47,20 @@ final url = await controller.currentUrl();
 final title = await controller.title();
 ```
 
+### History and URL changes
+
+```dart
+final history = await controller.getBackForwardList();
+print(history.items.map((i) => i.url)); // oldest first
+print(history.current?.url);
+
+await controller.goBackOrForward(-2); // two entries back; ignored when out of range
+```
+
+`onUrlChanged` reports every change of the main frame's URL, including `history.pushState`, `replaceState` and
+fragment navigation that single-page apps use for routing. These do not fire `onPageStarted` or `onPageFinished`.
+A reload of the same URL is not reported. Set it when you create the controller.
+
 Platform notes for the three newer loaders:
 
 - `loadFlutterAsset`: relative links resolve to sibling assets. Android serves them from

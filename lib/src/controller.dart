@@ -8,6 +8,7 @@ import 'console_message.dart';
 import 'cookie.dart';
 import 'download.dart';
 import 'find.dart';
+import 'history.dart';
 import 'hit_test.dart';
 import 'intercept.dart';
 import 'js_dialog.dart';
@@ -47,6 +48,7 @@ class AdvancedWebViewController {
     this.onRenderProcessGone,
     this.onFindResult,
     this.onFaviconChanged,
+    this.onUrlChanged,
     this.onEnterFullscreen,
     this.onExitFullscreen,
     this.onNavigationRequest,
@@ -98,6 +100,7 @@ class AdvancedWebViewController {
         hasFaviconDelegate: onFaviconChanged != null,
         hasFullscreenDelegate:
             onEnterFullscreen != null || onExitFullscreen != null,
+        hasUrlChangedDelegate: onUrlChanged != null,
         interceptSchemes: schemes,
         userScripts: [for (final script in userScripts) script.toMessage()],
       ),
@@ -163,6 +166,18 @@ class AdvancedWebViewController {
   /// iOS: `WKWebView.evaluateJavaScript(_:completionHandler:)` after
   /// `WKNavigationDelegate.webView(_:didFinish:)`.
   final FaviconChangedCallback? onFaviconChanged;
+
+  /// Called when the URL of the main frame changes, including changes the page
+  /// makes itself without a page load: `history.pushState`, `replaceState` and
+  /// fragment navigation, which single-page apps use for routing.
+  ///
+  /// Not called for a reload of the same URL. [onPageStarted] and
+  /// [onPageFinished] only fire for real page loads, so use this to follow a
+  /// single-page app. Only set at construction.
+  ///
+  /// Android: `WebViewClient.doUpdateVisitedHistory`.
+  /// iOS: key-value observing of `WKWebView.url`.
+  final UrlChangedCallback? onUrlChanged;
 
   /// Called when the page enters fullscreen, for example when the user taps the
   /// fullscreen button of a `<video>` or the page calls
@@ -514,6 +529,30 @@ class AdvancedWebViewController {
   Future<void> goBack() => _call(() => _hostApi.goBack(webViewId));
 
   Future<void> goForward() => _call(() => _hostApi.goForward(webViewId));
+
+  /// Moves [steps] entries through the history: negative goes back, positive
+  /// forward. Does nothing when the target lies outside the history; use
+  /// [getBackForwardList] to find a valid step.
+  ///
+  /// Android: `WebView.goBackOrForward`.
+  /// iOS: `WKWebView.go(to:)` with an item of `WKBackForwardList`.
+  Future<void> goBackOrForward(int steps) =>
+      _call(() => _hostApi.goBackOrForward(webViewId, steps));
+
+  /// The navigation history of the main frame, oldest entry first.
+  ///
+  /// Android: `WebView.copyBackForwardList`.
+  /// iOS: `WKWebView.backForwardList`.
+  Future<WebViewBackForwardList> getBackForwardList() async {
+    final list = await _call(() => _hostApi.getBackForwardList(webViewId));
+    return WebViewBackForwardList(
+      items: [
+        for (final item in list.items)
+          WebViewHistoryItem(url: item.url, title: item.title),
+      ],
+      currentIndex: list.currentIndex,
+    );
+  }
 
   Future<bool> canGoBack() => _call(() => _hostApi.canGoBack(webViewId));
 
@@ -1002,6 +1041,9 @@ class _EventListener implements WebViewEventListener {
 
   @override
   void onFaviconChanged(String? url) => _controller.onFaviconChanged?.call(url);
+
+  @override
+  void onUrlChanged(String url) => _controller.onUrlChanged?.call(url);
 
   @override
   void onEnterFullscreen() => _controller.onEnterFullscreen?.call();

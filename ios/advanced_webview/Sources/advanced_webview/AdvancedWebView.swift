@@ -20,6 +20,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   private let hasHttpErrorDelegate: Bool
   private let hasFindDelegate: Bool
   private let hasFaviconDelegate: Bool
+  private let hasUrlChangedDelegate: Bool
   private let hasFullscreenDelegate: Bool
   private var javaScriptChannelNames: [String] = []
   private let hasJavaScriptHandlers: Bool
@@ -49,6 +50,7 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     self.hasHttpErrorDelegate = params.hasHttpErrorDelegate
     self.hasFindDelegate = params.hasFindDelegate
     self.hasFaviconDelegate = params.hasFaviconDelegate
+    self.hasUrlChangedDelegate = params.hasUrlChangedDelegate
     self.hasFullscreenDelegate = params.hasFullscreenDelegate
     self.hasJavaScriptHandlers = !params.javaScriptHandlerNames.isEmpty
     self.handlerObjectName = params.javaScriptHandlerObjectName
@@ -564,6 +566,13 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
         self?.send { api, id in try await api.onTitleChanged(webViewId: id, title: title) }
       },
     ]
+    if hasUrlChangedDelegate {
+      observations.append(
+        webView.observe(\.url, options: [.new]) { [weak self] webView, _ in
+          guard let url = webView.url?.absoluteString else { return }
+          self?.send { api, id in try await api.onUrlChanged(webViewId: id, url: url) }
+        })
+    }
     if hasFullscreenDelegate {
       observations.append(
         webView.observe(\.fullscreenState, options: [.new]) { [weak self] webView, _ in

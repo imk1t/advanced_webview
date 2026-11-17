@@ -126,6 +126,28 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     try registry.get(webViewId).webView.goForward()
   }
 
+  func goBackOrForward(webViewId: Int64, steps: Int64) throws {
+    let webView = try registry.get(webViewId).webView
+    guard let step = Int(exactly: steps), let item = webView.backForwardList.item(at: step) else {
+      return
+    }
+    webView.go(to: item)
+  }
+
+  func getBackForwardList(webViewId: Int64) throws -> BackForwardListMessage {
+    let list = try registry.get(webViewId).webView.backForwardList
+    var entries = list.backList
+    let currentIndex = list.currentItem == nil ? -1 : entries.count
+    if let current = list.currentItem { entries.append(current) }
+    entries += list.forwardList
+    return BackForwardListMessage(
+      items: entries.map {
+        HistoryItemMessage(
+          url: $0.url.absoluteString, title: $0.title.flatMap { $0.isEmpty ? nil : $0 })
+      },
+      currentIndex: Int64(currentIndex))
+  }
+
   func canGoBack(webViewId: Int64) throws -> Bool {
     return try registry.get(webViewId).webView.canGoBack
   }

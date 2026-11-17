@@ -33,6 +33,7 @@ void main() {
     RenderProcessGoneCallback? onRenderProcessGone,
     FindResultCallback? onFindResult,
     FaviconChangedCallback? onFaviconChanged,
+    UrlChangedCallback? onUrlChanged,
     VoidCallback? onEnterFullscreen,
     VoidCallback? onExitFullscreen,
     NavigationRequestCallback? onNavigationRequest,
@@ -62,6 +63,7 @@ void main() {
       onRenderProcessGone: onRenderProcessGone,
       onFindResult: onFindResult,
       onFaviconChanged: onFaviconChanged,
+      onUrlChanged: onUrlChanged,
       onEnterFullscreen: onEnterFullscreen,
       onExitFullscreen: onExitFullscreen,
       onNavigationRequest: onNavigationRequest,
@@ -1180,6 +1182,50 @@ void main() {
       dispatcher.onExitFullscreen(controller.webViewId);
 
       expect(log, ['icon https://a/i.ico', 'icon null', 'enter', 'exit']);
+    });
+  });
+
+  group('url changes and history', () {
+    test('are only delegated when a callback is set', () async {
+      final without = createController();
+      final withCallback = createController(onUrlChanged: (_) {});
+      await without.ready;
+      await withCallback.ready;
+
+      expect(hostApi.created[without.webViewId]!.hasUrlChangedDelegate, false);
+      expect(
+        hostApi.created[withCallback.webViewId]!.hasUrlChangedDelegate,
+        true,
+      );
+    });
+
+    test('url changes are routed by webViewId', () async {
+      final urls = <String>[];
+      final controller = createController(onUrlChanged: urls.add);
+      final other = createController(onUrlChanged: (_) => fail('wrong view'));
+      addTearDown(other.dispose);
+
+      dispatcher.onUrlChanged(controller.webViewId, 'https://a/#x');
+
+      expect(urls, ['https://a/#x']);
+    });
+
+    test('goBackOrForward forwards the step count', () async {
+      final controller = createController();
+      await controller.goBackOrForward(-2);
+      expect(hostApi.calls, contains('goBackOrForward -2'));
+    });
+
+    test('getBackForwardList converts the native list', () async {
+      final controller = createController();
+      final list = await controller.getBackForwardList();
+
+      expect(list.currentIndex, 1);
+      expect(list.items, [
+        const WebViewHistoryItem(url: 'https://a/', title: 'A'),
+        const WebViewHistoryItem(url: 'https://b/'),
+      ]);
+      expect(list.current?.url, 'https://b/');
     });
   });
 

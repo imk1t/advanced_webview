@@ -101,6 +101,7 @@ On both platforms, JavaScript can call `window.Bridge.postMessage('hello')`.
 - System browser for sign-in flows: Chrome Custom Tabs / `SFSafariViewController` (`AdvancedSystemBrowser`)
 - Certificate error, HTTP authentication and client certificate (mutual TLS) callbacks
 - Navigation decisions (main frame)
+- History list, jumping several entries, URL change callback for single-page apps
 - Request interception: answer custom-scheme requests (and, on Android, `https`) from Dart
 - Pause and resume (`pause`, `resume`, Android `pauseTimers`)
 - Zoom control (`zoomBy`, `setZoomScale`)

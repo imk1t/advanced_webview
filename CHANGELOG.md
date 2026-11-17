@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.onUrlChanged`: be told when the main frame's URL changes, including `history.pushState`, `replaceState` and fragment navigation that never fire `onPageStarted` or `onPageFinished`. A reload of the same URL is not reported.
+- Add `AdvancedWebViewController.getBackForwardList` and `goBackOrForward`, with `WebViewBackForwardList` and `WebViewHistoryItem`: read the navigation history (oldest first, with the current index) and jump several entries at once. A step outside the history is ignored.
+
 ## 0.11.0 - 2026-11-12
 
 - Add `AdvancedSystemBrowser` and `SystemBrowserOptions`: open an `http` or `https` page in the system's browser UI, Chrome Custom Tabs on Android and `SFSafariViewController` on iOS, with `isAvailable()`, a `toolbarColor` option and an `onClosed` callback. The page runs in the user's browser with its cookies and passkeys, for sign-in flows that should not run in an embedded WebView. `onClosed` is reliable on iOS and best effort on Android, where Custom Tabs report nothing when they close. The plugin now depends on `androidx.browser`.

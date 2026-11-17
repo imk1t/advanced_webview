@@ -78,6 +78,9 @@ typedef TitleChangedCallback = void Function(String? title);
 
 /// Reports the favicon URL of a page, or `null` when it has none.
 typedef FaviconChangedCallback = void Function(String? url);
+
+/// Reports the new URL of the main frame.
+typedef UrlChangedCallback = void Function(String url);
 typedef LongPressCallback = void Function(Offset offset);
 typedef ScrollChangedCallback = void Function(Offset offset);
 typedef WebResourceErrorCallback = void Function(WebResourceError error);

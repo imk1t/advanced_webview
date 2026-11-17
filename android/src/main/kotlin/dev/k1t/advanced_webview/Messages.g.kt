@@ -756,6 +756,8 @@ data class CreationParamsMessage (
    * reported to Dart.
    */
   val hasFullscreenDelegate: Boolean,
+  /** When false, URL changes are never reported to Dart. */
+  val hasUrlChangedDelegate: Boolean,
   /**
    * Lower-case URL schemes whose requests are answered by Dart through
    * `onInterceptRequest`. Empty when the app has no intercept callback.
@@ -787,9 +789,10 @@ data class CreationParamsMessage (
       val hasFindDelegate = pigeonVar_list[17] as Boolean
       val hasFaviconDelegate = pigeonVar_list[18] as Boolean
       val hasFullscreenDelegate = pigeonVar_list[19] as Boolean
-      val interceptSchemes = pigeonVar_list[20] as List<String>
-      val userScripts = pigeonVar_list[21] as List<UserScriptMessage>
-      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, hasDownloadDelegate, hasSslErrorDelegate, hasHttpAuthDelegate, hasClientCertDelegate, hasScrollDelegate, hasLongPressDelegate, hasConsoleMessageDelegate, hasJsDialogDelegate, hasHttpErrorDelegate, hasFindDelegate, hasFaviconDelegate, hasFullscreenDelegate, interceptSchemes, userScripts)
+      val hasUrlChangedDelegate = pigeonVar_list[20] as Boolean
+      val interceptSchemes = pigeonVar_list[21] as List<String>
+      val userScripts = pigeonVar_list[22] as List<UserScriptMessage>
+      return CreationParamsMessage(webViewId, settings, javaScriptChannelNames, javaScriptHandlerNames, javaScriptHandlerObjectName, hasNavigationDelegate, hasNewWindowDelegate, hasPermissionDelegate, hasDownloadDelegate, hasSslErrorDelegate, hasHttpAuthDelegate, hasClientCertDelegate, hasScrollDelegate, hasLongPressDelegate, hasConsoleMessageDelegate, hasJsDialogDelegate, hasHttpErrorDelegate, hasFindDelegate, hasFaviconDelegate, hasFullscreenDelegate, hasUrlChangedDelegate, interceptSchemes, userScripts)
     }
   }
   fun toList(): List<Any?> {
@@ -814,6 +817,7 @@ data class CreationParamsMessage (
       hasFindDelegate,
       hasFaviconDelegate,
       hasFullscreenDelegate,
+      hasUrlChangedDelegate,
       interceptSchemes,
       userScripts,
     )
@@ -826,7 +830,7 @@ data class CreationParamsMessage (
       return true
     }
     val other = other as CreationParamsMessage
-    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.hasDownloadDelegate, other.hasDownloadDelegate) && MessagesPigeonUtils.deepEquals(this.hasSslErrorDelegate, other.hasSslErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpAuthDelegate, other.hasHttpAuthDelegate) && MessagesPigeonUtils.deepEquals(this.hasClientCertDelegate, other.hasClientCertDelegate) && MessagesPigeonUtils.deepEquals(this.hasScrollDelegate, other.hasScrollDelegate) && MessagesPigeonUtils.deepEquals(this.hasLongPressDelegate, other.hasLongPressDelegate) && MessagesPigeonUtils.deepEquals(this.hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && MessagesPigeonUtils.deepEquals(this.hasJsDialogDelegate, other.hasJsDialogDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpErrorDelegate, other.hasHttpErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasFindDelegate, other.hasFindDelegate) && MessagesPigeonUtils.deepEquals(this.hasFaviconDelegate, other.hasFaviconDelegate) && MessagesPigeonUtils.deepEquals(this.hasFullscreenDelegate, other.hasFullscreenDelegate) && MessagesPigeonUtils.deepEquals(this.interceptSchemes, other.interceptSchemes) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
+    return MessagesPigeonUtils.deepEquals(this.webViewId, other.webViewId) && MessagesPigeonUtils.deepEquals(this.settings, other.settings) && MessagesPigeonUtils.deepEquals(this.javaScriptChannelNames, other.javaScriptChannelNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerNames, other.javaScriptHandlerNames) && MessagesPigeonUtils.deepEquals(this.javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && MessagesPigeonUtils.deepEquals(this.hasNavigationDelegate, other.hasNavigationDelegate) && MessagesPigeonUtils.deepEquals(this.hasNewWindowDelegate, other.hasNewWindowDelegate) && MessagesPigeonUtils.deepEquals(this.hasPermissionDelegate, other.hasPermissionDelegate) && MessagesPigeonUtils.deepEquals(this.hasDownloadDelegate, other.hasDownloadDelegate) && MessagesPigeonUtils.deepEquals(this.hasSslErrorDelegate, other.hasSslErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpAuthDelegate, other.hasHttpAuthDelegate) && MessagesPigeonUtils.deepEquals(this.hasClientCertDelegate, other.hasClientCertDelegate) && MessagesPigeonUtils.deepEquals(this.hasScrollDelegate, other.hasScrollDelegate) && MessagesPigeonUtils.deepEquals(this.hasLongPressDelegate, other.hasLongPressDelegate) && MessagesPigeonUtils.deepEquals(this.hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && MessagesPigeonUtils.deepEquals(this.hasJsDialogDelegate, other.hasJsDialogDelegate) && MessagesPigeonUtils.deepEquals(this.hasHttpErrorDelegate, other.hasHttpErrorDelegate) && MessagesPigeonUtils.deepEquals(this.hasFindDelegate, other.hasFindDelegate) && MessagesPigeonUtils.deepEquals(this.hasFaviconDelegate, other.hasFaviconDelegate) && MessagesPigeonUtils.deepEquals(this.hasFullscreenDelegate, other.hasFullscreenDelegate) && MessagesPigeonUtils.deepEquals(this.hasUrlChangedDelegate, other.hasUrlChangedDelegate) && MessagesPigeonUtils.deepEquals(this.interceptSchemes, other.interceptSchemes) && MessagesPigeonUtils.deepEquals(this.userScripts, other.userScripts)
   }
 
   override fun hashCode(): Int {
@@ -851,12 +855,13 @@ data class CreationParamsMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasFindDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasFaviconDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.hasFullscreenDelegate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.hasUrlChangedDelegate)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.interceptSchemes)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userScripts)
     return result
   }
   override fun toString(): String {
-    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, hasDownloadDelegate=$hasDownloadDelegate, hasSslErrorDelegate=$hasSslErrorDelegate, hasHttpAuthDelegate=$hasHttpAuthDelegate, hasClientCertDelegate=$hasClientCertDelegate, hasScrollDelegate=$hasScrollDelegate, hasLongPressDelegate=$hasLongPressDelegate, hasConsoleMessageDelegate=$hasConsoleMessageDelegate, hasJsDialogDelegate=$hasJsDialogDelegate, hasHttpErrorDelegate=$hasHttpErrorDelegate, hasFindDelegate=$hasFindDelegate, hasFaviconDelegate=$hasFaviconDelegate, hasFullscreenDelegate=$hasFullscreenDelegate, interceptSchemes=$interceptSchemes, userScripts=$userScripts)"
+    return "CreationParamsMessage(webViewId=$webViewId, settings=$settings, javaScriptChannelNames=$javaScriptChannelNames, javaScriptHandlerNames=$javaScriptHandlerNames, javaScriptHandlerObjectName=$javaScriptHandlerObjectName, hasNavigationDelegate=$hasNavigationDelegate, hasNewWindowDelegate=$hasNewWindowDelegate, hasPermissionDelegate=$hasPermissionDelegate, hasDownloadDelegate=$hasDownloadDelegate, hasSslErrorDelegate=$hasSslErrorDelegate, hasHttpAuthDelegate=$hasHttpAuthDelegate, hasClientCertDelegate=$hasClientCertDelegate, hasScrollDelegate=$hasScrollDelegate, hasLongPressDelegate=$hasLongPressDelegate, hasConsoleMessageDelegate=$hasConsoleMessageDelegate, hasJsDialogDelegate=$hasJsDialogDelegate, hasHttpErrorDelegate=$hasHttpErrorDelegate, hasFindDelegate=$hasFindDelegate, hasFaviconDelegate=$hasFaviconDelegate, hasFullscreenDelegate=$hasFullscreenDelegate, hasUrlChangedDelegate=$hasUrlChangedDelegate, interceptSchemes=$interceptSchemes, userScripts=$userScripts)"
   }
 }
 
@@ -1588,6 +1593,90 @@ data class FindResultMessage (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class HistoryItemMessage (
+  val url: String,
+  val title: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): HistoryItemMessage {
+      val url = pigeonVar_list[0] as String
+      val title = pigeonVar_list[1] as String?
+      return HistoryItemMessage(url, title)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      url,
+      title,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as HistoryItemMessage
+    return MessagesPigeonUtils.deepEquals(this.url, other.url) && MessagesPigeonUtils.deepEquals(this.title, other.title)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.url)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.title)
+    return result
+  }
+  override fun toString(): String {
+    return "HistoryItemMessage(url=$url, title=$title)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class BackForwardListMessage (
+  /** Oldest entry first. */
+  val items: List<HistoryItemMessage>,
+  /** Index of the current entry in `items`, or -1 when the list is empty. */
+  val currentIndex: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): BackForwardListMessage {
+      val items = pigeonVar_list[0] as List<HistoryItemMessage>
+      val currentIndex = pigeonVar_list[1] as Long
+      return BackForwardListMessage(items, currentIndex)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      items,
+      currentIndex,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as BackForwardListMessage
+    return MessagesPigeonUtils.deepEquals(this.items, other.items) && MessagesPigeonUtils.deepEquals(this.currentIndex, other.currentIndex)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.items)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.currentIndex)
+    return result
+  }
+  override fun toString(): String {
+    return "BackForwardListMessage(items=$items, currentIndex=$currentIndex)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class ScrollPositionMessage (
   /** Horizontal offset in logical pixels. */
   val x: Double,
@@ -1995,20 +2084,30 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       163.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ScrollPositionMessage.fromList(it)
+          HistoryItemMessage.fromList(it)
         }
       }
       164.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CookieMessage.fromList(it)
+          BackForwardListMessage.fromList(it)
         }
       }
       165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SystemBrowserParamsMessage.fromList(it)
+          ScrollPositionMessage.fromList(it)
         }
       }
       166.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CookieMessage.fromList(it)
+        }
+      }
+      167.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SystemBrowserParamsMessage.fromList(it)
+        }
+      }
+      168.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           InAppBrowserParamsMessage.fromList(it)
         }
@@ -2154,20 +2253,28 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(162)
         writeValue(stream, value.toList())
       }
-      is ScrollPositionMessage -> {
+      is HistoryItemMessage -> {
         stream.write(163)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is BackForwardListMessage -> {
         stream.write(164)
         writeValue(stream, value.toList())
       }
-      is SystemBrowserParamsMessage -> {
+      is ScrollPositionMessage -> {
         stream.write(165)
         writeValue(stream, value.toList())
       }
-      is InAppBrowserParamsMessage -> {
+      is CookieMessage -> {
         stream.write(166)
+        writeValue(stream, value.toList())
+      }
+      is SystemBrowserParamsMessage -> {
+        stream.write(167)
+        writeValue(stream, value.toList())
+      }
+      is InAppBrowserParamsMessage -> {
+        stream.write(168)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -2209,6 +2316,13 @@ interface AdvancedWebViewHostApi {
   fun goForward(webViewId: Long)
   fun canGoBack(webViewId: Long): Boolean
   fun canGoForward(webViewId: Long): Boolean
+  /**
+   * Moves `steps` entries through the history (negative goes back). Does
+   * nothing when the target is outside the history.
+   */
+  fun goBackOrForward(webViewId: Long, steps: Long)
+  /** The navigation history of the main frame. */
+  fun getBackForwardList(webViewId: Long): BackForwardListMessage
   fun getUrl(webViewId: Long): String?
   fun getTitle(webViewId: Long): String?
   /** Returns the evaluation result encoded as JSON (or null). */
@@ -2615,6 +2729,42 @@ interface AdvancedWebViewHostApi {
             val webViewIdArg = args[0] as Long
             val wrapped: List<Any?> = try {
               listOf(api.canGoForward(webViewIdArg))
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.goBackOrForward$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val stepsArg = args[1] as Long
+            val wrapped: List<Any?> = try {
+              api.goBackOrForward(webViewIdArg, stepsArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getBackForwardList$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val wrapped: List<Any?> = try {
+              listOf(api.getBackForwardList(webViewIdArg))
             } catch (exception: Throwable) {
               MessagesPigeonUtils.wrapError(exception)
             }
@@ -3358,6 +3508,30 @@ class AdvancedWebViewFlutterApi(private val binaryMessenger: BinaryMessenger, pr
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
       val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onFaviconChanged$separatedMessageChannelSuffix"
+      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+      channel.send(listOf(webViewIdArg, urlArg)) {
+        if (it is List<*>) {
+          if (it.size > 1) {
+            continuation.resumeWithException(FlutterError(it[0] as String, it[1] as String, it[2] as String?))
+          } else {
+            continuation.resume(Unit)
+          }
+        } else {
+          continuation.resumeWithException(MessagesPigeonUtils.createConnectionError(channelName))
+        } 
+      }
+    }
+  }
+  /**
+   * The URL of the main frame changed, including changes made by the page
+   * itself (`history.pushState`, fragment navigation). Only sent when the
+   * controller was created with `hasUrlChangedDelegate`.
+   */
+  suspend fun onUrlChanged(webViewIdArg: Long, urlArg: String)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    return suspendCancellableCoroutine { continuation ->
+      val channelName = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onUrlChanged$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(webViewIdArg, urlArg)) {
         if (it is List<*>) {

@@ -271,6 +271,7 @@ class InAppBrowserTest {
         hasFindDelegate = false,
         hasFaviconDelegate = false,
         hasFullscreenDelegate = false,
+        hasUrlChangedDelegate = false,
         interceptSchemes = emptyList(),
         userScripts = emptyList(),
     )

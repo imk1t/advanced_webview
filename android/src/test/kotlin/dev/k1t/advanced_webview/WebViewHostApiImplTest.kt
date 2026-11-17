@@ -41,6 +41,7 @@ import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockStatic
 import org.mockito.Mockito.never
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.Robolectric
@@ -375,6 +376,34 @@ class WebViewHostApiImplTest {
             any(),
             any(),
         )
+    }
+
+    @Test
+    fun urlChangesAreOnlyReportedWithADelegateAndNotForReloads() {
+        val channel = "dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onUrlChanged"
+        hostApi.create(params(webViewId = 1))
+        hostApi.create(params(webViewId = 2, hasUrlChangedDelegate = true))
+
+        for (id in 1L..2L) {
+            val view = registry.get(id).webView
+            view.webViewClient.doUpdateVisitedHistory(view, "https://a.test/#x", false)
+        }
+        val reloaded = registry.get(2).webView
+        reloaded.webViewClient.doUpdateVisitedHistory(reloaded, "https://a.test/#x", true)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(messenger, times(1)).send(eq(channel), any(), any())
+    }
+
+    @Test
+    fun anEmptyHistoryHasNoCurrentEntry() {
+        hostApi.create(params(webViewId = 1))
+
+        val list = hostApi.getBackForwardList(1)
+
+        assertEquals(emptyList<HistoryItemMessage>(), list.items)
+        assertEquals(-1L, list.currentIndex)
+        hostApi.goBackOrForward(1, -3)
     }
 
     @Test
@@ -1002,6 +1031,7 @@ class WebViewHostApiImplTest {
         hasFindDelegate: Boolean = false,
         hasFaviconDelegate: Boolean = false,
         hasFullscreenDelegate: Boolean = false,
+        hasUrlChangedDelegate: Boolean = false,
         interceptSchemes: List<String> = emptyList(),
         userScripts: List<UserScriptMessage> = emptyList(),
     ) = CreationParamsMessage(
@@ -1025,6 +1055,7 @@ class WebViewHostApiImplTest {
         hasFindDelegate,
         hasFaviconDelegate,
         hasFullscreenDelegate,
+        hasUrlChangedDelegate,
         interceptSchemes,
         userScripts,
     )
