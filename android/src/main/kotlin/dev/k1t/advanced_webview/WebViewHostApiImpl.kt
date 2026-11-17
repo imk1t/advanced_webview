@@ -123,7 +123,9 @@ class WebViewHostApiImpl(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) return certificate.x509Certificate
         // Before API 29 the certificate is only reachable through the state bundle.
         val bytes = SslCertificate.saveState(certificate)?.getByteArray("x509-certificate") ?: return null
-        return CertificateFactory.getInstance("X.509").generateCertificate(ByteArrayInputStream(bytes)) as? X509Certificate
+        return CertificateFactory.getInstance(
+            "X.509",
+        ).generateCertificate(ByteArrayInputStream(bytes)) as? X509Certificate
     }
 
     override fun getUrl(webViewId: Long): String? = registry.get(webViewId).webView.url
