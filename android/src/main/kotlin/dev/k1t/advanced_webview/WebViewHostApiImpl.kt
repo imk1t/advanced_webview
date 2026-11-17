@@ -4,10 +4,16 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.net.http.SslCertificate
+import android.os.Build
 import io.flutter.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.ByteArrayInputStream
 import java.io.File
+import java.security.MessageDigest
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 
 /** Implements the Dart -> native calls by dispatching to [WebViewRegistry]. */
 class WebViewHostApiImpl(
@@ -104,6 +110,22 @@ class WebViewHostApiImpl(
             HistoryItemMessage(url = item.url, title = item.title?.takeIf { it.isNotEmpty() })
         }
         return BackForwardListMessage(items = items, currentIndex = list.currentIndex.toLong())
+    }
+
+    override fun getCertificate(webViewId: Long): CertificateMessage? {
+        val certificate = registry.get(webViewId).webView.certificate ?: return null
+        val der = x509Of(certificate)?.encoded ?: return null
+        val digest = MessageDigest.getInstance("SHA-256").digest(der)
+        return CertificateMessage(der = der, sha256 = digest.joinToString("") { "%02x".format(it) })
+    }
+
+    private fun x509Of(certificate: SslCertificate): X509Certificate? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) return certificate.x509Certificate
+        // Before API 29 the certificate is only reachable through the state bundle.
+        val bytes = SslCertificate.saveState(certificate)?.getByteArray("x509-certificate") ?: return null
+        return CertificateFactory.getInstance(
+            "X.509",
+        ).generateCertificate(ByteArrayInputStream(bytes)) as? X509Certificate
     }
 
     override fun getUrl(webViewId: Long): String? = registry.get(webViewId).webView.url

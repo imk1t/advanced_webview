@@ -99,7 +99,7 @@ On both platforms, JavaScript can call `window.Bridge.postMessage('hello')`.
 - Download notifications (the app decides how to fetch the file)
 - Full-screen in-app browser with a toolbar (`AdvancedInAppBrowser`)
 - System browser for sign-in flows: Chrome Custom Tabs / `SFSafariViewController` (`AdvancedSystemBrowser`)
-- Certificate error, HTTP authentication and client certificate (mutual TLS) callbacks
+- Certificate error, HTTP authentication and client certificate (mutual TLS) callbacks, and the current page's certificate
 - Navigation decisions (main frame)
 - History list, jumping several entries, URL change callback for single-page apps
 - Request interception: answer custom-scheme requests (and, on Android, `https`) from Dart

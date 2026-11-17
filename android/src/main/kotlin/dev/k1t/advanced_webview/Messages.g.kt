@@ -1677,6 +1677,49 @@ data class BackForwardListMessage (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class CertificateMessage (
+  /** The server's (leaf) certificate, DER encoded. */
+  val der: ByteArray,
+  /** SHA-256 of `der` as lower-case hex. */
+  val sha256: String
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): CertificateMessage {
+      val der = pigeonVar_list[0] as ByteArray
+      val sha256 = pigeonVar_list[1] as String
+      return CertificateMessage(der, sha256)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      der,
+      sha256,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as CertificateMessage
+    return MessagesPigeonUtils.deepEquals(this.der, other.der) && MessagesPigeonUtils.deepEquals(this.sha256, other.sha256)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.der)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.sha256)
+    return result
+  }
+  override fun toString(): String {
+    return "CertificateMessage(der=${der.contentToString()}, sha256=$sha256)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class ScrollPositionMessage (
   /** Horizontal offset in logical pixels. */
   val x: Double,
@@ -2094,20 +2137,25 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ScrollPositionMessage.fromList(it)
+          CertificateMessage.fromList(it)
         }
       }
       166.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CookieMessage.fromList(it)
+          ScrollPositionMessage.fromList(it)
         }
       }
       167.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SystemBrowserParamsMessage.fromList(it)
+          CookieMessage.fromList(it)
         }
       }
       168.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SystemBrowserParamsMessage.fromList(it)
+        }
+      }
+      169.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           InAppBrowserParamsMessage.fromList(it)
         }
@@ -2261,20 +2309,24 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(164)
         writeValue(stream, value.toList())
       }
-      is ScrollPositionMessage -> {
+      is CertificateMessage -> {
         stream.write(165)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is ScrollPositionMessage -> {
         stream.write(166)
         writeValue(stream, value.toList())
       }
-      is SystemBrowserParamsMessage -> {
+      is CookieMessage -> {
         stream.write(167)
         writeValue(stream, value.toList())
       }
-      is InAppBrowserParamsMessage -> {
+      is SystemBrowserParamsMessage -> {
         stream.write(168)
+        writeValue(stream, value.toList())
+      }
+      is InAppBrowserParamsMessage -> {
+        stream.write(169)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -2323,6 +2375,11 @@ interface AdvancedWebViewHostApi {
   fun goBackOrForward(webViewId: Long, steps: Long)
   /** The navigation history of the main frame. */
   fun getBackForwardList(webViewId: Long): BackForwardListMessage
+  /**
+   * The certificate the server of the current page presented, or null when
+   * the page was not loaded over HTTPS.
+   */
+  fun getCertificate(webViewId: Long): CertificateMessage?
   fun getUrl(webViewId: Long): String?
   fun getTitle(webViewId: Long): String?
   /** Returns the evaluation result encoded as JSON (or null). */
@@ -2765,6 +2822,23 @@ interface AdvancedWebViewHostApi {
             val webViewIdArg = args[0] as Long
             val wrapped: List<Any?> = try {
               listOf(api.getBackForwardList(webViewIdArg))
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getCertificate$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val wrapped: List<Any?> = try {
+              listOf(api.getCertificate(webViewIdArg))
             } catch (exception: Throwable) {
               MessagesPigeonUtils.wrapError(exception)
             }

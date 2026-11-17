@@ -4,6 +4,7 @@ import 'dart:ui' show Offset;
 
 import 'package:flutter/foundation.dart';
 
+import 'certificate.dart';
 import 'console_message.dart';
 import 'cookie.dart';
 import 'download.dart';
@@ -552,6 +553,25 @@ class AdvancedWebViewController {
       ],
       currentIndex: list.currentIndex,
     );
+  }
+
+  /// The certificate the server presented for the current page, or `null`
+  /// when the page was not loaded over HTTPS (or nothing is loaded yet).
+  ///
+  /// Use it to show the user who they are talking to, or to compare
+  /// [WebViewCertificate.sha256] with a fingerprint you expect (certificate
+  /// pinning for the page you display). Only the server's own certificate is
+  /// returned, not the chain. To decide about a certificate the platform
+  /// rejects, use [onSslError].
+  ///
+  /// Android: `WebView.getCertificate` (`SslCertificate.getX509Certificate`
+  /// from Android 10; before that the certificate saved in
+  /// `SslCertificate.saveState`).
+  /// iOS: `WKWebView.serverTrust` (`SecTrustCopyCertificateChain`).
+  Future<WebViewCertificate?> getCertificate() async {
+    final message = await _call(() => _hostApi.getCertificate(webViewId));
+    if (message == null) return null;
+    return WebViewCertificate.fromDer(message.der, sha256: message.sha256);
   }
 
   Future<bool> canGoBack() => _call(() => _hostApi.canGoBack(webViewId));

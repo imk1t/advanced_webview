@@ -97,7 +97,7 @@ JS からは両OS共通で `window.Bridge.postMessage('hello')` を呼べます�
 - ダウンロードの通知（ファイルの取得方法はアプリが決める）
 - ツールバー付きの全画面アプリ内ブラウザ（`AdvancedInAppBrowser`）
 - サインインなど向けのシステムブラウザ: Chrome Custom Tabs / `SFSafariViewController`（`AdvancedSystemBrowser`）
-- 証明書エラー、HTTP 認証、クライアント証明書（相互 TLS）のコールバック
+- 証明書エラー、HTTP 認証、クライアント証明書（相互 TLS）のコールバックと、表示中ページの証明書の取得
 - リクエストのインターセプト: カスタムスキーム（Android では `https` も）へのリクエストに Dart から応答
 - 一時停止と再開（`pause`、`resume`、Android の `pauseTimers`）
 - ズーム操作（`zoomBy`、`setZoomScale`）

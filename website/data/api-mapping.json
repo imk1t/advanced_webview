@@ -69,6 +69,7 @@
       "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
+      "SslCertificate": "https://developer.android.com/reference/android/net/http/SslCertificate",
       "WebBackForwardList": "https://developer.android.com/reference/android/webkit/WebBackForwardList",
       "WebHistoryItem": "https://developer.android.com/reference/android/webkit/WebHistoryItem",
       "CustomTabsIntent": "https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent",
@@ -106,6 +107,8 @@
     },
     "ios": {
       "WKWebView": "https://developer.apple.com/documentation/webkit/wkwebview",
+      "SecTrustCopyCertificateChain": "https://developer.apple.com/documentation/security/sectrustcopycertificatechain(_:)",
+      "SecCertificateCopyData": "https://developer.apple.com/documentation/security/seccertificatecopydata(_:)",
       "WKBackForwardList": "https://developer.apple.com/documentation/webkit/wkbackforwardlist",
       "WKBackForwardListItem": "https://developer.apple.com/documentation/webkit/wkbackforwardlistitem",
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
@@ -1114,6 +1117,50 @@
           "en": "Observed with KVO and scaled to 0-100.",
           "ja": "KVO で監視し、0〜100 に変換します。"
         }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.getCertificate",
+      "group": "loading",
+      "summary": {
+        "en": "Returns the certificate the server of the current page presented.",
+        "ja": "表示中ページのサーバーが提示した証明書を返します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.getCertificate()", "SslCertificate.getX509Certificate()"],
+        "note": {
+          "en": "Before Android 10 the certificate is read from SslCertificate.saveState. Subject, issuer and validity are parsed from the DER bytes in Dart so both platforms agree.",
+          "ja": "Android 10 より前は SslCertificate.saveState から証明書を取り出します。サブジェクト・発行者・有効期間は両 OS で揃うよう、DER を Dart で解析して得ます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKWebView.serverTrust",
+          "SecTrustCopyCertificateChain(_:)",
+          "SecCertificateCopyData(_:)"
+        ],
+        "note": {
+          "en": "Only the leaf certificate is returned.",
+          "ja": "返すのは先頭(リーフ)の証明書だけです。"
+        }
+      }
+    },
+    {
+      "dart": "WebViewCertificate",
+      "group": "loading",
+      "summary": {
+        "en": "The server certificate: subject, issuer, validity, SHA-256 fingerprint and DER bytes.",
+        "ja": "サーバー証明書で、サブジェクト・発行者・有効期間・SHA-256 フィンガープリント・DER を持ちます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["SslCertificate.getX509Certificate()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["SecCertificateCopyData(_:)"]
       }
     },
     {

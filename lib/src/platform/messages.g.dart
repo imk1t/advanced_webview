@@ -1713,6 +1713,58 @@ class BackForwardListMessage {
   }
 }
 
+class CertificateMessage {
+  CertificateMessage({
+    required this.der,
+    required this.sha256,
+  });
+
+  /// The server's (leaf) certificate, DER encoded.
+  Uint8List der;
+
+  /// SHA-256 of `der` as lower-case hex.
+  String sha256;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      der,
+      sha256,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static CertificateMessage decode(Object result) {
+    result as List<Object?>;
+    return CertificateMessage(
+      der: result[0]! as Uint8List,
+      sha256: result[1]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! CertificateMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(der, other.der) && _deepEquals(sha256, other.sha256);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'CertificateMessage(der: $der, sha256: $sha256)';
+  }
+}
+
 class ScrollPositionMessage {
   ScrollPositionMessage({
     required this.x,
@@ -2095,17 +2147,20 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is BackForwardListMessage) {
       buffer.putUint8(164);
       writeValue(buffer, value.encode());
-    }    else if (value is ScrollPositionMessage) {
+    }    else if (value is CertificateMessage) {
       buffer.putUint8(165);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is ScrollPositionMessage) {
       buffer.putUint8(166);
       writeValue(buffer, value.encode());
-    }    else if (value is SystemBrowserParamsMessage) {
+    }    else if (value is CookieMessage) {
       buffer.putUint8(167);
       writeValue(buffer, value.encode());
-    }    else if (value is InAppBrowserParamsMessage) {
+    }    else if (value is SystemBrowserParamsMessage) {
       buffer.putUint8(168);
+      writeValue(buffer, value.encode());
+    }    else if (value is InAppBrowserParamsMessage) {
+      buffer.putUint8(169);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2202,12 +2257,14 @@ class _PigeonCodec extends StandardMessageCodec {
       case 164:
         return BackForwardListMessage.decode(readValue(buffer)!);
       case 165:
-        return ScrollPositionMessage.decode(readValue(buffer)!);
+        return CertificateMessage.decode(readValue(buffer)!);
       case 166:
-        return CookieMessage.decode(readValue(buffer)!);
+        return ScrollPositionMessage.decode(readValue(buffer)!);
       case 167:
-        return SystemBrowserParamsMessage.decode(readValue(buffer)!);
+        return CookieMessage.decode(readValue(buffer)!);
       case 168:
+        return SystemBrowserParamsMessage.decode(readValue(buffer)!);
+      case 169:
         return InAppBrowserParamsMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2588,6 +2645,27 @@ class AdvancedWebViewHostApi {
     )
     ;
     return pigeonVar_replyValue! as BackForwardListMessage;
+  }
+
+  /// The certificate the server of the current page presented, or null when
+  /// the page was not loaded over HTTPS.
+  Future<CertificateMessage?> getCertificate(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getCertificate$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+    return pigeonVar_replyValue as CertificateMessage?;
   }
 
   Future<String?> getUrl(int webViewId) async {

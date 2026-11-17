@@ -3,6 +3,20 @@
 By default the WebView refuses pages with a bad certificate, cancels HTTP authentication and does not present
 a client certificate. Three callbacks let the app take over.
 
+## The certificate of the current page
+
+```dart
+final certificate = await controller.getCertificate(); // null when not HTTPS
+print(certificate?.subject); // CN=example.com, O=Example Inc, C=US
+print(certificate?.issuer);
+print(certificate?.notAfter); // UTC
+print(certificate?.sha256); // lower-case hex
+```
+
+Use it to show who the user is talking to, or to compare the fingerprint with one you expect. Subject and issuer are
+read from the certificate itself, so they look the same on Android and iOS. Only the server's own certificate is
+returned, not the chain. To decide about a certificate the platform rejects, use `onSslError` (below).
+
 ## Certificate errors
 
 ```dart
