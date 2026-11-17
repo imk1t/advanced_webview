@@ -1185,6 +1185,67 @@ void main() {
     });
   });
 
+  group('proxy', () {
+    test('forwards the configuration', () async {
+      final controller = createController();
+      await controller.setProxy(
+        const ProxyConfig(
+          host: ' proxy.test ',
+          port: 3128,
+          type: ProxyType.socks5,
+          bypassHosts: ['localhost'],
+        ),
+      );
+
+      final sent = hostApi.proxy!;
+      expect(sent.host, 'proxy.test');
+      expect(sent.port, 3128);
+      expect(sent.type, ProxyTypeMessage.socks5);
+      expect(sent.bypassHosts, ['localhost']);
+    });
+
+    test('null clears it', () async {
+      final controller = createController();
+      await controller.setProxy(const ProxyConfig(host: 'p', port: 1));
+      await controller.setProxy(null);
+
+      expect(hostApi.proxy, isNull);
+      expect(
+        hostApi.calls,
+        containsAllInOrder(['setProxy p', 'setProxy null']),
+      );
+    });
+
+    test('rejects an empty host and a bad port before calling native', () {
+      final controller = createController();
+
+      expect(
+        () => controller.setProxy(const ProxyConfig(host: ' ', port: 80)),
+        throwsArgumentError,
+      );
+      expect(
+        () => controller.setProxy(const ProxyConfig(host: 'p', port: 0)),
+        throwsArgumentError,
+      );
+      expect(
+        () => controller.setProxy(const ProxyConfig(host: 'p', port: 70000)),
+        throwsArgumentError,
+      );
+      expect(hostApi.proxy, isNull);
+    });
+
+    test('ProxyConfig compares by value', () {
+      expect(
+        const ProxyConfig(host: 'p', port: 1, bypassHosts: ['a']),
+        const ProxyConfig(host: 'p', port: 1, bypassHosts: ['a']),
+      );
+      expect(
+        const ProxyConfig(host: 'p', port: 1),
+        isNot(const ProxyConfig(host: 'p', port: 2)),
+      );
+    });
+  });
+
   group('url changes and history', () {
     test('are only delegated when a callback is set', () async {
       final without = createController();

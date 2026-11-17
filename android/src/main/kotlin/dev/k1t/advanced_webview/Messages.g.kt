@@ -201,6 +201,17 @@ class FlutterError (
   val details: Any? = null
 ) : RuntimeException()
 
+enum class ProxyTypeMessage(val raw: Int) {
+  HTTP(0),
+  SOCKS5(1);
+
+  companion object {
+    fun ofRaw(raw: Int): ProxyTypeMessage? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class CacheModeMessage(val raw: Int) {
   NORMAL(0),
   PREFER_CACHE(1),
@@ -1677,6 +1688,56 @@ data class BackForwardListMessage (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class ProxyConfigMessage (
+  val host: String,
+  val port: Long,
+  val type: ProxyTypeMessage,
+  /** Domains reached directly. Each also covers its subdomains. */
+  val bypassHosts: List<String>
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ProxyConfigMessage {
+      val host = pigeonVar_list[0] as String
+      val port = pigeonVar_list[1] as Long
+      val type = pigeonVar_list[2] as ProxyTypeMessage
+      val bypassHosts = pigeonVar_list[3] as List<String>
+      return ProxyConfigMessage(host, port, type, bypassHosts)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      host,
+      port,
+      type,
+      bypassHosts,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as ProxyConfigMessage
+    return MessagesPigeonUtils.deepEquals(this.host, other.host) && MessagesPigeonUtils.deepEquals(this.port, other.port) && MessagesPigeonUtils.deepEquals(this.type, other.type) && MessagesPigeonUtils.deepEquals(this.bypassHosts, other.bypassHosts)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.host)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.port)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.type)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.bypassHosts)
+    return result
+  }
+  override fun toString(): String {
+    return "ProxyConfigMessage(host=$host, port=$port, type=$type, bypassHosts=$bypassHosts)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class CertificateMessage (
   /** The server's (leaf) certificate, DER encoded. */
   val der: ByteArray,
@@ -1957,205 +2018,215 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
     return when (type) {
       129.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          CacheModeMessage.ofRaw(it.toInt())
+          ProxyTypeMessage.ofRaw(it.toInt())
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          ContentModeMessage.ofRaw(it.toInt())
+          CacheModeMessage.ofRaw(it.toInt())
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          UserInterfaceStyleMessage.ofRaw(it.toInt())
+          ContentModeMessage.ofRaw(it.toInt())
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          MixedContentModeMessage.ofRaw(it.toInt())
+          UserInterfaceStyleMessage.ofRaw(it.toInt())
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          ConsoleMessageLevelMessage.ofRaw(it.toInt())
+          MixedContentModeMessage.ofRaw(it.toInt())
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          UserScriptInjectionTimeMessage.ofRaw(it.toInt())
+          ConsoleMessageLevelMessage.ofRaw(it.toInt())
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          NavigationDecisionMessage.ofRaw(it.toInt())
+          UserScriptInjectionTimeMessage.ofRaw(it.toInt())
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          SslErrorDecisionMessage.ofRaw(it.toInt())
+          NavigationDecisionMessage.ofRaw(it.toInt())
         }
       }
       137.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          ClientCertActionMessage.ofRaw(it.toInt())
+          SslErrorDecisionMessage.ofRaw(it.toInt())
         }
       }
       138.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PermissionResourceMessage.ofRaw(it.toInt())
+          ClientCertActionMessage.ofRaw(it.toInt())
         }
       }
       139.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PermissionDecisionMessage.ofRaw(it.toInt())
+          PermissionResourceMessage.ofRaw(it.toInt())
         }
       }
       140.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          JsDialogTypeMessage.ofRaw(it.toInt())
+          PermissionDecisionMessage.ofRaw(it.toInt())
         }
       }
       141.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          WebsiteDataTypeMessage.ofRaw(it.toInt())
+          JsDialogTypeMessage.ofRaw(it.toInt())
         }
       }
       142.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          HttpMethodMessage.ofRaw(it.toInt())
+          WebsiteDataTypeMessage.ofRaw(it.toInt())
         }
       }
       143.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          WebViewSettingsMessage.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          HttpMethodMessage.ofRaw(it.toInt())
         }
       }
       144.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ConsoleMessageMessage.fromList(it)
+          WebViewSettingsMessage.fromList(it)
         }
       }
       145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UserScriptMessage.fromList(it)
+          ConsoleMessageMessage.fromList(it)
         }
       }
       146.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CreationParamsMessage.fromList(it)
+          UserScriptMessage.fromList(it)
         }
       }
       147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          NavigationRequestMessage.fromList(it)
+          CreationParamsMessage.fromList(it)
         }
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpErrorMessage.fromList(it)
+          NavigationRequestMessage.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          RenderProcessGoneMessage.fromList(it)
+          HttpErrorMessage.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          WebResourceErrorMessage.fromList(it)
+          RenderProcessGoneMessage.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SslErrorMessage.fromList(it)
+          WebResourceErrorMessage.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthRequestMessage.fromList(it)
+          SslErrorMessage.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ClientCertRequestMessage.fromList(it)
+          HttpAuthRequestMessage.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ClientCertResponseMessage.fromList(it)
+          ClientCertRequestMessage.fromList(it)
         }
       }
       155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthCredentialsMessage.fromList(it)
+          ClientCertResponseMessage.fromList(it)
         }
       }
       156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DownloadRequestMessage.fromList(it)
+          HttpAuthCredentialsMessage.fromList(it)
         }
       }
       157.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PermissionRequestMessage.fromList(it)
+          DownloadRequestMessage.fromList(it)
         }
       }
       158.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogRequestMessage.fromList(it)
+          PermissionRequestMessage.fromList(it)
         }
       }
       159.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogResultMessage.fromList(it)
+          JsDialogRequestMessage.fromList(it)
         }
       }
       160.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InterceptRequestMessage.fromList(it)
+          JsDialogResultMessage.fromList(it)
         }
       }
       161.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InterceptResponseMessage.fromList(it)
+          InterceptRequestMessage.fromList(it)
         }
       }
       162.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          FindResultMessage.fromList(it)
+          InterceptResponseMessage.fromList(it)
         }
       }
       163.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HistoryItemMessage.fromList(it)
+          FindResultMessage.fromList(it)
         }
       }
       164.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BackForwardListMessage.fromList(it)
+          HistoryItemMessage.fromList(it)
         }
       }
       165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CertificateMessage.fromList(it)
+          BackForwardListMessage.fromList(it)
         }
       }
       166.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ScrollPositionMessage.fromList(it)
+          ProxyConfigMessage.fromList(it)
         }
       }
       167.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CookieMessage.fromList(it)
+          CertificateMessage.fromList(it)
         }
       }
       168.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SystemBrowserParamsMessage.fromList(it)
+          ScrollPositionMessage.fromList(it)
         }
       }
       169.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CookieMessage.fromList(it)
+        }
+      }
+      170.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SystemBrowserParamsMessage.fromList(it)
+        }
+      }
+      171.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           InAppBrowserParamsMessage.fromList(it)
         }
@@ -2165,168 +2236,176 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
   }
   override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     when (value) {
-      is CacheModeMessage -> {
+      is ProxyTypeMessage -> {
         stream.write(129)
         writeValue(stream, value.raw.toLong())
       }
-      is ContentModeMessage -> {
+      is CacheModeMessage -> {
         stream.write(130)
         writeValue(stream, value.raw.toLong())
       }
-      is UserInterfaceStyleMessage -> {
+      is ContentModeMessage -> {
         stream.write(131)
         writeValue(stream, value.raw.toLong())
       }
-      is MixedContentModeMessage -> {
+      is UserInterfaceStyleMessage -> {
         stream.write(132)
         writeValue(stream, value.raw.toLong())
       }
-      is ConsoleMessageLevelMessage -> {
+      is MixedContentModeMessage -> {
         stream.write(133)
         writeValue(stream, value.raw.toLong())
       }
-      is UserScriptInjectionTimeMessage -> {
+      is ConsoleMessageLevelMessage -> {
         stream.write(134)
         writeValue(stream, value.raw.toLong())
       }
-      is NavigationDecisionMessage -> {
+      is UserScriptInjectionTimeMessage -> {
         stream.write(135)
         writeValue(stream, value.raw.toLong())
       }
-      is SslErrorDecisionMessage -> {
+      is NavigationDecisionMessage -> {
         stream.write(136)
         writeValue(stream, value.raw.toLong())
       }
-      is ClientCertActionMessage -> {
+      is SslErrorDecisionMessage -> {
         stream.write(137)
         writeValue(stream, value.raw.toLong())
       }
-      is PermissionResourceMessage -> {
+      is ClientCertActionMessage -> {
         stream.write(138)
         writeValue(stream, value.raw.toLong())
       }
-      is PermissionDecisionMessage -> {
+      is PermissionResourceMessage -> {
         stream.write(139)
         writeValue(stream, value.raw.toLong())
       }
-      is JsDialogTypeMessage -> {
+      is PermissionDecisionMessage -> {
         stream.write(140)
         writeValue(stream, value.raw.toLong())
       }
-      is WebsiteDataTypeMessage -> {
+      is JsDialogTypeMessage -> {
         stream.write(141)
         writeValue(stream, value.raw.toLong())
       }
-      is HttpMethodMessage -> {
+      is WebsiteDataTypeMessage -> {
         stream.write(142)
         writeValue(stream, value.raw.toLong())
       }
-      is WebViewSettingsMessage -> {
+      is HttpMethodMessage -> {
         stream.write(143)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is ConsoleMessageMessage -> {
+      is WebViewSettingsMessage -> {
         stream.write(144)
         writeValue(stream, value.toList())
       }
-      is UserScriptMessage -> {
+      is ConsoleMessageMessage -> {
         stream.write(145)
         writeValue(stream, value.toList())
       }
-      is CreationParamsMessage -> {
+      is UserScriptMessage -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
-      is NavigationRequestMessage -> {
+      is CreationParamsMessage -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is HttpErrorMessage -> {
+      is NavigationRequestMessage -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is RenderProcessGoneMessage -> {
+      is HttpErrorMessage -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is WebResourceErrorMessage -> {
+      is RenderProcessGoneMessage -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is SslErrorMessage -> {
+      is WebResourceErrorMessage -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is HttpAuthRequestMessage -> {
+      is SslErrorMessage -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is ClientCertRequestMessage -> {
+      is HttpAuthRequestMessage -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is ClientCertResponseMessage -> {
+      is ClientCertRequestMessage -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is HttpAuthCredentialsMessage -> {
+      is ClientCertResponseMessage -> {
         stream.write(155)
         writeValue(stream, value.toList())
       }
-      is DownloadRequestMessage -> {
+      is HttpAuthCredentialsMessage -> {
         stream.write(156)
         writeValue(stream, value.toList())
       }
-      is PermissionRequestMessage -> {
+      is DownloadRequestMessage -> {
         stream.write(157)
         writeValue(stream, value.toList())
       }
-      is JsDialogRequestMessage -> {
+      is PermissionRequestMessage -> {
         stream.write(158)
         writeValue(stream, value.toList())
       }
-      is JsDialogResultMessage -> {
+      is JsDialogRequestMessage -> {
         stream.write(159)
         writeValue(stream, value.toList())
       }
-      is InterceptRequestMessage -> {
+      is JsDialogResultMessage -> {
         stream.write(160)
         writeValue(stream, value.toList())
       }
-      is InterceptResponseMessage -> {
+      is InterceptRequestMessage -> {
         stream.write(161)
         writeValue(stream, value.toList())
       }
-      is FindResultMessage -> {
+      is InterceptResponseMessage -> {
         stream.write(162)
         writeValue(stream, value.toList())
       }
-      is HistoryItemMessage -> {
+      is FindResultMessage -> {
         stream.write(163)
         writeValue(stream, value.toList())
       }
-      is BackForwardListMessage -> {
+      is HistoryItemMessage -> {
         stream.write(164)
         writeValue(stream, value.toList())
       }
-      is CertificateMessage -> {
+      is BackForwardListMessage -> {
         stream.write(165)
         writeValue(stream, value.toList())
       }
-      is ScrollPositionMessage -> {
+      is ProxyConfigMessage -> {
         stream.write(166)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is CertificateMessage -> {
         stream.write(167)
         writeValue(stream, value.toList())
       }
-      is SystemBrowserParamsMessage -> {
+      is ScrollPositionMessage -> {
         stream.write(168)
         writeValue(stream, value.toList())
       }
-      is InAppBrowserParamsMessage -> {
+      is CookieMessage -> {
         stream.write(169)
+        writeValue(stream, value.toList())
+      }
+      is SystemBrowserParamsMessage -> {
+        stream.write(170)
+        writeValue(stream, value.toList())
+      }
+      is InAppBrowserParamsMessage -> {
+        stream.write(171)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -2375,6 +2454,14 @@ interface AdvancedWebViewHostApi {
   fun goBackOrForward(webViewId: Long, steps: Long)
   /** The navigation history of the main frame. */
   fun getBackForwardList(webViewId: Long): BackForwardListMessage
+  /**
+   * Routes the WebView's traffic through a proxy, or back to a direct
+   * connection when `config` is null. Android's proxy override is
+   * process-wide (all WebViews of the app); iOS sets it on the WebView's
+   * website data store. Fails with `unsupported` when Android's WebView has no
+   * proxy override and with `invalid-argument` for a bad host or port.
+   */
+  suspend fun setProxy(webViewId: Long, config: ProxyConfigMessage?)
   /**
    * The certificate the server of the current page presented, or null when
    * the page was not loaded over HTTPS.
@@ -2826,6 +2913,27 @@ interface AdvancedWebViewHostApi {
               MessagesPigeonUtils.wrapError(exception)
             }
             reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setProxy$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val configArg = args[1] as ProxyConfigMessage?
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                api.setProxy(webViewIdArg, configArg)
+                listOf(null)
+              } catch (exception: Throwable) {
+                MessagesPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
           }
         } else {
           channel.setMessageHandler(null)

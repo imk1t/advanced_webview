@@ -47,6 +47,35 @@ final class RunnerTests: XCTestCase {
     XCTAssertNil(try hostApi.getCertificate(webViewId: 1))
   }
 
+  func testProxyIsSetAndCleared() async throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    let store = try registry.get(1).webView.configuration.websiteDataStore
+
+    try await hostApi.setProxy(
+      webViewId: 1,
+      config: ProxyConfigMessage(
+        host: "127.0.0.1", port: 8080, type: .socks5, bypassHosts: ["example.com"]))
+    XCTAssertEqual(store.proxyConfigurations.count, 1)
+
+    try await hostApi.setProxy(webViewId: 1, config: nil)
+    XCTAssertTrue(store.proxyConfigurations.isEmpty)
+  }
+
+  func testAnInvalidProxyIsRejected() async throws {
+    let (hostApi, _, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+
+    do {
+      try await hostApi.setProxy(
+        webViewId: 1,
+        config: ProxyConfigMessage(host: "", port: 8080, type: .http, bypassHosts: []))
+      XCTFail("expected invalid-argument")
+    } catch let error as PigeonError {
+      XCTAssertEqual(error.code, "invalid-argument")
+    }
+  }
+
   func testUnknownIdThrowsNotFound() {
     let (hostApi, _, _) = makeHostApi()
 

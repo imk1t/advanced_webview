@@ -54,8 +54,8 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import kotlin.test.assertSame
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -393,6 +393,18 @@ class WebViewHostApiImplTest {
         shadowOf(Looper.getMainLooper()).idle()
 
         verify(messenger, times(1)).send(eq(channel), any(), any())
+    }
+
+    @Test
+    fun anInvalidProxyIsRejectedOrUnsupported() = runBlocking(Dispatchers.Unconfined) {
+        hostApi.create(params(webViewId = 1))
+
+        val error = runCatching {
+            hostApi.setProxy(1, ProxyConfigMessage("", 8080, ProxyTypeMessage.HTTP, emptyList()))
+        }.exceptionOrNull()
+
+        // Robolectric's WebView has no proxy override; a real one rejects the empty host.
+        assertTrue(error is FlutterError && (error.code == "unsupported" || error.code == "invalid-argument"))
     }
 
     @Test

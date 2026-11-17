@@ -70,6 +70,8 @@
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
       "SslCertificate": "https://developer.android.com/reference/android/net/http/SslCertificate",
+      "ProxyController": "https://developer.android.com/reference/androidx/webkit/ProxyController",
+      "ProxyConfig": "https://developer.android.com/reference/androidx/webkit/ProxyConfig",
       "WebBackForwardList": "https://developer.android.com/reference/android/webkit/WebBackForwardList",
       "WebHistoryItem": "https://developer.android.com/reference/android/webkit/WebHistoryItem",
       "CustomTabsIntent": "https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent",
@@ -109,6 +111,7 @@
       "WKWebView": "https://developer.apple.com/documentation/webkit/wkwebview",
       "SecTrustCopyCertificateChain": "https://developer.apple.com/documentation/security/sectrustcopycertificatechain(_:)",
       "SecCertificateCopyData": "https://developer.apple.com/documentation/security/seccertificatecopydata(_:)",
+      "ProxyConfiguration": "https://developer.apple.com/documentation/network/proxyconfiguration",
       "WKBackForwardList": "https://developer.apple.com/documentation/webkit/wkbackforwardlist",
       "WKBackForwardListItem": "https://developer.apple.com/documentation/webkit/wkbackforwardlistitem",
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
@@ -1161,6 +1164,67 @@
       "ios": {
         "status": "supported",
         "apis": ["SecCertificateCopyData(_:)"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.setProxy",
+      "group": "loading",
+      "summary": {
+        "en": "Sends the WebView's traffic through a proxy, or back to a direct connection with null.",
+        "ja": "WebView の通信をプロキシ経由にします。null を渡すと直接接続に戻ります。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "ProxyController.setProxyOverride(ProxyConfig, Executor, Runnable)",
+          "ProxyController.clearProxyOverride(Executor, Runnable)",
+          "ProxyConfig",
+          "WebViewFeature.isFeatureSupported(String)"
+        ],
+        "note": {
+          "en": "ProxyConfig.Builder adds one proxy rule and the bypass rules. The override is process-wide and needs WebViewFeature.PROXY_OVERRIDE; otherwise the call fails with the code unsupported. Each bypass domain also adds a wildcard rule so subdomains bypass too.",
+          "ja": "上書きはプロセス全体に効き、WebViewFeature.PROXY_OVERRIDE が必要です。非対応なら unsupported で失敗します。除外ドメインにはワイルドカードのルールも加え、サブドメインも除外します。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebsiteDataStore.proxyConfigurations", "ProxyConfiguration.excludedDomains"],
+        "note": {
+          "en": "Set on the WebView's website data store with ProxyConfiguration(httpCONNECTProxy:) or ProxyConfiguration(socksv5Proxy:), so WebViews sharing a store share the proxy.",
+          "ja": "WebView のウェブサイトデータストアに ProxyConfiguration(httpCONNECTProxy:) または ProxyConfiguration(socksv5Proxy:) で設定するため、同じストアを共有する WebView は同じプロキシになります。"
+        }
+      }
+    },
+    {
+      "dart": "ProxyConfig",
+      "group": "loading",
+      "summary": {
+        "en": "A proxy server: host, port, type and the domains that bypass it.",
+        "ja": "プロキシサーバーで、ホスト・ポート・種類・除外ドメインを持ちます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["ProxyConfig"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebsiteDataStore.proxyConfigurations"]
+      }
+    },
+    {
+      "dart": "ProxyType",
+      "group": "loading",
+      "summary": {
+        "en": "Whether the proxy speaks HTTP or SOCKS5.",
+        "ja": "プロキシが HTTP と SOCKS5 のどちらを話すかを表します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["ProxyConfig"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebsiteDataStore.proxyConfigurations"]
       }
     },
     {

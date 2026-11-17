@@ -6,14 +6,20 @@ import android.content.Intent
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.os.Build
+import androidx.webkit.ProxyConfig
+import androidx.webkit.ProxyController
+import androidx.webkit.WebViewFeature
 import io.flutter.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.security.MessageDigest
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
+import java.util.concurrent.Executor
 
 /** Implements the Dart -> native calls by dispatching to [WebViewRegistry]. */
 class WebViewHostApiImpl(
@@ -110,6 +116,32 @@ class WebViewHostApiImpl(
             HistoryItemMessage(url = item.url, title = item.title?.takeIf { it.isNotEmpty() })
         }
         return BackForwardListMessage(items = items, currentIndex = list.currentIndex.toLong())
+    }
+
+    override suspend fun setProxy(webViewId: Long, config: ProxyConfigMessage?) {
+        registry.get(webViewId)
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE)) {
+            throw FlutterError("unsupported", "This WebView does not support a proxy override", null)
+        }
+        val controller = ProxyController.getInstance()
+        val direct = Executor { it.run() }
+        if (config == null) {
+            suspendCoroutine { continuation -> controller.clearProxyOverride(direct) { continuation.resume(Unit) } }
+            return
+        }
+        if (config.host.isBlank() || config.port !in 1L..65535L) {
+            throw FlutterError("invalid-argument", "Invalid proxy host or port", null)
+        }
+        val scheme = if (config.type == ProxyTypeMessage.SOCKS5) "socks5" else "http"
+        val builder = ProxyConfig.Builder().addProxyRule("$scheme://${config.host}:${config.port}")
+        for (host in config.bypassHosts) {
+            // A bypassed domain covers its subdomains, as on iOS.
+            builder.addBypassRule(host)
+            if (!host.contains('*')) builder.addBypassRule("*.$host")
+        }
+        suspendCoroutine { continuation ->
+            controller.setProxyOverride(builder.build(), direct) { continuation.resume(Unit) }
+        }
     }
 
     override fun getCertificate(webViewId: Long): CertificateMessage? {

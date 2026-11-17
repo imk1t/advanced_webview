@@ -15,6 +15,7 @@ export 'src/js_dialog.dart';
 export 'src/load_request.dart';
 export 'src/navigation.dart';
 export 'src/permission.dart';
+export 'src/proxy.dart';
 export 'src/security.dart';
 export 'src/settings.dart';
 export 'src/system_browser.dart';

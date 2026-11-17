@@ -107,6 +107,11 @@ int _deepHash(Object? value) {
 }
 
 
+enum ProxyTypeMessage {
+  http,
+  socks5;
+}
+
 enum CacheModeMessage {
   normal,
   preferCache,
@@ -1713,6 +1718,67 @@ class BackForwardListMessage {
   }
 }
 
+class ProxyConfigMessage {
+  ProxyConfigMessage({
+    required this.host,
+    required this.port,
+    required this.type,
+    required this.bypassHosts,
+  });
+
+  String host;
+
+  int port;
+
+  ProxyTypeMessage type;
+
+  /// Domains reached directly. Each also covers its subdomains.
+  List<String> bypassHosts;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      host,
+      port,
+      type,
+      bypassHosts,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ProxyConfigMessage decode(Object result) {
+    result as List<Object?>;
+    return ProxyConfigMessage(
+      host: result[0]! as String,
+      port: result[1]! as int,
+      type: result[2]! as ProxyTypeMessage,
+      bypassHosts: (result[3]! as List<Object?>).cast<String>(),
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ProxyConfigMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(host, other.host) && _deepEquals(port, other.port) && _deepEquals(type, other.type) && _deepEquals(bypassHosts, other.bypassHosts);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ProxyConfigMessage(host: $host, port: $port, type: $type, bypassHosts: $bypassHosts)';
+  }
+}
+
 class CertificateMessage {
   CertificateMessage({
     required this.der,
@@ -2039,128 +2105,134 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is CacheModeMessage) {
+    }    else if (value is ProxyTypeMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    }    else if (value is ContentModeMessage) {
+    }    else if (value is CacheModeMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    }    else if (value is UserInterfaceStyleMessage) {
+    }    else if (value is ContentModeMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.index);
-    }    else if (value is MixedContentModeMessage) {
+    }    else if (value is UserInterfaceStyleMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.index);
-    }    else if (value is ConsoleMessageLevelMessage) {
+    }    else if (value is MixedContentModeMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.index);
-    }    else if (value is UserScriptInjectionTimeMessage) {
+    }    else if (value is ConsoleMessageLevelMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.index);
-    }    else if (value is NavigationDecisionMessage) {
+    }    else if (value is UserScriptInjectionTimeMessage) {
       buffer.putUint8(135);
       writeValue(buffer, value.index);
-    }    else if (value is SslErrorDecisionMessage) {
+    }    else if (value is NavigationDecisionMessage) {
       buffer.putUint8(136);
       writeValue(buffer, value.index);
-    }    else if (value is ClientCertActionMessage) {
+    }    else if (value is SslErrorDecisionMessage) {
       buffer.putUint8(137);
       writeValue(buffer, value.index);
-    }    else if (value is PermissionResourceMessage) {
+    }    else if (value is ClientCertActionMessage) {
       buffer.putUint8(138);
       writeValue(buffer, value.index);
-    }    else if (value is PermissionDecisionMessage) {
+    }    else if (value is PermissionResourceMessage) {
       buffer.putUint8(139);
       writeValue(buffer, value.index);
-    }    else if (value is JsDialogTypeMessage) {
+    }    else if (value is PermissionDecisionMessage) {
       buffer.putUint8(140);
       writeValue(buffer, value.index);
-    }    else if (value is WebsiteDataTypeMessage) {
+    }    else if (value is JsDialogTypeMessage) {
       buffer.putUint8(141);
       writeValue(buffer, value.index);
-    }    else if (value is HttpMethodMessage) {
+    }    else if (value is WebsiteDataTypeMessage) {
       buffer.putUint8(142);
       writeValue(buffer, value.index);
-    }    else if (value is WebViewSettingsMessage) {
+    }    else if (value is HttpMethodMessage) {
       buffer.putUint8(143);
-      writeValue(buffer, value.encode());
-    }    else if (value is ConsoleMessageMessage) {
+      writeValue(buffer, value.index);
+    }    else if (value is WebViewSettingsMessage) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    }    else if (value is UserScriptMessage) {
+    }    else if (value is ConsoleMessageMessage) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    }    else if (value is CreationParamsMessage) {
+    }    else if (value is UserScriptMessage) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    }    else if (value is NavigationRequestMessage) {
+    }    else if (value is CreationParamsMessage) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpErrorMessage) {
+    }    else if (value is NavigationRequestMessage) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    }    else if (value is RenderProcessGoneMessage) {
+    }    else if (value is HttpErrorMessage) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    }    else if (value is WebResourceErrorMessage) {
+    }    else if (value is RenderProcessGoneMessage) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    }    else if (value is SslErrorMessage) {
+    }    else if (value is WebResourceErrorMessage) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthRequestMessage) {
+    }    else if (value is SslErrorMessage) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    }    else if (value is ClientCertRequestMessage) {
+    }    else if (value is HttpAuthRequestMessage) {
       buffer.putUint8(153);
       writeValue(buffer, value.encode());
-    }    else if (value is ClientCertResponseMessage) {
+    }    else if (value is ClientCertRequestMessage) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    }    else if (value is HttpAuthCredentialsMessage) {
+    }    else if (value is ClientCertResponseMessage) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    }    else if (value is DownloadRequestMessage) {
+    }    else if (value is HttpAuthCredentialsMessage) {
       buffer.putUint8(156);
       writeValue(buffer, value.encode());
-    }    else if (value is PermissionRequestMessage) {
+    }    else if (value is DownloadRequestMessage) {
       buffer.putUint8(157);
       writeValue(buffer, value.encode());
-    }    else if (value is JsDialogRequestMessage) {
+    }    else if (value is PermissionRequestMessage) {
       buffer.putUint8(158);
       writeValue(buffer, value.encode());
-    }    else if (value is JsDialogResultMessage) {
+    }    else if (value is JsDialogRequestMessage) {
       buffer.putUint8(159);
       writeValue(buffer, value.encode());
-    }    else if (value is InterceptRequestMessage) {
+    }    else if (value is JsDialogResultMessage) {
       buffer.putUint8(160);
       writeValue(buffer, value.encode());
-    }    else if (value is InterceptResponseMessage) {
+    }    else if (value is InterceptRequestMessage) {
       buffer.putUint8(161);
       writeValue(buffer, value.encode());
-    }    else if (value is FindResultMessage) {
+    }    else if (value is InterceptResponseMessage) {
       buffer.putUint8(162);
       writeValue(buffer, value.encode());
-    }    else if (value is HistoryItemMessage) {
+    }    else if (value is FindResultMessage) {
       buffer.putUint8(163);
       writeValue(buffer, value.encode());
-    }    else if (value is BackForwardListMessage) {
+    }    else if (value is HistoryItemMessage) {
       buffer.putUint8(164);
       writeValue(buffer, value.encode());
-    }    else if (value is CertificateMessage) {
+    }    else if (value is BackForwardListMessage) {
       buffer.putUint8(165);
       writeValue(buffer, value.encode());
-    }    else if (value is ScrollPositionMessage) {
+    }    else if (value is ProxyConfigMessage) {
       buffer.putUint8(166);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is CertificateMessage) {
       buffer.putUint8(167);
       writeValue(buffer, value.encode());
-    }    else if (value is SystemBrowserParamsMessage) {
+    }    else if (value is ScrollPositionMessage) {
       buffer.putUint8(168);
       writeValue(buffer, value.encode());
-    }    else if (value is InAppBrowserParamsMessage) {
+    }    else if (value is CookieMessage) {
       buffer.putUint8(169);
+      writeValue(buffer, value.encode());
+    }    else if (value is SystemBrowserParamsMessage) {
+      buffer.putUint8(170);
+      writeValue(buffer, value.encode());
+    }    else if (value is InAppBrowserParamsMessage) {
+      buffer.putUint8(171);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2172,99 +2244,104 @@ class _PigeonCodec extends StandardMessageCodec {
     switch (type) {
       case 129:
         final value = readValue(buffer) as int?;
-        return value == null ? null : CacheModeMessage.values[value];
+        return value == null ? null : ProxyTypeMessage.values[value];
       case 130:
         final value = readValue(buffer) as int?;
-        return value == null ? null : ContentModeMessage.values[value];
+        return value == null ? null : CacheModeMessage.values[value];
       case 131:
         final value = readValue(buffer) as int?;
-        return value == null ? null : UserInterfaceStyleMessage.values[value];
+        return value == null ? null : ContentModeMessage.values[value];
       case 132:
         final value = readValue(buffer) as int?;
-        return value == null ? null : MixedContentModeMessage.values[value];
+        return value == null ? null : UserInterfaceStyleMessage.values[value];
       case 133:
         final value = readValue(buffer) as int?;
-        return value == null ? null : ConsoleMessageLevelMessage.values[value];
+        return value == null ? null : MixedContentModeMessage.values[value];
       case 134:
         final value = readValue(buffer) as int?;
-        return value == null ? null : UserScriptInjectionTimeMessage.values[value];
+        return value == null ? null : ConsoleMessageLevelMessage.values[value];
       case 135:
         final value = readValue(buffer) as int?;
-        return value == null ? null : NavigationDecisionMessage.values[value];
+        return value == null ? null : UserScriptInjectionTimeMessage.values[value];
       case 136:
         final value = readValue(buffer) as int?;
-        return value == null ? null : SslErrorDecisionMessage.values[value];
+        return value == null ? null : NavigationDecisionMessage.values[value];
       case 137:
         final value = readValue(buffer) as int?;
-        return value == null ? null : ClientCertActionMessage.values[value];
+        return value == null ? null : SslErrorDecisionMessage.values[value];
       case 138:
         final value = readValue(buffer) as int?;
-        return value == null ? null : PermissionResourceMessage.values[value];
+        return value == null ? null : ClientCertActionMessage.values[value];
       case 139:
         final value = readValue(buffer) as int?;
-        return value == null ? null : PermissionDecisionMessage.values[value];
+        return value == null ? null : PermissionResourceMessage.values[value];
       case 140:
         final value = readValue(buffer) as int?;
-        return value == null ? null : JsDialogTypeMessage.values[value];
+        return value == null ? null : PermissionDecisionMessage.values[value];
       case 141:
         final value = readValue(buffer) as int?;
-        return value == null ? null : WebsiteDataTypeMessage.values[value];
+        return value == null ? null : JsDialogTypeMessage.values[value];
       case 142:
         final value = readValue(buffer) as int?;
-        return value == null ? null : HttpMethodMessage.values[value];
+        return value == null ? null : WebsiteDataTypeMessage.values[value];
       case 143:
-        return WebViewSettingsMessage.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : HttpMethodMessage.values[value];
       case 144:
-        return ConsoleMessageMessage.decode(readValue(buffer)!);
+        return WebViewSettingsMessage.decode(readValue(buffer)!);
       case 145:
-        return UserScriptMessage.decode(readValue(buffer)!);
+        return ConsoleMessageMessage.decode(readValue(buffer)!);
       case 146:
-        return CreationParamsMessage.decode(readValue(buffer)!);
+        return UserScriptMessage.decode(readValue(buffer)!);
       case 147:
-        return NavigationRequestMessage.decode(readValue(buffer)!);
+        return CreationParamsMessage.decode(readValue(buffer)!);
       case 148:
-        return HttpErrorMessage.decode(readValue(buffer)!);
+        return NavigationRequestMessage.decode(readValue(buffer)!);
       case 149:
-        return RenderProcessGoneMessage.decode(readValue(buffer)!);
+        return HttpErrorMessage.decode(readValue(buffer)!);
       case 150:
-        return WebResourceErrorMessage.decode(readValue(buffer)!);
+        return RenderProcessGoneMessage.decode(readValue(buffer)!);
       case 151:
-        return SslErrorMessage.decode(readValue(buffer)!);
+        return WebResourceErrorMessage.decode(readValue(buffer)!);
       case 152:
-        return HttpAuthRequestMessage.decode(readValue(buffer)!);
+        return SslErrorMessage.decode(readValue(buffer)!);
       case 153:
-        return ClientCertRequestMessage.decode(readValue(buffer)!);
+        return HttpAuthRequestMessage.decode(readValue(buffer)!);
       case 154:
-        return ClientCertResponseMessage.decode(readValue(buffer)!);
+        return ClientCertRequestMessage.decode(readValue(buffer)!);
       case 155:
-        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
+        return ClientCertResponseMessage.decode(readValue(buffer)!);
       case 156:
-        return DownloadRequestMessage.decode(readValue(buffer)!);
+        return HttpAuthCredentialsMessage.decode(readValue(buffer)!);
       case 157:
-        return PermissionRequestMessage.decode(readValue(buffer)!);
+        return DownloadRequestMessage.decode(readValue(buffer)!);
       case 158:
-        return JsDialogRequestMessage.decode(readValue(buffer)!);
+        return PermissionRequestMessage.decode(readValue(buffer)!);
       case 159:
-        return JsDialogResultMessage.decode(readValue(buffer)!);
+        return JsDialogRequestMessage.decode(readValue(buffer)!);
       case 160:
-        return InterceptRequestMessage.decode(readValue(buffer)!);
+        return JsDialogResultMessage.decode(readValue(buffer)!);
       case 161:
-        return InterceptResponseMessage.decode(readValue(buffer)!);
+        return InterceptRequestMessage.decode(readValue(buffer)!);
       case 162:
-        return FindResultMessage.decode(readValue(buffer)!);
+        return InterceptResponseMessage.decode(readValue(buffer)!);
       case 163:
-        return HistoryItemMessage.decode(readValue(buffer)!);
+        return FindResultMessage.decode(readValue(buffer)!);
       case 164:
-        return BackForwardListMessage.decode(readValue(buffer)!);
+        return HistoryItemMessage.decode(readValue(buffer)!);
       case 165:
-        return CertificateMessage.decode(readValue(buffer)!);
+        return BackForwardListMessage.decode(readValue(buffer)!);
       case 166:
-        return ScrollPositionMessage.decode(readValue(buffer)!);
+        return ProxyConfigMessage.decode(readValue(buffer)!);
       case 167:
-        return CookieMessage.decode(readValue(buffer)!);
+        return CertificateMessage.decode(readValue(buffer)!);
       case 168:
-        return SystemBrowserParamsMessage.decode(readValue(buffer)!);
+        return ScrollPositionMessage.decode(readValue(buffer)!);
       case 169:
+        return CookieMessage.decode(readValue(buffer)!);
+      case 170:
+        return SystemBrowserParamsMessage.decode(readValue(buffer)!);
+      case 171:
         return InAppBrowserParamsMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2645,6 +2722,29 @@ class AdvancedWebViewHostApi {
     )
     ;
     return pigeonVar_replyValue! as BackForwardListMessage;
+  }
+
+  /// Routes the WebView's traffic through a proxy, or back to a direct
+  /// connection when `config` is null. Android's proxy override is
+  /// process-wide (all WebViews of the app); iOS sets it on the WebView's
+  /// website data store. Fails with `unsupported` when Android's WebView has no
+  /// proxy override and with `invalid-argument` for a bad host or port.
+  Future<void> setProxy(int webViewId, ProxyConfigMessage? config) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setProxy$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, config]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   /// The certificate the server of the current page presented, or null when
