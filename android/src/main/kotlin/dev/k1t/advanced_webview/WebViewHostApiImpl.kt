@@ -91,6 +91,21 @@ class WebViewHostApiImpl(
 
     override fun canGoForward(webViewId: Long): Boolean = registry.get(webViewId).webView.canGoForward()
 
+    override fun goBackOrForward(webViewId: Long, steps: Long) {
+        val webView = registry.get(webViewId).webView
+        val step = steps.coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
+        if (webView.canGoBackOrForward(step)) webView.goBackOrForward(step)
+    }
+
+    override fun getBackForwardList(webViewId: Long): BackForwardListMessage {
+        val list = registry.get(webViewId).webView.copyBackForwardList()
+        val items = (0 until list.size).map { index ->
+            val item = list.getItemAtIndex(index)
+            HistoryItemMessage(url = item.url, title = item.title?.takeIf { it.isNotEmpty() })
+        }
+        return BackForwardListMessage(items = items, currentIndex = list.currentIndex.toLong())
+    }
+
     override fun getUrl(webViewId: Long): String? = registry.get(webViewId).webView.url
 
     override fun getTitle(webViewId: Long): String? = registry.get(webViewId).webView.title

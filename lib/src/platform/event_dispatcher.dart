@@ -13,6 +13,7 @@ abstract interface class WebViewEventListener {
   void onConsoleMessage(ConsoleMessageMessage message);
   void onFindResult(int activeMatchIndex, int numberOfMatches, bool isDone);
   void onFaviconChanged(String? url);
+  void onUrlChanged(String url);
   void onEnterFullscreen();
   void onExitFullscreen();
   void onReceivedError(WebResourceErrorMessage error);
@@ -103,6 +104,10 @@ class WebViewEventDispatcher implements AdvancedWebViewFlutterApi {
   @override
   void onFaviconChanged(int webViewId, String? url) =>
       _listeners[webViewId]?.onFaviconChanged(url);
+
+  @override
+  void onUrlChanged(int webViewId, String url) =>
+      _listeners[webViewId]?.onUrlChanged(url);
 
   @override
   void onEnterFullscreen(int webViewId) =>

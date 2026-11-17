@@ -28,6 +28,17 @@ final class RunnerTests: XCTestCase {
     }
   }
 
+  func testAnEmptyHistoryHasNoCurrentEntry() throws {
+    try hostApi.create(params: params(webViewId: 1))
+
+    let list = try hostApi.getBackForwardList(webViewId: 1)
+
+    XCTAssertTrue(list.items.isEmpty)
+    XCTAssertEqual(list.currentIndex, -1)
+    // Out of range steps are ignored.
+    try hostApi.goBackOrForward(webViewId: 1, steps: -3)
+  }
+
   func testUnknownIdThrowsNotFound() {
     let (hostApi, _, _) = makeHostApi()
 
@@ -696,6 +707,7 @@ final class RunnerTests: XCTestCase {
     hasFindDelegate: Bool = false,
     hasFaviconDelegate: Bool = false,
     hasFullscreenDelegate: Bool = false,
+    hasUrlChangedDelegate: Bool = false,
     interceptSchemes: [String] = [],
     userScripts: [UserScriptMessage] = []
   ) -> CreationParamsMessage {
@@ -720,6 +732,7 @@ final class RunnerTests: XCTestCase {
       hasFindDelegate: hasFindDelegate,
       hasFaviconDelegate: hasFaviconDelegate,
       hasFullscreenDelegate: hasFullscreenDelegate,
+      hasUrlChangedDelegate: hasUrlChangedDelegate,
       interceptSchemes: interceptSchemes,
       userScripts: userScripts)
   }

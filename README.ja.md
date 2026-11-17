@@ -101,6 +101,7 @@ JS からは両OS共通で `window.Bridge.postMessage('hello')` を呼べます�
 - リクエストのインターセプト: カスタムスキーム（Android では `https` も）へのリクエストに Dart から応答
 - 一時停止と再開（`pause`、`resume`、Android の `pauseTimers`）
 - ズーム操作（`zoomBy`、`setZoomScale`）
+- 閲覧履歴の取得と複数件の移動、シングルページアプリ向けの URL 変更コールバック
 - PDF の書き出し、ページ内検索のヒット数のライブ通知、ファビコン URL と全画面動画のコールバック
 - コールバック: ページ開始・完了、進捗、タイトル変更、読み込みエラー
 - 設定: JavaScript 有効化、User-Agent、メディア自動再生、インライン再生（iOS）、ズーム（Android）、背景透過

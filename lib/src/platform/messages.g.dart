@@ -562,6 +562,7 @@ class CreationParamsMessage {
     required this.hasFindDelegate,
     required this.hasFaviconDelegate,
     required this.hasFullscreenDelegate,
+    required this.hasUrlChangedDelegate,
     required this.interceptSchemes,
     required this.userScripts,
   });
@@ -635,6 +636,9 @@ class CreationParamsMessage {
   /// reported to Dart.
   bool hasFullscreenDelegate;
 
+  /// When false, URL changes are never reported to Dart.
+  bool hasUrlChangedDelegate;
+
   /// Lower-case URL schemes whose requests are answered by Dart through
   /// `onInterceptRequest`. Empty when the app has no intercept callback.
   List<String> interceptSchemes;
@@ -664,6 +668,7 @@ class CreationParamsMessage {
       hasFindDelegate,
       hasFaviconDelegate,
       hasFullscreenDelegate,
+      hasUrlChangedDelegate,
       interceptSchemes,
       userScripts,
     ];
@@ -695,8 +700,9 @@ class CreationParamsMessage {
       hasFindDelegate: result[17]! as bool,
       hasFaviconDelegate: result[18]! as bool,
       hasFullscreenDelegate: result[19]! as bool,
-      interceptSchemes: (result[20]! as List<Object?>).cast<String>(),
-      userScripts: (result[21]! as List<Object?>).cast<UserScriptMessage>(),
+      hasUrlChangedDelegate: result[20]! as bool,
+      interceptSchemes: (result[21]! as List<Object?>).cast<String>(),
+      userScripts: (result[22]! as List<Object?>).cast<UserScriptMessage>(),
     );
   }
 
@@ -709,7 +715,7 @@ class CreationParamsMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasClientCertDelegate, other.hasClientCertDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(hasFindDelegate, other.hasFindDelegate) && _deepEquals(hasFaviconDelegate, other.hasFaviconDelegate) && _deepEquals(hasFullscreenDelegate, other.hasFullscreenDelegate) && _deepEquals(interceptSchemes, other.interceptSchemes) && _deepEquals(userScripts, other.userScripts);
+    return _deepEquals(webViewId, other.webViewId) && _deepEquals(settings, other.settings) && _deepEquals(javaScriptChannelNames, other.javaScriptChannelNames) && _deepEquals(javaScriptHandlerNames, other.javaScriptHandlerNames) && _deepEquals(javaScriptHandlerObjectName, other.javaScriptHandlerObjectName) && _deepEquals(hasNavigationDelegate, other.hasNavigationDelegate) && _deepEquals(hasNewWindowDelegate, other.hasNewWindowDelegate) && _deepEquals(hasPermissionDelegate, other.hasPermissionDelegate) && _deepEquals(hasDownloadDelegate, other.hasDownloadDelegate) && _deepEquals(hasSslErrorDelegate, other.hasSslErrorDelegate) && _deepEquals(hasHttpAuthDelegate, other.hasHttpAuthDelegate) && _deepEquals(hasClientCertDelegate, other.hasClientCertDelegate) && _deepEquals(hasScrollDelegate, other.hasScrollDelegate) && _deepEquals(hasLongPressDelegate, other.hasLongPressDelegate) && _deepEquals(hasConsoleMessageDelegate, other.hasConsoleMessageDelegate) && _deepEquals(hasJsDialogDelegate, other.hasJsDialogDelegate) && _deepEquals(hasHttpErrorDelegate, other.hasHttpErrorDelegate) && _deepEquals(hasFindDelegate, other.hasFindDelegate) && _deepEquals(hasFaviconDelegate, other.hasFaviconDelegate) && _deepEquals(hasFullscreenDelegate, other.hasFullscreenDelegate) && _deepEquals(hasUrlChangedDelegate, other.hasUrlChangedDelegate) && _deepEquals(interceptSchemes, other.interceptSchemes) && _deepEquals(userScripts, other.userScripts);
   }
 
   @override
@@ -718,7 +724,7 @@ class CreationParamsMessage {
 
   @override
   String toString() {
-    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasClientCertDelegate: $hasClientCertDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, hasHttpErrorDelegate: $hasHttpErrorDelegate, hasFindDelegate: $hasFindDelegate, hasFaviconDelegate: $hasFaviconDelegate, hasFullscreenDelegate: $hasFullscreenDelegate, interceptSchemes: $interceptSchemes, userScripts: $userScripts)';
+    return 'CreationParamsMessage(webViewId: $webViewId, settings: $settings, javaScriptChannelNames: $javaScriptChannelNames, javaScriptHandlerNames: $javaScriptHandlerNames, javaScriptHandlerObjectName: $javaScriptHandlerObjectName, hasNavigationDelegate: $hasNavigationDelegate, hasNewWindowDelegate: $hasNewWindowDelegate, hasPermissionDelegate: $hasPermissionDelegate, hasDownloadDelegate: $hasDownloadDelegate, hasSslErrorDelegate: $hasSslErrorDelegate, hasHttpAuthDelegate: $hasHttpAuthDelegate, hasClientCertDelegate: $hasClientCertDelegate, hasScrollDelegate: $hasScrollDelegate, hasLongPressDelegate: $hasLongPressDelegate, hasConsoleMessageDelegate: $hasConsoleMessageDelegate, hasJsDialogDelegate: $hasJsDialogDelegate, hasHttpErrorDelegate: $hasHttpErrorDelegate, hasFindDelegate: $hasFindDelegate, hasFaviconDelegate: $hasFaviconDelegate, hasFullscreenDelegate: $hasFullscreenDelegate, hasUrlChangedDelegate: $hasUrlChangedDelegate, interceptSchemes: $interceptSchemes, userScripts: $userScripts)';
   }
 }
 
@@ -1605,6 +1611,108 @@ class FindResultMessage {
   }
 }
 
+class HistoryItemMessage {
+  HistoryItemMessage({
+    required this.url,
+    this.title,
+  });
+
+  String url;
+
+  String? title;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      url,
+      title,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static HistoryItemMessage decode(Object result) {
+    result as List<Object?>;
+    return HistoryItemMessage(
+      url: result[0]! as String,
+      title: result[1] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! HistoryItemMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(url, other.url) && _deepEquals(title, other.title);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'HistoryItemMessage(url: $url, title: $title)';
+  }
+}
+
+class BackForwardListMessage {
+  BackForwardListMessage({
+    required this.items,
+    required this.currentIndex,
+  });
+
+  /// Oldest entry first.
+  List<HistoryItemMessage> items;
+
+  /// Index of the current entry in `items`, or -1 when the list is empty.
+  int currentIndex;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      items,
+      currentIndex,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static BackForwardListMessage decode(Object result) {
+    result as List<Object?>;
+    return BackForwardListMessage(
+      items: (result[0]! as List<Object?>).cast<HistoryItemMessage>(),
+      currentIndex: result[1]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! BackForwardListMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(items, other.items) && _deepEquals(currentIndex, other.currentIndex);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'BackForwardListMessage(items: $items, currentIndex: $currentIndex)';
+  }
+}
+
 class ScrollPositionMessage {
   ScrollPositionMessage({
     required this.x,
@@ -1981,17 +2089,23 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is FindResultMessage) {
       buffer.putUint8(162);
       writeValue(buffer, value.encode());
-    }    else if (value is ScrollPositionMessage) {
+    }    else if (value is HistoryItemMessage) {
       buffer.putUint8(163);
       writeValue(buffer, value.encode());
-    }    else if (value is CookieMessage) {
+    }    else if (value is BackForwardListMessage) {
       buffer.putUint8(164);
       writeValue(buffer, value.encode());
-    }    else if (value is SystemBrowserParamsMessage) {
+    }    else if (value is ScrollPositionMessage) {
       buffer.putUint8(165);
       writeValue(buffer, value.encode());
-    }    else if (value is InAppBrowserParamsMessage) {
+    }    else if (value is CookieMessage) {
       buffer.putUint8(166);
+      writeValue(buffer, value.encode());
+    }    else if (value is SystemBrowserParamsMessage) {
+      buffer.putUint8(167);
+      writeValue(buffer, value.encode());
+    }    else if (value is InAppBrowserParamsMessage) {
+      buffer.putUint8(168);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2084,12 +2198,16 @@ class _PigeonCodec extends StandardMessageCodec {
       case 162:
         return FindResultMessage.decode(readValue(buffer)!);
       case 163:
-        return ScrollPositionMessage.decode(readValue(buffer)!);
+        return HistoryItemMessage.decode(readValue(buffer)!);
       case 164:
-        return CookieMessage.decode(readValue(buffer)!);
+        return BackForwardListMessage.decode(readValue(buffer)!);
       case 165:
-        return SystemBrowserParamsMessage.decode(readValue(buffer)!);
+        return ScrollPositionMessage.decode(readValue(buffer)!);
       case 166:
+        return CookieMessage.decode(readValue(buffer)!);
+      case 167:
+        return SystemBrowserParamsMessage.decode(readValue(buffer)!);
+      case 168:
         return InAppBrowserParamsMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2430,6 +2548,46 @@ class AdvancedWebViewHostApi {
     )
     ;
     return pigeonVar_replyValue! as bool;
+  }
+
+  /// Moves `steps` entries through the history (negative goes back). Does
+  /// nothing when the target is outside the history.
+  Future<void> goBackOrForward(int webViewId, int steps) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.goBackOrForward$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId, steps]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// The navigation history of the main frame.
+  Future<BackForwardListMessage> getBackForwardList(int webViewId) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getBackForwardList$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[webViewId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return pigeonVar_replyValue! as BackForwardListMessage;
   }
 
   Future<String?> getUrl(int webViewId) async {
@@ -3035,6 +3193,11 @@ abstract class AdvancedWebViewFlutterApi {
   /// `hasFaviconDelegate`.
   void onFaviconChanged(int webViewId, String? url);
 
+  /// The URL of the main frame changed, including changes made by the page
+  /// itself (`history.pushState`, fragment navigation). Only sent when the
+  /// controller was created with `hasUrlChangedDelegate`.
+  void onUrlChanged(int webViewId, String url);
+
   /// The page (a video or any element) entered fullscreen. Only sent when the
   /// controller was created with `hasFullscreenDelegate`.
   void onEnterFullscreen(int webViewId);
@@ -3295,6 +3458,28 @@ abstract class AdvancedWebViewFlutterApi {
           final String? arg_url = args[1] as String?;
           try {
             api.onFaviconChanged(arg_webViewId, arg_url);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.advanced_webview.AdvancedWebViewFlutterApi.onUrlChanged$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final int arg_webViewId = args[0]! as int;
+          final String arg_url = args[1]! as String;
+          try {
+            api.onUrlChanged(arg_webViewId, arg_url);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

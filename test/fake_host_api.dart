@@ -80,6 +80,22 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
   Future<bool> canGoForward(int webViewId) async => false;
 
   @override
+  Future<void> goBackOrForward(int webViewId, int steps) async =>
+      calls.add('goBackOrForward $steps');
+
+  BackForwardListMessage backForwardList = BackForwardListMessage(
+    items: [
+      HistoryItemMessage(url: 'https://a/', title: 'A'),
+      HistoryItemMessage(url: 'https://b/'),
+    ],
+    currentIndex: 1,
+  );
+
+  @override
+  Future<BackForwardListMessage> getBackForwardList(int webViewId) async =>
+      backForwardList;
+
+  @override
   Future<String?> getUrl(int webViewId) async => 'https://example.com/';
 
   @override

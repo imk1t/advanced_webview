@@ -219,6 +219,7 @@ class CreationParamsMessage {
     required this.hasFindDelegate,
     required this.hasFaviconDelegate,
     required this.hasFullscreenDelegate,
+    required this.hasUrlChangedDelegate,
     required this.interceptSchemes,
     required this.userScripts,
   });
@@ -290,6 +291,9 @@ class CreationParamsMessage {
   /// When false, fullscreen changes are still shown natively but never
   /// reported to Dart.
   bool hasFullscreenDelegate;
+
+  /// When false, URL changes are never reported to Dart.
+  bool hasUrlChangedDelegate;
 
   /// Lower-case URL schemes whose requests are answered by Dart through
   /// `onInterceptRequest`. Empty when the app has no intercept callback.
@@ -500,6 +504,23 @@ class FindResultMessage {
   int? activeMatchIndex;
 }
 
+class HistoryItemMessage {
+  HistoryItemMessage({required this.url, this.title});
+
+  String url;
+  String? title;
+}
+
+class BackForwardListMessage {
+  BackForwardListMessage({required this.items, required this.currentIndex});
+
+  /// Oldest entry first.
+  List<HistoryItemMessage> items;
+
+  /// Index of the current entry in `items`, or -1 when the list is empty.
+  int currentIndex;
+}
+
 class ScrollPositionMessage {
   ScrollPositionMessage({required this.x, required this.y});
 
@@ -640,6 +661,13 @@ abstract class AdvancedWebViewHostApi {
   bool canGoBack(int webViewId);
 
   bool canGoForward(int webViewId);
+
+  /// Moves `steps` entries through the history (negative goes back). Does
+  /// nothing when the target is outside the history.
+  void goBackOrForward(int webViewId, int steps);
+
+  /// The navigation history of the main frame.
+  BackForwardListMessage getBackForwardList(int webViewId);
 
   String? getUrl(int webViewId);
 
@@ -785,6 +813,11 @@ abstract class AdvancedWebViewFlutterApi {
   /// has none. Only sent when the controller was created with
   /// `hasFaviconDelegate`.
   void onFaviconChanged(int webViewId, String? url);
+
+  /// The URL of the main frame changed, including changes made by the page
+  /// itself (`history.pushState`, fragment navigation). Only sent when the
+  /// controller was created with `hasUrlChangedDelegate`.
+  void onUrlChanged(int webViewId, String url);
 
   /// The page (a video or any element) entered fullscreen. Only sent when the
   /// controller was created with `hasFullscreenDelegate`.

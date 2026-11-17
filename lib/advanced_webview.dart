@@ -6,6 +6,7 @@ export 'src/controller.dart' show AdvancedWebViewController;
 export 'src/cookie.dart';
 export 'src/download.dart';
 export 'src/find.dart';
+export 'src/history.dart';
 export 'src/hit_test.dart' show WebViewHitTestResult, WebViewHitTestType;
 export 'src/in_app_browser.dart';
 export 'src/intercept.dart';

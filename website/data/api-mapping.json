@@ -69,6 +69,8 @@
       "View": "https://developer.android.com/reference/android/view/View",
       "WebSettings": "https://developer.android.com/reference/android/webkit/WebSettings",
       "WebViewClient": "https://developer.android.com/reference/android/webkit/WebViewClient",
+      "WebBackForwardList": "https://developer.android.com/reference/android/webkit/WebBackForwardList",
+      "WebHistoryItem": "https://developer.android.com/reference/android/webkit/WebHistoryItem",
       "CustomTabsIntent": "https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent",
       "CustomTabColorSchemeParams": "https://developer.android.com/reference/androidx/browser/customtabs/CustomTabColorSchemeParams",
       "Intent": "https://developer.android.com/reference/android/content/Intent",
@@ -104,6 +106,8 @@
     },
     "ios": {
       "WKWebView": "https://developer.apple.com/documentation/webkit/wkwebview",
+      "WKBackForwardList": "https://developer.apple.com/documentation/webkit/wkbackforwardlist",
+      "WKBackForwardListItem": "https://developer.apple.com/documentation/webkit/wkbackforwardlistitem",
       "WKWebViewConfiguration": "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration",
       "WKWebsiteDataStore": "https://developer.apple.com/documentation/webkit/wkwebsitedatastore",
       "UIImage": "https://developer.apple.com/documentation/uikit/uiimage",
@@ -1109,6 +1113,114 @@
         "note": {
           "en": "Observed with KVO and scaled to 0-100.",
           "ja": "KVO で監視し、0〜100 に変換します。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.goBackOrForward",
+      "group": "loading",
+      "summary": {
+        "en": "Moves several entries through the history.",
+        "ja": "履歴を複数件分、戻る・進みます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.canGoBackOrForward(int)", "WebView.goBackOrForward(int)"],
+        "note": {
+          "en": "Does nothing when the target is outside the history.",
+          "ja": "対象が履歴の範囲外のときは何もしません。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKBackForwardList.item(at:)", "WKWebView.go(to:)"],
+        "note": {
+          "en": "Does nothing when the target is outside the history.",
+          "ja": "対象が履歴の範囲外のときは何もしません。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.getBackForwardList",
+      "group": "loading",
+      "summary": {
+        "en": "Returns the navigation history of the main frame.",
+        "ja": "メインフレームの閲覧履歴を返します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebView.copyBackForwardList()",
+          "WebBackForwardList.getItemAtIndex(int)",
+          "WebHistoryItem.getUrl()",
+          "WebHistoryItem.getTitle()"
+        ]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKWebView.backForwardList",
+          "WKBackForwardList.backList",
+          "WKBackForwardList.currentItem",
+          "WKBackForwardList.forwardList",
+          "WKBackForwardListItem.url",
+          "WKBackForwardListItem.title"
+        ]
+      }
+    },
+    {
+      "dart": "WebViewBackForwardList",
+      "group": "loading",
+      "summary": {
+        "en": "The history entries and the index of the current one.",
+        "ja": "履歴のエントリと、現在位置のインデックスです。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.copyBackForwardList()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.backForwardList"]
+      }
+    },
+    {
+      "dart": "WebViewHistoryItem",
+      "group": "loading",
+      "summary": {
+        "en": "One history entry: its URL and title.",
+        "ja": "履歴の 1 件分で、URL とタイトルを持ちます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebHistoryItem.getUrl()", "WebHistoryItem.getTitle()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKBackForwardListItem.url", "WKBackForwardListItem.title"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.onUrlChanged",
+      "group": "events",
+      "summary": {
+        "en": "Reports a change of the main frame's URL, including pushState and fragment navigation.",
+        "ja": "メインフレームの URL の変更を通知します。pushState やフラグメント遷移も含みます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewClient.doUpdateVisitedHistory(WebView, String, boolean)"],
+        "note": {
+          "en": "Not reported for a reload of the same URL (isReload).",
+          "ja": "同じ URL のリロード(isReload)では通知しません。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.url"],
+        "note": {
+          "en": "Observed with KVO.",
+          "ja": "KVO で監視します。"
         }
       }
     },

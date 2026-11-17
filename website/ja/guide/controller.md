@@ -46,6 +46,20 @@ final url = await controller.currentUrl();
 final title = await controller.title();
 ```
 
+### 履歴と URL の変更
+
+```dart
+final history = await controller.getBackForwardList();
+print(history.items.map((i) => i.url)); // 古い順
+print(history.current?.url);
+
+await controller.goBackOrForward(-2); // 2 件戻る。範囲外のときは無視されます
+```
+
+`onUrlChanged` はメインフレームの URL の変更をすべて通知します。シングルページアプリがルーティングに使う
+`history.pushState`、`replaceState`、フラグメント遷移も含みます。これらでは `onPageStarted` や
+`onPageFinished` は呼ばれません。同じ URL のリロードは通知されません。コントローラーの作成時に設定してください。
+
 新しい 3 つの読み込みのプラットフォーム別の注意点です。
 
 - `loadFlutterAsset`: 相対リンクは同じフォルダのアセットに解決されます。Android は

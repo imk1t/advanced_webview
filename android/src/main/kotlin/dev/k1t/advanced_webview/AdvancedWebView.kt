@@ -121,6 +121,7 @@ class AdvancedWebView(
     private val hasFindDelegate = params.hasFindDelegate
     private val hasFaviconDelegate = params.hasFaviconDelegate
     private val hasFullscreenDelegate = params.hasFullscreenDelegate
+    private val hasUrlChangedDelegate = params.hasUrlChangedDelegate
     private var fullscreen: Fullscreen? = null
     private val interceptSchemes = params.interceptSchemes.map { it.lowercase(Locale.ROOT) }.toSet()
     private val scriptHandlers = mutableListOf<ScriptHandler>()
@@ -752,6 +753,10 @@ class AdvancedWebView(
             if (hasFaviconDelegate) reportFavicon()
             send { flutterApi.onPageFinished(id, url) }
             onPageStateChanged?.invoke()
+        }
+
+        override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {
+            if (hasUrlChangedDelegate && !isReload) send { flutterApi.onUrlChanged(id, url) }
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
