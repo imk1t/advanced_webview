@@ -12,14 +12,14 @@ import androidx.webkit.WebViewFeature
 import io.flutter.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.security.MessageDigest
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.util.concurrent.Executor
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /** Implements the Dart -> native calls by dispatching to [WebViewRegistry]. */
 class WebViewHostApiImpl(
