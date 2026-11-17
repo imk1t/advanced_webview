@@ -1,3 +1,4 @@
+import CryptoKit
 import Flutter
 import Foundation
 import UIKit
@@ -146,6 +147,16 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
           url: $0.url.absoluteString, title: $0.title.flatMap { $0.isEmpty ? nil : $0 })
       },
       currentIndex: Int64(currentIndex))
+  }
+
+  func getCertificate(webViewId: Int64) throws -> CertificateMessage? {
+    guard let trust = try registry.get(webViewId).webView.serverTrust,
+      let chain = SecTrustCopyCertificateChain(trust) as? [SecCertificate],
+      let leaf = chain.first
+    else { return nil }
+    let der = SecCertificateCopyData(leaf) as Data
+    let hash = SHA256.hash(data: der).map { String(format: "%02x", $0) }.joined()
+    return CertificateMessage(der: FlutterStandardTypedData(bytes: der), sha256: hash)
   }
 
   func canGoBack(webViewId: Int64) throws -> Bool {

@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.getCertificate` and `WebViewCertificate`: the certificate the server of the current page presented, with subject, issuer, validity period, SHA-256 fingerprint and the DER bytes, read the same way on both platforms. It is `null` for pages that were not loaded over HTTPS. Only the server's own certificate is returned, not the chain.
+
 - Add `AdvancedWebViewController.onUrlChanged`: be told when the main frame's URL changes, including `history.pushState`, `replaceState` and fragment navigation that never fire `onPageStarted` or `onPageFinished`. A reload of the same URL is not reported.
 - Add `AdvancedWebViewController.getBackForwardList` and `goBackOrForward`, with `WebViewBackForwardList` and `WebViewHistoryItem`: read the navigation history (oldest first, with the current index) and jump several entries at once. A step outside the history is ignored.
 

@@ -1575,6 +1575,48 @@ struct BackForwardListMessage: Hashable, CustomStringConvertible {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct CertificateMessage: Hashable, CustomStringConvertible {
+  /// The server's (leaf) certificate, DER encoded.
+  var der: FlutterStandardTypedData
+  /// SHA-256 of `der` as lower-case hex.
+  var sha256: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> CertificateMessage? {
+    let der = pigeonVar_list[0] as! FlutterStandardTypedData
+    let sha256 = pigeonVar_list[1] as! String
+
+    return CertificateMessage(
+      der: der,
+      sha256: sha256
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      der,
+      sha256,
+    ]
+  }
+  static func == (lhs: CertificateMessage, rhs: CertificateMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.der, rhs.der) && MessagesPigeonInternal.deepEquals(lhs.sha256, rhs.sha256)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("CertificateMessage")
+    MessagesPigeonInternal.deepHash(value: der, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: sha256, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "CertificateMessage(der: \(String(describing: der)), sha256: \(String(describing: sha256)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct ScrollPositionMessage: Hashable, CustomStringConvertible {
   /// Horizontal offset in logical pixels.
   var x: Double
@@ -1934,12 +1976,14 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 164:
       return BackForwardListMessage.fromList(self.readValue() as! [Any?])
     case 165:
-      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+      return CertificateMessage.fromList(self.readValue() as! [Any?])
     case 166:
-      return CookieMessage.fromList(self.readValue() as! [Any?])
+      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
     case 167:
-      return SystemBrowserParamsMessage.fromList(self.readValue() as! [Any?])
+      return CookieMessage.fromList(self.readValue() as! [Any?])
     case 168:
+      return SystemBrowserParamsMessage.fromList(self.readValue() as! [Any?])
+    case 169:
       return InAppBrowserParamsMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -2057,17 +2101,20 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? BackForwardListMessage {
       super.writeByte(164)
       super.writeValue(value.toList())
-    } else if let value = value as? ScrollPositionMessage {
+    } else if let value = value as? CertificateMessage {
       super.writeByte(165)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? ScrollPositionMessage {
       super.writeByte(166)
       super.writeValue(value.toList())
-    } else if let value = value as? SystemBrowserParamsMessage {
+    } else if let value = value as? CookieMessage {
       super.writeByte(167)
       super.writeValue(value.toList())
-    } else if let value = value as? InAppBrowserParamsMessage {
+    } else if let value = value as? SystemBrowserParamsMessage {
       super.writeByte(168)
+      super.writeValue(value.toList())
+    } else if let value = value as? InAppBrowserParamsMessage {
+      super.writeByte(169)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -2124,6 +2171,9 @@ protocol AdvancedWebViewHostApi {
   func goBackOrForward(webViewId: Int64, steps: Int64) throws
   /// The navigation history of the main frame.
   func getBackForwardList(webViewId: Int64) throws -> BackForwardListMessage
+  /// The certificate the server of the current page presented, or null when
+  /// the page was not loaded over HTTPS.
+  func getCertificate(webViewId: Int64) throws -> CertificateMessage?
   func getUrl(webViewId: Int64) throws -> String?
   func getTitle(webViewId: Int64) throws -> String?
   /// Returns the evaluation result encoded as JSON (or null).
@@ -2509,6 +2559,23 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       getBackForwardListChannel.setMessageHandler(nil)
+    }
+    /// The certificate the server of the current page presented, or null when
+    /// the page was not loaded over HTTPS.
+    let getCertificateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getCertificate\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getCertificateChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        do {
+          let result = try api.getCertificate(webViewId: webViewIdArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getCertificateChannel.setMessageHandler(nil)
     }
     let getUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.getUrl\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

@@ -40,6 +40,13 @@ final class RunnerTests: XCTestCase {
     try hostApi.goBackOrForward(webViewId: 1, steps: -3)
   }
 
+  func testAPageWithoutTlsHasNoCertificate() throws {
+    let (hostApi, _, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+
+    XCTAssertNil(try hostApi.getCertificate(webViewId: 1))
+  }
+
   func testUnknownIdThrowsNotFound() {
     let (hostApi, _, _) = makeHostApi()
 

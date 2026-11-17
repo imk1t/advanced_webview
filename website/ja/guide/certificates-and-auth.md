@@ -3,6 +3,20 @@
 既定では、WebView は不正な証明書のページを拒否し、HTTP 認証もキャンセルし、クライアント証明書も提示しません。
 3 つのコールバックで、アプリ側が判断を引き取れます。
 
+## 表示中ページの証明書
+
+```dart
+final certificate = await controller.getCertificate(); // HTTPS でなければ null
+print(certificate?.subject); // CN=example.com, O=Example Inc, C=US
+print(certificate?.issuer);
+print(certificate?.notAfter); // UTC
+print(certificate?.sha256); // 小文字の 16 進数
+```
+
+接続先を利用者に示したり、想定するフィンガープリントと比べたりするのに使います。サブジェクトと発行者は証明書自体から
+読み取るため、Android と iOS で同じ形式になります。返るのはサーバー自身の証明書で、チェーンは含みません。プラット
+フォームが拒否した証明書への対応は、下の `onSslError` で決めます。
+
 ## 証明書エラー
 
 ```dart

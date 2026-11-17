@@ -521,6 +521,16 @@ class BackForwardListMessage {
   int currentIndex;
 }
 
+class CertificateMessage {
+  CertificateMessage({required this.der, required this.sha256});
+
+  /// The server's (leaf) certificate, DER encoded.
+  Uint8List der;
+
+  /// SHA-256 of `der` as lower-case hex.
+  String sha256;
+}
+
 class ScrollPositionMessage {
   ScrollPositionMessage({required this.x, required this.y});
 
@@ -668,6 +678,10 @@ abstract class AdvancedWebViewHostApi {
 
   /// The navigation history of the main frame.
   BackForwardListMessage getBackForwardList(int webViewId);
+
+  /// The certificate the server of the current page presented, or null when
+  /// the page was not loaded over HTTPS.
+  CertificateMessage? getCertificate(int webViewId);
 
   String? getUrl(int webViewId);
 

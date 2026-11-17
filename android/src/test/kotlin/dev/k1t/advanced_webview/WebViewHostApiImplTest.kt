@@ -396,6 +396,13 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun aPageWithoutTlsHasNoCertificate() {
+        hostApi.create(params(webViewId = 1))
+
+        assertNull(hostApi.getCertificate(1))
+    }
+
+    @Test
     fun anEmptyHistoryHasNoCurrentEntry() {
         hostApi.create(params(webViewId = 1))
 
