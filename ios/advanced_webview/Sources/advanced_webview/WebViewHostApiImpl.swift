@@ -142,7 +142,8 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     entries += list.forwardList
     return BackForwardListMessage(
       items: entries.map {
-        HistoryItemMessage(url: $0.url.absoluteString, title: $0.title.flatMap { $0.isEmpty ? nil : $0 })
+        HistoryItemMessage(
+          url: $0.url.absoluteString, title: $0.title.flatMap { $0.isEmpty ? nil : $0 })
       },
       currentIndex: Int64(currentIndex))
   }
