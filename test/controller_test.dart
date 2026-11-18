@@ -34,6 +34,7 @@ void main() {
     FindResultCallback? onFindResult,
     FaviconChangedCallback? onFaviconChanged,
     UrlChangedCallback? onUrlChanged,
+    VoidCallback? onPrintRequest,
     VoidCallback? onEnterFullscreen,
     VoidCallback? onExitFullscreen,
     NavigationRequestCallback? onNavigationRequest,
@@ -64,6 +65,7 @@ void main() {
       onFindResult: onFindResult,
       onFaviconChanged: onFaviconChanged,
       onUrlChanged: onUrlChanged,
+      onPrintRequest: onPrintRequest,
       onEnterFullscreen: onEnterFullscreen,
       onExitFullscreen: onExitFullscreen,
       onNavigationRequest: onNavigationRequest,
@@ -1182,6 +1184,73 @@ void main() {
       dispatcher.onExitFullscreen(controller.webViewId);
 
       expect(log, ['icon https://a/i.ico', 'icon null', 'enter', 'exit']);
+    });
+  });
+
+  group('print requests and selection', () {
+    test(
+      'onPrintRequest installs the window.print override and a handler',
+      () async {
+        var printed = 0;
+        final controller = createController(
+          javaScriptHandlerObjectName: 'bridge',
+          userScripts: const [UserScript(source: 'mine')],
+          onPrintRequest: () => printed++,
+        );
+        await controller.ready;
+
+        final created = hostApi.created[controller.webViewId]!;
+        expect(created.javaScriptHandlerNames, ['__advancedWebViewPrint']);
+        expect(created.userScripts.length, 2);
+        expect(created.userScripts.first.source, contains("window['bridge']"));
+        expect(created.userScripts.first.mainFrameOnly, false);
+        expect(created.userScripts.last.source, 'mine');
+
+        final result = await dispatcher.onJavaScriptHandlerCall(
+          controller.webViewId,
+          '__advancedWebViewPrint',
+          '[]',
+        );
+        expect(jsonDecode(result), isNull);
+        expect(printed, 1);
+      },
+    );
+
+    test('nothing is installed without onPrintRequest', () async {
+      final controller = createController();
+      await controller.ready;
+
+      final created = hostApi.created[controller.webViewId]!;
+      expect(created.javaScriptHandlerNames, isEmpty);
+      expect(created.userScripts, isEmpty);
+    });
+
+    test('removeAllUserScripts keeps the print override', () async {
+      final controller = createController(onPrintRequest: () {});
+      await controller.ready;
+      hostApi.calls.clear();
+
+      await controller.removeAllUserScripts();
+
+      expect(hostApi.calls, ['removeAllUserScripts', 'addUserScript']);
+    });
+
+    test('getSelectedText returns the selection or an empty string', () async {
+      final controller = createController();
+      hostApi.nextJavaScriptResult = jsonEncode('hello');
+      expect(await controller.getSelectedText(), 'hello');
+
+      hostApi.nextJavaScriptResult = null;
+      expect(await controller.getSelectedText(), '');
+    });
+
+    test('clearSelection runs a script', () async {
+      final controller = createController();
+      hostApi.calls.clear();
+
+      await controller.clearSelection();
+
+      expect(hostApi.calls.single, contains('removeAllRanges'));
     });
   });
 
