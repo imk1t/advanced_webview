@@ -396,6 +396,18 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun anInvalidProxyIsRejectedOrUnsupported() = runBlocking(Dispatchers.Unconfined) {
+        hostApi.create(params(webViewId = 1))
+
+        val error = runCatching {
+            hostApi.setProxy(1, ProxyConfigMessage("", 8080, ProxyTypeMessage.HTTP, emptyList()))
+        }.exceptionOrNull()
+
+        // Robolectric's WebView has no proxy override; a real one rejects the empty host.
+        assertTrue(error is FlutterError && (error.code == "unsupported" || error.code == "invalid-argument"))
+    }
+
+    @Test
     fun aPageWithoutTlsHasNoCertificate() {
         hostApi.create(params(webViewId = 1))
 

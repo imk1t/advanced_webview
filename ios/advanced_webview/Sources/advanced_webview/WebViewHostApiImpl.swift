@@ -1,6 +1,7 @@
 import CryptoKit
 import Flutter
 import Foundation
+import Network
 import UIKit
 
 /// Implements the Dart -> native calls by dispatching to `WebViewRegistry`.
@@ -147,6 +148,29 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
           url: $0.url.absoluteString, title: $0.title.flatMap { $0.isEmpty ? nil : $0 })
       },
       currentIndex: Int64(currentIndex))
+  }
+
+  @MainActor
+  func setProxy(webViewId: Int64, config: ProxyConfigMessage?) async throws {
+    let store = try registry.get(webViewId).webView.configuration.websiteDataStore
+    guard let config else {
+      store.proxyConfigurations = []
+      return
+    }
+    guard let port = UInt16(exactly: config.port).flatMap({ NWEndpoint.Port(rawValue: $0) }),
+      !config.host.trimmingCharacters(in: .whitespaces).isEmpty
+    else {
+      throw PigeonError(
+        code: "invalid-argument", message: "Invalid proxy host or port", details: nil)
+    }
+    let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(config.host), port: port)
+    var proxy: ProxyConfiguration
+    switch config.type {
+    case .http: proxy = ProxyConfiguration(httpCONNECTProxy: endpoint)
+    case .socks5: proxy = ProxyConfiguration(socksv5Proxy: endpoint)
+    }
+    proxy.excludedDomains = config.bypassHosts
+    store.proxyConfigurations = [proxy]
   }
 
   func getCertificate(webViewId: Int64) throws -> CertificateMessage? {

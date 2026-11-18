@@ -18,6 +18,7 @@ import 'navigation.dart';
 import 'permission.dart';
 import 'platform/event_dispatcher.dart';
 import 'platform/messages.g.dart';
+import 'proxy.dart';
 import 'security.dart';
 import 'settings.dart';
 import 'user_script.dart';
@@ -552,6 +553,46 @@ class AdvancedWebViewController {
           WebViewHistoryItem(url: item.url, title: item.title),
       ],
       currentIndex: list.currentIndex,
+    );
+  }
+
+  /// Sends the WebView's network traffic through [config], or back to a direct
+  /// connection when it is `null`. It applies to requests made after the call,
+  /// so set it before loading a page.
+  ///
+  /// Android's proxy override is process-wide: it applies to every WebView of
+  /// the app, not only this one, and needs a WebView with proxy override
+  /// support (otherwise this throws a `PlatformException` with code
+  /// `unsupported`). iOS sets it on the WebView's website data store, which the
+  /// WebViews of the same store share; an `incognito` WebView has its own.
+  ///
+  /// Android: `ProxyController.setProxyOverride` / `clearProxyOverride`.
+  /// iOS: `WKWebsiteDataStore.proxyConfigurations` with
+  /// `ProxyConfiguration(httpCONNECTProxy:)` or `ProxyConfiguration(socksv5Proxy:)`.
+  Future<void> setProxy(ProxyConfig? config) {
+    if (config != null) {
+      if (config.host.trim().isEmpty) {
+        throw ArgumentError.value(config.host, 'host', 'must not be empty');
+      }
+      if (config.port < 1 || config.port > 65535) {
+        throw ArgumentError.value(config.port, 'port', 'must be 1 to 65535');
+      }
+    }
+    return _call(
+      () => _hostApi.setProxy(
+        webViewId,
+        config == null
+            ? null
+            : ProxyConfigMessage(
+                host: config.host.trim(),
+                port: config.port,
+                type: switch (config.type) {
+                  ProxyType.http => ProxyTypeMessage.http,
+                  ProxyType.socks5 => ProxyTypeMessage.socks5,
+                },
+                bypassHosts: List.of(config.bypassHosts),
+              ),
+      ),
     );
   }
 

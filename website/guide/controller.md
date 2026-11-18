@@ -47,6 +47,25 @@ final url = await controller.currentUrl();
 final title = await controller.title();
 ```
 
+### Proxy
+
+```dart
+await controller.setProxy(
+  const ProxyConfig(
+    host: 'proxy.example.com',
+    port: 8080,
+    type: ProxyType.http, // or ProxyType.socks5
+    bypassHosts: ['localhost', 'intranet.example.com'], // also covers subdomains
+  ),
+);
+await controller.setProxy(null); // direct again
+```
+
+Set the proxy before loading a page; it applies to requests made after the call. On Android the proxy override is
+process-wide, so it affects every WebView of the app, and it needs a WebView that supports it (otherwise the call
+throws a `PlatformException` with code `unsupported`). On iOS it is set on the WebView's website data store, so
+WebViews that share a store share the proxy, while an `incognito` WebView has its own.
+
 ### History and URL changes
 
 ```dart

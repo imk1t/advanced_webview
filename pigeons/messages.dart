@@ -21,6 +21,8 @@ import 'package:pigeon/pigeon.dart';
 // ---------------------------------------------------------------------------
 // Data classes
 // ---------------------------------------------------------------------------
+enum ProxyTypeMessage { http, socks5 }
+
 enum CacheModeMessage { normal, preferCache, cacheOnly, noCache }
 
 enum ContentModeMessage { recommended, mobile, desktop }
@@ -521,6 +523,22 @@ class BackForwardListMessage {
   int currentIndex;
 }
 
+class ProxyConfigMessage {
+  ProxyConfigMessage({
+    required this.host,
+    required this.port,
+    required this.type,
+    required this.bypassHosts,
+  });
+
+  String host;
+  int port;
+  ProxyTypeMessage type;
+
+  /// Domains reached directly. Each also covers its subdomains.
+  List<String> bypassHosts;
+}
+
 class CertificateMessage {
   CertificateMessage({required this.der, required this.sha256});
 
@@ -678,6 +696,14 @@ abstract class AdvancedWebViewHostApi {
 
   /// The navigation history of the main frame.
   BackForwardListMessage getBackForwardList(int webViewId);
+
+  /// Routes the WebView's traffic through a proxy, or back to a direct
+  /// connection when `config` is null. Android's proxy override is
+  /// process-wide (all WebViews of the app); iOS sets it on the WebView's
+  /// website data store. Fails with `unsupported` when Android's WebView has no
+  /// proxy override and with `invalid-argument` for a bad host or port.
+  @async
+  void setProxy(int webViewId, ProxyConfigMessage? config);
 
   /// The certificate the server of the current page presented, or null when
   /// the page was not loaded over HTTPS.

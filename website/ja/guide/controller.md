@@ -46,6 +46,25 @@ final url = await controller.currentUrl();
 final title = await controller.title();
 ```
 
+### プロキシ
+
+```dart
+await controller.setProxy(
+  const ProxyConfig(
+    host: 'proxy.example.com',
+    port: 8080,
+    type: ProxyType.http, // または ProxyType.socks5
+    bypassHosts: ['localhost', 'intranet.example.com'], // サブドメインも対象
+  ),
+);
+await controller.setProxy(null); // 直接接続に戻す
+```
+
+プロキシはページを読み込む前に設定してください。設定後に行われるリクエストから適用されます。Android のプロキシ上書きは
+プロセス全体に効くため、アプリのすべての WebView に影響し、対応する WebView が必要です（非対応なら
+`unsupported` の `PlatformException` を投げます）。iOS では WebView のウェブサイトデータストアに設定するため、同じ
+ストアを共有する WebView は同じプロキシになり、`incognito` の WebView は専用のストアを持ちます。
+
 ### 履歴と URL の変更
 
 ```dart

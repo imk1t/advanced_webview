@@ -188,6 +188,11 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
 }
 
 
+enum ProxyTypeMessage: Int, CaseIterable {
+  case http = 0
+  case socks5 = 1
+}
+
 enum CacheModeMessage: Int, CaseIterable {
   case normal = 0
   case preferCache = 1
@@ -1575,6 +1580,57 @@ struct BackForwardListMessage: Hashable, CustomStringConvertible {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct ProxyConfigMessage: Hashable, CustomStringConvertible {
+  var host: String
+  var port: Int64
+  var type: ProxyTypeMessage
+  /// Domains reached directly. Each also covers its subdomains.
+  var bypassHosts: [String]
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ProxyConfigMessage? {
+    let host = pigeonVar_list[0] as! String
+    let port = pigeonVar_list[1] as! Int64
+    let type = pigeonVar_list[2] as! ProxyTypeMessage
+    let bypassHosts = pigeonVar_list[3] as! [String]
+
+    return ProxyConfigMessage(
+      host: host,
+      port: port,
+      type: type,
+      bypassHosts: bypassHosts
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      host,
+      port,
+      type,
+      bypassHosts,
+    ]
+  }
+  static func == (lhs: ProxyConfigMessage, rhs: ProxyConfigMessage) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return MessagesPigeonInternal.deepEquals(lhs.host, rhs.host) && MessagesPigeonInternal.deepEquals(lhs.port, rhs.port) && MessagesPigeonInternal.deepEquals(lhs.type, rhs.type) && MessagesPigeonInternal.deepEquals(lhs.bypassHosts, rhs.bypassHosts)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("ProxyConfigMessage")
+    MessagesPigeonInternal.deepHash(value: host, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: port, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: type, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: bypassHosts, hasher: &hasher)
+  }
+
+  public var description: String {
+    return "ProxyConfigMessage(host: \(String(describing: host)), port: \(String(describing: port)), type: \(String(describing: type)), bypassHosts: \(String(describing: bypassHosts)))"
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct CertificateMessage: Hashable, CustomStringConvertible {
   /// The server's (leaf) certificate, DER encoded.
   var der: FlutterStandardTypedData
@@ -1850,140 +1906,148 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 129:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return CacheModeMessage(rawValue: enumResultAsInt)
+        return ProxyTypeMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 130:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return ContentModeMessage(rawValue: enumResultAsInt)
+        return CacheModeMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 131:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return UserInterfaceStyleMessage(rawValue: enumResultAsInt)
+        return ContentModeMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 132:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MixedContentModeMessage(rawValue: enumResultAsInt)
+        return UserInterfaceStyleMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 133:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return ConsoleMessageLevelMessage(rawValue: enumResultAsInt)
+        return MixedContentModeMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 134:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return UserScriptInjectionTimeMessage(rawValue: enumResultAsInt)
+        return ConsoleMessageLevelMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 135:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return NavigationDecisionMessage(rawValue: enumResultAsInt)
+        return UserScriptInjectionTimeMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 136:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return SslErrorDecisionMessage(rawValue: enumResultAsInt)
+        return NavigationDecisionMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 137:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return ClientCertActionMessage(rawValue: enumResultAsInt)
+        return SslErrorDecisionMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 138:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return PermissionResourceMessage(rawValue: enumResultAsInt)
+        return ClientCertActionMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 139:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return PermissionDecisionMessage(rawValue: enumResultAsInt)
+        return PermissionResourceMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 140:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return JsDialogTypeMessage(rawValue: enumResultAsInt)
+        return PermissionDecisionMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 141:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return WebsiteDataTypeMessage(rawValue: enumResultAsInt)
+        return JsDialogTypeMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 142:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return HttpMethodMessage(rawValue: enumResultAsInt)
+        return WebsiteDataTypeMessage(rawValue: enumResultAsInt)
       }
       return nil
     case 143:
-      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return HttpMethodMessage(rawValue: enumResultAsInt)
+      }
+      return nil
     case 144:
-      return ConsoleMessageMessage.fromList(self.readValue() as! [Any?])
+      return WebViewSettingsMessage.fromList(self.readValue() as! [Any?])
     case 145:
-      return UserScriptMessage.fromList(self.readValue() as! [Any?])
+      return ConsoleMessageMessage.fromList(self.readValue() as! [Any?])
     case 146:
-      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
+      return UserScriptMessage.fromList(self.readValue() as! [Any?])
     case 147:
-      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
+      return CreationParamsMessage.fromList(self.readValue() as! [Any?])
     case 148:
-      return HttpErrorMessage.fromList(self.readValue() as! [Any?])
+      return NavigationRequestMessage.fromList(self.readValue() as! [Any?])
     case 149:
-      return RenderProcessGoneMessage.fromList(self.readValue() as! [Any?])
+      return HttpErrorMessage.fromList(self.readValue() as! [Any?])
     case 150:
-      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
+      return RenderProcessGoneMessage.fromList(self.readValue() as! [Any?])
     case 151:
-      return SslErrorMessage.fromList(self.readValue() as! [Any?])
+      return WebResourceErrorMessage.fromList(self.readValue() as! [Any?])
     case 152:
-      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
+      return SslErrorMessage.fromList(self.readValue() as! [Any?])
     case 153:
-      return ClientCertRequestMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthRequestMessage.fromList(self.readValue() as! [Any?])
     case 154:
-      return ClientCertResponseMessage.fromList(self.readValue() as! [Any?])
+      return ClientCertRequestMessage.fromList(self.readValue() as! [Any?])
     case 155:
-      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
+      return ClientCertResponseMessage.fromList(self.readValue() as! [Any?])
     case 156:
-      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
+      return HttpAuthCredentialsMessage.fromList(self.readValue() as! [Any?])
     case 157:
-      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
+      return DownloadRequestMessage.fromList(self.readValue() as! [Any?])
     case 158:
-      return JsDialogRequestMessage.fromList(self.readValue() as! [Any?])
+      return PermissionRequestMessage.fromList(self.readValue() as! [Any?])
     case 159:
-      return JsDialogResultMessage.fromList(self.readValue() as! [Any?])
+      return JsDialogRequestMessage.fromList(self.readValue() as! [Any?])
     case 160:
-      return InterceptRequestMessage.fromList(self.readValue() as! [Any?])
+      return JsDialogResultMessage.fromList(self.readValue() as! [Any?])
     case 161:
-      return InterceptResponseMessage.fromList(self.readValue() as! [Any?])
+      return InterceptRequestMessage.fromList(self.readValue() as! [Any?])
     case 162:
-      return FindResultMessage.fromList(self.readValue() as! [Any?])
+      return InterceptResponseMessage.fromList(self.readValue() as! [Any?])
     case 163:
-      return HistoryItemMessage.fromList(self.readValue() as! [Any?])
+      return FindResultMessage.fromList(self.readValue() as! [Any?])
     case 164:
-      return BackForwardListMessage.fromList(self.readValue() as! [Any?])
+      return HistoryItemMessage.fromList(self.readValue() as! [Any?])
     case 165:
-      return CertificateMessage.fromList(self.readValue() as! [Any?])
+      return BackForwardListMessage.fromList(self.readValue() as! [Any?])
     case 166:
-      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
+      return ProxyConfigMessage.fromList(self.readValue() as! [Any?])
     case 167:
-      return CookieMessage.fromList(self.readValue() as! [Any?])
+      return CertificateMessage.fromList(self.readValue() as! [Any?])
     case 168:
-      return SystemBrowserParamsMessage.fromList(self.readValue() as! [Any?])
+      return ScrollPositionMessage.fromList(self.readValue() as! [Any?])
     case 169:
+      return CookieMessage.fromList(self.readValue() as! [Any?])
+    case 170:
+      return SystemBrowserParamsMessage.fromList(self.readValue() as! [Any?])
+    case 171:
       return InAppBrowserParamsMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1993,128 +2057,134 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
 
 private class MessagesPigeonCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? CacheModeMessage {
+    if let value = value as? ProxyTypeMessage {
       super.writeByte(129)
       super.writeValue(value.rawValue)
-    } else if let value = value as? ContentModeMessage {
+    } else if let value = value as? CacheModeMessage {
       super.writeByte(130)
       super.writeValue(value.rawValue)
-    } else if let value = value as? UserInterfaceStyleMessage {
+    } else if let value = value as? ContentModeMessage {
       super.writeByte(131)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MixedContentModeMessage {
+    } else if let value = value as? UserInterfaceStyleMessage {
       super.writeByte(132)
       super.writeValue(value.rawValue)
-    } else if let value = value as? ConsoleMessageLevelMessage {
+    } else if let value = value as? MixedContentModeMessage {
       super.writeByte(133)
       super.writeValue(value.rawValue)
-    } else if let value = value as? UserScriptInjectionTimeMessage {
+    } else if let value = value as? ConsoleMessageLevelMessage {
       super.writeByte(134)
       super.writeValue(value.rawValue)
-    } else if let value = value as? NavigationDecisionMessage {
+    } else if let value = value as? UserScriptInjectionTimeMessage {
       super.writeByte(135)
       super.writeValue(value.rawValue)
-    } else if let value = value as? SslErrorDecisionMessage {
+    } else if let value = value as? NavigationDecisionMessage {
       super.writeByte(136)
       super.writeValue(value.rawValue)
-    } else if let value = value as? ClientCertActionMessage {
+    } else if let value = value as? SslErrorDecisionMessage {
       super.writeByte(137)
       super.writeValue(value.rawValue)
-    } else if let value = value as? PermissionResourceMessage {
+    } else if let value = value as? ClientCertActionMessage {
       super.writeByte(138)
       super.writeValue(value.rawValue)
-    } else if let value = value as? PermissionDecisionMessage {
+    } else if let value = value as? PermissionResourceMessage {
       super.writeByte(139)
       super.writeValue(value.rawValue)
-    } else if let value = value as? JsDialogTypeMessage {
+    } else if let value = value as? PermissionDecisionMessage {
       super.writeByte(140)
       super.writeValue(value.rawValue)
-    } else if let value = value as? WebsiteDataTypeMessage {
+    } else if let value = value as? JsDialogTypeMessage {
       super.writeByte(141)
       super.writeValue(value.rawValue)
-    } else if let value = value as? HttpMethodMessage {
+    } else if let value = value as? WebsiteDataTypeMessage {
       super.writeByte(142)
       super.writeValue(value.rawValue)
-    } else if let value = value as? WebViewSettingsMessage {
+    } else if let value = value as? HttpMethodMessage {
       super.writeByte(143)
-      super.writeValue(value.toList())
-    } else if let value = value as? ConsoleMessageMessage {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? WebViewSettingsMessage {
       super.writeByte(144)
       super.writeValue(value.toList())
-    } else if let value = value as? UserScriptMessage {
+    } else if let value = value as? ConsoleMessageMessage {
       super.writeByte(145)
       super.writeValue(value.toList())
-    } else if let value = value as? CreationParamsMessage {
+    } else if let value = value as? UserScriptMessage {
       super.writeByte(146)
       super.writeValue(value.toList())
-    } else if let value = value as? NavigationRequestMessage {
+    } else if let value = value as? CreationParamsMessage {
       super.writeByte(147)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpErrorMessage {
+    } else if let value = value as? NavigationRequestMessage {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? RenderProcessGoneMessage {
+    } else if let value = value as? HttpErrorMessage {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? WebResourceErrorMessage {
+    } else if let value = value as? RenderProcessGoneMessage {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? SslErrorMessage {
+    } else if let value = value as? WebResourceErrorMessage {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthRequestMessage {
+    } else if let value = value as? SslErrorMessage {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? ClientCertRequestMessage {
+    } else if let value = value as? HttpAuthRequestMessage {
       super.writeByte(153)
       super.writeValue(value.toList())
-    } else if let value = value as? ClientCertResponseMessage {
+    } else if let value = value as? ClientCertRequestMessage {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? HttpAuthCredentialsMessage {
+    } else if let value = value as? ClientCertResponseMessage {
       super.writeByte(155)
       super.writeValue(value.toList())
-    } else if let value = value as? DownloadRequestMessage {
+    } else if let value = value as? HttpAuthCredentialsMessage {
       super.writeByte(156)
       super.writeValue(value.toList())
-    } else if let value = value as? PermissionRequestMessage {
+    } else if let value = value as? DownloadRequestMessage {
       super.writeByte(157)
       super.writeValue(value.toList())
-    } else if let value = value as? JsDialogRequestMessage {
+    } else if let value = value as? PermissionRequestMessage {
       super.writeByte(158)
       super.writeValue(value.toList())
-    } else if let value = value as? JsDialogResultMessage {
+    } else if let value = value as? JsDialogRequestMessage {
       super.writeByte(159)
       super.writeValue(value.toList())
-    } else if let value = value as? InterceptRequestMessage {
+    } else if let value = value as? JsDialogResultMessage {
       super.writeByte(160)
       super.writeValue(value.toList())
-    } else if let value = value as? InterceptResponseMessage {
+    } else if let value = value as? InterceptRequestMessage {
       super.writeByte(161)
       super.writeValue(value.toList())
-    } else if let value = value as? FindResultMessage {
+    } else if let value = value as? InterceptResponseMessage {
       super.writeByte(162)
       super.writeValue(value.toList())
-    } else if let value = value as? HistoryItemMessage {
+    } else if let value = value as? FindResultMessage {
       super.writeByte(163)
       super.writeValue(value.toList())
-    } else if let value = value as? BackForwardListMessage {
+    } else if let value = value as? HistoryItemMessage {
       super.writeByte(164)
       super.writeValue(value.toList())
-    } else if let value = value as? CertificateMessage {
+    } else if let value = value as? BackForwardListMessage {
       super.writeByte(165)
       super.writeValue(value.toList())
-    } else if let value = value as? ScrollPositionMessage {
+    } else if let value = value as? ProxyConfigMessage {
       super.writeByte(166)
       super.writeValue(value.toList())
-    } else if let value = value as? CookieMessage {
+    } else if let value = value as? CertificateMessage {
       super.writeByte(167)
       super.writeValue(value.toList())
-    } else if let value = value as? SystemBrowserParamsMessage {
+    } else if let value = value as? ScrollPositionMessage {
       super.writeByte(168)
       super.writeValue(value.toList())
-    } else if let value = value as? InAppBrowserParamsMessage {
+    } else if let value = value as? CookieMessage {
       super.writeByte(169)
+      super.writeValue(value.toList())
+    } else if let value = value as? SystemBrowserParamsMessage {
+      super.writeByte(170)
+      super.writeValue(value.toList())
+    } else if let value = value as? InAppBrowserParamsMessage {
+      super.writeByte(171)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -2171,6 +2241,12 @@ protocol AdvancedWebViewHostApi {
   func goBackOrForward(webViewId: Int64, steps: Int64) throws
   /// The navigation history of the main frame.
   func getBackForwardList(webViewId: Int64) throws -> BackForwardListMessage
+  /// Routes the WebView's traffic through a proxy, or back to a direct
+  /// connection when `config` is null. Android's proxy override is
+  /// process-wide (all WebViews of the app); iOS sets it on the WebView's
+  /// website data store. Fails with `unsupported` when Android's WebView has no
+  /// proxy override and with `invalid-argument` for a bad host or port.
+  func setProxy(webViewId: Int64, config: ProxyConfigMessage?) async throws
   /// The certificate the server of the current page presented, or null when
   /// the page was not loaded over HTTPS.
   func getCertificate(webViewId: Int64) throws -> CertificateMessage?
@@ -2559,6 +2635,29 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       getBackForwardListChannel.setMessageHandler(nil)
+    }
+    /// Routes the WebView's traffic through a proxy, or back to a direct
+    /// connection when `config` is null. Android's proxy override is
+    /// process-wide (all WebViews of the app); iOS sets it on the WebView's
+    /// website data store. Fails with `unsupported` when Android's WebView has no
+    /// proxy override and with `invalid-argument` for a bad host or port.
+    let setProxyChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setProxy\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setProxyChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let configArg: ProxyConfigMessage? = nilOrValue(args[1])
+        Task { @MainActor in
+          do {
+            try await api.setProxy(webViewId: webViewIdArg, config: configArg)
+            reply(wrapResult(nil))
+          } catch {
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      setProxyChannel.setMessageHandler(nil)
     }
     /// The certificate the server of the current page presented, or null when
     /// the page was not loaded over HTTPS.

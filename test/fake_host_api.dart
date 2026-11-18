@@ -95,6 +95,14 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
   Future<BackForwardListMessage> getBackForwardList(int webViewId) async =>
       backForwardList;
 
+  ProxyConfigMessage? proxy;
+
+  @override
+  Future<void> setProxy(int webViewId, ProxyConfigMessage? config) async {
+    proxy = config;
+    calls.add('setProxy ${config?.host}');
+  }
+
   CertificateMessage? certificate;
 
   @override
