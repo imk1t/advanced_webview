@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.12.0 - 2026-11-19
+
 - Add `AdvancedWebViewController.onPrintRequest`: be told when a page calls `window.print()`. The plugin replaces `window.print` in every frame and reports the call, and you decide what to do, for example call `printPage`. It needs a WebView that supports JavaScript handlers.
 - Add `AdvancedWebViewController.getSelectedText` and `clearSelection`: read and clear the text the user selected in the page, including text in an `<input>` or `<textarea>`. Both are built on `window.getSelection()` and behave the same on Android and iOS.
 
