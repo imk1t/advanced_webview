@@ -1015,6 +1015,73 @@
       }
     },
     {
+      "dart": "AdvancedWebViewController.onPrintRequest",
+      "group": "javascript",
+      "summary": {
+        "en": "Reports a page's window.print() call; the WebView does not print on its own.",
+        "ja": "ページの window.print() の呼び出しを通知します。WebView が自動で印刷することはありません。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewCompat.addWebMessageListener", "WebViewCompat.addDocumentStartJavaScript"],
+        "note": {
+          "en": "Built on the JavaScript handler bridge, so it needs WEB_MESSAGE_LISTENER and DOCUMENT_START_SCRIPT. A document-start script replaces window.print in every frame.",
+          "ja": "JavaScript ハンドラのブリッジの上に作られているため、WEB_MESSAGE_LISTENER と DOCUMENT_START_SCRIPT が必要です。ドキュメント開始時のスクリプトが、すべてのフレームの window.print を置き換えます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKUserContentController.addScriptMessageHandler(_:contentWorld:name:)",
+          "WKScriptMessageHandlerWithReply"
+        ],
+        "note": {
+          "en": "A document-start user script replaces window.print in every frame and calls the handler bridge.",
+          "ja": "ドキュメント開始時のユーザースクリプトが、すべてのフレームの window.print を置き換え、ハンドラのブリッジを呼びます。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.getSelectedText",
+      "group": "javascript",
+      "summary": {
+        "en": "Returns the text selected in the page, including text selected in an input or textarea.",
+        "ja": "ページで選択されているテキストを返します。input や textarea の選択も含みます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.evaluateJavascript(String, ValueCallback)"],
+        "note": {
+          "en": "Implemented with window.getSelection() in the main frame, so it matches iOS.",
+          "ja": "メインフレームの window.getSelection() で実装しているため、iOS と同じ結果になります。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:)"],
+        "note": {
+          "en": "Implemented with window.getSelection() in the main frame.",
+          "ja": "メインフレームの window.getSelection() で実装しています。"
+        }
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.clearSelection",
+      "group": "javascript",
+      "summary": {
+        "en": "Clears the text selection in the page and in a focused text field.",
+        "ja": "ページと、フォーカス中のテキスト入力欄の選択を解除します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.evaluateJavascript(String, ValueCallback)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.evaluateJavaScript(_:)"]
+      }
+    },
+    {
       "dart": "AdvancedWebViewController.javaScriptHandlers",
       "group": "javascript",
       "summary": {

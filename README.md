@@ -107,6 +107,7 @@ On both platforms, JavaScript can call `window.Bridge.postMessage('hello')`.
 - Zoom control (`zoomBy`, `setZoomScale`)
 - Proxy server with bypass domains (`setProxy`)
 - PDF export, live find-in-page match count, favicon URL and fullscreen video callbacks
+- Print request callback (`onPrintRequest`), selected text (`getSelectedText`)
 - Callbacks: page started / finished, progress, title changed, load errors
 - Settings: JavaScript enabled, User-Agent, media autoplay, inline playback (iOS),
   zoom (Android), transparent background
