@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.12.0 - 2026-11-19
 
+- Add `AdvancedWebViewController.onPrintRequest`: be told when a page calls `window.print()`. The plugin replaces `window.print` in every frame and reports the call, and you decide what to do, for example call `printPage`. It needs a WebView that supports JavaScript handlers.
+- Add `AdvancedWebViewController.getSelectedText` and `clearSelection`: read and clear the text the user selected in the page, including text in an `<input>` or `<textarea>`. Both are built on `window.getSelection()` and behave the same on Android and iOS.
+
 - Add `AdvancedWebViewController.setProxy`, `ProxyConfig` and `ProxyType`: send the WebView's traffic through an HTTP or SOCKS5 proxy, with domains that bypass it, or pass `null` to go direct again. Android's proxy override is process-wide and needs a WebView that supports it (`ProxyController`); iOS sets it on the WebView's website data store (`WKWebsiteDataStore.proxyConfigurations`). It applies to requests made after the call.
 
 - Add `AdvancedWebViewController.getCertificate` and `WebViewCertificate`: the certificate the server of the current page presented, with subject, issuer, validity period, SHA-256 fingerprint and the DER bytes, read the same way on both platforms. It is `null` for pages that were not loaded over HTTPS. Only the server's own certificate is returned, not the chain.

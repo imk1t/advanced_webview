@@ -15,6 +15,7 @@ import 'intercept.dart';
 import 'js_dialog.dart';
 import 'load_request.dart';
 import 'navigation.dart';
+import 'page_scripts.dart';
 import 'permission.dart';
 import 'platform/event_dispatcher.dart';
 import 'platform/messages.g.dart';
@@ -51,6 +52,7 @@ class AdvancedWebViewController {
     this.onFindResult,
     this.onFaviconChanged,
     this.onUrlChanged,
+    this.onPrintRequest,
     this.onEnterFullscreen,
     this.onExitFullscreen,
     this.onNavigationRequest,
@@ -66,7 +68,20 @@ class AdvancedWebViewController {
   }) : webViewId = _nextWebViewId++,
        _settings = settings,
        _javaScriptChannels = Map.unmodifiable(javaScriptChannels),
-       _javaScriptHandlers = Map.unmodifiable(javaScriptHandlers),
+       _javaScriptHandlers = Map.unmodifiable({
+         ...javaScriptHandlers,
+         if (onPrintRequest != null)
+           printHandlerName: (_) {
+             onPrintRequest();
+             return null;
+           },
+       }),
+       _printScript = onPrintRequest == null
+           ? null
+           : UserScript(
+               source: printOverrideScript(javaScriptHandlerObjectName),
+               mainFrameOnly: false,
+             ),
        _hostApi = hostApi ?? AdvancedWebViewHostApi(),
        _dispatcher = dispatcher ?? WebViewEventDispatcher.instance {
     final schemes = _normalizeSchemes(interceptSchemes, onInterceptRequest);
@@ -104,10 +119,15 @@ class AdvancedWebViewController {
             onEnterFullscreen != null || onExitFullscreen != null,
         hasUrlChangedDelegate: onUrlChanged != null,
         interceptSchemes: schemes,
-        userScripts: [for (final script in userScripts) script.toMessage()],
+        userScripts: [
+          if (_printScript != null) _printScript.toMessage(),
+          for (final script in userScripts) script.toMessage(),
+        ],
       ),
     );
   }
+
+  final UserScript? _printScript;
 
   static int _nextWebViewId = 0;
 
@@ -180,6 +200,15 @@ class AdvancedWebViewController {
   /// Android: `WebViewClient.doUpdateVisitedHistory`.
   /// iOS: key-value observing of `WKWebView.url`.
   final UrlChangedCallback? onUrlChanged;
+
+  /// Called when the page calls `window.print()`, for example from a "Print"
+  /// button. The WebView does not print on its own: call [printPage] from the
+  /// callback to open the system print UI, or do something else.
+  ///
+  /// Implemented with a script that replaces `window.print` in every frame and
+  /// a JavaScript handler, so it needs a WebView that supports JavaScript
+  /// handlers (see [javaScriptHandlers]). Only set at construction.
+  final VoidCallback? onPrintRequest;
 
   /// Called when the page enters fullscreen, for example when the user taps the
   /// fullscreen button of a `<video>` or the page calls
@@ -751,6 +780,21 @@ class AdvancedWebViewController {
   Future<void> printPage({String? jobName}) =>
       _call(() => _hostApi.printPage(webViewId, jobName));
 
+  /// The text the user has selected in the page, or an empty string. Text
+  /// selected in a focused `<input>` or `<textarea>` is included. Only the main
+  /// frame is read.
+  ///
+  /// Use it to build your own selection menu or to react to the user's
+  /// selection. Implemented with `window.getSelection()`, so it behaves the
+  /// same on Android and iOS.
+  Future<String> getSelectedText() async {
+    final result = await runJavaScriptReturningResult(selectedTextScript);
+    return result is String ? result : '';
+  }
+
+  /// Clears the text selection, in the page and in a focused text field.
+  Future<void> clearSelection() => runJavaScript(clearSelectionScript);
+
   /// Reports what is at [position] (logical pixels, relative to the WebView,
   /// as given to [onLongPress]): a link, an image, both, or neither.
   ///
@@ -806,8 +850,15 @@ class AdvancedWebViewController {
   /// Android: `ScriptHandler.remove()` for each registered script.
   /// iOS: `WKUserContentController.removeAllUserScripts()`; the JavaScript
   /// channel shims are registered again afterwards.
-  Future<void> removeAllUserScripts() =>
-      _call(() => _hostApi.removeAllUserScripts(webViewId));
+  Future<void> removeAllUserScripts() => _call(() async {
+    await _hostApi.removeAllUserScripts(webViewId);
+    // The `window.print` replacement belongs to `onPrintRequest`, not to the
+    // scripts the app added, so it stays.
+    final printScript = _printScript;
+    if (printScript != null) {
+      await _hostApi.addUserScript(webViewId, printScript.toMessage());
+    }
+  });
 
   /// Stores [cookie] in the WebView's cookie store.
   ///

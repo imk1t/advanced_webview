@@ -96,6 +96,25 @@ none). Dismissing makes `confirm` return `false` and `prompt` return `null`. An 
 counts as a dismissal. Without `onJsDialog` the platform default applies: Android shows the system
 WebView's dialog and the plugin presents a native alert on iOS. `beforeunload` dialogs are not reported.
 
+## Print requests and selection
+
+```dart
+late final AdvancedWebViewController controller;
+controller = AdvancedWebViewController(
+  onPrintRequest: () => controller.printPage(), // the page called window.print()
+);
+
+final text = await controller.getSelectedText(); // '' when nothing is selected
+await controller.clearSelection();
+```
+
+The WebView does not print on its own when a page calls `window.print()`. `onPrintRequest` tells you, and you decide, for
+example by calling `printPage`. It replaces `window.print` in every frame and uses the JavaScript handler bridge, so on
+Android it needs a WebView that supports web message listeners. Set it when you create the controller.
+
+`getSelectedText` and `clearSelection` use `window.getSelection()`, so they behave the same on both platforms. Only the
+main frame is read; text selected in an `<input>` or `<textarea>` is included.
+
 ## User scripts
 
 User scripts are injected into every page the WebView loads, before or after the DOM is parsed.

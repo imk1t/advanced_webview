@@ -95,6 +95,26 @@ final controller = AdvancedWebViewController(
 `dismiss` として扱います。`onJsDialog` がない場合はプラットフォームの標準動作になり、Android はシステム WebView の
 ダイアログを表示し、iOS ではプラグインがネイティブのアラートを表示します。`beforeunload` のダイアログは通知されません。
 
+## 印刷要求とテキスト選択
+
+```dart
+late final AdvancedWebViewController controller;
+controller = AdvancedWebViewController(
+  onPrintRequest: () => controller.printPage(), // ページが window.print() を呼んだ
+);
+
+final text = await controller.getSelectedText(); // 何も選択されていなければ ''
+await controller.clearSelection();
+```
+
+ページが `window.print()` を呼んでも、WebView が自動で印刷することはありません。`onPrintRequest` で通知を受け取り、
+`printPage` を呼ぶなど、対応をアプリ側で決めます。すべてのフレームの `window.print` を置き換え、JavaScript ハンドラの
+ブリッジを使うため、Android では Web メッセージリスナーに対応した WebView が必要です。コントローラーの作成時に設定して
+ください。
+
+`getSelectedText` と `clearSelection` は `window.getSelection()` を使うため、両プラットフォームで同じ動作になります。読み取る
+のはメインフレームだけで、`<input>` や `<textarea>` で選択したテキストも含みます。
+
 ## ユーザースクリプト
 
 ユーザースクリプトは、WebView が読み込むすべてのページに、DOM の解析前または解析後に注入されます。
