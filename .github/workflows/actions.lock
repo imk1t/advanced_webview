@@ -18,7 +18,7 @@ workflows:
         - 'oven-sh/setup-bun@v2.2.0'
     '.github/workflows/publish.yml':
         - 'actions/checkout@v7.0.1'
-        - 'dart-lang/setup-dart@v1.8.1'
+        - 'dart-lang/setup-dart@v1.8.2'
         - 'jdx/mise-action@v5.2.9'
     '.github/workflows/verify-lockfile.yml':
         - 'actions/checkout@v7.0.1'
@@ -55,9 +55,9 @@ dependencies:
         repo_id: 496012378
         uses:
             - 'actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f'
-    'dart-lang/setup-dart@v1.8.1':
-        ref: 'v1.8.1'
-        commit: 'sha1-6afc89df92d6eb3834022f73cd65adc8cdfcb92d'
+    'dart-lang/setup-dart@v1.8.2':
+        ref: 'v1.8.2'
+        commit: 'sha1-2286a0c042b44434fe26d292bbce8d34f7ec662b'
         owner_id: 1609975
         repo_id: 320563763
     'imk1t/apm-shared@v0.1.4':
