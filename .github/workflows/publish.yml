@@ -47,7 +47,7 @@ jobs:
             echo "$package $version is already published; skipping pub.dev upload"
           fi
       # Configures the pub.dev OIDC credentials only when an upload is needed.
-      - uses: dart-lang/setup-dart@v1.8.1
+      - uses: dart-lang/setup-dart@v1.8.2
         if: steps.pub-dev.outputs.published == 'false'
       - uses: jdx/mise-action@v5.2.9
         with:
