@@ -212,6 +212,33 @@ enum class ProxyTypeMessage(val raw: Int) {
   }
 }
 
+enum class ContentBlockerActionMessage(val raw: Int) {
+  BLOCK(0),
+  CSS_DISPLAY_NONE(1);
+
+  companion object {
+    fun ofRaw(raw: Int): ContentBlockerActionMessage? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class ContentBlockerResourceTypeMessage(val raw: Int) {
+  DOCUMENT(0),
+  IMAGE(1),
+  STYLESHEET(2),
+  SCRIPT(3),
+  FONT(4),
+  MEDIA(5),
+  OTHER(6);
+
+  companion object {
+    fun ofRaw(raw: Int): ContentBlockerResourceTypeMessage? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class CacheModeMessage(val raw: Int) {
   NORMAL(0),
   PREFER_CACHE(1),
@@ -1738,6 +1765,58 @@ data class ProxyConfigMessage (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class ContentBlockerRuleMessage (
+  /** Regular expression matched against the URL (case insensitive). */
+  val urlFilter: String,
+  /** Resource types the rule applies to; empty means all of them. */
+  val resourceTypes: List<ContentBlockerResourceTypeMessage>,
+  val action: ContentBlockerActionMessage,
+  /** CSS selector of the elements to hide, for `cssDisplayNone`. */
+  val selector: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ContentBlockerRuleMessage {
+      val urlFilter = pigeonVar_list[0] as String
+      val resourceTypes = pigeonVar_list[1] as List<ContentBlockerResourceTypeMessage>
+      val action = pigeonVar_list[2] as ContentBlockerActionMessage
+      val selector = pigeonVar_list[3] as String?
+      return ContentBlockerRuleMessage(urlFilter, resourceTypes, action, selector)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      urlFilter,
+      resourceTypes,
+      action,
+      selector,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as ContentBlockerRuleMessage
+    return MessagesPigeonUtils.deepEquals(this.urlFilter, other.urlFilter) && MessagesPigeonUtils.deepEquals(this.resourceTypes, other.resourceTypes) && MessagesPigeonUtils.deepEquals(this.action, other.action) && MessagesPigeonUtils.deepEquals(this.selector, other.selector)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.urlFilter)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.resourceTypes)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.action)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.selector)
+    return result
+  }
+  override fun toString(): String {
+    return "ContentBlockerRuleMessage(urlFilter=$urlFilter, resourceTypes=$resourceTypes, action=$action, selector=$selector)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class CertificateMessage (
   /** The server's (leaf) certificate, DER encoded. */
   val der: ByteArray,
@@ -2023,210 +2102,225 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          CacheModeMessage.ofRaw(it.toInt())
+          ContentBlockerActionMessage.ofRaw(it.toInt())
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          ContentModeMessage.ofRaw(it.toInt())
+          ContentBlockerResourceTypeMessage.ofRaw(it.toInt())
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          UserInterfaceStyleMessage.ofRaw(it.toInt())
+          CacheModeMessage.ofRaw(it.toInt())
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          MixedContentModeMessage.ofRaw(it.toInt())
+          ContentModeMessage.ofRaw(it.toInt())
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          ConsoleMessageLevelMessage.ofRaw(it.toInt())
+          UserInterfaceStyleMessage.ofRaw(it.toInt())
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          UserScriptInjectionTimeMessage.ofRaw(it.toInt())
+          MixedContentModeMessage.ofRaw(it.toInt())
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          NavigationDecisionMessage.ofRaw(it.toInt())
+          ConsoleMessageLevelMessage.ofRaw(it.toInt())
         }
       }
       137.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          SslErrorDecisionMessage.ofRaw(it.toInt())
+          UserScriptInjectionTimeMessage.ofRaw(it.toInt())
         }
       }
       138.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          ClientCertActionMessage.ofRaw(it.toInt())
+          NavigationDecisionMessage.ofRaw(it.toInt())
         }
       }
       139.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PermissionResourceMessage.ofRaw(it.toInt())
+          SslErrorDecisionMessage.ofRaw(it.toInt())
         }
       }
       140.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PermissionDecisionMessage.ofRaw(it.toInt())
+          ClientCertActionMessage.ofRaw(it.toInt())
         }
       }
       141.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          JsDialogTypeMessage.ofRaw(it.toInt())
+          PermissionResourceMessage.ofRaw(it.toInt())
         }
       }
       142.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          WebsiteDataTypeMessage.ofRaw(it.toInt())
+          PermissionDecisionMessage.ofRaw(it.toInt())
         }
       }
       143.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          HttpMethodMessage.ofRaw(it.toInt())
+          JsDialogTypeMessage.ofRaw(it.toInt())
         }
       }
       144.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          WebViewSettingsMessage.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          WebsiteDataTypeMessage.ofRaw(it.toInt())
         }
       }
       145.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ConsoleMessageMessage.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          HttpMethodMessage.ofRaw(it.toInt())
         }
       }
       146.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UserScriptMessage.fromList(it)
+          WebViewSettingsMessage.fromList(it)
         }
       }
       147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CreationParamsMessage.fromList(it)
+          ConsoleMessageMessage.fromList(it)
         }
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          NavigationRequestMessage.fromList(it)
+          UserScriptMessage.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpErrorMessage.fromList(it)
+          CreationParamsMessage.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          RenderProcessGoneMessage.fromList(it)
+          NavigationRequestMessage.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          WebResourceErrorMessage.fromList(it)
+          HttpErrorMessage.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SslErrorMessage.fromList(it)
+          RenderProcessGoneMessage.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthRequestMessage.fromList(it)
+          WebResourceErrorMessage.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ClientCertRequestMessage.fromList(it)
+          SslErrorMessage.fromList(it)
         }
       }
       155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ClientCertResponseMessage.fromList(it)
+          HttpAuthRequestMessage.fromList(it)
         }
       }
       156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HttpAuthCredentialsMessage.fromList(it)
+          ClientCertRequestMessage.fromList(it)
         }
       }
       157.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DownloadRequestMessage.fromList(it)
+          ClientCertResponseMessage.fromList(it)
         }
       }
       158.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PermissionRequestMessage.fromList(it)
+          HttpAuthCredentialsMessage.fromList(it)
         }
       }
       159.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogRequestMessage.fromList(it)
+          DownloadRequestMessage.fromList(it)
         }
       }
       160.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          JsDialogResultMessage.fromList(it)
+          PermissionRequestMessage.fromList(it)
         }
       }
       161.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InterceptRequestMessage.fromList(it)
+          JsDialogRequestMessage.fromList(it)
         }
       }
       162.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InterceptResponseMessage.fromList(it)
+          JsDialogResultMessage.fromList(it)
         }
       }
       163.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          FindResultMessage.fromList(it)
+          InterceptRequestMessage.fromList(it)
         }
       }
       164.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          HistoryItemMessage.fromList(it)
+          InterceptResponseMessage.fromList(it)
         }
       }
       165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BackForwardListMessage.fromList(it)
+          FindResultMessage.fromList(it)
         }
       }
       166.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ProxyConfigMessage.fromList(it)
+          HistoryItemMessage.fromList(it)
         }
       }
       167.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CertificateMessage.fromList(it)
+          BackForwardListMessage.fromList(it)
         }
       }
       168.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ScrollPositionMessage.fromList(it)
+          ProxyConfigMessage.fromList(it)
         }
       }
       169.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CookieMessage.fromList(it)
+          ContentBlockerRuleMessage.fromList(it)
         }
       }
       170.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SystemBrowserParamsMessage.fromList(it)
+          CertificateMessage.fromList(it)
         }
       }
       171.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ScrollPositionMessage.fromList(it)
+        }
+      }
+      172.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CookieMessage.fromList(it)
+        }
+      }
+      173.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SystemBrowserParamsMessage.fromList(it)
+        }
+      }
+      174.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           InAppBrowserParamsMessage.fromList(it)
         }
@@ -2240,172 +2334,184 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.raw.toLong())
       }
-      is CacheModeMessage -> {
+      is ContentBlockerActionMessage -> {
         stream.write(130)
         writeValue(stream, value.raw.toLong())
       }
-      is ContentModeMessage -> {
+      is ContentBlockerResourceTypeMessage -> {
         stream.write(131)
         writeValue(stream, value.raw.toLong())
       }
-      is UserInterfaceStyleMessage -> {
+      is CacheModeMessage -> {
         stream.write(132)
         writeValue(stream, value.raw.toLong())
       }
-      is MixedContentModeMessage -> {
+      is ContentModeMessage -> {
         stream.write(133)
         writeValue(stream, value.raw.toLong())
       }
-      is ConsoleMessageLevelMessage -> {
+      is UserInterfaceStyleMessage -> {
         stream.write(134)
         writeValue(stream, value.raw.toLong())
       }
-      is UserScriptInjectionTimeMessage -> {
+      is MixedContentModeMessage -> {
         stream.write(135)
         writeValue(stream, value.raw.toLong())
       }
-      is NavigationDecisionMessage -> {
+      is ConsoleMessageLevelMessage -> {
         stream.write(136)
         writeValue(stream, value.raw.toLong())
       }
-      is SslErrorDecisionMessage -> {
+      is UserScriptInjectionTimeMessage -> {
         stream.write(137)
         writeValue(stream, value.raw.toLong())
       }
-      is ClientCertActionMessage -> {
+      is NavigationDecisionMessage -> {
         stream.write(138)
         writeValue(stream, value.raw.toLong())
       }
-      is PermissionResourceMessage -> {
+      is SslErrorDecisionMessage -> {
         stream.write(139)
         writeValue(stream, value.raw.toLong())
       }
-      is PermissionDecisionMessage -> {
+      is ClientCertActionMessage -> {
         stream.write(140)
         writeValue(stream, value.raw.toLong())
       }
-      is JsDialogTypeMessage -> {
+      is PermissionResourceMessage -> {
         stream.write(141)
         writeValue(stream, value.raw.toLong())
       }
-      is WebsiteDataTypeMessage -> {
+      is PermissionDecisionMessage -> {
         stream.write(142)
         writeValue(stream, value.raw.toLong())
       }
-      is HttpMethodMessage -> {
+      is JsDialogTypeMessage -> {
         stream.write(143)
         writeValue(stream, value.raw.toLong())
       }
-      is WebViewSettingsMessage -> {
+      is WebsiteDataTypeMessage -> {
         stream.write(144)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is ConsoleMessageMessage -> {
+      is HttpMethodMessage -> {
         stream.write(145)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is UserScriptMessage -> {
+      is WebViewSettingsMessage -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
-      is CreationParamsMessage -> {
+      is ConsoleMessageMessage -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is NavigationRequestMessage -> {
+      is UserScriptMessage -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is HttpErrorMessage -> {
+      is CreationParamsMessage -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is RenderProcessGoneMessage -> {
+      is NavigationRequestMessage -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is WebResourceErrorMessage -> {
+      is HttpErrorMessage -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is SslErrorMessage -> {
+      is RenderProcessGoneMessage -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is HttpAuthRequestMessage -> {
+      is WebResourceErrorMessage -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is ClientCertRequestMessage -> {
+      is SslErrorMessage -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is ClientCertResponseMessage -> {
+      is HttpAuthRequestMessage -> {
         stream.write(155)
         writeValue(stream, value.toList())
       }
-      is HttpAuthCredentialsMessage -> {
+      is ClientCertRequestMessage -> {
         stream.write(156)
         writeValue(stream, value.toList())
       }
-      is DownloadRequestMessage -> {
+      is ClientCertResponseMessage -> {
         stream.write(157)
         writeValue(stream, value.toList())
       }
-      is PermissionRequestMessage -> {
+      is HttpAuthCredentialsMessage -> {
         stream.write(158)
         writeValue(stream, value.toList())
       }
-      is JsDialogRequestMessage -> {
+      is DownloadRequestMessage -> {
         stream.write(159)
         writeValue(stream, value.toList())
       }
-      is JsDialogResultMessage -> {
+      is PermissionRequestMessage -> {
         stream.write(160)
         writeValue(stream, value.toList())
       }
-      is InterceptRequestMessage -> {
+      is JsDialogRequestMessage -> {
         stream.write(161)
         writeValue(stream, value.toList())
       }
-      is InterceptResponseMessage -> {
+      is JsDialogResultMessage -> {
         stream.write(162)
         writeValue(stream, value.toList())
       }
-      is FindResultMessage -> {
+      is InterceptRequestMessage -> {
         stream.write(163)
         writeValue(stream, value.toList())
       }
-      is HistoryItemMessage -> {
+      is InterceptResponseMessage -> {
         stream.write(164)
         writeValue(stream, value.toList())
       }
-      is BackForwardListMessage -> {
+      is FindResultMessage -> {
         stream.write(165)
         writeValue(stream, value.toList())
       }
-      is ProxyConfigMessage -> {
+      is HistoryItemMessage -> {
         stream.write(166)
         writeValue(stream, value.toList())
       }
-      is CertificateMessage -> {
+      is BackForwardListMessage -> {
         stream.write(167)
         writeValue(stream, value.toList())
       }
-      is ScrollPositionMessage -> {
+      is ProxyConfigMessage -> {
         stream.write(168)
         writeValue(stream, value.toList())
       }
-      is CookieMessage -> {
+      is ContentBlockerRuleMessage -> {
         stream.write(169)
         writeValue(stream, value.toList())
       }
-      is SystemBrowserParamsMessage -> {
+      is CertificateMessage -> {
         stream.write(170)
         writeValue(stream, value.toList())
       }
-      is InAppBrowserParamsMessage -> {
+      is ScrollPositionMessage -> {
         stream.write(171)
+        writeValue(stream, value.toList())
+      }
+      is CookieMessage -> {
+        stream.write(172)
+        writeValue(stream, value.toList())
+      }
+      is SystemBrowserParamsMessage -> {
+        stream.write(173)
+        writeValue(stream, value.toList())
+      }
+      is InAppBrowserParamsMessage -> {
+        stream.write(174)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -2462,6 +2568,13 @@ interface AdvancedWebViewHostApi {
    * proxy override and with `invalid-argument` for a bad host or port.
    */
   suspend fun setProxy(webViewId: Long, config: ProxyConfigMessage?)
+  /**
+   * Replaces the content blocking rules; an empty list removes them. Fails with
+   * `invalid-argument` when a rule's `urlFilter` or `selector` is invalid, and
+   * with `unsupported` when `cssDisplayNone` needs a WebView feature that is
+   * missing.
+   */
+  suspend fun setContentBlockers(webViewId: Long, rules: List<ContentBlockerRuleMessage>)
   /**
    * The certificate the server of the current page presented, or null when
    * the page was not loaded over HTTPS.
@@ -2928,6 +3041,27 @@ interface AdvancedWebViewHostApi {
             CoroutineScope(Dispatchers.Main).launch {
               val wrapped: List<Any?> = try {
                 api.setProxy(webViewIdArg, configArg)
+                listOf(null)
+              } catch (exception: Throwable) {
+                MessagesPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.setContentBlockers$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val rulesArg = args[1] as List<ContentBlockerRuleMessage>
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                api.setContentBlockers(webViewIdArg, rulesArg)
                 listOf(null)
               } catch (exception: Throwable) {
                 MessagesPigeonUtils.wrapError(exception)

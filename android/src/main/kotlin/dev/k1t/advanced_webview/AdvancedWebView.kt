@@ -76,6 +76,8 @@ import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
+import java.util.regex.PatternSyntaxException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.math.roundToInt
@@ -125,6 +127,10 @@ class AdvancedWebView(
     private var fullscreen: Fullscreen? = null
     private val interceptSchemes = params.interceptSchemes.map { it.lowercase(Locale.ROOT) }.toSet()
     private val scriptHandlers = mutableListOf<ScriptHandler>()
+
+    /** Read on WebView's IO threads in `shouldInterceptRequest`, so it is replaced as a whole. */
+    @Volatile private var blockRules: List<BlockRule> = emptyList()
+    private var hideScriptHandler: ScriptHandler? = null
     private var isDestroyed = false
 
     /** Called after a page started or finished loading or its title changed, e.g. to refresh a toolbar. */
@@ -440,6 +446,94 @@ class AdvancedWebView(
             "User scripts need a WebView that supports DOCUMENT_START_SCRIPT"
         }
         scriptHandlers += WebViewCompat.addDocumentStartJavaScript(webView, script.wrapped(), setOf("*"))
+    }
+
+    private class BlockRule(val pattern: Pattern, val types: Set<ContentBlockerResourceTypeMessage>)
+
+    fun setContentBlockers(rules: List<ContentBlockerRuleMessage>) {
+        val blocking = mutableListOf<BlockRule>()
+        val hiding = JSONArray()
+        for (rule in rules) {
+            val pattern = try {
+                Pattern.compile(rule.urlFilter, Pattern.CASE_INSENSITIVE)
+            } catch (e: PatternSyntaxException) {
+                throw FlutterError("invalid-argument", "Invalid urlFilter '${rule.urlFilter}': ${e.description}", null)
+            }
+            when (rule.action) {
+                ContentBlockerActionMessage.BLOCK -> blocking += BlockRule(pattern, rule.resourceTypes.toSet())
+
+                ContentBlockerActionMessage.CSS_DISPLAY_NONE -> {
+                    val selector = rule.selector?.trim().orEmpty()
+                    if (selector.isEmpty()) throw FlutterError("invalid-argument", "A selector is required", null)
+                    hiding.put(JSONObject().put("url", rule.urlFilter).put("selector", selector))
+                }
+            }
+        }
+        if (hiding.length() > 0) {
+            if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+                throw FlutterError("unsupported", "Hiding elements needs DOCUMENT_START_SCRIPT support", null)
+            }
+        }
+        blockRules = blocking
+        hideScriptHandler?.remove()
+        hideScriptHandler = if (hiding.length() > 0) {
+            WebViewCompat.addDocumentStartJavaScript(webView, hideScript(hiding), setOf("*"))
+        } else {
+            null
+        }
+    }
+
+    /** One `<style>` rule per selector, so a selector the browser rejects cannot break the others. */
+    private fun hideScript(rules: JSONArray): String = """
+        (function() {
+          var rules = $rules;
+          var css = '';
+          for (var i = 0; i < rules.length; i++) {
+            var matches = false;
+            try { matches = new RegExp(rules[i].url, 'i').test(location.href); } catch (e) {}
+            if (matches) css += rules[i].selector + ' { display: none !important; }\n';
+          }
+          if (!css) return;
+          var style = document.createElement('style');
+          style.textContent = css;
+          (document.head || document.documentElement).appendChild(style);
+        })();
+    """.trimIndent()
+
+    private fun blockedResponse(request: WebResourceRequest): WebResourceResponse? {
+        val rules = blockRules
+        if (rules.isEmpty()) return null
+        val url = request.url.toString()
+        val type = request.resourceType()
+        val blocked = rules.any { rule ->
+            (rule.types.isEmpty() || type in rule.types) && rule.pattern.matcher(url).find()
+        }
+        return if (blocked) WebResourceResponse("text/plain", "UTF-8", ByteArrayInputStream(ByteArray(0))) else null
+    }
+
+    /** WebView does not report the resource type, so it is read from the request. */
+    private fun WebResourceRequest.resourceType(): ContentBlockerResourceTypeMessage {
+        if (isForMainFrame) return ContentBlockerResourceTypeMessage.DOCUMENT
+        val extension = url.lastPathSegment?.substringAfterLast('.', "")?.lowercase(Locale.ROOT).orEmpty()
+        val accept = requestHeaders.entries.firstOrNull { it.key.equals("Accept", ignoreCase = true) }
+            ?.value?.lowercase(Locale.ROOT).orEmpty()
+        return when {
+            extension in setOf("js", "mjs") -> ContentBlockerResourceTypeMessage.SCRIPT
+
+            extension == "css" || accept.startsWith("text/css") -> ContentBlockerResourceTypeMessage.STYLESHEET
+
+            extension in setOf("woff", "woff2", "ttf", "otf", "eot") -> ContentBlockerResourceTypeMessage.FONT
+
+            extension in setOf("mp4", "webm", "ogg", "mp3", "m4a", "wav", "m3u8", "mpd") ->
+                ContentBlockerResourceTypeMessage.MEDIA
+
+            extension in setOf("png", "jpg", "jpeg", "gif", "webp", "svg", "ico", "avif", "bmp") ||
+                accept.startsWith("image/") -> ContentBlockerResourceTypeMessage.IMAGE
+
+            accept.startsWith("text/html") -> ContentBlockerResourceTypeMessage.DOCUMENT
+
+            else -> ContentBlockerResourceTypeMessage.OTHER
+        }
     }
 
     fun removeAllUserScripts() {
@@ -773,7 +867,7 @@ class AdvancedWebView(
         // Serves Flutter assets loaded with `loadFlutterAsset` and the schemes Dart asked for; every other
         // request goes to the network.
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
-            assetLoader.shouldInterceptRequest(request.url) ?: interceptRequest(request)
+            blockedResponse(request) ?: assetLoader.shouldInterceptRequest(request.url) ?: interceptRequest(request)
 
         override fun onReceivedHttpError(
             view: WebView,

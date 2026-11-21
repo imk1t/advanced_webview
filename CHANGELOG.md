@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.setContentBlockers`, `ContentBlockerRule`, `ContentBlockerAction` and `ContentBlockerResourceType`: block requests whose URL matches a regular expression (optionally only for some resource types) and hide page elements with a CSS selector. iOS compiles the rules to a `WKContentRuleList`; Android cancels requests in `shouldInterceptRequest`, infers the resource type from the request, and hides elements with a document-start script.
+
 ## 0.12.0 - 2026-11-19
 
 - Add `AdvancedWebViewController.onPrintRequest`: be told when a page calls `window.print()`. The plugin replaces `window.print` in every frame and reports the call, and you decide what to do, for example call `printPage`. It needs a WebView that supports JavaScript handlers.

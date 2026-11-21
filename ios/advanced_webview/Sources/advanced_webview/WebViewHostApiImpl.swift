@@ -173,6 +173,11 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     store.proxyConfigurations = [proxy]
   }
 
+  @MainActor
+  func setContentBlockers(webViewId: Int64, rules: [ContentBlockerRuleMessage]) async throws {
+    try await registry.get(webViewId).setContentBlockers(rules)
+  }
+
   func getCertificate(webViewId: Int64) throws -> CertificateMessage? {
     guard let trust = try registry.get(webViewId).webView.serverTrust,
       let chain = SecTrustCopyCertificateChain(trust) as? [SecCertificate],

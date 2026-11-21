@@ -1254,6 +1254,56 @@ void main() {
     });
   });
 
+  group('content blockers', () {
+    test('forwards block and hide rules', () async {
+      final controller = createController();
+      await controller.setContentBlockers(const [
+        ContentBlockerRule.block(
+          urlFilter: r'ads\.example\.com',
+          resourceTypes: [ContentBlockerResourceType.script],
+        ),
+        ContentBlockerRule.hideElements(selector: ' .banner '),
+      ]);
+
+      final sent = hostApi.contentBlockers;
+      expect(sent, hasLength(2));
+      expect(sent[0].action, ContentBlockerActionMessage.block);
+      expect(sent[0].resourceTypes, [ContentBlockerResourceTypeMessage.script]);
+      expect(sent[0].selector, isNull);
+      expect(sent[1].action, ContentBlockerActionMessage.cssDisplayNone);
+      expect(sent[1].selector, '.banner');
+      expect(sent[1].urlFilter, '.*');
+    });
+
+    test('an empty list removes the rules', () async {
+      final controller = createController();
+      await controller.setContentBlockers(const [
+        ContentBlockerRule.block(urlFilter: 'x'),
+      ]);
+      await controller.setContentBlockers(const []);
+
+      expect(hostApi.contentBlockers, isEmpty);
+    });
+
+    test('rejects an invalid pattern or an empty selector', () {
+      final controller = createController();
+
+      expect(
+        () => controller.setContentBlockers(const [
+          ContentBlockerRule.block(urlFilter: '('),
+        ]),
+        throwsArgumentError,
+      );
+      expect(
+        () => controller.setContentBlockers(const [
+          ContentBlockerRule.hideElements(selector: ' '),
+        ]),
+        throwsArgumentError,
+      );
+      expect(hostApi.contentBlockers, isEmpty);
+    });
+  });
+
   group('proxy', () {
     test('forwards the configuration', () async {
       final controller = createController();

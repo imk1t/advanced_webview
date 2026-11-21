@@ -103,6 +103,7 @@ JS からは両OS共通で `window.Bridge.postMessage('hello')` を呼べます�
 - ズーム操作（`zoomBy`、`setZoomScale`）
 - プロキシサーバーの指定と除外ドメイン（`setProxy`）
 - 閲覧履歴の取得と複数件の移動、シングルページアプリ向けの URL 変更コールバック
+- コンテンツブロッカー: URL パターンによるリクエストのブロックと要素の非表示（`setContentBlockers`）
 - PDF の書き出し、ページ内検索のヒット数のライブ通知、ファビコン URL と全画面動画のコールバック
 - 印刷要求のコールバック（`onPrintRequest`）、選択テキストの取得（`getSelectedText`）
 - コールバック: ページ開始・完了、進捗、タイトル変更、読み込みエラー

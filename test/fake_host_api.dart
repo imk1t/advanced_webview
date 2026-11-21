@@ -103,6 +103,17 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     calls.add('setProxy ${config?.host}');
   }
 
+  List<ContentBlockerRuleMessage> contentBlockers = [];
+
+  @override
+  Future<void> setContentBlockers(
+    int webViewId,
+    List<ContentBlockerRuleMessage> rules,
+  ) async {
+    contentBlockers = rules;
+    calls.add('setContentBlockers ${rules.length}');
+  }
+
   CertificateMessage? certificate;
 
   @override

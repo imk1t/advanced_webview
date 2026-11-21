@@ -144,6 +144,9 @@ class WebViewHostApiImpl(
         }
     }
 
+    override suspend fun setContentBlockers(webViewId: Long, rules: List<ContentBlockerRuleMessage>) =
+        registry.get(webViewId).setContentBlockers(rules)
+
     override fun getCertificate(webViewId: Long): CertificateMessage? {
         val certificate = registry.get(webViewId).webView.certificate ?: return null
         val der = x509Of(certificate)?.encoded ?: return null

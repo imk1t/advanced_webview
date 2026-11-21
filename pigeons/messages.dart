@@ -23,6 +23,18 @@ import 'package:pigeon/pigeon.dart';
 // ---------------------------------------------------------------------------
 enum ProxyTypeMessage { http, socks5 }
 
+enum ContentBlockerActionMessage { block, cssDisplayNone }
+
+enum ContentBlockerResourceTypeMessage {
+  document,
+  image,
+  stylesheet,
+  script,
+  font,
+  media,
+  other,
+}
+
 enum CacheModeMessage { normal, preferCache, cacheOnly, noCache }
 
 enum ContentModeMessage { recommended, mobile, desktop }
@@ -539,6 +551,25 @@ class ProxyConfigMessage {
   List<String> bypassHosts;
 }
 
+class ContentBlockerRuleMessage {
+  ContentBlockerRuleMessage({
+    required this.urlFilter,
+    required this.resourceTypes,
+    required this.action,
+    this.selector,
+  });
+
+  /// Regular expression matched against the URL (case insensitive).
+  String urlFilter;
+
+  /// Resource types the rule applies to; empty means all of them.
+  List<ContentBlockerResourceTypeMessage> resourceTypes;
+  ContentBlockerActionMessage action;
+
+  /// CSS selector of the elements to hide, for `cssDisplayNone`.
+  String? selector;
+}
+
 class CertificateMessage {
   CertificateMessage({required this.der, required this.sha256});
 
@@ -704,6 +735,13 @@ abstract class AdvancedWebViewHostApi {
   /// proxy override and with `invalid-argument` for a bad host or port.
   @async
   void setProxy(int webViewId, ProxyConfigMessage? config);
+
+  /// Replaces the content blocking rules; an empty list removes them. Fails with
+  /// `invalid-argument` when a rule's `urlFilter` or `selector` is invalid, and
+  /// with `unsupported` when `cssDisplayNone` needs a WebView feature that is
+  /// missing.
+  @async
+  void setContentBlockers(int webViewId, List<ContentBlockerRuleMessage> rules);
 
   /// The certificate the server of the current page presented, or null when
   /// the page was not loaded over HTTPS.

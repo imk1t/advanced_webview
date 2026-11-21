@@ -131,6 +131,8 @@
       "WKNavigationActionPolicy": "https://developer.apple.com/documentation/webkit/wknavigationactionpolicy",
       "WKUserContentController": "https://developer.apple.com/documentation/webkit/wkusercontentcontroller",
       "WKUserScript": "https://developer.apple.com/documentation/webkit/wkuserscript",
+      "WKContentRuleList": "https://developer.apple.com/documentation/webkit/wkcontentrulelist",
+      "WKContentRuleListStore": "https://developer.apple.com/documentation/webkit/wkcontentruleliststore",
       "WKScriptMessageHandler": "https://developer.apple.com/documentation/webkit/wkscriptmessagehandler",
       "WKNavigationResponse": "https://developer.apple.com/documentation/webkit/wknavigationresponse",
       "SecTrustEvaluateWithError": "https://developer.apple.com/documentation/security/sectrustevaluatewitherror(_:_:)",
@@ -3050,6 +3052,86 @@
       "ios": {
         "status": "supported",
         "apis": ["WKUIDelegate"]
+      }
+    },
+    {
+      "dart": "AdvancedWebViewController.setContentBlockers",
+      "group": "loading",
+      "summary": {
+        "en": "Blocks requests whose URL matches a pattern, or hides page elements, with a list of rules.",
+        "ja": "ルールのリストで、URL がパターンに一致するリクエストをブロックしたり、ページの要素を非表示にしたりします。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": [
+          "WebViewClient.shouldInterceptRequest(WebView, WebResourceRequest)",
+          "WebViewCompat.addDocumentStartJavaScript(WebView, String, Set)",
+          "ScriptHandler.remove()"
+        ],
+        "note": {
+          "en": "A blocked request gets an empty response. The resource type is inferred from the request headers and file extension. Hiding elements injects a style sheet from a document-start script and needs WebViewFeature.DOCUMENT_START_SCRIPT.",
+          "ja": "ブロックしたリクエストには空のレスポンスを返します。リソース種別はリクエストヘッダとファイル拡張子から推測します。要素の非表示は document-start スクリプトでスタイルシートを挿入するため、WebViewFeature.DOCUMENT_START_SCRIPT が必要です。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "WKContentRuleListStore.compileContentRuleList(forIdentifier:encodedContentRuleList:)",
+          "WKUserContentController.add(_:)",
+          "WKUserContentController.remove(_:)"
+        ],
+        "note": {
+          "en": "The rules are compiled to a WKContentRuleList (block and css-display-none actions) and applied to loads that start afterwards. The URL pattern must use the regular expression subset WebKit supports.",
+          "ja": "ルールを WKContentRuleList（block と css-display-none のアクション）にコンパイルし、その後に始まる読み込みに適用します。URL パターンは WebKit がサポートする正規表現の範囲で書く必要があります。"
+        }
+      }
+    },
+    {
+      "dart": "ContentBlockerRule",
+      "group": "loading",
+      "summary": {
+        "en": "One blocking or element-hiding rule: a URL pattern, optional resource types and a CSS selector.",
+        "ja": "ブロックまたは要素非表示の 1 つのルールで、URL パターン、任意のリソース種別、CSS セレクタを持ちます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebResourceRequest"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKContentRuleList"]
+      }
+    },
+    {
+      "dart": "ContentBlockerAction",
+      "group": "loading",
+      "summary": {
+        "en": "Whether a rule blocks requests or hides elements.",
+        "ja": "ルールがリクエストをブロックするか、要素を非表示にするかを表します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebViewClient.shouldInterceptRequest(WebView, WebResourceRequest)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKContentRuleList"]
+      }
+    },
+    {
+      "dart": "ContentBlockerResourceType",
+      "group": "loading",
+      "summary": {
+        "en": "The kind of resource a blocking rule applies to.",
+        "ja": "ブロックのルールが対象とするリソースの種類を表します。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebResourceRequest.getRequestHeaders()", "WebResourceRequest.isForMainFrame()"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKContentRuleList"]
       }
     },
     {
