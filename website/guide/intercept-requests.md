@@ -48,4 +48,33 @@ served from `app://host/` come back to the callback too. Request bodies are not 
 - **Cross-origin access.** A page on one origin that fetches from another needs the usual CORS
   headers in `InterceptResponse.headers` (for example `Access-Control-Allow-Origin`).
 
+## Block requests and hide elements
+
+`setContentBlockers` takes a list of rules. A blocking rule cancels requests whose URL matches a regular
+expression, optionally only for some resource types. A hiding rule sets `display: none` on elements that
+match a CSS selector, on pages whose URL matches.
+
+```dart
+await controller.setContentBlockers([
+  const ContentBlockerRule.block(urlFilter: r'ads\.example\.com'),
+  const ContentBlockerRule.block(
+    urlFilter: r'/tracker\.js',
+    resourceTypes: [ContentBlockerResourceType.script],
+  ),
+  const ContentBlockerRule.hideElements(selector: '.cookie-banner'),
+]);
+await controller.setContentBlockers(const []); // remove all rules
+```
+
+- Rules apply to loads that start after the call. Call it before `loadUrl`.
+- `urlFilter` is matched case-insensitively against the whole URL. iOS accepts the regular expression subset
+  WebKit supports (no look-around or back-references); stay within it so a rule behaves the same on both
+  platforms. An invalid pattern throws an `ArgumentError`, or a `PlatformException` with code
+  `invalid-argument` when only the native side rejects it.
+- On iOS a blocked request fails like any other load error. On Android it receives an empty response, so
+  it is not reported to `onWebResourceError`.
+- Android infers the resource type from the request headers and file extension, so an unusual resource can
+  count as `ContentBlockerResourceType.other`. Hiding elements on Android needs a WebView that supports
+  document-start scripts, like user scripts do.
+
 See the [API mapping](./api-mapping) for the native APIs behind it.

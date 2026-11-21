@@ -106,6 +106,7 @@ On both platforms, JavaScript can call `window.Bridge.postMessage('hello')`.
 - Pause and resume (`pause`, `resume`, Android `pauseTimers`)
 - Zoom control (`zoomBy`, `setZoomScale`)
 - Proxy server with bypass domains (`setProxy`)
+- Content blocker: block requests by URL pattern and hide elements (`setContentBlockers`)
 - PDF export, live find-in-page match count, favicon URL and fullscreen video callbacks
 - Print request callback (`onPrintRequest`), selected text (`getSelectedText`)
 - Callbacks: page started / finished, progress, title changed, load errors

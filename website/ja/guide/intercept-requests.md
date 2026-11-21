@@ -48,4 +48,33 @@ await controller.loadUrl('app://host/index.html');
 - **オリジン間アクセス。** あるオリジンのページが別のオリジンから取得する場合は、通常の CORS ヘッダ
   （例: `Access-Control-Allow-Origin`）を `InterceptResponse.headers` に付ける必要があります。
 
+## リクエストのブロックと要素の非表示
+
+`setContentBlockers` にルールのリストを渡します。ブロックのルールは、URL が正規表現に一致するリクエストを
+キャンセルします（リソース種別で絞り込むこともできます）。非表示のルールは、URL が一致するページで CSS セレクタに
+一致する要素を `display: none` にします。
+
+```dart
+await controller.setContentBlockers([
+  const ContentBlockerRule.block(urlFilter: r'ads\.example\.com'),
+  const ContentBlockerRule.block(
+    urlFilter: r'/tracker\.js',
+    resourceTypes: [ContentBlockerResourceType.script],
+  ),
+  const ContentBlockerRule.hideElements(selector: '.cookie-banner'),
+]);
+await controller.setContentBlockers(const []); // すべてのルールを外す
+```
+
+- ルールは呼び出しの後に始まる読み込みに適用されます。`loadUrl` の前に呼んでください。
+- `urlFilter` は URL 全体に対して大文字小文字を区別せずに照合されます。iOS は WebKit がサポートする正規表現の範囲
+  （先読みや後方参照は不可）のみ受け付けるため、両方のプラットフォームで同じ動きにするにはその範囲で書いてください。
+  不正なパターンは `ArgumentError` を投げます。ネイティブ側だけが拒否した場合は `invalid-argument` の
+  `PlatformException` になります。
+- iOS ではブロックされたリクエストは通常の読み込みエラーと同じように失敗します。Android では空のレスポンスが返るため、
+  `onWebResourceError` には通知されません。
+- Android はリソース種別をリクエストヘッダとファイル拡張子から推測するため、珍しいリソースは
+  `ContentBlockerResourceType.other` になることがあります。Android で要素を非表示にするには、ユーザースクリプトと同じく
+  document-start スクリプトに対応した WebView が必要です。
+
 背後のネイティブ API は [API 対応表](./api-mapping) を参照してください。

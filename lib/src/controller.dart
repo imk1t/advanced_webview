@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 
 import 'certificate.dart';
 import 'console_message.dart';
+import 'content_blocker.dart';
 import 'cookie.dart';
 import 'download.dart';
 import 'find.dart';
@@ -623,6 +624,50 @@ class AdvancedWebViewController {
               ),
       ),
     );
+  }
+
+  /// Replaces the content blocking rules; an empty list removes them. Use it
+  /// to block ads, trackers or any URL, or to hide page elements.
+  ///
+  /// Rules apply to requests and pages loaded after the call. A URL that
+  /// matches a blocking rule fails to load without reaching the network.
+  /// [ContentBlockerRule.urlFilter] must be a valid regular expression and a
+  /// hiding rule needs a non-empty selector, otherwise this throws an
+  /// [ArgumentError] before native is called.
+  ///
+  /// Android: requests are cancelled in `WebViewClient.shouldInterceptRequest`
+  /// (the resource type is inferred from the request) and hidden elements get a
+  /// style sheet from a document-start script (needs `DOCUMENT_START_SCRIPT`
+  /// support). iOS: the rules are compiled to a `WKContentRuleList`.
+  Future<void> setContentBlockers(List<ContentBlockerRule> rules) {
+    final messages = <ContentBlockerRuleMessage>[];
+    for (final rule in rules) {
+      try {
+        RegExp(rule.urlFilter);
+      } on FormatException catch (e) {
+        throw ArgumentError.value(rule.urlFilter, 'urlFilter', e.message);
+      }
+      if (rule.action == ContentBlockerAction.cssDisplayNone &&
+          (rule.selector ?? '').trim().isEmpty) {
+        throw ArgumentError.value(
+          rule.selector,
+          'selector',
+          'must not be empty',
+        );
+      }
+      messages.add(
+        ContentBlockerRuleMessage(
+          urlFilter: rule.urlFilter,
+          resourceTypes: [
+            for (final type in rule.resourceTypes)
+              ContentBlockerResourceTypeMessage.values.byName(type.name),
+          ],
+          action: ContentBlockerActionMessage.values.byName(rule.action.name),
+          selector: rule.selector?.trim(),
+        ),
+      );
+    }
+    return _call(() => _hostApi.setContentBlockers(webViewId, messages));
   }
 
   /// The certificate the server presented for the current page, or `null`

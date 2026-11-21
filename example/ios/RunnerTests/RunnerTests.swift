@@ -76,6 +76,34 @@ final class RunnerTests: XCTestCase {
     }
   }
 
+  func testContentBlockersCompileAndAnInvalidFilterIsRejected() async throws {
+    let (hostApi, _, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+
+    try await hostApi.setContentBlockers(
+      webViewId: 1,
+      rules: [
+        ContentBlockerRuleMessage(
+          urlFilter: "ads\\.example\\.com", resourceTypes: [.script], action: .block,
+          selector: nil),
+        ContentBlockerRuleMessage(
+          urlFilter: ".*", resourceTypes: [], action: .cssDisplayNone, selector: ".banner"),
+      ])
+    try await hostApi.setContentBlockers(webViewId: 1, rules: [])
+
+    do {
+      try await hostApi.setContentBlockers(
+        webViewId: 1,
+        rules: [
+          ContentBlockerRuleMessage(
+            urlFilter: "(?=x)", resourceTypes: [], action: .block, selector: nil)
+        ])
+      XCTFail("expected invalid-argument")
+    } catch let error as PigeonError {
+      XCTAssertEqual(error.code, "invalid-argument")
+    }
+  }
+
   func testUnknownIdThrowsNotFound() {
     let (hostApi, _, _) = makeHostApi()
 

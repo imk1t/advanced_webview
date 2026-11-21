@@ -3,6 +3,7 @@ library;
 
 export 'src/certificate.dart';
 export 'src/console_message.dart';
+export 'src/content_blocker.dart';
 export 'src/controller.dart' show AdvancedWebViewController;
 export 'src/cookie.dart';
 export 'src/download.dart';

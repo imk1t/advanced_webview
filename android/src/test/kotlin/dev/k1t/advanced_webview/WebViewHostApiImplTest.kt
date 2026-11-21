@@ -408,6 +408,31 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun blockingRulesAreAcceptedAndAnInvalidPatternIsRejected() = runBlocking(Dispatchers.Unconfined) {
+        hostApi.create(params(webViewId = 1))
+
+        hostApi.setContentBlockers(
+            1,
+            listOf(
+                ContentBlockerRuleMessage(
+                    "ads\\.example\\.com",
+                    listOf(ContentBlockerResourceTypeMessage.SCRIPT),
+                    ContentBlockerActionMessage.BLOCK,
+                ),
+            ),
+        )
+        hostApi.setContentBlockers(1, emptyList())
+        val error = runCatching {
+            hostApi.setContentBlockers(
+                1,
+                listOf(ContentBlockerRuleMessage("(", emptyList(), ContentBlockerActionMessage.BLOCK)),
+            )
+        }.exceptionOrNull()
+
+        assertTrue(error is FlutterError && error.code == "invalid-argument")
+    }
+
+    @Test
     fun aPageWithoutTlsHasNoCertificate() {
         hostApi.create(params(webViewId = 1))
 

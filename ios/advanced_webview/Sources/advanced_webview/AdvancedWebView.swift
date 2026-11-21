@@ -452,6 +452,69 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
         source: script.source, injectionTime: time, forMainFrameOnly: script.mainFrameOnly))
   }
 
+  private var contentRuleList: WKContentRuleList?
+
+  /// Replaces the content rule list. WebKit applies it to loads that start afterwards.
+  @MainActor
+  func setContentBlockers(_ rules: [ContentBlockerRuleMessage]) async throws {
+    let controller = webView.configuration.userContentController
+    let store = WKContentRuleListStore.default()
+    let identifier = "advanced_webview.\(id)"
+    var entries: [[String: Any]] = []
+    for rule in rules {
+      var trigger: [String: Any] = ["url-filter": rule.urlFilter]
+      let types = rule.resourceTypes.flatMap(Self.contentRuleResourceTypes)
+      if !types.isEmpty { trigger["resource-type"] = types }
+      switch rule.action {
+      case .block:
+        entries.append(["trigger": trigger, "action": ["type": "block"]])
+      case .cssDisplayNone:
+        guard let selector = rule.selector?.trimmingCharacters(in: .whitespaces), !selector.isEmpty
+        else {
+          throw PigeonError(
+            code: "invalid-argument", message: "A selector is required", details: nil)
+        }
+        entries.append([
+          "trigger": trigger, "action": ["type": "css-display-none", "selector": selector],
+        ])
+      }
+    }
+    let list: WKContentRuleList?
+    if entries.isEmpty {
+      list = nil
+    } else {
+      let json = String(
+        decoding: try JSONSerialization.data(withJSONObject: entries), as: UTF8.self)
+      do {
+        list = try await store.compileContentRuleList(
+          forIdentifier: identifier, encodedContentRuleList: json)
+      } catch {
+        throw PigeonError(
+          code: "invalid-argument", message: "Invalid content blocker rules: \(error)", details: nil
+        )
+      }
+    }
+    if let old = contentRuleList { controller.remove(old) }
+    contentRuleList = list
+    if let list { controller.add(list) }
+    // The compiled list stays attached to the WebView; the stored copy is not needed.
+    try? await store.removeContentRuleList(forIdentifier: identifier)
+  }
+
+  private static func contentRuleResourceTypes(
+    _ type: ContentBlockerResourceTypeMessage
+  ) -> [String] {
+    switch type {
+    case .document: return ["document"]
+    case .image: return ["image", "svg-document"]
+    case .stylesheet: return ["style-sheet"]
+    case .script: return ["script"]
+    case .font: return ["font"]
+    case .media: return ["media"]
+    case .other: return ["fetch", "raw", "ping", "other"]
+    }
+  }
+
   /// Removes the scripts added by the app. WebKit has no way to remove a single
   /// script, so the JavaScript channel shims are registered again.
   func removeAllUserScripts() {
