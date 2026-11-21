@@ -24,6 +24,9 @@ await controller.dispose();
 await controller.loadUrl('https://example.com', headers: {'X-Token': 'abc'});
 await controller.loadHtmlString('<h1>Hello</h1>', baseUrl: 'https://example.com');
 
+// MIME タイプを指定したバイト列（画像、PDF、古いエンコーディングの HTML など）
+await controller.loadData(bytes, mimeType: 'application/pdf');
+
 // pubspec.yaml の `flutter: assets:` に宣言した Flutter アセット
 await controller.loadFlutterAsset('assets/web/index.html');
 
@@ -85,6 +88,8 @@ await controller.goBackOrForward(-2); // 2 件戻る。範囲外のときは無�
   `https://appassets.androidplatform.net/assets/flutter_assets/...` で配信し、`allowFileAccess` は不要です。
   存在しないアセットは 404 として読み込まれます（`onHttpError` を参照）。iOS はアプリバンドルのファイルを、
   そのフォルダへの読み取り権限付きで読み込み、存在しないアセットは `not-found` を投げます。
+- `loadData`: `encoding`（既定は `utf-8`）はテキストデータの文字セットです。`baseUrl` がないとページは
+  `about:blank` になり、ローカルやリモートのサブリソースを読み込めません。HTML 文字列には `loadHtmlString` を使ってください。
 - `loadFile`: Android は `AndroidWebViewSettings.allowFileAccess`（既定は無効）が必要で、無効の場合は
   `file-access-disabled` を投げます。iOS は存在しないファイルに `not-found` を投げます。
 - `loadRequest`: Android は POST の body を `application/x-www-form-urlencoded` で送り、POST にヘッダーを

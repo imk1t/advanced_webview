@@ -32,6 +32,24 @@ class FakeHostApi extends Fake implements AdvancedWebViewHostApi {
     String? baseUrl,
   ) async => calls.add('loadHtmlString($baseUrl)');
 
+  Uint8List? loadedData;
+  String? loadedMimeType;
+  String? loadedEncoding;
+
+  @override
+  Future<void> loadData(
+    int webViewId,
+    Uint8List data,
+    String mimeType,
+    String encoding,
+    String? baseUrl,
+  ) async {
+    loadedData = data;
+    loadedMimeType = mimeType;
+    loadedEncoding = encoding;
+    calls.add('loadData($baseUrl)');
+  }
+
   @override
   Future<void> loadRequest(
     int webViewId,

@@ -347,6 +347,23 @@ final class RunnerTests: XCTestCase {
   }
 
   @MainActor
+  func testLoadDataLoadsTheBytes() async throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    defer { hostApi.disposeAll() }
+    let webView = try registry.get(1).webView
+
+    try hostApi.loadData(
+      webViewId: 1, data: FlutterStandardTypedData(bytes: Data("<p id=x>é</p>".utf8)),
+      mimeType: "text/html", encoding: "utf-8", baseUrl: "https://example.com/")
+    for _ in 0..<100 where webView.isLoading || webView.url == nil {
+      try await Task.sleep(nanoseconds: 50_000_000)
+    }
+
+    let text = try await webView.evaluateJavaScript("document.getElementById('x').textContent")
+    XCTAssertEqual(text as? String, "é")
+  }
+
   func testFindTextReportsWhetherTheQueryWasFound() async throws {
     let (hostApi, registry, _) = makeHostApi()
     try hostApi.create(params: params(webViewId: 1))

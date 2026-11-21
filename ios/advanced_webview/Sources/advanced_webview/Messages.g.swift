@@ -2215,6 +2215,9 @@ protocol AdvancedWebViewHostApi {
   func dispose(webViewId: Int64) throws
   func loadUrl(webViewId: Int64, url: String, headers: [String: String]) throws
   func loadHtmlString(webViewId: Int64, html: String, baseUrl: String?) throws
+  /// Loads raw `data` of the given `mimeType` and character `encoding`. A null
+  /// `baseUrl` means `about:blank`.
+  func loadData(webViewId: Int64, data: FlutterStandardTypedData, mimeType: String, encoding: String, baseUrl: String?) throws
   /// Loads `url` with an explicit method. A `body` is only sent with POST.
   func loadRequest(webViewId: Int64, url: String, method: HttpMethodMessage, headers: [String: String], body: FlutterStandardTypedData?) throws
   /// Loads a Flutter asset declared in the app's `pubspec.yaml`.
@@ -2388,6 +2391,27 @@ class AdvancedWebViewHostApiSetup {
       }
     } else {
       loadHtmlStringChannel.setMessageHandler(nil)
+    }
+    /// Loads raw `data` of the given `mimeType` and character `encoding`. A null
+    /// `baseUrl` means `about:blank`.
+    let loadDataChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadData\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      loadDataChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let webViewIdArg = args[0] as! Int64
+        let dataArg = args[1] as! FlutterStandardTypedData
+        let mimeTypeArg = args[2] as! String
+        let encodingArg = args[3] as! String
+        let baseUrlArg: String? = nilOrValue(args[4])
+        do {
+          try api.loadData(webViewId: webViewIdArg, data: dataArg, mimeType: mimeTypeArg, encoding: encodingArg, baseUrl: baseUrlArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      loadDataChannel.setMessageHandler(nil)
     }
     /// Loads `url` with an explicit method. A `body` is only sent with POST.
     let loadRequestChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadRequest\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)

@@ -648,6 +648,16 @@ abstract class AdvancedWebViewHostApi {
 
   void loadHtmlString(int webViewId, String html, String? baseUrl);
 
+  /// Loads raw `data` of the given `mimeType` and character `encoding`. A null
+  /// `baseUrl` means `about:blank`.
+  void loadData(
+    int webViewId,
+    Uint8List data,
+    String mimeType,
+    String encoding,
+    String? baseUrl,
+  );
+
   /// Loads `url` with an explicit method. A `body` is only sent with POST.
   void loadRequest(
     int webViewId,

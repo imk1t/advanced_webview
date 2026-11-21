@@ -60,6 +60,15 @@ final class WebViewHostApiImpl: AdvancedWebViewHostApi {
     try registry.get(webViewId).loadHTMLString(html, baseURL: baseUrl.flatMap(URL.init))
   }
 
+  func loadData(
+    webViewId: Int64, data: FlutterStandardTypedData, mimeType: String, encoding: String,
+    baseUrl: String?
+  ) throws {
+    try registry.get(webViewId).loadData(
+      data.data, mimeType: mimeType, encoding: encoding,
+      baseURL: baseUrl.flatMap(URL.init) ?? URL(string: "about:blank")!)
+  }
+
   func loadRequest(
     webViewId: Int64, url: String, method: HttpMethodMessage, headers: [String: String],
     body: FlutterStandardTypedData?

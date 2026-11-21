@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Add `AdvancedWebViewController.loadData`: load bytes of any MIME type and character encoding with an optional base URL, for example an image, a PDF or HTML in a legacy encoding.
+
 ## 0.12.0 - 2026-11-19
 
 - Add `AdvancedWebViewController.onPrintRequest`: be told when a page calls `window.print()`. The plugin replaces `window.print` in every frame and reports the call, and you decide what to do, for example call `printPage`. It needs a WebView that supports JavaScript handlers.

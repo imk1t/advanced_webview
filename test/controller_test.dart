@@ -1254,6 +1254,32 @@ void main() {
     });
   });
 
+  group('loadData', () {
+    test('forwards the bytes, type and encoding', () async {
+      final controller = createController();
+      await controller.loadData(
+        Uint8List.fromList([1, 2, 3]),
+        mimeType: 'application/pdf',
+        encoding: ' ',
+        baseUrl: 'https://example.com/',
+      );
+
+      expect(hostApi.loadedData, [1, 2, 3]);
+      expect(hostApi.loadedMimeType, 'application/pdf');
+      expect(hostApi.loadedEncoding, 'utf-8');
+      expect(hostApi.calls, contains('loadData(https://example.com/)'));
+    });
+
+    test('rejects an empty MIME type', () {
+      final controller = createController();
+
+      expect(
+        () => controller.loadData(Uint8List(0), mimeType: ' '),
+        throwsArgumentError,
+      );
+    });
+  });
+
   group('proxy', () {
     test('forwards the configuration', () async {
       final controller = createController();

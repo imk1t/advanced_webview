@@ -142,6 +142,19 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun loadDataSendsBase64WithTheCharset() {
+        hostApi.create(params(webViewId = 1))
+
+        hostApi.loadData(1, "<p>hi</p>".toByteArray(), "text/html", "utf-8", "https://example.com/")
+
+        val load = shadowOf(registry.get(1).webView).lastLoadDataWithBaseURL
+        assertEquals("https://example.com/", load.baseUrl)
+        assertEquals("PHA+aGk8L3A+", load.data)
+        assertEquals("text/html;charset=utf-8", load.mimeType)
+        assertEquals("base64", load.encoding)
+    }
+
+    @Test
     fun settingsAreAppliedAtCreationAndOnUpdate() {
         hostApi.create(
             params(webViewId = 1, settings = settings(javaScriptEnabled = false, userAgent = "ua-1")),
