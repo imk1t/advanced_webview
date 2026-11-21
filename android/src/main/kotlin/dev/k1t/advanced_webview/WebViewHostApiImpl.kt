@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.os.Build
+import android.util.Base64
 import androidx.webkit.ProxyConfig
 import androidx.webkit.ProxyController
 import androidx.webkit.WebViewFeature
@@ -50,6 +51,16 @@ class WebViewHostApiImpl(
 
     override fun loadHtmlString(webViewId: Long, html: String, baseUrl: String?) =
         registry.get(webViewId).webView.loadDataWithBaseURL(baseUrl, html, "text/html", "UTF-8", null)
+
+    // Base64 keeps binary data intact; the charset travels with the MIME type.
+    override fun loadData(webViewId: Long, data: ByteArray, mimeType: String, encoding: String, baseUrl: String?) =
+        registry.get(webViewId).webView.loadDataWithBaseURL(
+            baseUrl,
+            Base64.encodeToString(data, Base64.NO_WRAP),
+            "$mimeType;charset=$encoding",
+            "base64",
+            null,
+        )
 
     override fun loadRequest(
         webViewId: Long,

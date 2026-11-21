@@ -304,6 +304,30 @@
       }
     },
     {
+      "dart": "AdvancedWebViewController.loadData",
+      "group": "loading",
+      "summary": {
+        "en": "Loads bytes of any MIME type and character encoding, with an optional base URL.",
+        "ja": "任意の MIME タイプと文字エンコーディングのバイト列を読み込みます。base URL も指定できます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.loadDataWithBaseURL(String, String, String, String, String)"],
+        "note": {
+          "en": "The bytes are sent base64 encoded, with the character set appended to the MIME type.",
+          "ja": "バイト列は base64 で渡し、文字セットは MIME タイプに付けます。"
+        }
+      },
+      "ios": {
+        "status": "supported",
+        "apis": ["WKWebView.load(_:mimeType:characterEncodingName:baseURL:)"],
+        "note": {
+          "en": "A missing base URL becomes about:blank, because WebKit requires one.",
+          "ja": "WebKit が base URL を必須とするため、指定がなければ about:blank にします。"
+        }
+      }
+    },
+    {
       "dart": "AdvancedWebViewController.loadRequest",
       "group": "loading",
       "summary": {

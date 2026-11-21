@@ -25,6 +25,9 @@ await controller.dispose();
 await controller.loadUrl('https://example.com', headers: {'X-Token': 'abc'});
 await controller.loadHtmlString('<h1>Hello</h1>', baseUrl: 'https://example.com');
 
+// Raw bytes with a MIME type (an image, a PDF, or HTML in a legacy encoding)
+await controller.loadData(bytes, mimeType: 'application/pdf');
+
 // A Flutter asset from `flutter: assets:` in pubspec.yaml
 await controller.loadFlutterAsset('assets/web/index.html');
 
@@ -86,6 +89,8 @@ Platform notes for the three newer loaders:
   `https://appassets.androidplatform.net/assets/flutter_assets/...` and does not need
   `allowFileAccess`; a missing asset loads as a 404 (see `onHttpError`). iOS loads the file from the
   app bundle with read access to its folder and throws `not-found` for a missing asset.
+- `loadData`: `encoding` (default `utf-8`) is the character set of text data. Without a `baseUrl` the page is
+  `about:blank` and cannot load local or remote sub-resources. Use `loadHtmlString` for an HTML string.
 - `loadFile`: Android needs `AndroidWebViewSettings.allowFileAccess` (off by default), otherwise it
   throws `file-access-disabled`. iOS throws `not-found` for a missing file.
 - `loadRequest`: Android sends a POST body as `application/x-www-form-urlencoded` and cannot add

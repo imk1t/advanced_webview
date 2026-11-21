@@ -2424,6 +2424,11 @@ interface AdvancedWebViewHostApi {
   fun dispose(webViewId: Long)
   fun loadUrl(webViewId: Long, url: String, headers: Map<String, String>)
   fun loadHtmlString(webViewId: Long, html: String, baseUrl: String?)
+  /**
+   * Loads raw `data` of the given `mimeType` and character `encoding`. A null
+   * `baseUrl` means `about:blank`.
+   */
+  fun loadData(webViewId: Long, data: ByteArray, mimeType: String, encoding: String, baseUrl: String?)
   /** Loads `url` with an explicit method. A `body` is only sent with POST. */
   fun loadRequest(webViewId: Long, url: String, method: HttpMethodMessage, headers: Map<String, String>, body: ByteArray?)
   /** Loads a Flutter asset declared in the app's `pubspec.yaml`. */
@@ -2630,6 +2635,28 @@ interface AdvancedWebViewHostApi {
             val baseUrlArg = args[2] as String?
             val wrapped: List<Any?> = try {
               api.loadHtmlString(webViewIdArg, htmlArg, baseUrlArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.advanced_webview.AdvancedWebViewHostApi.loadData$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val webViewIdArg = args[0] as Long
+            val dataArg = args[1] as ByteArray
+            val mimeTypeArg = args[2] as String
+            val encodingArg = args[3] as String
+            val baseUrlArg = args[4] as String?
+            val wrapped: List<Any?> = try {
+              api.loadData(webViewIdArg, dataArg, mimeTypeArg, encodingArg, baseUrlArg)
               listOf(null)
             } catch (exception: Throwable) {
               MessagesPigeonUtils.wrapError(exception)

@@ -460,6 +460,36 @@ class AdvancedWebViewController {
   Future<void> loadHtmlString(String html, {String? baseUrl}) =>
       _call(() => _hostApi.loadHtmlString(webViewId, html, baseUrl));
 
+  /// Loads [data] as a page of the given [mimeType], for content that is not a
+  /// string: an image, a PDF, or HTML in a legacy [encoding].
+  ///
+  /// [encoding] names the character set of text data (`utf-8` by default) and
+  /// is ignored for binary types. Relative links resolve against [baseUrl];
+  /// without one the page is `about:blank`, so it cannot load local or remote
+  /// sub-resources. For HTML that is already a string use [loadHtmlString].
+  ///
+  /// Android: `WebView.loadDataWithBaseURL` with base64 data. iOS:
+  /// `WKWebView.load(_:mimeType:characterEncodingName:baseURL:)`.
+  Future<void> loadData(
+    Uint8List data, {
+    String mimeType = 'text/html',
+    String encoding = 'utf-8',
+    String? baseUrl,
+  }) {
+    if (mimeType.trim().isEmpty) {
+      throw ArgumentError.value(mimeType, 'mimeType', 'must not be empty');
+    }
+    return _call(
+      () => _hostApi.loadData(
+        webViewId,
+        data,
+        mimeType.trim(),
+        encoding.trim().isEmpty ? 'utf-8' : encoding.trim(),
+        baseUrl,
+      ),
+    );
+  }
+
   /// Loads [url] with the given [method].
   ///
   /// A [body] is only allowed with [WebViewHttpMethod.post]. On Android a POST

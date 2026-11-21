@@ -320,6 +320,12 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     webView.loadHTMLString(html, baseURL: baseURL)
   }
 
+  /// Loads raw data, like `loadHTMLString`, without telling the navigation delegate.
+  func loadData(_ data: Data, mimeType: String, encoding: String, baseURL: URL) {
+    pendingAppInitiatedURL = baseURL.absoluteString
+    webView.load(data, mimeType: mimeType, characterEncodingName: encoding, baseURL: baseURL)
+  }
+
   /// WKWebView must be used on the main thread. Without `@MainActor` this
   /// `async` function runs on the global executor, calls WKWebView off the
   /// main thread and can hang.
