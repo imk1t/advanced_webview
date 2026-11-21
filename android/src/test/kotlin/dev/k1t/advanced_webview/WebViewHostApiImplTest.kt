@@ -142,6 +142,16 @@ class WebViewHostApiImplTest {
     }
 
     @Test
+    fun backgroundColorOverridesTheTransparentFlag() {
+        hostApi.create(params(webViewId = 1, settings = settings(transparentBackground = true)))
+        val webView = registry.get(1).webView
+
+        hostApi.updateSettings(1, settings(backgroundColor = 0x80112233L))
+
+        assertEquals(0x80112233.toInt(), shadowOf(webView).backgroundColor)
+    }
+
+    @Test
     fun settingsAreAppliedAtCreationAndOnUpdate() {
         hostApi.create(
             params(webViewId = 1, settings = settings(javaScriptEnabled = false, userAgent = "ua-1")),
@@ -1085,6 +1095,7 @@ class WebViewHostApiImplTest {
         builtInZoomControls: Boolean = true,
         displayZoomControls: Boolean = false,
         transparentBackground: Boolean = false,
+        backgroundColor: Long? = null,
         userAgent: String? = null,
         passkeysEnabled: Boolean = false,
         inspectable: Boolean = false,
@@ -1111,6 +1122,7 @@ class WebViewHostApiImplTest {
         builtInZoomControls = builtInZoomControls,
         displayZoomControls = displayZoomControls,
         transparentBackground = transparentBackground,
+        backgroundColor = backgroundColor,
         passkeysEnabled = passkeysEnabled,
         allowsBackForwardNavigationGestures = false,
         inspectable = inspectable,

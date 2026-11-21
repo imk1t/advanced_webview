@@ -76,6 +76,21 @@ final class RunnerTests: XCTestCase {
     }
   }
 
+  func testBackgroundColorOverridesTheTransparentFlag() throws {
+    let (hostApi, registry, _) = makeHostApi()
+    try hostApi.create(params: params(webViewId: 1))
+    defer { hostApi.disposeAll() }
+
+    try hostApi.updateSettings(
+      webViewId: 1, settings: settings(transparentBackground: true, backgroundColor: 0xFF11_2233))
+    let webView = try registry.get(1).webView
+
+    XCTAssertTrue(webView.isOpaque)
+    var red: CGFloat = 0
+    webView.backgroundColor?.getRed(&red, green: nil, blue: nil, alpha: nil)
+    XCTAssertEqual(red, 0x11 / 255, accuracy: 0.01)
+  }
+
   func testUnknownIdThrowsNotFound() {
     let (hostApi, _, _) = makeHostApi()
 
@@ -779,6 +794,7 @@ final class RunnerTests: XCTestCase {
     mediaPlaybackRequiresUserGesture: Bool = true,
     allowsInlineMediaPlayback: Bool = false,
     transparentBackground: Bool = false,
+    backgroundColor: Int64? = nil,
     allowsBackForwardNavigationGestures: Bool = false,
     inspectable: Bool = false,
     textZoom: Int = 100,
@@ -811,6 +827,7 @@ final class RunnerTests: XCTestCase {
       builtInZoomControls: true,
       displayZoomControls: false,
       transparentBackground: transparentBackground,
+      backgroundColor: backgroundColor,
       passkeysEnabled: false,
       allowsBackForwardNavigationGestures: allowsBackForwardNavigationGestures,
       inspectable: inspectable,
