@@ -458,7 +458,9 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
   @MainActor
   func setContentBlockers(_ rules: [ContentBlockerRuleMessage]) async throws {
     let controller = webView.configuration.userContentController
-    let store = WKContentRuleListStore.default()
+    guard let store = WKContentRuleListStore.default() else {
+      throw PigeonError(code: "unsupported", message: "No content rule list store", details: nil)
+    }
     let identifier = "advanced_webview.\(id)"
     var entries: [[String: Any]] = []
     for rule in rules {
