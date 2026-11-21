@@ -148,9 +148,18 @@ final class AdvancedWebView: NSObject, FlutterPlatformView {
     webView.configuration.preferences.minimumFontSize =
       settings.minimumFontSize.map { CGFloat($0) } ?? 0
     webView.customUserAgent = settings.userAgent
-    webView.isOpaque = !settings.transparentBackground
-    webView.backgroundColor = settings.transparentBackground ? .clear : .white
-    webView.scrollView.backgroundColor = webView.backgroundColor
+    let background: UIColor
+    if let argb = settings.backgroundColor {
+      background = UIColor(
+        red: CGFloat((argb >> 16) & 0xFF) / 255, green: CGFloat((argb >> 8) & 0xFF) / 255,
+        blue: CGFloat(argb & 0xFF) / 255, alpha: CGFloat((argb >> 24) & 0xFF) / 255)
+    } else {
+      background = settings.transparentBackground ? .clear : .white
+    }
+    webView.isOpaque = background.cgColor.alpha >= 1
+    webView.backgroundColor = background
+    webView.scrollView.backgroundColor = background
+    if settings.backgroundColor != nil { webView.underPageBackgroundColor = background }
   }
 
   @objc private func handleRefresh() {

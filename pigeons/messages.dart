@@ -40,6 +40,7 @@ class WebViewSettingsMessage {
     required this.builtInZoomControls,
     required this.displayZoomControls,
     required this.transparentBackground,
+    this.backgroundColor,
     required this.passkeysEnabled,
     required this.allowsBackForwardNavigationGestures,
     required this.inspectable,
@@ -81,6 +82,10 @@ class WebViewSettingsMessage {
   /// Android only. Ignored on iOS.
   bool displayZoomControls;
   bool transparentBackground;
+
+  /// ARGB color of the WebView behind the page; null keeps the default (white,
+  /// or clear when `transparentBackground` is set).
+  int? backgroundColor;
 
   /// Android only. Ignored on iOS, where WebAuthn is governed by entitlements.
   bool passkeysEnabled;

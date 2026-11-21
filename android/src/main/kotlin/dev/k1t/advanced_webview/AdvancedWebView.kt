@@ -273,7 +273,10 @@ class AdvancedWebView(
         WebView.setWebContentsDebuggingEnabled(settings.inspectable)
         container.isEnabled = settings.pullToRefreshEnabled
         if (!settings.pullToRefreshEnabled) container.isRefreshing = false
-        webView.setBackgroundColor(if (settings.transparentBackground) Color.TRANSPARENT else Color.WHITE)
+        webView.setBackgroundColor(
+            settings.backgroundColor?.toInt()
+                ?: if (settings.transparentBackground) Color.TRANSPARENT else Color.WHITE,
+        )
     }
 
     /** Back/forward list and scroll position as a marshalled [Bundle], or null while the list is empty. */

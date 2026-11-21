@@ -28,6 +28,7 @@ const WebViewSettings(
 | `javaScriptEnabled` | `true` | Yes | Yes |
 | `mediaPlaybackRequiresUserGesture` | `true` | Yes | Creation only |
 | `transparentBackground` | `false` | Yes | Yes |
+| `backgroundColor` | `null` | Yes | Yes |
 | `inspectable` | `false` | Yes (process-wide) | Yes |
 | `textZoom` | `100` | Text only | Whole page |
 | `cacheMode` | `normal` | Yes | `loadUrl` only |

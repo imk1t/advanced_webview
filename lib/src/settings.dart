@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import 'package:flutter/foundation.dart';
 
 import 'platform/messages.g.dart';
@@ -339,6 +341,7 @@ class WebViewSettings {
     this.javaScriptEnabled = true,
     this.mediaPlaybackRequiresUserGesture = true,
     this.transparentBackground = false,
+    this.backgroundColor,
     this.inspectable = false,
     this.textZoom = 100,
     this.cacheMode = WebViewCacheMode.normal,
@@ -362,6 +365,18 @@ class WebViewSettings {
   final bool mediaPlaybackRequiresUserGesture;
 
   final bool transparentBackground;
+
+  /// The color of the WebView behind the page, shown where the page is
+  /// transparent and before it has loaded. Its alpha is respected, so a
+  /// color with alpha `0` is the same as [transparentBackground]. When set,
+  /// it takes precedence over [transparentBackground]; `null` (the default)
+  /// leaves white, or clear when [transparentBackground] is `true`.
+  ///
+  /// Android: `WebView.setBackgroundColor`. iOS: `UIView.backgroundColor`
+  /// and `isOpaque` of the `WKWebView` and its scroll view, plus
+  /// `WKWebView.underPageBackgroundColor` (iOS 15 and later) for the area
+  /// revealed by overscroll.
+  final Color? backgroundColor;
 
   /// Allows the page to be inspected with Safari Web Inspector (iOS) or
   /// `chrome://inspect` (Android).
@@ -422,6 +437,7 @@ class WebViewSettings {
     bool? javaScriptEnabled,
     bool? mediaPlaybackRequiresUserGesture,
     bool? transparentBackground,
+    Color? backgroundColor,
     bool? inspectable,
     int? textZoom,
     WebViewCacheMode? cacheMode,
@@ -441,6 +457,7 @@ class WebViewSettings {
           this.mediaPlaybackRequiresUserGesture,
       transparentBackground:
           transparentBackground ?? this.transparentBackground,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
       inspectable: inspectable ?? this.inspectable,
       textZoom: textZoom ?? this.textZoom,
       cacheMode: cacheMode ?? this.cacheMode,
@@ -467,6 +484,7 @@ class WebViewSettings {
     builtInZoomControls: android.builtInZoomControls,
     displayZoomControls: android.displayZoomControls,
     transparentBackground: transparentBackground,
+    backgroundColor: backgroundColor?.toARGB32(),
     passkeysEnabled: android.passkeysEnabled,
     allowsBackForwardNavigationGestures:
         ios.allowsBackForwardNavigationGestures,
@@ -504,6 +522,7 @@ class WebViewSettings {
       other.mediaPlaybackRequiresUserGesture ==
           mediaPlaybackRequiresUserGesture &&
       other.transparentBackground == transparentBackground &&
+      other.backgroundColor == backgroundColor &&
       other.inspectable == inspectable &&
       other.textZoom == textZoom &&
       other.cacheMode == cacheMode &&
@@ -522,6 +541,7 @@ class WebViewSettings {
     javaScriptEnabled,
     mediaPlaybackRequiresUserGesture,
     transparentBackground,
+    backgroundColor,
     inspectable,
     textZoom,
     cacheMode,

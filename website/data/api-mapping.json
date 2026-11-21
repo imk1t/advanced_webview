@@ -2082,6 +2082,31 @@
       }
     },
     {
+      "dart": "WebViewSettings.backgroundColor",
+      "group": "settings",
+      "summary": {
+        "en": "Sets the WebView background color, alpha included. It takes precedence over transparentBackground.",
+        "ja": "WebView の背景色をアルファ値も含めて設定します。transparentBackground より優先されます。"
+      },
+      "android": {
+        "status": "supported",
+        "apis": ["WebView.setBackgroundColor(int)"]
+      },
+      "ios": {
+        "status": "supported",
+        "apis": [
+          "UIView.isOpaque",
+          "UIView.backgroundColor",
+          "UIScrollView.backgroundColor",
+          "WKWebView.underPageBackgroundColor"
+        ],
+        "note": {
+          "en": "underPageBackgroundColor needs iOS 15 or later and is only set when a color is given.",
+          "ja": "underPageBackgroundColor は iOS 15 以降が必要で、色を指定したときだけ設定します。"
+        }
+      }
+    },
+    {
       "dart": "AndroidWebViewSettings.passkeysEnabled",
       "group": "settings",
       "summary": {

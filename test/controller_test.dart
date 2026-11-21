@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui' show Color;
 
 import 'package:advanced_webview/advanced_webview.dart';
 import 'package:advanced_webview/src/platform/event_dispatcher.dart';
@@ -1251,6 +1252,28 @@ void main() {
       await controller.clearSelection();
 
       expect(hostApi.calls.single, contains('removeAllRanges'));
+    });
+  });
+
+  group('background color', () {
+    test('settings send the color as ARGB', () {
+      const settings = WebViewSettings(backgroundColor: Color(0x80112233));
+
+      expect(settings.toMessage().backgroundColor, 0x80112233);
+      expect(const WebViewSettings().toMessage().backgroundColor, isNull);
+    });
+
+    test('copyWith and equality include the color', () {
+      const red = Color(0xFFFF0000);
+
+      expect(
+        const WebViewSettings().copyWith(backgroundColor: red),
+        const WebViewSettings(backgroundColor: red),
+      );
+      expect(
+        const WebViewSettings(backgroundColor: red),
+        isNot(const WebViewSettings()),
+      );
     });
   });
 
