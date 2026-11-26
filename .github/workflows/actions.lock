@@ -9,7 +9,7 @@ workflows:
     '.github/workflows/ci.yaml':
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-java@v6.2.0'
-        - 'jdx/mise-action@v5.2.9'
+        - 'jdx/mise-action@v5.3.0'
         - 'reactivecircus/android-emulator-runner@v2.38.0'
     '.github/workflows/docs.yml':
         - 'actions/checkout@v7.0.1'
@@ -19,7 +19,7 @@ workflows:
     '.github/workflows/publish.yml':
         - 'actions/checkout@v7.0.1'
         - 'dart-lang/setup-dart@v1.8.2'
-        - 'jdx/mise-action@v5.2.9'
+        - 'jdx/mise-action@v5.3.0'
     '.github/workflows/verify-lockfile.yml':
         - 'actions/checkout@v7.0.1'
 dependencies:
@@ -67,9 +67,9 @@ dependencies:
         repo_id: 1423830292
         uses:
             - 'actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97'
-    'jdx/mise-action@v5.2.9':
-        ref: 'v5.2.9'
-        commit: 'sha1-236a21c3b91f5db6d4e174b348674a0f0caac06d'
+    'jdx/mise-action@v5.3.0':
+        ref: 'v5.3.0'
+        commit: 'sha1-924e7c586e33d7d4bae9c14e26c5d22e2beb6e78'
         owner_id: 216188
         repo_id: 738284564
     'oven-sh/setup-bun@v2.2.0':
